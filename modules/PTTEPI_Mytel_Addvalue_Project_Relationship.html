@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PTTEPI Myanmar Telecommunications Project - Business Models</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.2em;
+        }
+        h2 {
+            color: #34495e;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        .overview-box {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 5px solid #3498db;
+        }
+        .company-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .company-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: transform 0.3s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .company-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        .company-card h3 {
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+        .company-card p {
+            color: #7f8c8d;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+        .solution-container {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 30px 0;
+            border: 2px solid #e9ecef;
+        }
+        .solution-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .flow-diagram {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .flow-box {
+            display: inline-block;
+            padding: 15px 25px;
+            background: #3498db;
+            color: white;
+            border-radius: 8px;
+            margin: 10px;
+            font-weight: bold;
+            position: relative;
+        }
+        .flow-arrow {
+            font-size: 2em;
+            color: #3498db;
+            margin: 0 10px;
+            vertical-align: middle;
+        }
+        .payment-flow {
+            background: #2ecc71;
+        }
+        .equipment-flow {
+            background: #e74c3c;
+        }
+        .service-flow {
+            background: #f39c12;
+        }
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .pros, .cons {
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .pros {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+        }
+        .cons {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+        }
+        .pros h4, .cons h4 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .pros h4 {
+            color: #155724;
+        }
+        .cons h4 {
+            color: #721c24;
+        }
+        ul {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        li {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .comparison-table th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        .comparison-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .comparison-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        .recommendation-box {
+            background: linear-gradient(135deg, #56ab2f, #a8e063);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        .recommendation-box h3 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+        .key-points {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .key-points strong {
+            color: #856404;
+        }
+        .timeline {
+            background: #e8f4f8;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+            color: #7f8c8d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛰️ PTTEPI Myanmar Telecommunications Project</h1>
+        <div class="subtitle">Business Model Comparison & Recommendations</div>
+
+        <div class="overview-box">
+            <strong>Project Background:</strong> PTTEPI Myanmar requires reliable offshore telecommunications infrastructure for ZQP-ZWP4 operations. The solution involves licensed 7-8GHz Ceragon IP-50CX systems with 5-year service model, replacing current problematic 5GHz unlicensed system.
+        </div>
+
+        <h2>📊 Project Stakeholders</h2>
+        <div class="company-grid">
+            <div class="company-card">
+                <h3>PTTEPI Myanmar</h3>
+                <p><strong>Role:</strong> End Customer</p>
+                <p>Oil & gas operator requiring telecommunications for offshore platforms (Zawtika & Yadana fields)</p>
+            </div>
+            <div class="company-card">
+                <h3>Mytel</h3>
+                <p><strong>Role:</strong> Licensed Operator</p>
+                <p>Myanmar telecom license holder, manages regulatory compliance & frequency licensing</p>
+            </div>
+            <div class="company-card">
+                <h3>Addvalue System</h3>
+                <p><strong>Role:</strong> Technical Partner</p>
+                <p>Thailand-based offshore telecom specialist, provides equipment & implementation</p>
+            </div>
+            <div class="company-card">
+                <h3>Ceragon Networks</h3>
+                <p><strong>Role:</strong> Equipment Supplier</p>
+                <p>Provides IP-50CX radio systems (ATEX Zone 2 certified)</p>
+            </div>
+        </div>
+
+        <div class="solution-container">
+            <div class="solution-header">
+                <h2 style="margin: 0; border: none;">💼 SOLUTION 1: Direct Sale Model</h2>
+                <p style="margin: 5px 0;">Addvalue sells equipment & services to Mytel → Mytel rents to PTTEPI</p>
+            </div>
+            
+            <div class="flow-diagram">
+                <div style="margin: 20px 0;">
+                    <span class="flow-box equipment-flow">Ceragon Equipment</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="flow-box service-flow">Addvalue (Purchase)</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="flow-box service-flow">Mytel (Buy)</span>
+                    <span class="flow-arrow">→</span>
+                    <span class="flow-box payment-flow">PTTEPI (5yr Rental)</span>
+                </div>
+            </div>
+
+            <div class="key-points">
+                <strong>Key Terms:</strong>
+                <ul>
+                    <li>Addvalue delivers: EXW Bangkok (Ex-Works)</li>
+                    <li>Delivery time: 24 weeks after PO</li>
+                    <li>Mytel owns equipment after purchase</li>
+                    <li>PTTEPI pays fixed monthly rental to Mytel</li>
+                </ul>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>✅ Advantages</h4>
+                    <ul>
+                        <li>Clear ownership structure (Mytel owns assets)</li>
+                        <li>Mytel has full control over service delivery</li>
+                        <li>Simple commercial arrangement</li>
+                        <li>PTTEPI has single point of contact</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>⚠️ Considerations</h4>
+                    <ul>
+                        <li>Mytel needs upfront capital investment</li>
+                        <li>Asset depreciation risk for Mytel</li>
+                        <li>Mytel bears technology obsolescence risk</li>
+                        <li>Higher initial cost for Mytel</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="solution-container">
+            <div class="solution-header">
+                <h2 style="margin: 0; border: none;">🤝 SOLUTION 2: Investment Partnership Model</h2>
+                <p style="margin: 5px 0;">Addvalue invests equipment → Mytel operates → Revenue sharing</p>
+            </div>
+            
+            <div class="flow-diagram">
+                <div style="margin: 20px 0;">
+                    <div style="margin-bottom: 20px;">
+                        <strong>Equipment Flow:</strong><br>
+                        <span class="flow-box equipment-flow">Addvalue Invests</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-box service-flow">Mytel Operates</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-box">PTTEPI Uses</span>
+                    </div>
+                    <div>
+                        <strong>Payment Flow:</strong><br>
+                        <span class="flow-box payment-flow">PTTEPI Pays</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-box payment-flow">Mytel (Commission)</span>
+                        <span class="flow-arrow">→</span>
+                        <span class="flow-box payment-flow">Addvalue (Revenue)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="key-points">
+                <strong>Key Terms:</strong>
+                <ul>
+                    <li>Addvalue retains equipment ownership</li>
+                    <li>Mytel operates under service agreement</li>
+                    <li>Revenue sharing model (to be negotiated)</li>
+                    <li>5-year rental contract with PTTEPI</li>
+                    <li>Similar to Thailand operator model</li>
+                </ul>
+            </div>
+
+            <div class="pros-cons">
+                <div class="pros">
+                    <h4>✅ Advantages</h4>
+                    <ul>
+                        <li>No upfront investment for Mytel</li>
+                        <li>Risk shared between partners</li>
+                        <li>Addvalue maintains technical control</li>
+                        <li>Proven model (used in Thailand)</li>
+                        <li>Better cash flow for Mytel</li>
+                    </ul>
+                </div>
+                <div class="cons">
+                    <h4>⚠️ Considerations</h4>
+                    <ul>
+                        <li>Complex revenue sharing arrangement</li>
+                        <li>Requires detailed partnership agreement</li>
+                        <li>Potential disputes over revenue split</li>
+                        <li>Addvalue bears investment risk</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <h2>📈 Comparison Table</h2>
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Aspect</th>
+                    <th>Solution 1: Direct Sale</th>
+                    <th>Solution 2: Investment Model</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Capital Required</strong></td>
+                    <td>High (Mytel purchases equipment)</td>
+                    <td>Low (Addvalue invests)</td>
+                </tr>
+                <tr>
+                    <td><strong>Equipment Ownership</strong></td>
+                    <td>Mytel</td>
+                    <td>Addvalue</td>
+                </tr>
+                <tr>
+                    <td><strong>Risk Distribution</strong></td>
+                    <td>Mainly on Mytel</td>
+                    <td>Shared between partners</td>
+                </tr>
+                <tr>
+                    <td><strong>Revenue Model</strong></td>
+                    <td>Full rental revenue to Mytel</td>
+                    <td>Revenue sharing</td>
+                </tr>
+                <tr>
+                    <td><strong>Maintenance Responsibility</strong></td>
+                    <td>Mytel (with Addvalue support)</td>
+                    <td>Addvalue (primary)</td>
+                </tr>
+                <tr>
+                    <td><strong>Commercial Simplicity</strong></td>
+                    <td>Simple</td>
+                    <td>Complex</td>
+                </tr>
+                <tr>
+                    <td><strong>Cash Flow Impact</strong></td>
+                    <td>Large initial outflow for Mytel</td>
+                    <td>Positive cash flow from start</td>
+                </tr>
+                <tr>
+                    <td><strong>Thailand Market Practice</strong></td>
+                    <td>Less common</td>
+                    <td>Standard practice</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="recommendation-box">
+            <h3>📌 Recommended Approach</h3>
+            <p style="font-size: 1.2em; margin: 15px 0;">
+                <strong>Consider Solution 2 (Investment Model)</strong> as it aligns with regional best practices, 
+                minimizes Mytel's capital exposure, and leverages Addvalue's technical expertise while maintaining 
+                Mytel's regulatory compliance role.
+            </p>
+        </div>
+
+        <h2>🎯 Key Discussion Points for Today's Meeting</h2>
+        <ol>
+            <li><strong>Revenue Sharing Percentage:</strong> Negotiate fair split (suggest 70/30 or 60/40)</li>
+            <li><strong>Service Level Agreement:</strong> Define 99.95% uptime guarantee</li>
+            <li><strong>Maintenance Terms:</strong> Clarify 24/7 support responsibilities</li>
+            <li><strong>Equipment End-of-Life:</strong> Plan for post-5-year scenarios</li>
+            <li><strong>Payment Terms:</strong> Monthly vs. quarterly payment schedules</li>
+            <li><strong>Force Majeure:</strong> Weather delays and offshore access issues</li>
+            <li><strong>Performance Penalties:</strong> SLA breach consequences</li>
+            <li><strong>Exclusivity:</strong> Addvalue as sole partner for PTTEPI offshore projects</li>
+        </ol>
+
+        <div class="timeline">
+            <h3>📅 Project Timeline</h3>
+            <ul>
+                <li><strong>Now:</strong> Finalize business model selection</li>
+                <li><strong>Week 1-2:</strong> Sign Service Agreement</li>
+                <li><strong>Week 3-4:</strong> Equipment order to Ceragon</li>
+                <li><strong>Week 4-28:</strong> Manufacturing & delivery (24 weeks)</li>
+                <li><strong>Week 29-30:</strong> Installation & commissioning</li>
+                <li><strong>Week 31:</strong> Service commencement</li>
+            </ul>
+        </div>
+
+        <div class="key-points">
+            <strong>⚡ Critical Success Factors:</strong>
+            <ul>
+                <li>Clear agreement on commercial terms today</li>
+                <li>Alignment on risk allocation between parties</li>
+                <li>Defined escalation procedures for technical issues</li>
+                <li>Regulatory compliance maintained by Mytel</li>
+                <li>Technical excellence delivered by Addvalue</li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            <p>Prepared for PTTEPI-Mytel-Addvalue Meeting</p>
+            <p>Reference: MOU (Mytel-Addvalue) | Draft Service Agreement Rev00 | Pre-FEED Study A0</p>
+        </div>
+    </div>
+</body>
+</html>

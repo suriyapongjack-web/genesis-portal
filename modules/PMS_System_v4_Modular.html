@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMS v4.0 | PJ25080493 | Modular System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #4f46e5;
+            --secondary: #7c3aed;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --border: #e5e7eb;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        /* Modal System */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            animation: fadeIn 0.3s;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s;
+        }
+        
+        .modal-header {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        .modal-body {
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .modal-footer {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        /* Navigation */
+        .navbar {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .nav-brand {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            padding: 8px 16px;
+            background: white;
+            color: var(--dark);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .nav-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+        
+        .nav-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .nav-divider {
+            width: 1px;
+            height: 24px;
+            background: var(--border);
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            padding: 0 20px;
+        }
+        
+        /* Module System */
+        .module {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            animation: fadeIn 0.3s;
+        }
+        
+        .module.active {
+            display: block;
+        }
+        
+        .module-header {
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .module-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+        
+        .module-subtitle {
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+        
+        /* Cards */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .card {
+            background: var(--light);
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+        
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .card-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+        
+        .card-label {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            margin: 16px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            background: var(--light);
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+        
+        tr:hover {
+            background: var(--light);
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 8px 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-1px);
+        }
+        
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+        
+        .btn-outline {
+            background: white;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Status Badges */
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-warning {
+            background: #fed7aa;
+            color: #92400e;
+        }
+        
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        /* File List */
+        .file-list {
+            display: grid;
+            gap: 8px;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            background: var(--light);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .file-item:hover {
+            background: white;
+            border-color: var(--primary);
+        }
+        
+        .file-name {
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .file-type {
+            padding: 2px 6px;
+            background: white;
+            color: var(--primary);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+        
+        .tab-btn {
+            padding: 8px 16px;
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: 20px;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 2px solid white;
+        }
+        
+        .timeline-content {
+            background: var(--light);
+            padding: 12px;
+            border-radius: 6px;
+        }
+        
+        .timeline-title {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+        
+        .timeline-meta {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-menu {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Modal System -->
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header" id="modalTitle">Information</div>
+            <div class="modal-body" id="modalBody">Content</div>
+            <div class="modal-footer">
+                <button class="btn btn-sm" onclick="PMS.modal.close()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span>📊</span>
+                <span>PMS v4.0 | PJ25080493</span>
+            </div>
+            <div class="nav-menu">
+                <button class="nav-btn active" data-module="dashboard">Dashboard</button>
+                <button class="nav-btn" data-module="directory">Directory</button>
+                <button class="nav-btn" data-module="summary">Summary</button>
+                <button class="nav-btn" data-module="financial">Financial</button>
+                <button class="nav-btn" data-module="timeline">Timeline</button>
+                <button class="nav-btn" data-module="contacts">Contacts</button>
+                <div class="nav-divider"></div>
+                <button class="nav-btn" onclick="PMS.actions.export()">📥 Export</button>
+                <button class="nav-btn" onclick="PMS.actions.print()">🖨️ Print</button>
+                <button class="nav-btn" onclick="PMS.actions.refresh()">🔄 Refresh</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Dashboard Module -->
+        <div id="dashboard" class="module active">
+            <div class="module-header">
+                <h1 class="module-title">Project Dashboard</h1>
+                <p class="module-subtitle">PTTEPI Myanmar Zawtika ZPQ-ZWP4 Telecommunications</p>
+            </div>
+            
+            <div class="card-grid" id="metricsGrid"></div>
+            
+            <h3 style="margin: 20px 0 12px; color: var(--dark);">Project Partners</h3>
+            <div class="table-container">
+                <table id="partnersTable"></table>
+            </div>
+        </div>
+
+        <!-- Directory Module -->
+        <div id="directory" class="module">
+            <div class="module-header">
+                <h1 class="module-title">Document Directory</h1>
+                <p class="module-subtitle">Complete document management system</p>
+            </div>
+            
+            <div id="directoryContent"></div>
+        </div>
+
+        <!-- Summary Module -->
+        <div id="summary" class="module">
+            <div class="module-header">
+                <h1 class="module-title">Project Summary</h1>
+                <p class="module-subtitle">Comprehensive overview and analysis</p>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="executive">Executive</button>
+                <button class="tab-btn" data-tab="technical">Technical</button>
+                <button class="tab-btn" data-tab="commercial">Commercial</button>
+                <button class="tab-btn" data-tab="risks">Risks</button>
+            </div>
+            
+            <div id="tab-executive" class="tab-content active"></div>
+            <div id="tab-technical" class="tab-content"></div>
+            <div id="tab-commercial" class="tab-content"></div>
+            <div id="tab-risks" class="tab-content"></div>
+        </div>
+
+        <!-- Financial Module -->
+        <div id="financial" class="module">
+            <div class="module-header">
+                <h1 class="module-title">Financial Analysis</h1>
+                <p class="module-subtitle">Complete cost and revenue model</p>
+            </div>
+            
+            <div id="financialContent"></div>
+        </div>
+
+        <!-- Timeline Module -->
+        <div id="timeline" class="module">
+            <div class="module-header">
+                <h1 class="module-title">Implementation Timeline</h1>
+                <p class="module-subtitle">24-week project schedule</p>
+            </div>
+            
+            <div id="timelineContent"></div>
+        </div>
+
+        <!-- Contacts Module -->
+        <div id="contacts" class="module">
+            <div class="module-header">
+                <h1 class="module-title">Project Contacts</h1>
+                <p class="module-subtitle">Key stakeholders and team members</p>
+            </div>
+            
+            <div id="contactsContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // PMS v4.0 - Modular Project Management System
+        const PMS = {
+            // Configuration
+            config: {
+                projectId: 'PJ25080493',
+                apiUrl: '/api/v1',  // Ready for backend integration
+                debug: false
+            },
+            
+            // Data Store (ready for database integration)
+            data: {
+                project: {
+                    id: 'PJ25080493',
+                    name: 'PTTEPI Myanmar Zawtika ZPQ-ZWP4',
+                    status: 'active',
+                    phase: 'implementation'
+                },
+                
+                metrics: [
+                    { id: 1, value: '$167,456', label: 'Total Investment', icon: '💰' },
+                    { id: 2, value: '$3,500', label: 'Monthly Revenue', icon: '📈' },
+                    { id: 3, value: '99.95%', label: 'SLA Guarantee', icon: '✅' },
+                    { id: 4, value: '24 Weeks', label: 'Delivery Time', icon: '📅' },
+                    { id: 5, value: '25.4%', label: 'ROI (5 Years)', icon: '📊' },
+                    { id: 6, value: 'Month 25', label: 'Break-even', icon: '🎯' }
+                ],
+                
+                partners: [
+                    {
+                        id: 1,
+                        name: 'PTTEP International',
+                        role: 'End User',
+                        status: 'Contract Ready',
+                        statusType: 'success',
+                        contact: 'Kitichai J.',
+                        details: 'Oil & Gas Platform Operations\nBudget: $5,000/month approved'
+                    },
+                    {
+                        id: 2,
+                        name: 'Mytel',
+                        role: 'Licensed Operator',
+                        status: 'MOU Signed',
+                        statusType: 'success',
+                        contact: 'Nay Lin Tun',
+                        details: 'Telecommunications License Provider\nRegulatory Compliance'
+                    },
+                    {
+                        id: 3,
+                        name: 'AddValue Systems',
+                        role: 'Technical Partner',
+                        status: 'Active',
+                        statusType: 'success',
+                        contact: 'Suriyapong Y.',
+                        details: '20+ years offshore telecom experience\nISO 9001:2015 certified'
+                    },
+                    {
+                        id: 4,
+                        name: 'Ceragon Networks',
+                        role: 'Equipment OEM',
+                        status: '24-Week Lead',
+                        statusType: 'warning',
+                        contact: 'Paul Lee',
+                        details: 'IP-50CX ATEX Zone 2 equipment\n18 months warranty'
+                    }
+                ],
+                
+                documents: [
+                    { category: 'Technical', files: [
+                        { name: 'Pre-FEED Study', type: 'PDF', size: '2.4MB', date: '2024-12-15' },
+                        { name: 'Ceragon IP-50CX Datasheet', type: 'PDF', size: '1.8MB', date: '2024-12-10' },
+                        { name: 'Link Budget Calculation', type: 'XLSX', size: '450KB', date: '2024-12-20' },
+                        { name: 'ATEX Certification', type: 'PDF', size: '3.2MB', date: '2024-11-28' }
+                    ]},
+                    { category: 'Financial', files: [
+                        { name: 'Cost Estimate Rev.4', type: 'XLSX', size: '780KB', date: '2024-12-22' },
+                        { name: 'Cost Analysis Simple', type: 'XLSX', size: '520KB', date: '2024-12-22' },
+                        { name: 'Interactive Calculator', type: 'HTML', size: '45KB', date: '2024-12-25' },
+                        { name: 'ROI Analysis', type: 'PDF', size: '1.2MB', date: '2024-12-18' }
+                    ]},
+                    { category: 'Commercial', files: [
+                        { name: 'Commercial Proposal', type: 'HTML', size: '68KB', date: '2024-12-24' },
+                        { name: 'Quotation 24-3018-3', type: 'PDF', size: '890KB', date: '2024-12-15' },
+                        { name: 'BOM Equipment List', type: 'XLSX', size: '125KB', date: '2024-12-20' },
+                        { name: 'Service Agreement Draft', type: 'PDF', size: '2.1MB', date: '2024-12-10' }
+                    ]},
+                    { category: 'Management', files: [
+                        { name: 'Risk Management Plan', type: 'HTML', size: '52KB', date: '2024-12-25' },
+                        { name: 'Project Workflow', type: 'HTML', size: '38KB', date: '2024-12-25' },
+                        { name: 'Implementation Timeline', type: 'HTML', size: '41KB', date: '2024-12-24' },
+                        { name: 'Contact Directory', type: 'XLSX', size: '95KB', date: '2024-12-22' }
+                    ]}
+                ],
+                
+                summaryData: {
+                    executive: {
+                        overview: 'Turnkey telecommunications link for offshore platform',
+                        distance: '30 km',
+                        spectrum: '7-8 GHz Licensed',
+                        capacity: '128 Mbps',
+                        contract: '5 Years'
+                    },
+                    technical: {
+                        radio: 'Ceragon IP-50CX 7GHz',
+                        antenna: '1.2m dish, 35.8 dBi',
+                        configuration: '1+0 with 2x2 MIMO',
+                        availability: '99.987% calculated'
+                    },
+                    commercial: {
+                        model: '5-year rental service',
+                        payment: '45 days from invoice',
+                        delivery: '24 weeks after PO',
+                        incoterm: 'EXW Bangkok'
+                    },
+                    risks: [
+                        { risk: 'Equipment Delivery', impact: 'High', mitigation: 'Early ordering' },
+                        { risk: 'Weather (Monsoon)', impact: 'Medium', mitigation: 'Schedule flexibility' },
+                        { risk: 'Technical Integration', impact: 'Low', mitigation: 'Proven technology' }
+                    ]
+                },
+                
+                financial: [
+                    { category: 'Equipment (Ceragon)', amount: 29688, percentage: 17.7 },
+                    { category: 'Implementation Services', amount: 56268, percentage: 33.6 },
+                    { category: '5-Year Maintenance', amount: 81500, percentage: 48.7 },
+                    { category: 'Total Project Cost', amount: 167456, percentage: 100 }
+                ],
+                
+                timeline: [
+                    { phase: 'Contract & Mobilization', weeks: 4, status: 'pending', start: '2025-02-01' },
+                    { phase: 'Equipment Procurement', weeks: 16, status: 'pending', start: '2025-03-01' },
+                    { phase: 'Site Preparation', weeks: 2, status: 'pending', start: '2025-06-15' },
+                    { phase: 'Installation', weeks: 2, status: 'pending', start: '2025-07-01' },
+                    { phase: 'Testing & Commissioning', weeks: 2, status: 'pending', start: '2025-07-15' }
+                ],
+                
+                contacts: [
+                    { org: 'PTTEP', name: 'Kitichai Jiracharoenvanit', position: 'Telecom Section Head', email: 'kitichai.j@pttep.com', phone: '+66-2-537-4000' },
+                    { org: 'Mytel', name: 'Nay Lin Tun', position: 'B2B Director', email: 'naylintun@mytel.com.mm', phone: '+95-9-123-4567' },
+                    { org: 'AddValue', name: 'Suriyapong Yoo-om-sin', position: 'Project Manager', email: 'suriyapong@addvaluesystem.com', phone: '+66-2-123-4567' },
+                    { org: 'Ceragon', name: 'Wai Ling Paul Lee', position: 'Regional Manager', email: 'wailingl@ceragon.com', phone: '+65-6789-0123' }
+                ]
+            },
+            
+            // Modal System (replaces alerts)
+            modal: {
+                show(title, content) {
+                    const overlay = document.getElementById('modalOverlay');
+                    const titleEl = document.getElementById('modalTitle');
+                    const bodyEl = document.getElementById('modalBody');
+                    
+                    titleEl.textContent = title;
+                    bodyEl.innerHTML = content;
+                    overlay.classList.add('active');
+                },
+                
+                close() {
+                    document.getElementById('modalOverlay').classList.remove('active');
+                }
+            },
+            
+            // Module System
+            modules: {
+                current: 'dashboard',
+                
+                switch(moduleName) {
+                    // Hide all modules
+                    document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+                    // Show selected module
+                    const module = document.getElementById(moduleName);
+                    if (module) {
+                        module.classList.add('active');
+                        this.current = moduleName;
+                        
+                        // Update nav buttons
+                        document.querySelectorAll('.nav-btn[data-module]').forEach(btn => {
+                            btn.classList.toggle('active', btn.dataset.module === moduleName);
+                        });
+                        
+                        // Load module data if needed
+                        this.loadModuleData(moduleName);
+                    }
+                },
+                
+                loadModuleData(moduleName) {
+                    // This is where API calls would happen in production
+                    console.log(`Loading data for module: ${moduleName}`);
+                }
+            },
+            
+            // Rendering Functions
+            render: {
+                dashboard() {
+                    // Render metrics
+                    const metricsGrid = document.getElementById('metricsGrid');
+                    metricsGrid.innerHTML = PMS.data.metrics.map(m => `
+                        <div class="card">
+                            <div class="card-value">${m.icon} ${m.value}</div>
+                            <div class="card-label">${m.label}</div>
+                        </div>
+                    `).join('');
+                    
+                    // Render partners table
+                    const partnersTable = document.getElementById('partnersTable');
+                    partnersTable.innerHTML = `
+                        <thead>
+                            <tr>
+                                <th>Organization</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Contact</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${PMS.data.partners.map(p => `
+                                <tr>
+                                    <td><strong>${p.name}</strong></td>
+                                    <td>${p.role}</td>
+                                    <td><span class="badge badge-${p.statusType}">${p.status}</span></td>
+                                    <td>${p.contact}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline" onclick="PMS.showPartnerDetails(${p.id})">
+                                            Details
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    `;
+                },
+                
+                directory() {
+                    const content = document.getElementById('directoryContent');
+                    content.innerHTML = PMS.data.documents.map(cat => `
+                        <div style="margin-bottom: 24px;">
+                            <h3 style="margin-bottom: 12px; color: var(--dark);">📁 ${cat.category}</h3>
+                            <div class="file-list">
+                                ${cat.files.map(f => `
+                                    <div class="file-item" onclick="PMS.openFile('${f.name}', '${f.type}')">
+                                        <div>
+                                            <div class="file-name">${f.name}</div>
+                                            <div style="font-size: 0.85rem; color: #6b7280; margin-top: 2px;">
+                                                ${f.size} • ${f.date}
+                                            </div>
+                                        </div>
+                                        <div class="file-type">${f.type}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('');
+                },
+                
+                summary() {
+                    const data = PMS.data.summaryData;
+                    
+                    // Executive tab
+                    document.getElementById('tab-executive').innerHTML = `
+                        <div class="card-grid">
+                            <div class="card">
+                                <div class="card-value">📍 ${data.executive.distance}</div>
+                                <div class="card-label">Link Distance</div>
+                            </div>
+                            <div class="card">
+                                <div class="card-value">📡 ${data.executive.spectrum}</div>
+                                <div class="card-label">Spectrum</div>
+                            </div>
+                            <div class="card">
+                                <div class="card-value">⚡ ${data.executive.capacity}</div>
+                                <div class="card-label">Max Capacity</div>
+                            </div>
+                            <div class="card">
+                                <div class="card-value">📝 ${data.executive.contract}</div>
+                                <div class="card-label">Contract Term</div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Technical tab
+                    document.getElementById('tab-technical').innerHTML = `
+                        <div class="table-container">
+                            <table>
+                                <tr><th>Component</th><th>Specification</th></tr>
+                                <tr><td>Radio Unit</td><td>${data.technical.radio}</td></tr>
+                                <tr><td>Antenna</td><td>${data.technical.antenna}</td></tr>
+                                <tr><td>Configuration</td><td>${data.technical.configuration}</td></tr>
+                                <tr><td>Availability</td><td>${data.technical.availability}</td></tr>
+                            </table>
+                        </div>
+                    `;
+                    
+                    // Commercial tab
+                    document.getElementById('tab-commercial').innerHTML = `
+                        <div class="table-container">
+                            <table>
+                                <tr><th>Term</th><th>Details</th></tr>
+                                <tr><td>Contract Model</td><td>${data.commercial.model}</td></tr>
+                                <tr><td>Payment Terms</td><td>${data.commercial.payment}</td></tr>
+                                <tr><td>Delivery</td><td>${data.commercial.delivery}</td></tr>
+                                <tr><td>Incoterm</td><td>${data.commercial.incoterm}</td></tr>
+                            </table>
+                        </div>
+                    `;
+                    
+                    // Risks tab
+                    document.getElementById('tab-risks').innerHTML = `
+                        <div class="table-container">
+                            <table>
+                                <tr><th>Risk</th><th>Impact</th><th>Mitigation</th></tr>
+                                ${data.risks.map(r => `
+                                    <tr>
+                                        <td>${r.risk}</td>
+                                        <td>
+                                            <span class="badge badge-${r.impact.toLowerCase() === 'high' ? 'danger' : 
+                                                r.impact.toLowerCase() === 'medium' ? 'warning' : 'success'}">
+                                                ${r.impact}
+                                            </span>
+                                        </td>
+                                        <td>${r.mitigation}</td>
+                                    </tr>
+                                `).join('')}
+                            </table>
+                        </div>
+                    `;
+                },
+                
+                financial() {
+                    const content = document.getElementById('financialContent');
+                    content.innerHTML = `
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>Amount (USD)</th>
+                                        <th>Percentage</th>
+                                        <th>Visual</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${PMS.data.financial.map(f => `
+                                        <tr ${f.category.includes('Total') ? 'style="font-weight: 600; background: var(--light);"' : ''}>
+                                            <td>${f.category}</td>
+                                            <td>$${f.amount.toLocaleString()}</td>
+                                            <td>${f.percentage}%</td>
+                                            <td>
+                                                <div style="width: 100px; height: 20px; background: var(--border); border-radius: 4px;">
+                                                    <div style="width: ${f.percentage}%; height: 100%; background: var(--primary); border-radius: 4px;"></div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                },
+                
+                timeline() {
+                    const content = document.getElementById('timelineContent');
+                    content.innerHTML = `
+                        <div class="timeline">
+                            ${PMS.data.timeline.map(t => `
+                                <div class="timeline-item">
+                                    <div class="timeline-content">
+                                        <div class="timeline-title">${t.phase}</div>
+                                        <div class="timeline-meta">
+                                            Duration: ${t.weeks} weeks • Start: ${t.start} • 
+                                            <span class="badge badge-warning">${t.status}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                },
+                
+                contacts() {
+                    const content = document.getElementById('contactsContent');
+                    content.innerHTML = `
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Organization</th>
+                                        <th>Name</th>
+                                        <th>Position</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${PMS.data.contacts.map(c => `
+                                        <tr>
+                                            <td><strong>${c.org}</strong></td>
+                                            <td>${c.name}</td>
+                                            <td>${c.position}</td>
+                                            <td><a href="mailto:${c.email}" style="color: var(--primary);">${c.email}</a></td>
+                                            <td>${c.phone}</td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                }
+            },
+            
+            // Action Functions
+            showPartnerDetails(partnerId) {
+                const partner = this.data.partners.find(p => p.id === partnerId);
+                if (partner) {
+                    this.modal.show(
+                        `${partner.name} - Details`,
+                        `<div style="line-height: 1.8;">
+                            <strong>Role:</strong> ${partner.role}<br>
+                            <strong>Status:</strong> ${partner.status}<br>
+                            <strong>Contact Person:</strong> ${partner.contact}<br>
+                            <strong>Details:</strong><br>
+                            ${partner.details.replace(/\n/g, '<br>')}
+                        </div>`
+                    );
+                }
+            },
+            
+            openFile(name, type) {
+                this.modal.show(
+                    `📄 ${name}`,
+                    `<div style="text-align: center; padding: 20px;">
+                        <div style="font-size: 3rem; margin-bottom: 20px;">📁</div>
+                        <p><strong>File Name:</strong> ${name}</p>
+                        <p><strong>Type:</strong> ${type}</p>
+                        <p style="color: #6b7280; margin-top: 20px;">
+                            In production, this would open the actual file.<br>
+                            Integration with document viewer is ready.
+                        </p>
+                    </div>`
+                );
+            },
+            
+            actions: {
+                export() {
+                    PMS.modal.show(
+                        '📥 Export Data',
+                        `<div>
+                            <p style="margin-bottom: 16px;">Select export format:</p>
+                            <div style="display: grid; gap: 8px;">
+                                <button class="btn btn-outline" onclick="PMS.modal.close()">📄 PDF Report</button>
+                                <button class="btn btn-outline" onclick="PMS.modal.close()">📊 Excel Workbook</button>
+                                <button class="btn btn-outline" onclick="PMS.modal.close()">📝 CSV Data</button>
+                                <button class="btn btn-outline" onclick="PMS.modal.close()">🔗 JSON API</button>
+                            </div>
+                        </div>`
+                    );
+                },
+                
+                print() {
+                    window.print();
+                },
+                
+                refresh() {
+                    PMS.modal.show(
+                        '🔄 Refresh Data',
+                        `<div style="text-align: center;">
+                            <p>Refreshing all data...</p>
+                            <p style="color: #6b7280; margin-top: 12px;">
+                                In production, this would sync with the database.
+                            </p>
+                        </div>`
+                    );
+                    setTimeout(() => {
+                        PMS.modal.close();
+                        PMS.init();
+                    }, 1500);
+                }
+            },
+            
+            // Initialize System
+            init() {
+                console.log('PMS v4.0 Initializing...');
+                
+                // Setup navigation
+                document.querySelectorAll('.nav-btn[data-module]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        this.modules.switch(e.target.dataset.module);
+                    });
+                });
+                
+                // Setup tabs
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const tab = e.target.dataset.tab;
+                        
+                        // Update tab buttons
+                        e.target.parentElement.querySelectorAll('.tab-btn').forEach(t => {
+                            t.classList.toggle('active', t.dataset.tab === tab);
+                        });
+                        
+                        // Update tab content
+                        document.querySelectorAll('.tab-content').forEach(content => {
+                            content.classList.toggle('active', content.id === `tab-${tab}`);
+                        });
+                    });
+                });
+                
+                // Close modal on overlay click
+                document.getElementById('modalOverlay').addEventListener('click', (e) => {
+                    if (e.target.id === 'modalOverlay') {
+                        this.modal.close();
+                    }
+                });
+                
+                // Render all modules
+                this.render.dashboard();
+                this.render.directory();
+                this.render.summary();
+                this.render.financial();
+                this.render.timeline();
+                this.render.contacts();
+                
+                console.log('PMS v4.0 Ready!');
+            }
+        };
+        
+        // Start application when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            PMS.init();
+        });
+    </script>
+</body>
+</html>

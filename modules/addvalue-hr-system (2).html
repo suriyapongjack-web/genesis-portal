@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Addvalue HR Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans Thai', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #764ba2;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: #6b7280;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #d1d5db;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            font-size: 24px;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: #6b7280;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-primary {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-warning {
+            background: #fed7aa;
+            color: #92400e;
+        }
+
+        .badge-danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .header-top {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .tabs {
+                overflow-x: auto;
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            .header-actions,
+            .btn,
+            .tabs,
+            .search-box {
+                display: none !important;
+            }
+
+            .card {
+                box-shadow: none;
+                border: 1px solid #d1d5db;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-top">
+                <div>
+                    <div class="logo">🏢 Addvalue HR Management System</div>
+                    <div style="font-size: 14px; color: #6b7280; margin-top: 5px;">ระบบบริหารจัดการทรัพยากรบุคคล</div>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="showModal('employeeModal')">➕ เพิ่มพนักงาน</button>
+                    <button class="btn btn-success" onclick="exportData()">📥 Export</button>
+                    <button class="btn btn-warning" onclick="document.getElementById('importFile').click()">📤 Import</button>
+                    <input type="file" id="importFile" style="display: none;" accept=".json" onchange="importData(event)">
+                </div>
+            </div>
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="dashboard">📊 Dashboard</button>
+                <button class="tab-btn" data-tab="employees">👥 พนักงาน</button>
+                <button class="tab-btn" data-tab="salary">💰 ประวัติเงินเดือน</button>
+                <button class="tab-btn" data-tab="departments">🏢 แผนก</button>
+                <button class="tab-btn" data-tab="reports">📈 รายงาน</button>
+            </div>
+        </header>
+
+        <!-- Dashboard Tab -->
+        <div class="tab-content active" id="dashboard">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">พนักงานทั้งหมด</div>
+                    <div class="stat-number" id="totalEmployees">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">เงินเดือนรวม/เดือน</div>
+                    <div class="stat-number" id="totalSalary">฿0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">เงินเดือนเฉลี่ย</div>
+                    <div class="stat-number" id="avgSalary">฿0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">เงินเดือนรวม/ปี</div>
+                    <div class="stat-number" id="yearlySalary">฿0</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Top 5 พนักงานเงินเดือนสูงสุด</h3>
+                <div id="topEmployees"></div>
+            </div>
+
+            <div class="card">
+                <h3>สรุปตามแผนก</h3>
+                <div id="departmentSummary"></div>
+            </div>
+        </div>
+
+        <!-- Employees Tab -->
+        <div class="tab-content" id="employees">
+            <div class="card">
+                <div class="search-box">
+                    <input type="text" class="search-input" id="searchInput" placeholder="🔍 ค้นหาพนักงาน..." onkeyup="searchEmployees()">
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>ชื่อ-นามสกุล</th>
+                            <th>ตำแหน่ง</th>
+                            <th>แผนก</th>
+                            <th>เงินเดือน</th>
+                            <th>อีเมล</th>
+                            <th>เบอร์โทร</th>
+                            <th>การจัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employeeTable">
+                        <!-- Employee rows will be added here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Salary History Tab -->
+        <div class="tab-content" id="salary">
+            <div class="card">
+                <h3>ประวัติการปรับเงินเดือน</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>พนักงาน</th>
+                            <th>เงินเดือนเดิม</th>
+                            <th>เงินเดือนใหม่</th>
+                            <th>% เปลี่ยนแปลง</th>
+                            <th>วันที่</th>
+                            <th>เหตุผล</th>
+                        </tr>
+                    </thead>
+                    <tbody id="salaryHistoryTable">
+                        <!-- Salary history rows will be added here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Departments Tab -->
+        <div class="tab-content" id="departments">
+            <div class="card">
+                <h3>สรุปข้อมูลตามแผนก</h3>
+                <div id="departmentDetails"></div>
+            </div>
+        </div>
+
+        <!-- Reports Tab -->
+        <div class="tab-content" id="reports">
+            <div class="card">
+                <h3>รายงาน Payroll</h3>
+                <button class="btn btn-primary" onclick="window.print()">🖨️ พิมพ์รายงาน</button>
+                <div id="payrollReport" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Employee Modal -->
+    <div class="modal" id="employeeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">เพิ่มพนักงาน</h2>
+                <button class="close-btn" onclick="closeModal('employeeModal')">×</button>
+            </div>
+            <form id="employeeForm" onsubmit="saveEmployee(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">ชื่อ-นามสกุล *</label>
+                        <input type="text" class="form-control" id="empName" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">ตำแหน่ง *</label>
+                        <input type="text" class="form-control" id="empPosition" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">แผนก *</label>
+                        <select class="form-control" id="empDepartment" required>
+                            <option value="">เลือกแผนก</option>
+                            <option value="Management">Management</option>
+                            <option value="Engineering">Engineering</option>
+                            <option value="Technical">Technical</option>
+                            <option value="Sales & Marketing">Sales & Marketing</option>
+                            <option value="Administration">Administration</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">เงินเดือน *</label>
+                        <input type="number" class="form-control" id="empSalary" required min="0">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">อีเมล</label>
+                        <input type="email" class="form-control" id="empEmail">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">เบอร์โทร</label>
+                        <input type="tel" class="form-control" id="empPhone">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">วันที่เริ่มงาน</label>
+                    <input type="date" class="form-control" id="empStartDate">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">หมายเหตุ</label>
+                    <textarea class="form-control" id="empNotes"></textarea>
+                </div>
+                <input type="hidden" id="empId">
+                <div class="action-buttons">
+                    <button type="button" class="btn btn-danger" onclick="closeModal('employeeModal')">ยกเลิก</button>
+                    <button type="submit" class="btn btn-primary">บันทึก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Database
+        let db = {
+            employees: [],
+            salaryHistory: [],
+            departments: ['Management', 'Engineering', 'Technical', 'Sales & Marketing', 'Administration']
+        };
+
+        // Initialize default employees
+        const defaultEmployees = [
+            { id: 1, name: 'ณัชชา ยอดอินทร์', position: 'เจ้าหน้าที่ธุรการโรงงานการบิน', department: 'Administration', salary: 14000, email: 'natcha@addvalue.co.th', phone: '081-234-5678', startDate: '2023-01-15', notes: 'พนักงานขยัน' },
+            { id: 2, name: 'Aurnchalee Meenak', position: 'Account Manager', department: 'Management', salary: 50000, email: 'aurnchalee@addvalue.co.th', phone: '082-345-6789', startDate: '2022-06-01', notes: '' },
+            { id: 3, name: 'Ratchaneekom Mo-on', position: 'Telecommunication Technician', department: 'Technical', salary: 24000, email: 'ratchaneekom@addvalue.co.th', phone: '083-456-7890', startDate: '2023-03-20', notes: '' },
+            { id: 4, name: 'Sakda Wongjam', position: 'Chief Engineer', department: 'Engineering', salary: 82000, email: 'sakda@addvalue.co.th', phone: '084-567-8901', startDate: '2020-02-10', notes: 'หัวหน้าทีม' },
+            { id: 5, name: 'Suriyapong Yoo-om-sin', position: 'Manager', department: 'Management', salary: 120000, email: 'suriyapong@addvalue.co.th', phone: '085-678-9012', startDate: '2019-08-15', notes: 'ผู้บริหาร' },
+            { id: 6, name: 'Suttirak Nunsong', position: 'Telecommunication Engineer', department: 'Engineering', salary: 33000, email: 'suttirak@addvalue.co.th', phone: '086-789-0123', startDate: '2022-11-01', notes: '' },
+            { id: 7, name: 'Wasupol Amonthat', position: 'Sales Manager', department: 'Sales & Marketing', salary: 18000, email: 'wasupol@addvalue.co.th', phone: '087-890-1234', startDate: '2023-05-10', notes: '' },
+            { id: 8, name: 'Yuttapong Eakimphon', position: 'Chief Technical', department: 'Technical', salary: 37000, email: 'yuttapong@addvalue.co.th', phone: '088-901-2345', startDate: '2021-09-01', notes: '' }
+        ];
+
+        const defaultSalaryHistory = [
+            { id: 1, employeeId: 1, oldSalary: 12000, newSalary: 14000, changeDate: '2024-01-01', reason: 'ปรับเงินเดือนประจำปี' },
+            { id: 2, employeeId: 2, oldSalary: 45000, newSalary: 50000, changeDate: '2024-03-01', reason: 'เลื่อนตำแหน่ง' },
+            { id: 3, employeeId: 3, oldSalary: 22000, newSalary: 24000, changeDate: '2024-01-01', reason: 'ปรับเงินเดือนประจำปี' },
+            { id: 4, employeeId: 4, oldSalary: 75000, newSalary: 82000, changeDate: '2024-06-01', reason: 'ผลงานดีเด่น' },
+            { id: 5, employeeId: 5, oldSalary: 100000, newSalary: 120000, changeDate: '2024-01-01', reason: 'เลื่อนตำแหน่ง' },
+            { id: 6, employeeId: 6, oldSalary: 30000, newSalary: 33000, changeDate: '2024-04-01', reason: 'ปรับเงินเดือนประจำปี' },
+            { id: 7, employeeId: 7, oldSalary: 15000, newSalary: 18000, changeDate: '2024-02-01', reason: 'ผ่านทดลองงาน' },
+            { id: 8, employeeId: 8, oldSalary: 35000, newSalary: 37000, changeDate: '2024-01-01', reason: 'ปรับเงินเดือนประจำปี' }
+        ];
+
+        // Load data from localStorage
+        function loadData() {
+            const saved = localStorage.getItem('addvalue_hr_database');
+            if (saved) {
+                db = JSON.parse(saved);
+            } else {
+                db.employees = defaultEmployees;
+                db.salaryHistory = defaultSalaryHistory;
+                saveData();
+            }
+            updateUI();
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('addvalue_hr_database', JSON.stringify(db));
+        }
+
+        // Update UI
+        function updateUI() {
+            updateDashboard();
+            updateEmployeeTable();
+            updateSalaryHistoryTable();
+            updateDepartments();
+            updateReports();
+        }
+
+        // Update dashboard
+        function updateDashboard() {
+            const totalEmployees = db.employees.length;
+            const totalSalary = db.employees.reduce((sum, emp) => sum + emp.salary, 0);
+            const avgSalary = totalEmployees > 0 ? Math.round(totalSalary / totalEmployees) : 0;
+
+            document.getElementById('totalEmployees').textContent = totalEmployees;
+            document.getElementById('totalSalary').textContent = '฿' + totalSalary.toLocaleString();
+            document.getElementById('avgSalary').textContent = '฿' + avgSalary.toLocaleString();
+            document.getElementById('yearlySalary').textContent = '฿' + (totalSalary * 12).toLocaleString();
+
+            // Top 5 employees
+            const topEmployees = [...db.employees]
+                .sort((a, b) => b.salary - a.salary)
+                .slice(0, 5)
+                .map((emp, index) => `
+                    <div style="padding: 10px; border-bottom: 1px solid #e5e7eb;">
+                        <strong>${index + 1}. ${emp.name}</strong> - ${emp.position}
+                        <div style="color: #667eea; font-weight: bold;">฿${emp.salary.toLocaleString()}</div>
+                    </div>
+                `).join('');
+            document.getElementById('topEmployees').innerHTML = topEmployees || '<div class="empty-state">ไม่มีข้อมูล</div>';
+
+            // Department summary
+            const deptSummary = {};
+            db.employees.forEach(emp => {
+                if (!deptSummary[emp.department]) {
+                    deptSummary[emp.department] = { count: 0, total: 0 };
+                }
+                deptSummary[emp.department].count++;
+                deptSummary[emp.department].total += emp.salary;
+            });
+
+            const deptHTML = Object.entries(deptSummary)
+                .map(([dept, data]) => `
+                    <div style="padding: 10px; border-bottom: 1px solid #e5e7eb;">
+                        <strong>${dept}</strong>
+                        <div>พนักงาน: ${data.count} คน | เงินเดือนรวม: ฿${data.total.toLocaleString()}</div>
+                    </div>
+                `).join('');
+            document.getElementById('departmentSummary').innerHTML = deptHTML || '<div class="empty-state">ไม่มีข้อมูล</div>';
+        }
+
+        // Update employee table
+        function updateEmployeeTable() {
+            const tbody = document.getElementById('employeeTable');
+            if (db.employees.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">ไม่มีข้อมูลพนักงาน</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = db.employees.map(emp => `
+                <tr>
+                    <td>${emp.id}</td>
+                    <td>${emp.name}</td>
+                    <td>${emp.position}</td>
+                    <td><span class="badge badge-primary">${emp.department}</span></td>
+                    <td style="font-weight: bold;">฿${emp.salary.toLocaleString()}</td>
+                    <td>${emp.email || '-'}</td>
+                    <td>${emp.phone || '-'}</td>
+                    <td>
+                        <button class="btn btn-warning" onclick="editEmployee(${emp.id})">แก้ไข</button>
+                        <button class="btn btn-danger" onclick="deleteEmployee(${emp.id})">ลบ</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Update salary history table
+        function updateSalaryHistoryTable() {
+            const tbody = document.getElementById('salaryHistoryTable');
+            if (db.salaryHistory.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">ไม่มีประวัติการปรับเงินเดือน</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = db.salaryHistory
+                .sort((a, b) => new Date(b.changeDate) - new Date(a.changeDate))
+                .map(history => {
+                    const emp = db.employees.find(e => e.id === history.employeeId);
+                    if (!emp) return '';
+                    
+                    const change = history.newSalary - history.oldSalary;
+                    const changePercent = ((change / history.oldSalary) * 100).toFixed(1);
+                    const badgeClass = change > 0 ? 'badge-success' : 'badge-danger';
+                    
+                    return `
+                        <tr>
+                            <td>${emp.name}</td>
+                            <td>฿${history.oldSalary.toLocaleString()}</td>
+                            <td>฿${history.newSalary.toLocaleString()}</td>
+                            <td><span class="badge ${badgeClass}">${change > 0 ? '+' : ''}${changePercent}%</span></td>
+                            <td>${formatDate(history.changeDate)}</td>
+                            <td>${history.reason || '-'}</td>
+                        </tr>
+                    `;
+                }).join('');
+        }
+
+        // Update departments
+        function updateDepartments() {
+            const deptDetails = document.getElementById('departmentDetails');
+            const deptData = {};
+
+            db.departments.forEach(dept => {
+                const employees = db.employees.filter(emp => emp.department === dept);
+                deptData[dept] = {
+                    count: employees.length,
+                    total: employees.reduce((sum, emp) => sum + emp.salary, 0),
+                    avg: employees.length > 0 ? Math.round(employees.reduce((sum, emp) => sum + emp.salary, 0) / employees.length) : 0,
+                    employees: employees
+                };
+            });
+
+            deptDetails.innerHTML = Object.entries(deptData).map(([dept, data]) => `
+                <div style="margin-bottom: 20px; padding: 15px; background: #f9fafb; border-radius: 5px;">
+                    <h4>${dept}</h4>
+                    <p>จำนวนพนักงาน: ${data.count} คน</p>
+                    <p>เงินเดือนรวม: ฿${data.total.toLocaleString()}</p>
+                    <p>เงินเดือนเฉลี่ย: ฿${data.avg.toLocaleString()}</p>
+                    ${data.employees.length > 0 ? `
+                        <details>
+                            <summary style="cursor: pointer;">ดูรายชื่อพนักงาน</summary>
+                            <ul style="margin-top: 10px;">
+                                ${data.employees.map(emp => `<li>${emp.name} - ${emp.position} (฿${emp.salary.toLocaleString()})</li>`).join('')}
+                            </ul>
+                        </details>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Update reports
+        function updateReports() {
+            const report = document.getElementById('payrollReport');
+            const totalSalary = db.employees.reduce((sum, emp) => sum + emp.salary, 0);
+
+            report.innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>พนักงาน</th>
+                            <th>ตำแหน่ง</th>
+                            <th>แผนก</th>
+                            <th>เงินเดือน/เดือน</th>
+                            <th>เงินเดือน/ปี</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${db.employees.map(emp => `
+                            <tr>
+                                <td>${emp.name}</td>
+                                <td>${emp.position}</td>
+                                <td>${emp.department}</td>
+                                <td>฿${emp.salary.toLocaleString()}</td>
+                                <td>฿${(emp.salary * 12).toLocaleString()}</td>
+                            </tr>
+                        `).join('')}
+                        <tr style="font-weight: bold; background: #f9fafb;">
+                            <td colspan="3">รวมทั้งหมด</td>
+                            <td>฿${totalSalary.toLocaleString()}</td>
+                            <td>฿${(totalSalary * 12).toLocaleString()}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // Search employees
+        function searchEmployees() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#employeeTable tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(search) ? '' : 'none';
+            });
+        }
+
+        // Show modal
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+        }
+
+        // Close modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+            document.getElementById('employeeForm').reset();
+            document.getElementById('empId').value = '';
+        }
+
+        // Save employee
+        function saveEmployee(event) {
+            event.preventDefault();
+
+            const empData = {
+                name: document.getElementById('empName').value,
+                position: document.getElementById('empPosition').value,
+                department: document.getElementById('empDepartment').value,
+                salary: parseInt(document.getElementById('empSalary').value),
+                email: document.getElementById('empEmail').value,
+                phone: document.getElementById('empPhone').value,
+                startDate: document.getElementById('empStartDate').value,
+                notes: document.getElementById('empNotes').value
+            };
+
+            const empId = document.getElementById('empId').value;
+            
+            if (empId) {
+                // Edit mode
+                const index = db.employees.findIndex(e => e.id == empId);
+                if (index !== -1) {
+                    const oldSalary = db.employees[index].salary;
+                    db.employees[index] = { ...db.employees[index], ...empData };
+                    
+                    // Add salary history if changed
+                    if (oldSalary !== empData.salary) {
+                        db.salaryHistory.push({
+                            id: Date.now(),
+                            employeeId: parseInt(empId),
+                            oldSalary: oldSalary,
+                            newSalary: empData.salary,
+                            changeDate: new Date().toISOString().split('T')[0],
+                            reason: 'แก้ไขข้อมูลพนักงาน'
+                        });
+                    }
+                }
+            } else {
+                // Add mode
+                empData.id = db.employees.length > 0 ? Math.max(...db.employees.map(e => e.id)) + 1 : 1;
+                db.employees.push(empData);
+            }
+
+            saveData();
+            updateUI();
+            closeModal('employeeModal');
+        }
+
+        // Edit employee
+        function editEmployee(id) {
+            const emp = db.employees.find(e => e.id === id);
+            if (!emp) return;
+
+            document.getElementById('modalTitle').textContent = 'แก้ไขข้อมูลพนักงาน';
+            document.getElementById('empId').value = emp.id;
+            document.getElementById('empName').value = emp.name;
+            document.getElementById('empPosition').value = emp.position;
+            document.getElementById('empDepartment').value = emp.department;
+            document.getElementById('empSalary').value = emp.salary;
+            document.getElementById('empEmail').value = emp.email || '';
+            document.getElementById('empPhone').value = emp.phone || '';
+            document.getElementById('empStartDate').value = emp.startDate || '';
+            document.getElementById('empNotes').value = emp.notes || '';
+
+            showModal('employeeModal');
+        }
+
+        // Delete employee
+        function deleteEmployee(id) {
+            if (!confirm('คุณแน่ใจหรือไม่ที่จะลบพนักงานนี้?')) return;
+
+            db.employees = db.employees.filter(e => e.id !== id);
+            saveData();
+            updateUI();
+        }
+
+        // Export data
+        function exportData() {
+            const dataStr = JSON.stringify(db, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hr_data_' + new Date().toISOString().split('T')[0] + '.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Import data
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    db = JSON.parse(e.target.result);
+                    saveData();
+                    updateUI();
+                    alert('นำเข้าข้อมูลสำเร็จ');
+                } catch (error) {
+                    alert('เกิดข้อผิดพลาดในการนำเข้าข้อมูล');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 
+                           'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+            return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear() + 543}`;
+        }
+
+        // Tab navigation
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                // Remove active from all tabs and contents
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active to clicked tab and corresponding content
+                this.classList.add('active');
+                document.getElementById(this.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Auto-save every 30 seconds
+        setInterval(() => {
+            saveData();
+            console.log('Auto-saved at', new Date().toLocaleTimeString());
+        }, 30000);
+
+        // Load data on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            loadData();
+        });
+    </script>
+</body>
+</html>

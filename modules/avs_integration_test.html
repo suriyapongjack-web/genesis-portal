@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AVS Integration Test - Service Catalog & Location Dashboard</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f5f5f5; }
+.header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    height: calc(100vh - 100px);
+    padding: 10px;
+}
+.frame-container {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+}
+.frame-header {
+    background: #4b5563;
+    color: white;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: bold;
+}
+iframe {
+    flex: 1;
+    width: 100%;
+    border: none;
+}
+.status-bar {
+    background: #1f2937;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.status-indicator {
+    width: 10px;
+    height: 10px;
+    background: #ef4444;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+}
+.status-indicator.connected {
+    background: #10b981;
+}
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+@media (max-width: 1024px) {
+    .container {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+    <h1>🔧 AVS Systems Integration Test</h1>
+    <p>Service Catalog v4.0 × Location Dashboard v4.0</p>
+</div>
+
+<div class="container">
+    <div class="frame-container">
+        <div class="frame-header">📋 AVS Service Catalog System</div>
+        <iframe id="catalog-frame" src="avs_service_catalog_system.html"></iframe>
+    </div>
+    
+    <div class="frame-container">
+        <div class="frame-header">📍 Location Dashboard</div>
+        <iframe id="dashboard-frame" src="location_dashboard_v4.html"></iframe>
+    </div>
+</div>
+
+<div class="status-bar">
+    <div class="status-item">
+        <span class="status-indicator" id="catalog-status"></span>
+        <span>Catalog: <span id="catalog-state">Loading...</span></span>
+    </div>
+    <div class="status-item">
+        <span class="status-indicator" id="dashboard-status"></span>
+        <span>Dashboard: <span id="dashboard-state">Loading...</span></span>
+    </div>
+    <div class="status-item">
+        <span class="status-indicator" id="integration-status"></span>
+        <span>Integration: <span id="integration-state">Initializing...</span></span>
+    </div>
+    <div class="status-item">
+        <span>Messages: <span id="message-count">0</span></span>
+    </div>
+</div>
+
+<script>
+// Integration Test Controller
+const IntegrationTest = {
+    messageCount: 0,
+    catalogReady: false,
+    dashboardReady: false,
+    
+    init: function() {
+        console.log('🚀 AVS Integration Test Started');
+        this.setupMessageBridge();
+        this.checkFramesLoaded();
+    },
+    
+    setupMessageBridge: function() {
+        window.addEventListener('message', (event) => {
+            // Log all messages
+            console.log('📨 Message received:', event.data);
+            this.messageCount++;
+            document.getElementById('message-count').textContent = this.messageCount;
+            
+            // Handle specific message types
+            if (event.data.type === 'AVS_MODULE_READY') {
+                this.handleModuleReady(event.data);
+            } else if (event.data.type === 'AVS_CATALOG_STATUS') {
+                this.handleCatalogStatus(event.data);
+            } else if (event.data.type === 'DASHBOARD_READY') {
+                this.handleDashboardReady(event.data);
+            } else if (event.data.type === 'LOCATION_SELECTED') {
+                this.bridgeLocationSelection(event.data);
+            }
+        });
+    },
+    
+    handleModuleReady: function(data) {
+        if (data.module === 'location-dashboard') {
+            this.dashboardReady = true;
+            document.getElementById('dashboard-status').classList.add('connected');
+            document.getElementById('dashboard-state').textContent = 'Connected';
+        }
+        this.checkIntegration();
+    },
+    
+    handleCatalogStatus: function(data) {
+        if (data.ready) {
+            this.catalogReady = true;
+            document.getElementById('catalog-status').classList.add('connected');
+            document.getElementById('catalog-state').textContent = 'Connected';
+        }
+        this.checkIntegration();
+    },
+    
+    handleDashboardReady: function(data) {
+        this.dashboardReady = true;
+        document.getElementById('dashboard-status').classList.add('connected');
+        document.getElementById('dashboard-state').textContent = 'Connected';
+        this.checkIntegration();
+    },
+    
+    bridgeLocationSelection: function(data) {
+        // Forward location selection from Dashboard to Catalog
+        const catalogFrame = document.getElementById('catalog-frame');
+        if (catalogFrame && catalogFrame.contentWindow) {
+            catalogFrame.contentWindow.postMessage(data, '*');
+            console.log('🔄 Forwarded location selection to Catalog:', data);
+        }
+    },
+    
+    checkIntegration: function() {
+        if (this.catalogReady && this.dashboardReady) {
+            document.getElementById('integration-status').classList.add('connected');
+            document.getElementById('integration-state').textContent = 'Active';
+            console.log('✅ Integration successful!');
+        }
+    },
+    
+    checkFramesLoaded: function() {
+        const catalogFrame = document.getElementById('catalog-frame');
+        const dashboardFrame = document.getElementById('dashboard-frame');
+        
+        // Check if frames are loaded
+        setTimeout(() => {
+            if (catalogFrame.contentDocument) {
+                document.getElementById('catalog-state').textContent = 'Frame Loaded';
+            }
+            if (dashboardFrame.contentDocument) {
+                document.getElementById('dashboard-state').textContent = 'Frame Loaded';
+            }
+        }, 2000);
+    }
+};
+
+// Start integration test
+document.addEventListener('DOMContentLoaded', function() {
+    IntegrationTest.init();
+});
+
+// Test functions for manual testing
+function testLocationSelection() {
+    // Simulate location selection
+    const testData = {
+        type: 'LOCATION_SELECTED',
+        data: {
+            id: 'th-g1',
+            content: 'G1 Platform: Test',
+            type: 'offshore',
+            country: 'thailand'
+        }
+    };
+    
+    const catalogFrame = document.getElementById('catalog-frame');
+    if (catalogFrame && catalogFrame.contentWindow) {
+        catalogFrame.contentWindow.postMessage(testData, '*');
+        console.log('📤 Test location sent:', testData);
+    }
+}
+
+// Make test function available globally
+window.testLocationSelection = testLocationSelection;
+
+console.log('💡 Tip: Run testLocationSelection() in console to test integration');
+</script>
+
+</body>
+</html>

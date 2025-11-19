@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Risk Management Plan - ZPQ-ZWP4 Telecommunications Project</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+        }
+        .header {
+            background: linear-gradient(135deg, #FF6B6B 0%, #FFE66D 100%);
+            color: white;
+            padding: 30px;
+            margin: -20px -20px 30px -20px;
+            text-align: center;
+        }
+        h1 {
+            margin: 0;
+            font-size: 32px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        h2 {
+            color: #FF6B6B;
+            border-bottom: 2px solid #FF6B6B;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+        h3 {
+            color: #4ECDC4;
+            margin-top: 25px;
+        }
+        .risk-matrix {
+            display: grid;
+            grid-template-columns: 80px repeat(5, 1fr);
+            grid-template-rows: repeat(6, 60px);
+            gap: 2px;
+            margin: 30px auto;
+            max-width: 600px;
+            background: #333;
+            padding: 2px;
+        }
+        .matrix-cell {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+        }
+        .matrix-header {
+            background: #333;
+            color: white;
+        }
+        .matrix-label {
+            background: #666;
+            font-size: 12px;
+            padding: 5px;
+        }
+        .risk-low { background: #4CAF50; }
+        .risk-medium { background: #FFC107; color: #333; }
+        .risk-high { background: #FF9800; }
+        .risk-critical { background: #F44336; }
+        .risk-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            page-break-inside: avoid;
+        }
+        .risk-card.critical {
+            border-color: #F44336;
+            border-width: 2px;
+            background: #FFEBEE;
+        }
+        .risk-card.high {
+            border-color: #FF9800;
+            background: #FFF3E0;
+        }
+        .risk-card.medium {
+            border-color: #FFC107;
+            background: #FFFDE7;
+        }
+        .risk-card.low {
+            border-color: #4CAF50;
+            background: #E8F5E9;
+        }
+        .risk-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .risk-id {
+            background: #333;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .risk-score {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .score-badge {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th {
+            background: #FF6B6B;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        tr:hover {
+            background: #f5f5f5;
+        }
+        .mitigation-timeline {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .timeline-item {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .contingency-plan {
+            background: #E3F2FD;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .action-items {
+            background: #FFF9C4;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .action-items ul {
+            margin: 10px 0;
+            padding-left: 25px;
+        }
+        .action-items li {
+            margin: 5px 0;
+        }
+        .summary-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+        @media print {
+            .risk-card {
+                break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Risk Management Plan</h1>
+        <p style="font-size: 18px;">ZPQ-ZWP4 Telecommunications Link Project</p>
+        <p>Document Version: 1.0 | Date: September 20, 2025</p>
+    </div>
+
+    <h2>Executive Summary</h2>
+    <p>This Risk Management Plan identifies, analyzes, and provides mitigation strategies for potential risks associated with the ZPQ-ZWP4 telecommunications link project. The plan covers technical, operational, regulatory, financial, and environmental risks throughout the project lifecycle.</p>
+
+    <div class="summary-box">
+        <h3 style="color: white; margin-top: 0;">Risk Overview</h3>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center;">
+            <div>
+                <div style="font-size: 24px; font-weight: bold;">2</div>
+                <div>Critical Risks</div>
+            </div>
+            <div>
+                <div style="font-size: 24px; font-weight: bold;">5</div>
+                <div>High Risks</div>
+            </div>
+            <div>
+                <div style="font-size: 24px; font-weight: bold;">8</div>
+                <div>Medium Risks</div>
+            </div>
+            <div>
+                <div style="font-size: 24px; font-weight: bold;">5</div>
+                <div>Low Risks</div>
+            </div>
+        </div>
+    </div>
+
+    <h2>Risk Assessment Matrix</h2>
+    <div class="risk-matrix">
+        <div class="matrix-cell matrix-header">Impact →</div>
+        <div class="matrix-cell matrix-label">Very Low<br>(1)</div>
+        <div class="matrix-cell matrix-label">Low<br>(2)</div>
+        <div class="matrix-cell matrix-label">Medium<br>(3)</div>
+        <div class="matrix-cell matrix-label">High<br>(4)</div>
+        <div class="matrix-cell matrix-label">Very High<br>(5)</div>
+        
+        <div class="matrix-cell matrix-label" style="writing-mode: vertical-rl;">Very High (5)</div>
+        <div class="matrix-cell risk-medium">5</div>
+        <div class="matrix-cell risk-high">10</div>
+        <div class="matrix-cell risk-high">15</div>
+        <div class="matrix-cell risk-critical">20</div>
+        <div class="matrix-cell risk-critical">25</div>
+        
+        <div class="matrix-cell matrix-label" style="writing-mode: vertical-rl;">High (4)</div>
+        <div class="matrix-cell risk-low">4</div>
+        <div class="matrix-cell risk-medium">8</div>
+        <div class="matrix-cell risk-high">12</div>
+        <div class="matrix-cell risk-high">16</div>
+        <div class="matrix-cell risk-critical">20</div>
+        
+        <div class="matrix-cell matrix-label" style="writing-mode: vertical-rl;">Medium (3)</div>
+        <div class="matrix-cell risk-low">3</div>
+        <div class="matrix-cell risk-medium">6</div>
+        <div class="matrix-cell risk-medium">9</div>
+        <div class="matrix-cell risk-high">12</div>
+        <div class="matrix-cell risk-high">15</div>
+        
+        <div class="matrix-cell matrix-label" style="writing-mode: vertical-rl;">Low (2)</div>
+        <div class="matrix-cell risk-low">2</div>
+        <div class="matrix-cell risk-low">4</div>
+        <div class="matrix-cell risk-medium">6</div>
+        <div class="matrix-cell risk-medium">8</div>
+        <div class="matrix-cell risk-high">10</div>
+        
+        <div class="matrix-cell matrix-label" style="writing-mode: vertical-rl;">Very Low (1)</div>
+        <div class="matrix-cell risk-low">1</div>
+        <div class="matrix-cell risk-low">2</div>
+        <div class="matrix-cell risk-low">3</div>
+        <div class="matrix-cell risk-low">4</div>
+        <div class="matrix-cell risk-medium">5</div>
+        
+        <div class="matrix-cell matrix-label" style="writing-mode: vertical-rl;">Probability ↑</div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+
+    <h2>Critical Risks (Score 20-25)</h2>
+
+    <div class="risk-card critical">
+        <div class="risk-header">
+            <div class="risk-id">R-001</div>
+            <div class="risk-score">
+                <span class="score-badge" style="background: #F44336; color: white;">Probability: 4</span>
+                <span class="score-badge" style="background: #F44336; color: white;">Impact: 5</span>
+                <span class="score-badge" style="background: #F44336; color: white;">Score: 20</span>
+            </div>
+        </div>
+        <h3>Equipment Delivery Delay</h3>
+        <p><strong>Description:</strong> Ceragon manufacturing delays or shipping issues causing project timeline slip beyond PTTEP operational requirements.</p>
+        <p><strong>Impact:</strong> Project delay, continued reliance on unreliable 5GHz system, potential production losses for PTTEP.</p>
+        <p><strong>Mitigation Strategies:</strong></p>
+        <ul>
+            <li>Establish priority manufacturing slot with Ceragon</li>
+            <li>Include penalty clauses in supplier contract</li>
+            <li>Arrange expedited shipping options</li>
+            <li>Maintain weekly communication with Ceragon project manager</li>
+        </ul>
+        <p><strong>Contingency Plan:</strong> Source alternative compatible equipment from regional stock if delays exceed 4 weeks.</p>
+        <p><strong>Owner:</strong> Procurement Manager | <strong>Review Date:</strong> Weekly during procurement phase</p>
+    </div>
+
+    <div class="risk-card critical">
+        <div class="risk-header">
+            <div class="risk-id">R-002</div>
+            <div class="risk-score">
+                <span class="score-badge" style="background: #F44336; color: white;">Probability: 4</span>
+                <span class="score-badge" style="background: #F44336; color: white;">Impact: 5</span>
+                <span class="score-badge" style="background: #F44336; color: white;">Score: 20</span>
+            </div>
+        </div>
+        <h3>Regulatory Approval Delays</h3>
+        <p><strong>Description:</strong> Myanmar PTD licensing or import permit delays preventing timely equipment deployment.</p>
+        <p><strong>Impact:</strong> Cannot operate legally, project suspension, financial penalties, reputation damage.</p>
+        <p><strong>Mitigation Strategies:</strong></p>
+        <ul>
+            <li>Leverage Mytel's existing operator license and relationships</li>
+            <li>Submit applications 3 months in advance</li>
+            <li>Engage local regulatory consultant</li>
+            <li>Prepare comprehensive documentation package</li>
+        </ul>
+        <p><strong>Contingency Plan:</strong> Escalate through Mytel's government relations team; consider temporary operation under testing license.</p>
+        <p><strong>Owner:</strong> Regulatory Affairs Lead | <strong>Review Date:</strong> Bi-weekly</p>
+    </div>
+
+    <h2>High Risks (Score 12-19)</h2>
+
+    <div class="risk-card high">
+        <div class="risk-header">
+            <div class="risk-id">R-003</div>
+            <div class="risk-score">
+                <span class="score-badge" style="background: #FF9800; color: white;">Probability: 3</span>
+                <span class="score-badge" style="background: #FF9800; color: white;">Impact: 5</span>
+                <span class="score-badge" style="background: #FF9800; color: white;">Score: 15</span>
+            </div>
+        </div>
+        <h3>Offshore Installation Weather Delays</h3>
+        <p><strong>Description:</strong> Monsoon season or rough seas preventing safe platform access for installation.</p>
+        <p><strong>Impact:</strong> Installation postponement, increased logistics costs, project timeline extension.</p>
+        <p><strong>Mitigation Strategies:</strong></p>
+        <ul>
+            <li>Schedule installation during favorable weather window (December-April)</li>
+            <li>Monitor 14-day weather forecasts</li>
+            <li>Secure backup installation slots</li>
+            <li>Pre-position equipment at shore base</li>
+        </ul>
+        <p><strong>Owner:</strong> Installation Manager</p>
+    </div>
+
+    <div class="risk-card high">
+        <div class="risk-header">
+            <div class="risk-id">R-004</div>
+            <div class="risk-score">
+                <span class="score-badge" style="background: #FF9800; color: white;">Probability: 3</span>
+                <span class="score-badge" style="background: #FF9800; color: white;">Impact: 4</span>
+                <span class="score-badge" style="background: #FF9800; color: white;">Score: 12</span>
+            </div>
+        </div>
+        <h3>Technical Skills Gap</h3>
+        <p><strong>Description:</strong> Local team lacks expertise in Ceragon IP-50CX and ATEX installations.</p>
+        <p><strong>Impact:</strong> Installation errors, safety incidents, extended commissioning time, poor system performance.</p>
+        <p><strong>Mitigation Strategies:</strong></p>
+        <ul>
+            <li>Arrange Ceragon certified training for installation team</li>
+            <li>Deploy vendor engineer for critical activities</li>
+            <li>Create detailed installation procedures and checklists</li>
+            <li>Conduct dry-run installation onshore</li>
+        </ul>
+        <p><strong>Owner:</strong> Technical Manager</p>
+    </div>
+
+    <h2>Medium Risks (Score 6-11)</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Risk ID</th>
+                <th>Risk Description</th>
+                <th>Score</th>
+                <th>Primary Mitigation</th>
+                <th>Owner</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>R-005</td>
+                <td>Currency fluctuation (USD/MMK)</td>
+                <td>9</td>
+                <td>Fix exchange rates in contract</td>
+                <td>Finance</td>
+            </tr>
+            <tr>
+                <td>R-006</td>
+                <td>Equipment damage during transport</td>
+                <td>8</td>
+                <td>Comprehensive insurance coverage</td>
+                <td>Logistics</td>
+            </tr>
+            <tr>
+                <td>R-007</td>
+                <td>Interference from new offshore radars</td>
+                <td>9</td>
+                <td>Frequency coordination with authorities</td>
+                <td>Technical</td>
+            </tr>
+            <tr>
+                <td>R-008</td>
+                <td>Spare parts availability</td>
+                <td>6</td>
+                <td>Pre-position critical spares in Myanmar</td>
+                <td>Operations</td>
+            </tr>
+            <tr>
+                <td>R-009</td>
+                <td>Contract disputes with Mytel</td>
+                <td>8</td>
+                <td>Clear SLA and escalation procedures</td>
+                <td>Legal</td>
+            </tr>
+            <tr>
+                <td>R-010</td>
+                <td>Power supply instability on platforms</td>
+                <td>9</td>
+                <td>Install voltage regulators and UPS</td>
+                <td>Technical</td>
+            </tr>
+            <tr>
+                <td>R-011</td>
+                <td>Cybersecurity threats</td>
+                <td>8</td>
+                <td>Implement security protocols and monitoring</td>
+                <td>IT Security</td>
+            </tr>
+            <tr>
+                <td>R-012</td>
+                <td>Staff turnover during project</td>
+                <td>6</td>
+                <td>Knowledge transfer and documentation</td>
+                <td>HR</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Risk Response Strategies</h2>
+
+    <div class="mitigation-timeline">
+        <div class="timeline-item">
+            <h4>Avoid</h4>
+            <p>Eliminate risk by changing project approach</p>
+            <ul style="text-align: left; font-size: 14px;">
+                <li>Use licensed spectrum</li>
+                <li>Partner with Mytel</li>
+            </ul>
+        </div>
+        <div class="timeline-item">
+            <h4>Mitigate</h4>
+            <p>Reduce probability or impact</p>
+            <ul style="text-align: left; font-size: 14px;">
+                <li>Training programs</li>
+                <li>Quality controls</li>
+            </ul>
+        </div>
+        <div class="timeline-item">
+            <h4>Transfer</h4>
+            <p>Shift risk to third party</p>
+            <ul style="text-align: left; font-size: 14px;">
+                <li>Insurance policies</li>
+                <li>Vendor warranties</li>
+            </ul>
+        </div>
+        <div class="timeline-item">
+            <h4>Accept</h4>
+            <p>Acknowledge and monitor</p>
+            <ul style="text-align: left; font-size: 14px;">
+                <li>Minor delays</li>
+                <li>Small cost overruns</li>
+            </ul>
+        </div>
+    </div>
+
+    <h2>Risk Monitoring & Control</h2>
+
+    <h3>Risk Review Schedule</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Review Type</th>
+                <th>Frequency</th>
+                <th>Participants</th>
+                <th>Focus Areas</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Executive Review</td>
+                <td>Monthly</td>
+                <td>Steering Committee</td>
+                <td>Critical & High risks</td>
+            </tr>
+            <tr>
+                <td>Project Team Review</td>
+                <td>Weekly</td>
+                <td>PM & Team Leads</td>
+                <td>All active risks</td>
+            </tr>
+            <tr>
+                <td>Technical Review</td>
+                <td>Bi-weekly</td>
+                <td>Technical Team</td>
+                <td>Technical risks</td>
+            </tr>
+            <tr>
+                <td>Vendor Review</td>
+                <td>Monthly</td>
+                <td>PM & Vendors</td>
+                <td>Supply chain risks</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Risk Triggers & Early Warning Signs</h3>
+    <div class="contingency-plan">
+        <h4>Key Risk Indicators to Monitor:</h4>
+        <ul>
+            <li><strong>Schedule Variance:</strong> Any task delayed >5 days triggers risk review</li>
+            <li><strong>Budget Variance:</strong> Cost overrun >5% requires escalation</li>
+            <li><strong>Quality Metrics:</strong> Failed tests or inspections initiate root cause analysis</li>
+            <li><strong>Vendor Performance:</strong> Missed milestones activate contingency plans</li>
+            <li><strong>Regulatory Status:</strong> Application processing >30 days triggers escalation</li>
+        </ul>
+    </div>
+
+    <h2>Contingency Reserves</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Reserve Type</th>
+                <th>Amount</th>
+                <th>Purpose</th>
+                <th>Approval Authority</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Schedule Buffer</td>
+                <td>4 weeks</td>
+                <td>Weather and logistics delays</td>
+                <td>Project Manager</td>
+            </tr>
+            <tr>
+                <td>Cost Contingency</td>
+                <td>$12,668 (15%)</td>
+                <td>Unforeseen expenses</td>
+                <td>Steering Committee</td>
+            </tr>
+            <tr>
+                <td>Technical Reserve</td>
+                <td>Backup equipment set</td>
+                <td>Equipment failure</td>
+                <td>Technical Manager</td>
+            </tr>
+            <tr>
+                <td>Resource Buffer</td>
+                <td>2 additional technicians</td>
+                <td>Skill gaps or absence</td>
+                <td>Project Manager</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="action-items">
+        <h2>Immediate Action Items</h2>
+        <h4>To be completed within 2 weeks:</h4>
+        <ul>
+            <li>Finalize risk register with all stakeholders</li>
+            <li>Assign risk owners and establish reporting procedures</li>
+            <li>Set up risk tracking system and dashboard</li>
+            <li>Conduct risk workshop with project team</li>
+            <li>Initiate insurance procurement process</li>
+            <li>Begin regulatory application preparation</li>
+            <li>Establish vendor communication protocols</li>
+        </ul>
+    </div>
+
+    <h2>Risk Communication Plan</h2>
+
+    <h3>Stakeholder Communication Matrix</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Stakeholder</th>
+                <th>Information Required</th>
+                <th>Frequency</th>
+                <th>Method</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>PTTEP Management</td>
+                <td>Critical risks and mitigation status</td>
+                <td>Monthly</td>
+                <td>Executive Report</td>
+            </tr>
+            <tr>
+                <td>Mytel</td>
+                <td>Partnership risks and joint actions</td>
+                <td>Bi-weekly</td>
+                <td>Video Conference</td>
+            </tr>
+            <tr>
+                <td>Ceragon</td>
+                <td>Technical and delivery risks</td>
+                <td>Weekly</td>
+                <td>Email Updates</td>
+            </tr>
+            <tr>
+                <td>Project Team</td>
+                <td>All risks and daily monitoring</td>
+                <td>Daily</td>
+                <td>Dashboard & Standup</td>
+            </tr>
+            <tr>
+                <td>Regulatory Authorities</td>
+                <td>Compliance status</td>
+                <td>As Required</td>
+                <td>Official Correspondence</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="summary-box" style="margin-top: 40px;">
+        <h3 style="color: white;">Document Control</h3>
+        <table style="color: white; background: transparent;">
+            <tr>
+                <td><strong>Document Owner:</strong></td>
+                <td>Suriyapong Yoo-om-sin, Project Manager</td>
+            </tr>
+            <tr>
+                <td><strong>Last Review:</strong></td>
+                <td>September 20, 2025</td>
+            </tr>
+            <tr>
+                <td><strong>Next Review:</strong></td>
+                <td>October 20, 2025</td>
+            </tr>
+            <tr>
+                <td><strong>Distribution:</strong></td>
+                <td>Project Team, PTTEP, Mytel, Add Value Management</td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

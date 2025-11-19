@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Addvalue HRMS – 8 Modules</title>
+<style>
+  body{font-family:Segoe UI,system-ui,Arial;background:#0b1325;color:#e8eeff;margin:0}
+  header{background:#101c3a;padding:14px 18px;border-bottom:1px solid #20305c}
+  h1{margin:0;font-size:18px;color:#4cc9f0}
+  nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  nav button{background:#1d2f5a;color:#fff;border:1px solid #3353a0;border-radius:6px;padding:8px 12px;cursor:pointer}
+  nav button.active{background:#3d6ef5;border-color:#5585ff}
+  main{max-width:1200px;margin:18px auto;padding:0 16px}
+  section{display:none}
+  section.active{display:block}
+  table{width:100%;border-collapse:collapse;margin-top:10px}
+  th,td{padding:8px;border-bottom:1px solid #263a6c}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+  input,select{padding:6px 8px;border-radius:6px;border:1px solid #3353a0;background:#0f1b3b;color:#e8eeff}
+  .danger{background:#b4232e;border-color:#e14f5a}
+  .ok{background:#2e7d32;border-color:#4caf50}
+  .ghost{background:#142246;border-color:#2a3f7a}
+</style>
+</head>
+<body>
+<header>
+  <h1>Addvalue HRMS – 8 Modules (DB-backed)</h1>
+  <nav id="tabs"></nav>
+</header>
+<main>
+  <div class="toolbar">
+    <button onclick="exportJSON()">Export JSON</button>
+    <button onclick="exportExcel()">Export Excel</button>
+    <button onclick="exportMySQL()">Export MySQL Dump</button>
+    <label class="ghost">Import JSON <input type="file" id="impJson" accept=".json" onchange="importJSON(event)"></label>
+    <label class="ghost">Import Excel <input type="file" id="impXlsx" accept=".xlsx" onchange="importExcel(event)"></label>
+  </div>
+
+  <!-- Sections -->
+  <section id="personnel" class="active"><h2>Personnel</h2><div id="grid-personnel"></div></section>
+  <section id="passport"><h2>Passport</h2><div id="grid-passport"></div></section>
+  <section id="medical_checkup"><h2>Medical Check-up</h2><div id="grid-medical_checkup"></div></section>
+  <section id="training_certificate"><h2>Training & Certificate</h2><div id="grid-training_certificate"></div></section>
+  <section id="work_experience"><h2>Work Experience</h2><div id="grid-work_experience"></div></section>
+  <section id="emergency_contact"><h2>Emergency Contact</h2><div id="grid-emergency_contact"></div></section>
+  <section id="payroll_master"><h2>Payroll Master</h2><div id="grid-payroll_master"></div></section>
+</main>
+
+<script>
+const modules = [
+  'personnel','passport','medical_checkup','training_certificate',
+  'work_experience','emergency_contact','payroll_master'
+];
+
+const keysMap = {
+  personnel: ['id_card','full_name_en','full_name_th','date_of_birth','nationality','religion','address','phone','email','department','position','status'],
+  passport: ['passport_id','id_card','passport_no','issue_date','expiry_date','issued_by','remarks'],
+  medical_checkup: ['medical_id','id_card','hospital','checkup_date','result','valid_until','doctor','note'],
+  training_certificate: ['training_id','id_card','certificate_name','course_type','issue_date','expiry_date','training_center','certificate_no','remarks'],
+  work_experience: ['work_id','id_card','company','position','duration','project_client','location','remark'],
+  emergency_contact: ['contact_id','id_card','name','relationship','phone','address'],
+  payroll_master: ['id_card','position','department','salary_monthly','daily_rate','hourly_rate','ot_rate','payment_status']
+};
+
+const idKey = {
+  personnel: 'id_card',
+  payroll_master: 'id_card',
+  passport: 'passport_id',
+  medical_checkup: 'medical_id',
+  training_certificate: 'training_id',
+  work_experience: 'work_id',
+  emergency_contact: 'contact_id'
+};
+
+const tabs = document.getElementById('tabs');
+modules.forEach(m=>{
+  const b=document.createElement('button');
+  b.textContent=m.replace('_',' ').toUpperCase();
+  b.onclick=()=>switchTab(m);
+  tabs.appendChild(b);
+});
+tabs.children[0].classList.add('active');
+
+function switchTab(id){
+  document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+  document.querySelector(`#${id}`).classList.add('active');
+  [...tabs.children].forEach(b=>b.classList.remove('active'));
+  [...tabs.children].find(b=>b.textContent.toLowerCase().includes(id.replace('_',' '))).classList.add('active');
+}
+
+async function loadModule(m){
+  const res = await fetch(`/api/${m}`);
+  const rows = await res.json();
+  renderTable(m, rows);
+}
+
+function renderTable(m, rows){
+  const container = document.getElementById(`grid-${m}`);
+  const cols = keysMap[m];
+  let html = '<table><thead><tr>';
+  cols.forEach(c=> html += `<th>${c}</th>`);
+  html += `<th>actions</th></tr></thead><tbody>`;
+  rows.forEach(r=>{
+    html += '<tr>';
+    cols.forEach(c=> html += `<td>${r[c]??''}</td>`);
+    const key = idKey[m];
+    const keyVal = r[key];
+    html += `<td>
+      <button class="ok" onclick="editRow('${m}','${key}','${keyVal}')">edit</button>
+      <button class="danger" onclick="delRow('${m}','${key}','${keyVal}')">delete</button>
+    </td>`;
+    html += '</tr>';
+  });
+  // empty row to create
+  html += '<tr>';
+  cols.forEach(c=> html += `<td contenteditable="true" data-new="${c}"></td>`);
+  html += `<td><button class="ok" onclick="createRow('${m}')">create</button></td></tr>`;
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+async function editRow(m, key, keyVal){
+  const row = getRowEl(event.target);
+  const cols = keysMap[m];
+  const payload = {};
+  row.querySelectorAll('td').forEach((td,i)=>{
+    if (i >= cols.length) return;
+    payload[cols[i]] = td.textContent.trim();
+  });
+  // do not allow change primary visible keys unintentionally on modules with integer PK
+  const put = await fetch(`/api/${m}/${encodeURIComponent(keyVal)}`, {
+    method:'PUT', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  });
+  if (!put.ok) alert('Update failed');
+  else loadModule(m);
+}
+
+async function delRow(m, key, keyVal){
+  if (!confirm('Delete?')) return;
+  const del = await fetch(`/api/${m}/${encodeURIComponent(keyVal)}`, { method:'DELETE' });
+  if (!del.ok) alert('Delete failed');
+  else loadModule(m);
+}
+
+async function createRow(m){
+  const row = event.target.closest('tr');
+  const cols = keysMap[m];
+  const tds = row.querySelectorAll('[data-new]');
+  const payload = {};
+  tds.forEach(td => payload[td.dataset.new] = td.textContent.trim());
+  const res = await fetch(`/api/${m}`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) alert('Create failed');
+  else loadModule(m);
+}
+
+function getRowEl(el){ while(el && el.tagName!=='TR') el=el.parentElement; return el; }
+
+// Import/Export
+async function exportJSON(){
+  const res = await fetch('/export/json');
+  const blob = await res.blob();
+  downloadBlob(blob, 'addvalue_hrms.json');
+}
+async function exportExcel(){
+  const res = await fetch('/export/excel');
+  const blob = await res.blob();
+  downloadBlob(blob, 'addvalue_hrms.xlsx');
+}
+async function exportMySQL(){
+  const res = await fetch('/export/mysql');
+  const blob = await res.blob();
+  downloadBlob(blob, 'addvalue_hrms_mysql_dump.sql');
+}
+function downloadBlob(blob, filename){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
+}
+async function importJSON(e){
+  const f = e.target.files[0]; if (!f) return;
+  const txt = await f.text();
+  const data = JSON.parse(txt);
+  const res = await fetch('/import/json',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  if (!res.ok) alert('Import JSON failed'); else reloadAll();
+}
+async function importExcel(e){
+  const f = e.target.files[0]; if (!f) return;
+  const fd = new FormData(); fd.append('file', f);
+  const res = await fetch('/import/excel',{method:'POST', body:fd});
+  if (!res.ok) alert('Import Excel failed'); else reloadAll();
+}
+function reloadAll(){ modules.forEach(loadModule); }
+reloadAll();
+</script>
+</body>
+</html>

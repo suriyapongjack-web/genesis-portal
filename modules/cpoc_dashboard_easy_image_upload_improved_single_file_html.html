@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CPOC Dashboard - Easy Image Upload (Improved)</title>
+  <!-- Optional export helper -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    :root{
+      --bg1:#667eea; --bg2:#764ba2; --primary:#0066cc; --primary-dark:#004499;
+      --card:#ffffff; --muted:#f8f9fa; --muted-2:#e3f2fd; --text:#333; --border:#dee2e6;
+      --accent:#4CAF50; --warning-bg:#fff3cd; --warning:#856404; --danger:#dc3545;
+    }
+    body{
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%);
+      min-height:100vh; padding:20px;
+    }
+    .dashboard-container{
+      max-width:1400px; margin:0 auto; background:var(--card);
+      border-radius:20px; box-shadow:0 20px 60px rgba(0,0,0,.3); overflow:hidden;
+    }
+
+    /* Header */
+    .header{
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color:#fff; padding:24px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap;
+    }
+    .header-left{ display:flex; align-items:center; gap:20px; }
+    .logo-container{ display:flex; gap:16px; align-items:center; }
+    .logo{ width:80px; height:80px; background:#fff; border-radius:10px; position:relative; overflow:hidden; }
+    .header-title h1{ font-size:26px; margin-bottom:6px; }
+    .header-title p{ font-size:14px; opacity:.9; }
+    .status-badge{ background:var(--accent); padding:10px 16px; border-radius:999px; font-weight:700; display:flex; align-items:center; gap:10px; }
+    .status-indicator{ width:10px; height:10px; background:#fff; border-radius:50%; animation:pulse 2s infinite; }
+    @keyframes pulse{0%{opacity:1}50%{opacity:.5}100%{opacity:1}}
+
+    /* Content */
+    .content{ padding:24px; }
+
+    /* Upload Instructions */
+    .upload-instructions{ background:var(--warning-bg); border:1px solid #ffc107; border-radius:12px; padding:18px; margin-bottom:20px; }
+    .upload-instructions h3{ color:var(--warning); margin-bottom:8px; }
+    .upload-instructions ol{ margin-left:20px; color:var(--warning); line-height:1.6; }
+
+    /* Sections */
+    .section-card{ background:#fff; border-radius:15px; padding:20px; box-shadow:0 2px 10px rgba(0,0,0,.1); }
+    .section-title{ font-size:20px; color:var(--text); margin-bottom:14px; display:flex; align-items:center; gap:10px; }
+    .section-title::before{ content:''; width:4px; height:24px; background:var(--primary); border-radius:2px; }
+
+    /* Executive Summary */
+    .executive-summary{ background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%); border-radius:15px; padding:20px; margin-bottom:24px; }
+    .summary-content{ display:grid; grid-template-columns:1fr 420px; gap:24px; }
+    .key-metrics{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+    .metric-card{ background:#fff; padding:14px; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,.08); }
+    .metric-value{ font-size:24px; font-weight:800; color:var(--primary); }
+    .metric-label{ font-size:12px; color:#666; margin-top:6px; }
+
+    /* Responsive grid */
+    .main-grid{ display:grid; grid-template-columns:2fr 1fr; gap:24px; margin-bottom:24px; }
+
+    /* Equipment */
+    .equipment-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:18px; margin-top:12px; }
+    .equipment-card{ background:#fff; border:1px solid var(--border); border-radius:12px; overflow:hidden; transition:transform .25s ease, box-shadow .25s ease; }
+    .equipment-card:hover{ transform:translateY(-4px); box-shadow:0 8px 20px rgba(0,0,0,.12); }
+    .equipment-details{ padding:14px; }
+    .equipment-name{ font-weight:700; color:var(--text); margin-bottom:8px; }
+
+    /* Image upload area */
+    .image-upload-area{ position:relative; border:2px dashed var(--primary); border-radius:12px; background:var(--muted); cursor:pointer; transition:all .25s ease; overflow:hidden; }
+    .image-upload-area:hover{ background:var(--muted-2); border-color:var(--primary-dark); }
+    .image-upload-area input[type="file"]{ position:absolute; inset:0; opacity:0; cursor:pointer; }
+    .upload-placeholder{ pointer-events:none; text-align:center; padding:16px; color:#666; font-size:13px; }
+    .uploaded-image{ width:100%; height:100%; object-fit:cover; display:block; }
+
+    /* Aspect ratios for nicer layout */
+    .ar-1x1{ aspect-ratio:1/1; }
+    .ar-4x3{ aspect-ratio:4/3; }
+    .ar-16x9{ aspect-ratio:16/9; }
+
+    /* Toolbar on each upload box */
+    .img-toolbar{
+      position:absolute; top:8px; right:8px; display:flex; gap:6px; z-index:2; opacity:0; transition:opacity .2s;
+    }
+    .image-upload-area:hover .img-toolbar{ opacity:1; }
+    .btn-mini{
+      background:rgba(0,0,0,.6); color:#fff; border:none; padding:6px 8px; border-radius:8px; font-size:12px; cursor:pointer;
+      backdrop-filter: blur(3px);
+    }
+    .btn-mini:hover{ background:rgba(0,0,0,.8); }
+
+    /* Floating actions */
+    .fab-wrap{ position:fixed; bottom:20px; right:20px; display:flex; flex-direction:column; gap:10px; z-index:1000; }
+    .fab{ border:none; border-radius:999px; padding:12px 16px; color:#fff; font-weight:700; cursor:pointer; box-shadow:0 6px 16px rgba(0,0,0,.25); }
+    .fab.reset{ background:var(--danger); }
+    .fab.export{ background:var(--primary); }
+    .fab.save{ background:#10b981; }
+    .fab.load{ background:#f59e0b; }
+
+    /* Modal preview */
+    .modal{ position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; padding:24px; z-index:1100; }
+    .modal.open{ display:flex; }
+    .modal-content{ max-width:min(96vw,1200px); max-height:86vh; background:#111; border-radius:12px; overflow:auto; position:relative; }
+    .modal-content img{ display:block; max-width:100%; height:auto; }
+    .modal-close{ position:absolute; top:8px; right:8px; background:#000; color:#fff; border:none; border-radius:8px; padding:8px 10px; cursor:pointer; }
+
+    /* Small screens */
+    @media (max-width: 1000px){
+      .summary-content{ grid-template-columns:1fr; }
+      .main-grid{ grid-template-columns:1fr; }
+      .header-title h1{ font-size:22px; }
+    }
+  </style>
+  <style>
+    /* --- Simplify / Accessibility Additions --- */
+    .topbar{display:flex;gap:10px;align-items:center;justify-content:flex-end;padding:10px 16px;background:#f1f5f9;border-bottom:1px solid #e5e7eb}
+    .topbar .seg{display:flex;gap:8px;align-items:center}
+    .toggle{appearance:none; width:40px;height:22px;border-radius:999px;background:#cbd5e1;position:relative;outline:none;cursor:pointer;transition:.2s}
+    .toggle:checked{background:#22c55e}
+    .toggle:before{content:'';position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s}
+    .toggle:checked:before{left:21px}
+    .pill{padding:6px 10px;border:1px solid #e5e7eb;border-radius:999px;background:#fff;cursor:pointer}
+    .sr{position:absolute;left:-9999px}
+    .simple .img-toolbar,.simple .fab.save,.simple .fab.load{display:none}
+    .simple .upload-instructions{display:none}
+    .simple .section-title::before{display:none}
+    .simple .equipment-card{border-color:#eee;box-shadow:none}
+    .simple .status-badge{filter:grayscale(.2)}
+    .density-compact .metric-card{padding:10px}
+    .density-compact .equipment-details{padding:10px}
+    .editable{outline:2px dashed transparent;padding:2px 4px;border-radius:6px}
+    .editable:focus{outline-color:#60a5fa;background:#eff6ff}
+    @media print{ .fab-wrap, .topbar{display:none !important}; body{background:#fff} }
+  </style>
+</head>
+<body>
+  <div class="dashboard-container" id="capture-root">
+    <!-- Upload Instructions -->
+    <div class="content">
+      <div class="upload-instructions" role="region" aria-label="Upload instructions">
+        <h3>📸 วิธีการใส่รูปภาพ</h3>
+        <ol>
+          <li>คลิกที่กรอบสีน้ำเงิน หรือ <b>ลากไฟล์รูป</b> มาวาง</li>
+          <li>เลือกไฟล์รูปจากคอมพิวเตอร์ (รองรับ JPG/PNG/WebP, ≤ 15 MB)</li>
+          <li>รูปจะแสดงขึ้นมาทันที และถูกบันทึกอัตโนมัติในเบราว์เซอร์ (localStorage)</li>
+          <li>ต้องการเริ่มใหม่ทั้งหมด ให้กดปุ่ม <b>Reset All Images</b></li>
+          <li>คลิกขวาที่กรอบสามารถ <b>Paste</b> รูปจากคลิปบอร์ดได้ (บนบางเบราว์เซอร์)</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+      <div class="header-left">
+        <div class="logo-container">
+          <div class="logo image-upload-area ar-1x1" id="cpoc-logo" data-label="CPOC Logo (80×80)">
+            <div class="img-toolbar">
+              <button class="btn-mini" data-action="preview" title="Preview">👁</button>
+              <button class="btn-mini" data-action="replace" title="Replace">↻</button>
+              <button class="btn-mini" data-action="remove" title="Remove">✕</button>
+            </div>
+            <input type="file" accept="image/*" />
+            <div class="upload-placeholder"><div style="font-size:11px; line-height:1.3;">คลิกอัปโหลด<br/>CPOC Logo<br/>(80×80)</div></div>
+          </div>
+          <div class="logo image-upload-area ar-1x1" id="avs-logo" data-label="AVS Logo (80×80)">
+            <div class="img-toolbar">
+              <button class="btn-mini" data-action="preview" title="Preview">👁</button>
+              <button class="btn-mini" data-action="replace" title="Replace">↻</button>
+              <button class="btn-mini" data-action="remove" title="Remove">✕</button>
+            </div>
+            <input type="file" accept="image/*" />
+            <div class="upload-placeholder"><div style="font-size:11px; line-height:1.3;">คลิกอัปโหลด<br/>AVS Logo<br/>(80×80)</div></div>
+          </div>
+        </div>
+        <div class="header-title">
+          <h1 contenteditable="true" class="editable" spellcheck="false">CPOC PTMP Telecommunications System</h1>
+          <p contenteditable="true" class="editable" spellcheck="false">Block B-17 &amp; B-17-01 Development | Gulf of Thailand</p>
+        </div>
+      </div>
+      <div class="status-badge" title="สถานะระบบ"><div class="status-indicator"></div><span contenteditable="true" class="editable" spellcheck="false">OPERATIONAL</span></div>
+    </div>
+    <div class="topbar" role="region" aria-label="ตัวเลือกการแสดงผล">
+      <div class="seg">
+        <label class="pill" title="สลับโหมดแบบง่าย" for="tgl-simple">Simple Mode</label>
+        <input id="tgl-simple" type="checkbox" class="toggle" />
+      </div>
+      <div class="seg">
+        <label class="pill" title="ลดช่องว่าง/ความหนาแน่นสูง" for="tgl-density">Compact</label>
+        <input id="tgl-density" type="checkbox" class="toggle" />
+      </div>
+      <button class="pill" id="btn-print">🖨️ Print</button>
+    </div>
+            <input type="file" accept="image/*" />
+            <div class="upload-placeholder"><div style="font-size:11px; line-height:1.3;">Click to upload<br/>CPOC Logo<br/>(80×80)</div></div>
+          </div>
+          <!-- AVS Logo Upload -->
+          <div class="logo image-upload-area ar-1x1" id="avs-logo" data-label="AVS Logo (80×80)">
+            <div class="img-toolbar">
+              <button class="btn-mini" data-action="preview" title="Preview">👁</button>
+              <button class="btn-mini" data-action="replace" title="Replace">↻</button>
+              <button class="btn-mini" data-action="remove" title="Remove">✕</button>
+            </div>
+            <input type="file" accept="image/*" />
+            <div class="upload-placeholder"><div style="font-size:11px; line-height:1.3;">Click to upload<br/>AVS Logo<br/>(80×80)</div></div>
+          </div>
+        </div>
+        <div class="header-title">
+          <h1>CPOC PTMP Telecommunications System</h1>
+          <p>Block B-17 &amp; B-17-01 Development | Gulf of Thailand</p>
+        </div>
+      </div>
+      <div class="status-badge"><div class="status-indicator"></div>OPERATIONAL</div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Executive Summary -->
+      <div class="executive-summary">
+        <h2 class="section-title">Executive Summary</h2>
+        <div class="summary-content">
+          <div class="key-metrics">
+            <div class="metric-card">
+              <div class="metric-value" contenteditable="true" class="editable" spellcheck="false">5.8 GHz</div>
+              <div class="metric-label">WiMAX Frequency</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value" contenteditable="true" class="editable" spellcheck="false">500 Mbps</div>
+              <div class="metric-label">Network Capacity</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value" contenteditable="true" class="editable" spellcheck="false">99.9%</div>
+              <div class="metric-label">Availability Target</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-value" contenteditable="true" class="editable" spellcheck="false">6 Sites</div>
+              <div class="metric-label">Platform Coverage</div>
+            </div>
+          </div><div class="metric-label">WiMAX Frequency</div></div>
+            <div class="metric-card"><div class="metric-value">500 Mbps</div><div class="metric-label">Network Capacity</div></div>
+            <div class="metric-card"><div class="metric-value">99.9%</div><div class="metric-label">Availability Target</div></div>
+            <div class="metric-card"><div class="metric-value">6 Sites</div><div class="metric-label">Platform Coverage</div></div>
+          </div>
+          <!-- Platform Map Upload -->
+          <div class="image-upload-area ar-4x3" id="platform-map" data-label="Platform Overview Map (400×250)">
+            <div class="img-toolbar">
+              <button class="btn-mini" data-action="preview" title="Preview">👁</button>
+              <button class="btn-mini" data-action="replace" title="Replace">↻</button>
+              <button class="btn-mini" data-action="remove" title="Remove">✕</button>
+            </div>
+            <input type="file" accept="image/*" />
+            <div class="upload-placeholder" aria-hidden="true"><br/><br/>Click to upload<br/>Platform Overview Map<br/>(400×250)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Grid -->
+      <div class="main-grid">
+        <div class="section-card">
+          <h2 class="section-title">Network Topology</h2>
+          <div class="image-upload-area ar-16x9" id="network-topology" data-label="Network Topology Diagram">
+            <div class="img-toolbar">
+              <button class="btn-mini" data-action="preview" title="Preview">👁</button>
+              <button class="btn-mini" data-action="replace" title="Replace">↻</button>
+              <button class="btn-mini" data-action="remove" title="Remove">✕</button>
+            </div>
+            <input type="file" accept="image/*" />
+            <div class="upload-placeholder"><br/><br/><br/>Click to upload<br/>Network Topology Diagram</div>
+          </div>
+        </div>
+        <div class="section-card">
+          <h2 class="section-title">Coverage Heatmap</h2>
+          <div class="image-upload-area ar-4x3" id="coverage-heatmap" data-label="Coverage Heatmap (350×200)">
+            <div class="img-toolbar">
+              <button class="btn-mini" data-action="preview" title="Preview">👁</button>
+              <button class="btn-mini" data-action="replace" title="Replace">↻</button>
+              <button class="btn-mini" data-action="remove" title="Remove">✕</button>
+            </div>
+            <input type="file" accept="image/*" />
+            <div class="upload-placeholder"><br/><br/>Click to upload<br/>Coverage Heatmap<br/>(350×200)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Equipment Section -->
+      <div class="section-card">
+        <h2 class="section-title">Major Equipment</h2>
+        <div class="equipment-grid">
+          <!-- Base Station -->
+          <div class="equipment-card">
+            <div class="image-upload-area ar-4x3" id="base-station" data-label="Base Station (250×150)">
+              <div class="img-toolbar">
+                <button class="btn-mini" data-action="preview" title="Preview">👁</button>
+                <button class="btn-mini" data-action="replace" title="Replace">↻</button>
+                <button class="btn-mini" data-action="remove" title="Remove">✕</button>
+              </div>
+              <input type="file" accept="image/*" />
+              <div class="upload-placeholder"><br/>Click to upload<br/>Base Station<br/>(250×150)</div>
+            </div>
+            <div class="equipment-details">
+              <div class="equipment-name">Radwin Jet Duo Base Station</div>
+              <div style="font-size:13px;color:#666;">Model: RW-5PG5-9655<br/>Frequency: 5.8 GHz<br/>Qty: 8 units</div>
+            </div>
+          </div>
+          <!-- CPE Unit -->
+          <div class="equipment-card">
+            <div class="image-upload-area ar-4x3" id="cpe-unit" data-label="CPE Unit (250×150)">
+              <div class="img-toolbar">
+                <button class="btn-mini" data-action="preview" title="Preview">👁</button>
+                <button class="btn-mini" data-action="replace" title="Replace">↻</button>
+                <button class="btn-mini" data-action="remove" title="Remove">✕</button>
+              </div>
+              <input type="file" accept="image/*" />
+              <div class="upload-placeholder"><br/>Click to upload<br/>CPE Unit<br/>(250×150)</div>
+            </div>
+            <div class="equipment-details">
+              <div class="equipment-name">Radwin Alpha Pro CPE</div>
+              <div style="font-size:13px;color:#666;">Model: RW-2954-6HC5<br/>Power: 25 dBm<br/>Qty: 6 units</div>
+            </div>
+          </div>
+          <!-- PoE Switch -->
+          <div class="equipment-card">
+            <div class="image-upload-area ar-4x3" id="poe-switch" data-label="PoE Switch (250×150)">
+              <div class="img-toolbar">
+                <button class="btn-mini" data-action="preview" title="Preview">👁</button>
+                <button class="btn-mini" data-action="replace" title="Replace">↻</button>
+                <button class="btn-mini" data-action="remove" title="Remove">✕</button>
+              </div>
+              <input type="file" accept="image/*" />
+              <div class="upload-placeholder"><br/>Click to upload<br/>PoE Switch<br/>(250×150)</div>
+            </div>
+            <div class="equipment-details">
+              <div class="equipment-name">PoE Switch</div>
+              <div style="font-size:13px;color:#666;">Model: RW-7400-8008<br/>Ports: 4×2.5 Gbps<br/>Qty: 7 units</div>
+            </div>
+          </div>
+          <!-- Antenna -->
+          <div class="equipment-card">
+            <div class="image-upload-area ar-4x3" id="antenna" data-label="Antenna (250×150)">
+              <div class="img-toolbar">
+                <button class="btn-mini" data-action="preview" title="Preview">👁</button>
+                <button class="btn-mini" data-action="replace" title="Replace">↻</button>
+                <button class="btn-mini" data-action="remove" title="Remove">✕</button>
+              </div>
+              <input type="file" accept="image/*" />
+              <div class="upload-placeholder"><br/>Click to upload<br/>Antenna<br/>(250×150)</div>
+            </div>
+            <div class="equipment-details">
+              <div class="equipment-name">Sector &amp; Parabolic Antennas</div>
+              <div style="font-size:13px;color:#666;">Coverage: 90°<br/>Gain: Up to 19 dBi<br/>Qty: 14 units</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating actions -->
+  <div class="fab-wrap" aria-live="polite">
+    <button class="fab export" id="btn-export" title="Export dashboard to PNG">⬇️ Export PNG</button>
+    <button class="fab save" id="btn-save" title="Download current image state (JSON)">💾 Save JSON</button>
+    <button class="fab load" id="btn-load" title="Load image state from JSON">📂 Load JSON</button>
+    <input type="file" id="state-file" accept="application/json" hidden />
+    <button class="fab reset" id="btn-reset" title="Reset all images">🔄 Reset All Images</button>
+  </div>
+
+  <!-- Modal preview -->
+  <div class="modal" id="img-modal" role="dialog" aria-modal="true" aria-label="Image preview">
+    <div class="modal-content">
+      <button class="modal-close" id="modal-close" aria-label="Close">✕</button>
+      <img id="modal-img" alt="Preview" />
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_PREFIX = 'cpoc_';
+    const MAX_BYTES = 15 * 1024 * 1024; // 15 MB per image
+
+    const uploadAreas = Array.from(document.querySelectorAll('.image-upload-area'));
+
+    function keyFor(id){ return STORAGE_PREFIX + id; }
+
+    function setImage(container, dataUrl){
+      const placeholder = container.querySelector('.upload-placeholder');
+      // remove old image
+      container.querySelectorAll('img.uploaded-image').forEach(el => el.remove());
+      if (dataUrl){
+        const img = document.createElement('img');
+        img.src = dataUrl; img.className = 'uploaded-image';
+        container.appendChild(img);
+        if (placeholder) placeholder.style.display = 'none';
+      } else {
+        if (placeholder) placeholder.style.display = '';
+      }
+    }
+
+    function validateFile(file){
+      if (!file) return 'No file';
+      if (!file.type.startsWith('image/')) return 'รองรับเฉพาะไฟล์รูปภาพเท่านั้น';
+      if (file.size > MAX_BYTES) return 'ไฟล์ใหญ่เกิน 15MB';
+      return null;
+    }
+
+    function readFileAsDataURL(file){
+      return new Promise((resolve, reject) => {
+        const err = validateFile(file);
+        if (err) return reject(err);
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.onerror = () => reject('อ่านไฟล์ไม่สำเร็จ');
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function handleFilesFor(container, files){
+      try{
+        const file = files && files[0];
+        const dataUrl = await readFileAsDataURL(file);
+        setImage(container, dataUrl);
+        localStorage.setItem(keyFor(container.id), dataUrl);
+      }catch(e){
+        alert(e);
+      }
+    }
+
+    function bindArea(area){
+      const input = area.querySelector('input[type="file"]');
+      const toolbar = area.querySelector('.img-toolbar');
+
+      // clicks
+      area.addEventListener('click', (e)=>{
+        // avoid double opening when clicking toolbar buttons
+        if (e.target.closest('.img-toolbar')) return;
+        input?.click();
+      });
+
+      input?.addEventListener('change', (e)=>{
+        handleFilesFor(area, e.target.files);
+      });
+
+      // drag & drop
+      area.addEventListener('dragover', (e)=>{e.preventDefault(); area.style.background= getComputedStyle(document.documentElement).getPropertyValue('--muted-2');});
+      area.addEventListener('dragleave', (e)=>{e.preventDefault(); area.style.background='var(--muted)';});
+      area.addEventListener('drop', (e)=>{
+        e.preventDefault(); area.style.background='var(--muted)';
+        const files = e.dataTransfer.files; if (files?.length) handleFilesFor(area, files);
+      });
+
+      // paste from clipboard
+      area.addEventListener('paste', async (e)=>{
+        if (!e.clipboardData) return;
+        const items = Array.from(e.clipboardData.items || []);
+        const fileItem = items.find(i => i.type && i.type.startsWith('image/'));
+        if (fileItem){
+          const file = fileItem.getAsFile();
+          await handleFilesFor(area, [file]);
+        }
+      });
+
+      // toolbar actions
+      toolbar?.addEventListener('click', (e)=>{
+        const btn = e.target.closest('button'); if (!btn) return;
+        const action = btn.getAttribute('data-action');
+        if (action === 'replace'){ input?.click(); }
+        if (action === 'remove'){
+          setImage(area, null);
+          localStorage.removeItem(keyFor(area.id));
+          // also clear input
+          if (input) input.value = '';
+        }
+        if (action === 'preview'){
+          const img = area.querySelector('img.uploaded-image');
+          if (img){ openModal(img.src, area.dataset.label || area.id); }
+        }
+      });
+
+      // restore saved
+      const saved = localStorage.getItem(keyFor(area.id));
+      if (saved) setImage(area, saved);
+    }
+
+    // bind all areas
+    uploadAreas.forEach(bindArea);
+
+    // Modal preview
+    const modal = document.getElementById('img-modal');
+    const modalImg = document.getElementById('modal-img');
+    const modalClose = document.getElementById('modal-close');
+    function openModal(src, label){ modalImg.src = src; modalImg.alt = label || 'Preview'; modal.classList.add('open'); }
+    function closeModal(){ modal.classList.remove('open'); modalImg.src=''; }
+    modalClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e)=>{ if (e.target === modal) closeModal(); });
+    window.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeModal(); });
+
+    // Global reset
+    document.getElementById('btn-reset').addEventListener('click', ()=>{
+      if (!confirm('ต้องการลบรูปทั้งหมดใช่หรือไม่?')) return;
+      uploadAreas.forEach(area=>{
+        setImage(area, null);
+        localStorage.removeItem(keyFor(area.id));
+        const input = area.querySelector('input[type="file"]'); if (input) input.value='';
+      });
+    });
+
+    // Export PNG (screenshot of the dashboard only)
+    document.getElementById('btn-export').addEventListener('click', async ()=>{
+      const root = document.getElementById('capture-root');
+      try{
+        const canvas = await html2canvas(root, {useCORS:true, backgroundColor:null, scale:2});
+        const data = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.href = data; link.download = 'CPOC_Dashboard.png';
+        document.body.appendChild(link); link.click(); link.remove();
+      }catch(err){ alert('ไม่สามารถ Export PNG ได้: '+ err); }
+    });
+
+    // Save / Load JSON state
+    function collectState(){
+      const ids = uploadAreas.map(a=>a.id);
+      const obj = {};
+      ids.forEach(id=>{ const v = localStorage.getItem(keyFor(id)); if (v) obj[id] = v; });
+      return obj;
+    }
+    function downloadJSON(obj){
+      const blob = new Blob([JSON.stringify(obj)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href=url; a.download='cpoc_dashboard_state.json';
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    }
+    document.getElementById('btn-save').addEventListener('click', ()=>{
+      downloadJSON(collectState());
+    });
+    const stateInput = document.getElementById('state-file');
+    document.getElementById('btn-load').addEventListener('click', ()=> stateInput.click());
+    stateInput.addEventListener('change', async (e)=>{
+      const file = e.target.files && e.target.files[0]; if (!file) return;
+      try{
+        const text = await file.text();
+        const obj = JSON.parse(text);
+        uploadAreas.forEach(area=>{
+          const dataUrl = obj[area.id];
+          if (dataUrl){ setImage(area, dataUrl); localStorage.setItem(keyFor(area.id), dataUrl); }
+        });
+        alert('โหลดรูปจากไฟล์ JSON สำเร็จ');
+      }catch(err){ alert('ไฟล์ไม่ถูกต้อง: '+ err); }
+      e.target.value = '';
+    });
+      // View toggles
+    const tSimple = document.getElementById('tgl-simple');
+    const tDensity = document.getElementById('tgl-density');
+    const root = document.documentElement;
+    const body = document.body;
+    // restore toggle state
+    try{
+      const s1 = localStorage.getItem('ui_simple'); if (s1==='1'){ tSimple.checked=true; body.classList.add('simple'); }
+      const s2 = localStorage.getItem('ui_density'); if (s2==='1'){ tDensity.checked=true; body.classList.add('density-compact'); }
+    }catch{}
+    tSimple?.addEventListener('change', ()=>{
+      body.classList.toggle('simple', tSimple.checked);
+      localStorage.setItem('ui_simple', tSimple.checked ? '1':'0');
+    });
+    tDensity?.addEventListener('change', ()=>{
+      body.classList.toggle('density-compact', tDensity.checked);
+      localStorage.setItem('ui_density', tDensity.checked ? '1':'0');
+    });
+    document.getElementById('btn-print').addEventListener('click', ()=> window.print());
+  </script>
+</body>
+</html>

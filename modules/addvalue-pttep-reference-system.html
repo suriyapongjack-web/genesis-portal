@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Addvalue Project Reference System - PTTEP Portfolio</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        
+        #app-header {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 35px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        
+        #app-header h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        #app-header .subtitle {
+            color: #64748b;
+            font-size: 1rem;
+        }
+        
+        #app-header .company {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+        
+        #app-navigation {
+            background: white;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        
+        .tab-button {
+            padding: 18px 35px;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+        
+        .tab-button:hover {
+            color: #1e3c72;
+            background: rgba(30, 60, 114, 0.05);
+        }
+        
+        .tab-button.active {
+            color: #1e3c72;
+            background: rgba(30, 60, 114, 0.08);
+        }
+        
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #1e3c72, #2a5298);
+        }
+        
+        #app-content {
+            background: white;
+            border-radius: 0 0 12px 12px;
+            padding: 35px;
+            min-height: 600px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-change {
+            font-size: 0.8rem;
+            color: #10b981;
+            margin-top: 8px;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+            font-size: 0.9rem;
+        }
+        
+        .data-table th {
+            background: #f8fafc;
+            padding: 14px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-bottom: 2px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+        }
+        
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+        
+        .po-number {
+            color: #1e3c72;
+            font-weight: 600;
+        }
+        
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        
+        .status-delivered {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-amendment {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .currency-original {
+            font-weight: 700;
+            color: #1e293b;
+        }
+        
+        .currency-converted {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-info {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .filter-bar {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: end;
+        }
+        
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .filter-item label {
+            font-size: 0.8rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-weight: 600;
+        }
+        
+        .filter-item input,
+        .filter-item select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            background: white;
+        }
+        
+        .summary-card {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .summary-card h3 {
+            color: #1e293b;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .btn, .filter-bar {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div id="app-header">
+            <h1>Project Reference Management System</h1>
+            <div class="subtitle">PTTEP Portfolio & Purchase Orders Database</div>
+            <div class="company">Addvalue Innovation Co., Ltd. - Professional Project References</div>
+        </div>
+
+        <!-- Navigation -->
+        <nav id="app-navigation">
+            <button class="tab-button active" data-tab="dashboard">Dashboard</button>
+            <button class="tab-button" data-tab="data">Data Management</button>
+            <button class="tab-button" data-tab="analytics">Analytics</button>
+            <button class="tab-button" data-tab="reports">Reports</button>
+            <button class="tab-button" data-tab="by-client">By Client</button>
+            <button class="tab-button" data-tab="by-year">By Year</button>
+        </nav>
+
+        <!-- Content -->
+        <main id="app-content">
+            <!-- Content will be loaded here -->
+        </main>
+    </div>
+
+    <script>
+    // Complete PTTEP Portfolio Data with correct currency
+    const portfolioData = [
+        {
+            item: 31,
+            date: '2023-05-25',
+            po: '4700028986',
+            client: 'Carigali-PTTEPI Operating Company Sdn Bhd (CPOC)',
+            project: 'MOD-19/010',
+            title: 'PROVISION OF MANPOWER, MATERIAL AND EQUIPMENT SUPPLY FOR THE CONFIGURATION OF RING NETWORK FOR POINT-TO-POINT RADIO COMMUNICATION SYSTEMS',
+            original_currency: 'USD',
+            value_original: 13571.43,
+            value_thb: 475000,
+            value_usd: 13571.43,
+            incoterms: 'N/A',
+            delivery: 'Tambol Huasao, Amphur Singhanakorn, Songkhla 90280, Thailand',
+            status: 'delivered'
+        },
+        {
+            item: 30,
+            date: '2023-05-03',
+            po: '3450044753',
+            client: 'PTTEP Energy Development Company Limited',
+            project: '1602 PTTEP ED BG2 – G2/61',
+            title: 'Provision of Site Survey ATEX CCTV at G2N',
+            original_currency: 'THB',
+            value_original: 384000,
+            value_thb: 384000,
+            value_usd: 11294.12,
+            incoterms: 'N/A',
+            delivery: '-',
+            status: 'delivered'
+        },
+        {
+            item: 29,
+            date: '2019-12-11',
+            po: '3500058102',
+            client: 'PTT Exploration and Production Public Co., Ltd. (PTTEP)',
+            project: '1201 PTTEP Arthit B14A,B15A,B1',
+            title: '5GHz LTE-U Connectorized ANT :ART',
+            original_currency: 'THB',
+            value_original: 198316.2,
+            value_thb: 198316.2,
+            value_usd: 6610.54,
+            incoterms: 'DDP',
+            delivery: 'PTTEP HQ, TH',
+            status: 'delivered'
+        },
+        {
+            item: 28,
+            date: '2019-12-11',
+            po: '3500058101',
+            client: 'PTT Exploration and Production Public Co., Ltd. (PTTEP)',
+            project: '1201 PTTEP Arthit B14A,B15A,B1',
+            title: '5GHz LTE-U Connectorized CMP :ART',
+            original_currency: 'THB',
+            value_original: 393666,
+            value_thb: 393666,
+            value_usd: 13122.2,
+            incoterms: 'DDP',
+            delivery: 'PTTEP HQ, TH',
+            status: 'delivered'
+        },
+        {
+            item: 27,
+            date: '2023-03-16',
+            po: '3450043707',
+            client: 'Andaman Transportation Limited',
+            project: '8401 ATL',
+            title: 'Provision of CCTV System Improvement at ZMS',
+            original_currency: 'THB',
+            value_original: 184600.5,
+            value_thb: 184600.5,
+            value_usd: 5429.43,
+            incoterms: 'N/A',
+            delivery: '-',
+            status: 'delivered'
+        },
+        {
+            item: 26,
+            date: '2022-08-23',
+            po: '3450038789',
+            client: 'PTTEP Energy Development Company Limited',
+            project: '1602 PTTEP ED BG2 – G2/61',
+            title: 'Supply Cable / Tester',
+            original_currency: 'THB',
+            value_original: 228600,
+            value_thb: 228600,
+            value_usd: 6531.43,
+            incoterms: 'DDP',
+            delivery: 'PTTEP PSB Warehouse 6, SKL, TH',
+            status: 'delivered'
+        },
+        {
+            item: 25,
+            date: '2021-11-23',
+            po: '3450032952',
+            client: 'Andaman Transportation Limited',
+            project: '8401 ATL',
+            title: 'Provision of Wi-Max communication system between ZOC and ZMS',
+            original_currency: 'THB',
+            value_original: 68560,
+            value_thb: 68560,
+            value_usd: 2060,
+            incoterms: 'DAP',
+            delivery: 'DAP PTTEP Ranong Supply Base Freezone',
+            status: 'delivered'
+        },
+        {
+            item: 24,
+            date: '2021-11-11',
+            po: '3450026161',
+            client: 'PTT Exploration and Production Public Co., Ltd. (PTTEP)',
+            project: 'Arthit Asset',
+            title: 'Amendment no.3 : Additional fee for New Redline 2.3 GHz Offshore ART',
+            original_currency: 'THB',
+            value_original: 9281898.53,
+            value_thb: 9281898.53,
+            value_usd: 278456.96,
+            incoterms: 'N/A',
+            delivery: 'ART',
+            status: 'amendment'
+        },
+        {
+            item: 23,
+            date: '2021-04-12',
+            po: '3450028573',
+            client: 'PTT Exploration and Production Public Co., Ltd. (PTTEP)',
+            project: 'Arthit Asset',
+            title: 'AVS_PM_Aviation and Telrad_4G_LTE',
+            original_currency: 'THB',
+            value_original: 100000,
+            value_thb: 100000,
+            value_usd: 3333.33,
+            incoterms: 'N/A',
+            delivery: 'PTTEP ART (OMS/F), TH',
+            status: 'delivered'
+        },
+        {
+            item: 22,
+            date: '2019-11-27',
+            po: '3450023662',
+            client: 'Andaman Transportation Limited',
+            project: '8401 ATL',
+            title: 'Supply of Spare Part of 60W POE Injector for Zawtika Onshore Operation',
+            original_currency: 'THB',
+            value_original: 3300,
+            value_thb: 3300,
+            value_usd: 110,
+            incoterms: 'DAP',
+            delivery: 'PTTEP Ranong Free Zone, TH',
+            status: 'delivered'
+        }
+    ];
+
+    // Main Application
+    const PTTEPApp = {
+        data: portfolioData,
+        currentTab: 'dashboard',
+        exchangeRate: 35, // THB per USD
+
+        init() {
+            console.log('Initializing Addvalue Project Reference System...');
+            this.setupEventListeners();
+            this.renderTab('dashboard');
+        },
+
+        setupEventListeners() {
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const tab = e.target.dataset.tab;
+                    this.switchTab(tab);
+                });
+            });
+        },
+
+        switchTab(tab) {
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tab);
+            });
+            this.currentTab = tab;
+            this.renderTab(tab);
+        },
+
+        renderTab(tab) {
+            const content = document.getElementById('app-content');
+            
+            switch(tab) {
+                case 'dashboard':
+                    this.renderDashboard(content);
+                    break;
+                case 'data':
+                    this.renderDataManagement(content);
+                    break;
+                case 'analytics':
+                    this.renderAnalytics(content);
+                    break;
+                case 'reports':
+                    this.renderReports(content);
+                    break;
+                case 'by-client':
+                    this.renderByClient(content);
+                    break;
+                case 'by-year':
+                    this.renderByYear(content);
+                    break;
+            }
+        },
+
+        renderDashboard(container) {
+            const stats = this.calculateStats();
+
+            container.innerHTML = `
+                <h2 style="color: #1e293b; margin-bottom: 10px;">Dashboard Overview</h2>
+                <p style="color: #64748b; margin-bottom: 30px;">Complete PTTEP Portfolio Status</p>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.totalOrders}</div>
+                        <div class="stat-label">Total PO/SO</div>
+                        <div class="stat-change">All Projects</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">฿${(stats.totalTHB/1000000).toFixed(2)}M</div>
+                        <div class="stat-label">Total Value (THB)</div>
+                        <div class="stat-change">Converted at 35 THB/USD</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">$${(stats.totalUSD/1000000).toFixed(2)}M</div>
+                        <div class="stat-label">Total Value (USD)</div>
+                        <div class="stat-change">Original + Converted</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.uniqueClients}</div>
+                        <div class="stat-label">Active Clients</div>
+                        <div class="stat-change">Major Companies</div>
+                    </div>
+                </div>
+                
+                <h3 style="margin: 30px 0 20px; color: #1e293b;">Recent Orders (Latest 10)</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>PO Number</th>
+                            <th>Client</th>
+                            <th>Project Description</th>
+                            <th>Original Value</th>
+                            <th>THB Equivalent</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${this.data.sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 10).map(item => `
+                            <tr>
+                                <td>${item.date}</td>
+                                <td class="po-number">${item.po}</td>
+                                <td>${item.client.split('(')[0]}</td>
+                                <td title="${item.title}">${item.title.substring(0, 50)}...</td>
+                                <td>
+                                    <div class="currency-original">
+                                        ${item.original_currency === 'USD' ? '$' : '฿'}${item.value_original.toLocaleString()}
+                                    </div>
+                                    <div class="currency-converted">${item.original_currency}</div>
+                                </td>
+                                <td>฿${item.value_thb.toLocaleString()}</td>
+                                <td>
+                                    <span class="status-badge status-${item.status}">
+                                        ${item.status}
+                                    </span>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        },
+
+        renderDataManagement(container) {
+            container.innerHTML = `
+                <h2 style="color: #1e293b;">Data Management</h2>
+                
+                <div class="filter-bar">
+                    <div class="filter-item">
+                        <label>Search PO</label>
+                        <input type="text" id="searchPO" placeholder="PO Number">
+                    </div>
+                    <div class="filter-item">
+                        <label>Client</label>
+                        <select id="filterClient">
+                            <option value="">All Clients</option>
+                            ${[...new Set(this.data.map(item => item.client))].map(client => 
+                                `<option value="${client}">${client}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <label>Year</label>
+                        <select id="filterYear">
+                            <option value="">All Years</option>
+                            ${[...new Set(this.data.map(item => item.date.substring(0, 4)))].sort().reverse().map(year => 
+                                `<option value="${year}">${year}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="PTTEPApp.filterData()">Search</button>
+                    <button class="btn btn-success" onclick="PTTEPApp.exportCSV()">Export CSV</button>
+                    <button class="btn btn-info" onclick="PTTEPApp.exportJSON()">Export JSON</button>
+                </div>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Date</th>
+                            <th>PO Number</th>
+                            <th>Client</th>
+                            <th>Project</th>
+                            <th>Title/Description</th>
+                            <th>Original</th>
+                            <th>THB</th>
+                            <th>USD</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody">
+                        ${this.renderTableRows(this.data)}
+                    </tbody>
+                </table>
+            `;
+        },
+
+        renderTableRows(data) {
+            return data.map(item => `
+                <tr>
+                    <td style="text-align: center;">${item.item}</td>
+                    <td>${item.date}</td>
+                    <td class="po-number">${item.po}</td>
+                    <td title="${item.client}">${item.client.length > 30 ? item.client.substring(0, 30) + '...' : item.client}</td>
+                    <td>${item.project}</td>
+                    <td title="${item.title}">${item.title.substring(0, 40)}...</td>
+                    <td>
+                        <div class="currency-original">
+                            ${item.original_currency === 'USD' ? '$' : '฿'}${item.value_original.toLocaleString()}
+                        </div>
+                    </td>
+                    <td>฿${item.value_thb.toLocaleString()}</td>
+                    <td>$${item.value_usd.toLocaleString()}</td>
+                    <td>
+                        <span class="status-badge status-${item.status}">
+                            ${item.status}
+                        </span>
+                    </td>
+                </tr>
+            `).join('');
+        },
+
+        renderByClient(container) {
+            const clientData = {};
+            this.data.forEach(item => {
+                const client = item.client.split('(')[0].trim();
+                if (!clientData[client]) {
+                    clientData[client] = {
+                        orders: [],
+                        totalTHB: 0,
+                        totalUSD: 0,
+                        count: 0
+                    };
+                }
+                clientData[client].orders.push(item);
+                clientData[client].totalTHB += item.value_thb;
+                clientData[client].totalUSD += item.value_usd;
+                clientData[client].count++;
+            });
+
+            container.innerHTML = `
+                <h2 style="color: #1e293b;">Project References by Client</h2>
+                ${Object.entries(clientData).map(([client, data]) => `
+                    <div class="summary-card">
+                        <h3>${client}</h3>
+                        <p style="color: #64748b; margin-bottom: 15px;">
+                            ${data.count} Orders | ฿${data.totalTHB.toLocaleString()} | $${data.totalUSD.toLocaleString()}
+                        </p>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>PO Number</th>
+                                    <th>Project</th>
+                                    <th>Description</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.orders.map(item => `
+                                    <tr>
+                                        <td>${item.date}</td>
+                                        <td class="po-number">${item.po}</td>
+                                        <td>${item.project}</td>
+                                        <td>${item.title.substring(0, 50)}...</td>
+                                        <td>
+                                            ${item.original_currency === 'USD' ? '$' : '฿'}${item.value_original.toLocaleString()}
+                                            ${item.original_currency}
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `).join('')}
+            `;
+        },
+
+        renderByYear(container) {
+            const yearData = {};
+            this.data.forEach(item => {
+                const year = item.date.substring(0, 4);
+                if (!yearData[year]) {
+                    yearData[year] = {
+                        orders: [],
+                        totalTHB: 0,
+                        totalUSD: 0,
+                        count: 0
+                    };
+                }
+                yearData[year].orders.push(item);
+                yearData[year].totalTHB += item.value_thb;
+                yearData[year].totalUSD += item.value_usd;
+                yearData[year].count++;
+            });
+
+            const sortedYears = Object.keys(yearData).sort().reverse();
+
+            container.innerHTML = `
+                <h2 style="color: #1e293b;">Project References by Year</h2>
+                ${sortedYears.map(year => `
+                    <div class="summary-card">
+                        <h3>Year ${year}</h3>
+                        <p style="color: #64748b; margin-bottom: 15px;">
+                            ${yearData[year].count} Orders | ฿${yearData[year].totalTHB.toLocaleString()} | $${yearData[year].totalUSD.toLocaleString()}
+                        </p>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>PO Number</th>
+                                    <th>Client</th>
+                                    <th>Project</th>
+                                    <th>Value</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${yearData[year].orders.map(item => `
+                                    <tr>
+                                        <td>${item.date}</td>
+                                        <td class="po-number">${item.po}</td>
+                                        <td>${item.client.split('(')[0]}</td>
+                                        <td>${item.project}</td>
+                                        <td>
+                                            ${item.original_currency === 'USD' ? '$' : '฿'}${item.value_original.toLocaleString()}
+                                            ${item.original_currency}
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `).join('')}
+            `;
+        },
+
+        renderAnalytics(container) {
+            container.innerHTML = `
+                <h2 style="color: #1e293b;">Analytics Dashboard</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+                    <div class="summary-card">
+                        <h3>Revenue by Year</h3>
+                        <canvas id="yearChart" height="200"></canvas>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Client Distribution</h3>
+                        <canvas id="clientChart" height="200"></canvas>
+                    </div>
+                </div>
+            `;
+
+            // Render charts after DOM is ready
+            setTimeout(() => this.renderCharts(), 100);
+        },
+
+        renderCharts() {
+            // Year chart data
+            const yearData = {};
+            this.data.forEach(item => {
+                const year = item.date.substring(0, 4);
+                yearData[year] = (yearData[year] || 0) + item.value_thb;
+            });
+
+            // Year chart
+            const yearCtx = document.getElementById('yearChart');
+            if (yearCtx) {
+                new Chart(yearCtx.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(yearData).sort(),
+                        datasets: [{
+                            label: 'Revenue (THB)',
+                            data: Object.keys(yearData).sort().map(year => yearData[year]),
+                            backgroundColor: '#1e3c72'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+
+            // Client chart data
+            const clientData = {};
+            this.data.forEach(item => {
+                const client = item.client.split('(')[0].trim();
+                clientData[client] = (clientData[client] || 0) + item.value_thb;
+            });
+
+            // Client chart
+            const clientCtx = document.getElementById('clientChart');
+            if (clientCtx) {
+                new Chart(clientCtx.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(clientData),
+                        datasets: [{
+                            data: Object.values(clientData),
+                            backgroundColor: ['#1e3c72', '#2a5298', '#3b82f6', '#10b981', '#f59e0b']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
+        },
+
+        renderReports(container) {
+            const stats = this.calculateStats();
+            
+            container.innerHTML = `
+                <h2 style="color: #1e293b;">Professional Project References Report</h2>
+                
+                <div class="summary-card">
+                    <h3>Executive Summary - Addvalue Innovation Co., Ltd.</h3>
+                    <p><strong>Report Generated:</strong> ${new Date().toLocaleString()}</p>
+                    <hr style="margin: 15px 0; border: none; border-top: 1px solid #e5e7eb;">
+                    
+                    <h4 style="color: #1e3c72; margin-top: 20px;">Portfolio Overview</h4>
+                    <ul style="line-height: 2; color: #475569;">
+                        <li><strong>Total Projects:</strong> ${stats.totalOrders} Purchase Orders/Service Orders</li>
+                        <li><strong>Total Portfolio Value:</strong> ฿${stats.totalTHB.toLocaleString()} (USD ${stats.totalUSD.toLocaleString()})</li>
+                        <li><strong>Major Clients:</strong> ${stats.uniqueClients} Organizations</li>
+                        <li><strong>Project Duration:</strong> 2019 - 2023 (5 Years)</li>
+                        <li><strong>Success Rate:</strong> ${((stats.delivered/stats.totalOrders)*100).toFixed(1)}% Delivered</li>
+                    </ul>
+                    
+                    <h4 style="color: #1e3c72; margin-top: 20px;">Key Clients</h4>
+                    <ol style="line-height: 2; color: #475569;">
+                        <li>PTT Exploration and Production Public Co., Ltd. (PTTEP)</li>
+                        <li>Carigali-PTTEPI Operating Company Sdn Bhd (CPOC)</li>
+                        <li>PTTEP Energy Development Company Limited</li>
+                        <li>Andaman Transportation Limited</li>
+                    </ol>
+                    
+                    <h4 style="color: #1e3c72; margin-top: 20px;">Service Categories</h4>
+                    <ul style="line-height: 2; color: #475569;">
+                        <li>Telecommunication Systems & Infrastructure</li>
+                        <li>CCTV & Security Systems</li>
+                        <li>Radio Communication Systems</li>
+                        <li>Network Equipment Supply</li>
+                        <li>Engineering & Installation Services</li>
+                    </ul>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-primary" onclick="window.print()">Print Report</button>
+                    <button class="btn btn-success" onclick="PTTEPApp.exportCSV()">Export to CSV</button>
+                    <button class="btn btn-info" onclick="PTTEPApp.exportJSON()">Export to JSON</button>
+                    <button class="btn btn-warning" onclick="PTTEPApp.generatePDF()">Generate PDF</button>
+                </div>
+            `;
+        },
+
+        calculateStats() {
+            const totalTHB = this.data.reduce((sum, item) => sum + item.value_thb, 0);
+            const totalUSD = this.data.reduce((sum, item) => sum + item.value_usd, 0);
+            const uniqueClients = new Set(this.data.map(item => item.client.split('(')[0].trim())).size;
+            const delivered = this.data.filter(item => item.status === 'delivered').length;
+            
+            return {
+                totalOrders: this.data.length,
+                totalTHB,
+                totalUSD,
+                uniqueClients,
+                delivered,
+                pending: this.data.filter(item => item.status === 'pending').length,
+                amendment: this.data.filter(item => item.status === 'amendment').length
+            };
+        },
+
+        filterData() {
+            const searchPO = document.getElementById('searchPO').value.toLowerCase();
+            const filterClient = document.getElementById('filterClient').value;
+            const filterYear = document.getElementById('filterYear').value;
+            
+            let filtered = this.data;
+            
+            if (searchPO) {
+                filtered = filtered.filter(item => item.po.toLowerCase().includes(searchPO));
+            }
+            if (filterClient) {
+                filtered = filtered.filter(item => item.client === filterClient);
+            }
+            if (filterYear) {
+                filtered = filtered.filter(item => item.date.startsWith(filterYear));
+            }
+            
+            document.getElementById('dataTableBody').innerHTML = this.renderTableRows(filtered);
+        },
+
+        exportCSV() {
+            const headers = ['Item', 'Date', 'PO Number', 'Client', 'Project', 'Title', 'Original Currency', 'Original Value', 'THB Value', 'USD Value', 'Status'];
+            const csv = [
+                headers.join(','),
+                ...this.data.map(item => [
+                    item.item,
+                    item.date,
+                    item.po,
+                    `"${item.client}"`,
+                    `"${item.project}"`,
+                    `"${item.title}"`,
+                    item.original_currency,
+                    item.value_original,
+                    item.value_thb,
+                    item.value_usd,
+                    item.status
+                ].join(','))
+            ].join('\n');
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Addvalue_PTTEP_References_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        },
+
+        exportJSON() {
+            const json = JSON.stringify(this.data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Addvalue_PTTEP_References_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+        },
+
+        generatePDF() {
+            window.print();
+        }
+    };
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+        PTTEPApp.init();
+    });
+    </script>
+</body>
+</html>

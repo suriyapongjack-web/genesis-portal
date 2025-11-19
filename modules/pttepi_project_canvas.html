@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PTTEPI ZQP-ZWP4 Project Canvas</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        .canvas-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.2em;
+            font-weight: 300;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        .canvas-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 0;
+        }
+        .canvas-section {
+            padding: 25px;
+            border-right: 1px solid #eee;
+            border-bottom: 1px solid #eee;
+            min-height: 300px;
+        }
+        .canvas-section:nth-child(2n) {
+            border-right: none;
+        }
+        .canvas-section h3 {
+            color: #1e3c72;
+            margin: 0 0 20px 0;
+            font-size: 1.3em;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+            display: flex;
+            align-items: center;
+        }
+        .icon {
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+        .metric {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .metric-title {
+            font-weight: 600;
+            color: #1e3c72;
+            margin-bottom: 5px;
+        }
+        .metric-value {
+            font-size: 1.1em;
+            color: #333;
+        }
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        .stakeholder {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .stakeholder:last-child {
+            border-bottom: none;
+        }
+        .stakeholder-name {
+            font-weight: 600;
+            color: #1e3c72;
+        }
+        .stakeholder-role {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .timeline-item {
+            display: flex;
+            margin: 15px 0;
+            align-items: center;
+        }
+        .timeline-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #667eea;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .timeline-dot.completed {
+            background: #28a745;
+        }
+        .timeline-content {
+            flex: 1;
+        }
+        .timeline-title {
+            font-weight: 600;
+            color: #1e3c72;
+        }
+        .timeline-date {
+            color: #666;
+            font-size: 0.9em;
+        }
+        .risk-item {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 6px;
+        }
+        .risk-high {
+            border-left: 4px solid #e53e3e;
+        }
+        .risk-medium {
+            border-left: 4px solid #dd6b20;
+        }
+        .risk-low {
+            border-left: 4px solid #38a169;
+        }
+        .financial-summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .financial-amount {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="canvas-container">
+        <div class="header">
+            <h1>🎯 PTTEPI ZQP-ZWP4 Telecommunications Link Project</h1>
+            <p>30km Offshore Microwave Communication System | Phase 1B Modification</p>
+        </div>
+        
+        <div class="canvas-grid">
+            <!-- Problem & Solution -->
+            <div class="canvas-section">
+                <h3><span class="icon">🎯</span>Problem & Solution</h3>
+                <div class="metric">
+                    <div class="metric-title">Current Issue</div>
+                    <div class="metric-value">5GHz unlicensed system causing production downtime due to maritime radar interference</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title">Proposed Solution</div>
+                    <div class="metric-value">Licensed 7-8GHz Ceragon IP-50CX microwave link via Mytel spectrum</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title">Business Model</div>
+                    <div class="metric-value">5-year Equipment-as-a-Service (EaaS) rental model</div>
+                </div>
+            </div>
+
+            <!-- Technical Specifications -->
+            <div class="canvas-section">
+                <h3><span class="icon">⚙️</span>Technical Specifications</h3>
+                <div class="metric">
+                    <div class="metric-title">Path Distance</div>
+                    <div class="metric-value">30km over-water (ZPQ ↔ ZWP4)</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title">Equipment</div>
+                    <div class="metric-value">Ceragon IP-50CX, 2x2 MIMO, 32QAM modulation</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title">Performance</div>
+                    <div class="metric-value">
+                        <strong>Option 1:</strong> 450 Mbps @ 99.95% availability<br>
+                        <strong>Option 2:</strong> 130-159 Mbps @ 99.99% availability<br>
+                        <strong>Option 3:</strong> 57-70 Mbps @ 99.997% availability
+                    </div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title">Compliance</div>
+                    <div class="metric-value">ATEX Zone 2 certified for offshore hazardous areas</div>
+                </div>
+            </div>
+
+            <!-- Stakeholders -->
+            <div class="canvas-section">
+                <h3><span class="icon">👥</span>Key Stakeholders</h3>
+                <div class="stakeholder">
+                    <div>
+                        <div class="stakeholder-name">PTTEPI Myanmar</div>
+                        <div class="stakeholder-role">End Client & Platform Owner</div>
+                    </div>
+                    <span class="status-active">Active</span>
+                </div>
+                <div class="stakeholder">
+                    <div>
+                        <div class="stakeholder-name">Mytel</div>
+                        <div class="stakeholder-role">Licensed Operator & Prime Contractor</div>
+                    </div>
+                    <span class="status-active">Active</span>
+                </div>
+                <div class="stakeholder">
+                    <div>
+                        <div class="stakeholder-name">Add Value System</div>
+                        <div class="stakeholder-role">Technical Implementation Partner</div>
+                    </div>
+                    <span class="status-active">Active</span>
+                </div>
+                <div class="stakeholder">
+                    <div>
+                        <div class="stakeholder-name">Ceragon Networks</div>
+                        <div class="stakeholder-role">Equipment Manufacturer</div>
+                    </div>
+                    <span class="status-pending">Pending</span>
+                </div>
+                <div class="stakeholder">
+                    <div>
+                        <div class="stakeholder-name">PTTEP Engineers</div>
+                        <div class="stakeholder-role">Technical Consultation</div>
+                    </div>
+                    <span class="status-pending">Informal</span>
+                </div>
+            </div>
+
+            <!-- Implementation Timeline -->
+            <div class="canvas-section">
+                <h3><span class="icon">📅</span>Implementation Timeline</h3>
+                <div class="timeline-item">
+                    <div class="timeline-dot completed"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">MOU Execution</div>
+                        <div class="timeline-date">July 2025 - Completed</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot completed"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Pre-FEED Study</div>
+                        <div class="timeline-date">August 2025 - Completed</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">PTTEP Technical Review</div>
+                        <div class="timeline-date">September 2025 - Current</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Commercial Agreement</div>
+                        <div class="timeline-date">Q4 2025 - Planned</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Equipment Manufacturing</div>
+                        <div class="timeline-date">16 weeks from order</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Installation & Commissioning</div>
+                        <div class="timeline-date">4-6 weeks</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Model -->
+            <div class="canvas-section">
+                <h3><span class="icon">💰</span>Financial Structure</h3>
+                <div class="financial-summary">
+                    <div>Equipment + Services Quote</div>
+                    <div class="financial-amount">$30,267</div>
+                    <div>Add Value System to Mytel</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title">Equipment Costs</div>
+                    <div class="metric-value">$22,515 (74%) - Hardware, ATEX certification</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title">Service Costs</div>
+                    <div class="metric-value">$7,752 (26%) - Design, training, support</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title">PTTEP/Mytel Scope</div>
+                    <div class="metric-value">Installation, towers, civil works, licensing fees</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title">Service Model</div>
+                    <div class="metric-value">5-year EaaS rental with 99.95% SLA guarantee</div>
+                </div>
+            </div>
+
+            <!-- Risk Management -->
+            <div class="canvas-section">
+                <h3><span class="icon">⚠️</span>Risk Assessment</h3>
+                <div class="risk-item risk-high">
+                    <strong>High:</strong> ATEX Zone 2 compliance for ZWP4 installation
+                </div>
+                <div class="risk-item risk-medium">
+                    <strong>Medium:</strong> Weather windows for offshore installation
+                </div>
+                <div class="risk-item risk-medium">
+                    <strong>Medium:</strong> Capacity vs availability trade-off decision
+                </div>
+                <div class="risk-item risk-low">
+                    <strong>Low:</strong> Mytel spectrum licensing (established partnership)
+                </div>
+                <div class="risk-item risk-low">
+                    <strong>Low:</strong> Equipment availability (Ceragon standard product)
+                </div>
+                <div class="metric">
+                    <div class="metric-title">Risk Mitigation</div>
+                    <div class="metric-value">
+                        • EaaS model transfers technical risks to service provider<br>
+                        • Myanmar-based spare inventory at Mytel facility<br>
+                        • 24/7 NOC monitoring and support
+                    </div>
+                </div>
+            </div>
+
+            <!-- Success Criteria -->
+            <div class="canvas-section">
+                <h3><span class="icon">🎯</span>Success Criteria</h3>
+                <div class="metric">
+                    <div class="metric-title">Performance Targets</div>
+                    <div class="metric-value">
+                        • Link availability: 99.95% minimum monthly<br>
+                        • Throughput: 105+ Mbps guaranteed<br>
+                        • Restoration time: <4 hours maximum
+                    </div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title">Business Objectives</div>
+                    <div class="metric-value">
+                        • Eliminate production downtime due to telecom failures<br>
+                        • Predictable OpEx vs CapEx investment<br>
+                        • Focus PTTEP resources on core operations
+                    </div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title">Strategic Goals</div>
+                    <div class="metric-value">
+                        • Scalable platform for future Zawtika expansion<br>
+                        • Technology currency maintained through service<br>
+                        • Regulatory compliance through licensed operator
+                    </div>
+                </div>
+            </div>
+
+            <!-- Document Status -->
+            <div class="canvas-section">
+                <h3><span class="icon">📋</span>Document Status</h3>
+                <div class="metric">
+                    <div class="metric-title">Pre-FEED Study</div>
+                    <div class="metric-value">MM-ZTK-Z4L-TEL-PREFEED-001 Rev A0 ✅</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title">MOU</div>
+                    <div class="metric-value">Mytel-AddValue executed July 2025 ✅</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title">Service Agreement</div>
+                    <div class="metric-value">Template ready, pending commercial terms ⏳</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title">FAT/SAT Procedures</div>
+                    <div class="metric-value">Bangkok facility - 2 days each ⏳</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-title">Next Actions</div>
+                    <div class="metric-value">
+                        • PTTEP capacity decision (450/159/70 Mbps)<br>
+                        • Commercial pricing development<br>
+                        • ATEX procedures documentation
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

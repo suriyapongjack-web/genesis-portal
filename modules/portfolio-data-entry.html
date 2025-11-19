@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio Data Entry System</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+<style>
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#f5f5f5}
+.container{max-width:1200px;margin:20px auto}
+.header{background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:20px;border-radius:10px;margin-bottom:20px}
+.entry-card{background:white;border-radius:10px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,0.1);margin-bottom:20px}
+.quick-entry{background:#f8f9fa;padding:15px;border-radius:8px;margin-bottom:20px}
+.data-table{background:white;padding:20px;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+.btn-action{margin:0 5px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:20px}
+.stat-card{background:white;padding:15px;border-radius:8px;box-shadow:0 1px 5px rgba(0,0,0,0.1)}
+.stat-value{font-size:24px;font-weight:bold;color:#667eea}
+.stat-label{font-size:12px;color:#666;text-transform:uppercase}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1><i class="bi bi-database"></i> Portfolio Data Entry System</h1>
+    <p class="mb-0">ระบบบันทึกข้อมูล PO/SO สำหรับ Portfolio</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-value" id="totalRecords">0</div>
+      <div class="stat-label">Total Records</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="totalAmount">฿0</div>
+      <div class="stat-label">Total Value</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="totalClients">0</div>
+      <div class="stat-label">Clients</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="avgAmount">฿0</div>
+      <div class="stat-label">Average Value</div>
+    </div>
+  </div>
+
+  <div class="entry-card">
+    <h5 class="mb-3"><i class="bi bi-lightning"></i> Quick Entry (Paste bulk data)</h5>
+    <div class="quick-entry">
+      <textarea class="form-control mb-3" id="bulkData" rows="5" 
+        placeholder="Paste data here in format:&#10;PO_Number | Description&#10;3450028573 | with sign1&#10;OB133728 | GBN AUS SU Ant 30dBi IDU Light"></textarea>
+      <button class="btn btn-success" onclick="app.parseBulk()">
+        <i class="bi bi-upload"></i> Process Bulk Data
+      </button>
+      <button class="btn btn-warning ms-2" onclick="app.loadSample()">
+        <i class="bi bi-file-text"></i> Load Sample Data
+      </button>
+    </div>
+
+    <h5 class="mb-3"><i class="bi bi-pencil"></i> Manual Entry</h5>
+    <div class="row g-3">
+      <div class="col-md-3">
+        <input type="text" class="form-control" id="po_number" placeholder="PO Number">
+      </div>
+      <div class="col-md-2">
+        <input type="date" class="form-control" id="date" value="2024-01-01">
+      </div>
+      <div class="col-md-2">
+        <select class="form-control" id="client">
+          <option value="PTTEP">PTTEP</option>
+          <option value="Alvarion">Alvarion</option>
+          <option value="GBN">GBN</option>
+          <option value="ART">ART</option>
+          <option value="Add Value">Add Value</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <input type="text" class="form-control" id="project" placeholder="Project/Location">
+      </div>
+      <div class="col-md-4">
+        <input type="text" class="form-control" id="description" placeholder="Description">
+      </div>
+      <div class="col-md-3">
+        <input type="number" class="form-control" id="amount" placeholder="Amount (THB)">
+      </div>
+      <div class="col-md-2">
+        <select class="form-control" id="status">
+          <option value="completed">Completed</option>
+          <option value="active">Active</option>
+          <option value="pending">Pending</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <button class="btn btn-primary w-100" onclick="app.addRecord()">
+          <i class="bi bi-plus-circle"></i> Add Record
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="data-table">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0"><i class="bi bi-table"></i> Portfolio Data</h5>
+      <div>
+        <button class="btn btn-success btn-sm" onclick="app.exportSQL()">
+          <i class="bi bi-database"></i> Export SQL
+        </button>
+        <button class="btn btn-info btn-sm" onclick="app.exportCSV()">
+          <i class="bi bi-file-earmark-excel"></i> Export CSV
+        </button>
+        <button class="btn btn-warning btn-sm" onclick="app.exportJSON()">
+          <i class="bi bi-file-code"></i> Export JSON
+        </button>
+        <button class="btn btn-danger btn-sm" onclick="app.clearAll()">
+          <i class="bi bi-trash"></i> Clear All
+        </button>
+      </div>
+    </div>
+    
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>PO Number</th>
+            <th>Date</th>
+            <th>Client</th>
+            <th>Project</th>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="dataTable"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+const app = {
+  data: [],
+  
+  init() {
+    const saved = localStorage.getItem('portfolio_data');
+    if(saved) {
+      this.data = JSON.parse(saved);
+      this.render();
+    }
+  },
+  
+  loadSample() {
+    const sampleData = `3450028573 | with sign1
+3450006534 | Anritsu Site S362E  
+3450026161 | Ack Addvalue_revised
+3450018836 | Add Value System acknowledgement
+3450023662 | Supply of Spare Part of 60W POE Injector for Zawtika
+3450018329 | R1_Add Value Acknowledgement
+3450018836 | Add Value System
+3450014616 | Approved-ALT-PMZ-N-PO-Acknowledgement Add Value
+3450014525 | Approved-ALT-PMZ-N-PO-16-3450014525-Purchasing
+3450013953 | ALT Wi-Max Testing & Stimulating SVCs_Add Value_ack
+3450003642 | ART AOS SU
+3450004323 | acknowledgement to PTTEP from Add Value System
+OB133685 | GBN license AUS SU54 3 6 54
+OA128163 | ART Trunk Radio.xps
+OB149401 | GBS AUS SU DC Ant Grid 30dBi Light RF Jumper
+OA127238 | ART Ant Omni 13dBi
+OB149087 | GBS Omni 15 dBi
+OA126755 | ART IDU DC
+QC127547 | S1 Wimax Testing
+OA125659 | ART AUS SU IDU Ant Grid 30 dBi Light RF Jumper
+OB142443 | GBN AU Training CASS
+OA119706 | Alvarion ART AU SU Grid IDU Light
+OB133728 | GBN AUS SU Ant 30dBi IDU Light
+OB130278 | Alvarion and JB GBN
+OB128282 | Alvarion Trial GBN`;
+    
+    document.getElementById('bulkData').value = sampleData;
+  },
+  
+  parseBulk() {
+    const text = document.getElementById('bulkData').value;
+    if(!text) return;
+    
+    const lines = text.split('\n');
+    let count = 0;
+    
+    lines.forEach(line => {
+      const parts = line.split('|').map(p => p.trim());
+      if(parts[0]) {
+        const po = parts[0];
+        const desc = parts[1] || '';
+        
+        // Auto detect client from description
+        let client = 'PTTEP';
+        if(desc.includes('GBN') || desc.includes('GBS')) client = 'GBN';
+        else if(desc.includes('ART') || po.startsWith('OA')) client = 'ART';
+        else if(desc.includes('Alvarion')) client = 'Alvarion';
+        else if(desc.includes('Add Value')) client = 'Add Value';
+        
+        // Auto detect project/field
+        let project = 'General';
+        if(desc.includes('Zawtika')) project = 'Zawtika';
+        else if(desc.includes('S1')) project = 'S1 Field';
+        else if(desc.includes('Anritsu')) project = 'Anritsu Site';
+        else if(desc.includes('PMZ')) project = 'PMZ Field';
+        
+        // Auto generate amount based on type
+        let amount = 100000;
+        if(desc.includes('System')) amount = 500000;
+        else if(desc.includes('Training')) amount = 150000;
+        else if(desc.includes('Testing')) amount = 250000;
+        else if(desc.includes('license')) amount = 350000;
+        
+        // Determine date based on PO prefix
+        let date = '2024-01-01';
+        if(po.startsWith('OB')) date = '2008-' + Math.floor(Math.random() * 12 + 1).toString().padStart(2,'0') + '-15';
+        else if(po.startsWith('OA')) date = '2010-' + Math.floor(Math.random() * 12 + 1).toString().padStart(2,'0') + '-15';
+        else if(po.startsWith('QC')) date = '2012-' + Math.floor(Math.random() * 12 + 1).toString().padStart(2,'0') + '-15';
+        else date = '2024-' + Math.floor(Math.random() * 12 + 1).toString().padStart(2,'0') + '-15';
+        
+        const record = {
+          po_number: po,
+          date: date,
+          client: client,
+          project: project,
+          description: desc,
+          amount: amount,
+          status: po.startsWith('OB') || po.startsWith('OA') ? 'completed' : 'active'
+        };
+        
+        this.data.push(record);
+        count++;
+      }
+    });
+    
+    document.getElementById('bulkData').value = '';
+    alert(`Added ${count} records successfully!`);
+    this.save();
+    this.render();
+  },
+  
+  addRecord() {
+    const record = {
+      po_number: document.getElementById('po_number').value,
+      date: document.getElementById('date').value,
+      client: document.getElementById('client').value,
+      project: document.getElementById('project').value,
+      description: document.getElementById('description').value,
+      amount: parseFloat(document.getElementById('amount').value) || 0,
+      status: document.getElementById('status').value
+    };
+    
+    if(!record.po_number) {
+      alert('Please enter PO Number');
+      return;
+    }
+    
+    this.data.push(record);
+    this.clearForm();
+    this.save();
+    this.render();
+  },
+  
+  clearForm() {
+    document.getElementById('po_number').value = '';
+    document.getElementById('description').value = '';
+    document.getElementById('project').value = '';
+    document.getElementById('amount').value = '';
+  },
+  
+  deleteRecord(index) {
+    if(confirm('Delete this record?')) {
+      this.data.splice(index, 1);
+      this.save();
+      this.render();
+    }
+  },
+  
+  save() {
+    localStorage.setItem('portfolio_data', JSON.stringify(this.data));
+  },
+  
+  render() {
+    // Update stats
+    const total = this.data.length;
+    const amount = this.data.reduce((sum, d) => sum + d.amount, 0);
+    const clients = new Set(this.data.map(d => d.client)).size;
+    const avg = total ? amount / total : 0;
+    
+    document.getElementById('totalRecords').textContent = total;
+    document.getElementById('totalAmount').textContent = '฿' + amount.toLocaleString();
+    document.getElementById('totalClients').textContent = clients;
+    document.getElementById('avgAmount').textContent = '฿' + Math.round(avg).toLocaleString();
+    
+    // Update table
+    const tbody = document.getElementById('dataTable');
+    tbody.innerHTML = this.data.map((record, index) => `
+      <tr>
+        <td><strong>${record.po_number}</strong></td>
+        <td>${record.date}</td>
+        <td>${record.client}</td>
+        <td>${record.project}</td>
+        <td>${record.description}</td>
+        <td>฿${record.amount.toLocaleString()}</td>
+        <td><span class="badge bg-${record.status === 'completed' ? 'success' : 'warning'}">${record.status}</span></td>
+        <td>
+          <button class="btn btn-sm btn-danger" onclick="app.deleteRecord(${index})">
+            <i class="bi bi-trash"></i>
+          </button>
+        </td>
+      </tr>
+    `).join('');
+  },
+  
+  exportSQL() {
+    let sql = `-- Portfolio Database Export
+-- Generated: ${new Date().toISOString()}
+
+CREATE TABLE IF NOT EXISTS portfolio (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  po_number VARCHAR(50) NOT NULL,
+  issue_date DATE,
+  client_name VARCHAR(100),
+  project VARCHAR(100),
+  description TEXT,
+  amount DECIMAL(12,2),
+  status VARCHAR(20)
+);
+
+-- Insert Data
+`;
+    
+    this.data.forEach(record => {
+      sql += `INSERT INTO portfolio (po_number, issue_date, client_name, project, description, amount, status) VALUES `;
+      sql += `('${record.po_number}', '${record.date}', '${record.client}', '${record.project}', '${record.description}', ${record.amount}, '${record.status}');\n`;
+    });
+    
+    this.download('portfolio_export.sql', sql);
+  },
+  
+  exportCSV() {
+    let csv = 'PO Number,Date,Client,Project,Description,Amount,Status\n';
+    this.data.forEach(record => {
+      csv += `"${record.po_number}","${record.date}","${record.client}","${record.project}","${record.description}",${record.amount},"${record.status}"\n`;
+    });
+    this.download('portfolio_export.csv', csv);
+  },
+  
+  exportJSON() {
+    const json = JSON.stringify(this.data, null, 2);
+    this.download('portfolio_export.json', json);
+  },
+  
+  download(filename, content) {
+    const blob = new Blob([content], {type: 'text/plain;charset=utf-8'});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+  },
+  
+  clearAll() {
+    if(confirm('Clear all data? This cannot be undone!')) {
+      this.data = [];
+      this.save();
+      this.render();
+    }
+  }
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+  app.init();
+});
+</script>
+
+</body>
+</html>

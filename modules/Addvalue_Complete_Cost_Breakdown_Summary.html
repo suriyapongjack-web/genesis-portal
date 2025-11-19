@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สรุปต้นทุนทั้งหมด Addvalue - แบบแบ่งหมวดหมู่</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        
+        th {
+            background: #f8f9fa;
+            color: #333;
+            font-weight: 600;
+            text-align: left;
+            padding: 12px;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .category-header {
+            background: #e8eaf6 !important;
+            font-weight: bold;
+            color: #5c6bc0;
+        }
+        
+        .subtotal-row {
+            background: #fff3e0;
+            font-weight: bold;
+        }
+        
+        .total-row {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        .amount {
+            text-align: right;
+            font-weight: 600;
+        }
+        
+        .thb {
+            color: #495057;
+        }
+        
+        .usd {
+            color: #007bff;
+        }
+        
+        .profit-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        
+        .profit-table th {
+            background: #28a745;
+            color: white;
+        }
+        
+        .loss {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .profit {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .warning-box h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .recommendation-box {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .recommendation-box h3 {
+            color: #155724;
+            margin-bottom: 10px;
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .summary-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .summary-card .label {
+            color: #6c757d;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+        
+        .summary-card .value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .summary-card.loss-card {
+            background: #ffebee;
+            border-color: #ef5350;
+        }
+        
+        .summary-card.loss-card .value {
+            color: #c62828;
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #6c757d;
+            border-top: 2px solid #dee2e6;
+        }
+        
+        .note {
+            font-size: 0.9em;
+            color: #6c757d;
+            font-style: italic;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>สรุปต้นทุนทั้งหมด - Addvalue to Mytel</h1>
+            <p>โครงการ ZPQ-ZWP4 Telecommunications Link</p>
+            <p>วันที่: September 2025 | อัตราแลกเปลี่ยน: 32 THB/USD</p>
+        </div>
+        
+        <div class="content">
+            <!-- สรุปภาพรวม -->
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <div class="label">ราคาขายให้ Mytel</div>
+                    <div class="value">$30,267</div>
+                </div>
+                <div class="summary-card">
+                    <div class="label">ต้นทุนรวมจริง</div>
+                    <div class="value">$84,212</div>
+                </div>
+                <div class="summary-card loss-card">
+                    <div class="label">ผลขาดทุน</div>
+                    <div class="value">-$53,945</div>
+                </div>
+                <div class="summary-card loss-card">
+                    <div class="label">อัตราขาดทุน</div>
+                    <div class="value">-64%</div>
+                </div>
+            </div>
+            
+            <!-- หมวด 1: ต้นทุนอุปกรณ์จาก NextG/Ceragon -->
+            <div class="section">
+                <h2 class="section-title">📦 หมวดที่ 1: ต้นทุนอุปกรณ์จาก NextG (Ceragon)</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 40%">รายการ</th>
+                            <th style="width: 15%">จำนวน</th>
+                            <th style="width: 15%">ราคา/หน่วย</th>
+                            <th class="amount" style="width: 15%">รวม (THB)</th>
+                            <th class="amount" style="width: 15%">รวม (USD)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="category-header">
+                            <td colspan="5">1.1 อุปกรณ์หลัก (Main Equipment)</td>
+                        </tr>
+                        <tr>
+                            <td>IP-50CX 7-8GHz Radio ODU (ATEX Zone-2)</td>
+                            <td>2 units</td>
+                            <td>373,344 ฿</td>
+                            <td class="amount thb">746,688</td>
+                            <td class="amount usd">23,334</td>
+                        </tr>
+                        <tr>
+                            <td>Diplexer Units (161F-01W02-H/L)</td>
+                            <td>2 units</td>
+                            <td>รวมในราคา</td>
+                            <td class="amount thb">-</td>
+                            <td class="amount usd">-</td>
+                        </tr>
+                        
+                        <tr class="category-header">
+                            <td colspan="5">1.2 RF Components & Accessories</td>
+                        </tr>
+                        <tr>
+                            <td>IP-20C OMT Kit 7-8GHz</td>
+                            <td>2 kits</td>
+                            <td>24,864 ฿</td>
+                            <td class="amount thb">49,728</td>
+                            <td class="amount usd">1,554</td>
+                        </tr>
+                        <tr>
+                            <td>4FT (1.2m) Dual-Pol Antennas</td>
+                            <td>2 units</td>
+                            <td>64,000 ฿</td>
+                            <td class="amount thb">128,000</td>
+                            <td class="amount usd">4,000</td>
+                        </tr>
+                        
+                        <tr class="category-header">
+                            <td colspan="5">1.3 Software Licenses</td>
+                        </tr>
+                        <tr>
+                            <td>Capacity License (50M per carrier)</td>
+                            <td>2</td>
+                            <td>รวมในราคา</td>
+                            <td class="amount thb">-</td>
+                            <td class="amount usd">-</td>
+                        </tr>
+                        <tr>
+                            <td>ACM License (Adaptive Modulation)</td>
+                            <td>2</td>
+                            <td>รวมในราคา</td>
+                            <td class="amount thb">-</td>
+                            <td class="amount usd">-</td>
+                        </tr>
+                        <tr>
+                            <td>Sync Unit License</td>
+                            <td>2</td>
+                            <td>รวมในราคา</td>
+                            <td class="amount thb">-</td>
+                            <td class="amount usd">-</td>
+                        </tr>
+                        
+                        <tr class="category-header">
+                            <td colspan="5">1.4 Installation Materials</td>
+                        </tr>
+                        <tr>
+                            <td>CAT5E Outdoor Cable</td>
+                            <td>1 set</td>
+                            <td>3,520 ฿</td>
+                            <td class="amount thb">3,520</td>
+                            <td class="amount usd">110</td>
+                        </tr>
+                        <tr>
+                            <td>Universal Grounding Kits</td>
+                            <td>4 sets</td>
+                            <td>960 ฿</td>
+                            <td class="amount thb">3,840</td>
+                            <td class="amount usd">120</td>
+                        </tr>
+                        <tr>
+                            <td>PoE Injectors</td>
+                            <td>2 units</td>
+                            <td>1,280 ฿</td>
+                            <td class="amount thb">2,560</td>
+                            <td class="amount usd">80</td>
+                        </tr>
+                        <tr>
+                            <td>Antenna Mounting Brackets</td>
+                            <td>2 sets</td>
+                            <td>3,200 ฿</td>
+                            <td class="amount thb">6,400</td>
+                            <td class="amount usd">200</td>
+                        </tr>
+                        <tr>
+                            <td>Connectors, Cable Ties & Misc</td>
+                            <td>Various</td>
+                            <td>-</td>
+                            <td class="amount thb">2,886</td>
+                            <td class="amount usd">90</td>
+                        </tr>
+                        <tr>
+                            <td>ATEX Mechanical Kits</td>
+                            <td>2 sets</td>
+                            <td>รวมในราคา</td>
+                            <td class="amount thb">-</td>
+                            <td class="amount usd">-</td>
+                        </tr>
+                        
+                        <tr class="subtotal-row">
+                            <td colspan="3"><strong>รวมหมวด 1: อุปกรณ์จาก NextG</strong></td>
+                            <td class="amount thb"><strong>943,622</strong></td>
+                            <td class="amount usd"><strong>29,488</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- หมวด 2: ค่านำเข้าและโลจิสติกส์ -->
+            <div class="section">
+                <h2 class="section-title">🚢 หมวดที่ 2: ค่านำเข้าและโลจิสติกส์</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 40%">รายการ</th>
+                            <th style="width: 20%">การคำนวณ</th>
+                            <th class="amount" style="width: 20%">จำนวน (THB)</th>
+                            <th class="amount" style="width: 20%">จำนวน (USD)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>ค่าขนส่ง (Shipping)</td>
+                            <td>10% ของอุปกรณ์</td>
+                            <td class="amount thb">94,321</td>
+                            <td class="amount usd">2,948</td>
+                        </tr>
+                        <tr>
+                            <td>อากรนำเข้า (Import Duty)</td>
+                            <td>5% ของ CIF</td>
+                            <td class="amount thb">47,160</td>
+                            <td class="amount usd">1,474</td>
+                        </tr>
+                        <tr>
+                            <td>VAT</td>
+                            <td>7% ของ (CIF + Duty)</td>
+                            <td class="amount thb">75,928</td>
+                            <td class="amount usd">2,373</td>
+                        </tr>
+                        <tr>
+                            <td>Customs Clearance</td>
+                            <td>ค่าดำเนินการ</td>
+                            <td class="amount thb">8,000</td>
+                            <td class="amount usd">250</td>
+                        </tr>
+                        <tr>
+                            <td>ค่าจัดเก็บชั่วคราวที่ท่าเรือ</td>
+                            <td>7 วัน</td>
+                            <td class="amount thb">12,000</td>
+                            <td class="amount usd">375</td>
+                        </tr>
+                        <tr>
+                            <td>ค่าขนส่งทางเฮลิคอปเตอร์ (Offshore)</td>
+                            <td>อุปกรณ์ + บุคลากร</td>
+                            <td class="amount thb">50,000</td>
+                            <td class="amount usd">1,563</td>
+                        </tr>
+                        
+                        <tr class="subtotal-row">
+                            <td colspan="2"><strong>รวมหมวด 2: นำเข้าและโลจิสติกส์</strong></td>
+                            <td class="amount thb"><strong>287,409</strong></td>
+                            <td class="amount usd"><strong>8,982</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- หมวด 3: ค่าบริการและการติดตั้ง -->
+            <div class="section">
+                <h2 class="section-title">🔧 หมวดที่ 3: ค่าบริการและการติดตั้ง</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 40%">รายการ</th>
+                            <th style="width: 15%">ระยะเวลา</th>
+                            <th class="amount" style="width: 20%">จำนวน (THB)</th>
+                            <th class="amount" style="width: 20%">จำนวน (USD)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="category-header">
+                            <td colspan="4">3.1 Engineering & Project Management</td>
+                        </tr>
+                        <tr>
+                            <td>Project Management Office (PMO)</td>
+                            <td>ตลอดโครงการ</td>
+                            <td class="amount thb">112,000</td>
+                            <td class="amount usd">3,500</td>
+                        </tr>
+                        <tr>
+                            <td>Engineering Design & Documentation</td>
+                            <td>4 สัปดาห์</td>
+                            <td class="amount thb">80,000</td>
+                            <td class="amount usd">2,500</td>
+                        </tr>
+                        <tr>
+                            <td>Project Management Fee (10%)</td>
+                            <td>-</td>
+                            <td class="amount thb">150,457</td>
+                            <td class="amount usd">4,702</td>
+                        </tr>
+                        
+                        <tr class="category-header">
+                            <td colspan="4">3.2 Testing & Commissioning</td>
+                        </tr>
+                        <tr>
+                            <td>Pre-FAT Testing (Bangkok)</td>
+                            <td>5 วัน</td>
+                            <td class="amount thb">20,300</td>
+                            <td class="amount usd">634</td>
+                        </tr>
+                        <tr>
+                            <td>FAT with PTTEP/Mytel Teams (7 pax)</td>
+                            <td>3 วัน</td>
+                            <td class="amount thb">59,633</td>
+                            <td class="amount usd">1,864</td>
+                        </tr>
+                        <tr>
+                            <td>SAT Offshore Installation</td>
+                            <td>7 วัน</td>
+                            <td class="amount thb">131,120</td>
+                            <td class="amount usd">4,098</td>
+                        </tr>
+                        <tr>
+                            <td>Spectrum Analyzer Rental</td>
+                            <td>7 วัน</td>
+                            <td class="amount thb">45,000</td>
+                            <td class="amount usd">1,406</td>
+                        </tr>
+                        <tr>
+                            <td>Test Equipment Calibration</td>
+                            <td>-</td>
+                            <td class="amount thb">15,000</td>
+                            <td class="amount usd">469</td>
+                        </tr>
+                        <tr>
+                            <td>Specialized ATEX Tools</td>
+                            <td>-</td>
+                            <td class="amount thb">28,000</td>
+                            <td class="amount usd">875</td>
+                        </tr>
+                        
+                        <tr class="category-header">
+                            <td colspan="4">3.3 Training & Documentation</td>
+                        </tr>
+                        <tr>
+                            <td>Operations & Maintenance Training (7 pax)</td>
+                            <td>5 วัน</td>
+                            <td class="amount thb">115,267</td>
+                            <td class="amount usd">3,602</td>
+                        </tr>
+                        <tr>
+                            <td>VDRL Technical Documentation</td>
+                            <td>-</td>
+                            <td class="amount thb">69,500</td>
+                            <td class="amount usd">2,172</td>
+                        </tr>
+                        <tr>
+                            <td>Cost Analysis Report</td>
+                            <td>-</td>
+                            <td class="amount thb">25,000</td>
+                            <td class="amount usd">781</td>
+                        </tr>
+                        
+                        <tr class="category-header">
+                            <td colspan="4">3.4 Support Services</td>
+                        </tr>
+                        <tr>
+                            <td>Operational Support</td>
+                            <td>-</td>
+                            <td class="amount thb">150,000</td>
+                            <td class="amount usd">4,688</td>
+                        </tr>
+                        <tr>
+                            <td>Additional Services</td>
+                            <td>-</td>
+                            <td class="amount thb">147,250</td>
+                            <td class="amount usd">4,602</td>
+                        </tr>
+                        
+                        <tr class="subtotal-row">
+                            <td colspan="2"><strong>รวมหมวด 3: บริการและการติดตั้ง</strong></td>
+                            <td class="amount thb"><strong>1,148,527</strong></td>
+                            <td class="amount usd"><strong>35,891</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- หมวด 4: ค่าใช้จ่าย Offshore และความปลอดภัย -->
+            <div class="section">
+                <h2 class="section-title">⚠️ หมวดที่ 4: ค่าใช้จ่าย Offshore และความปลอดภัย</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 40%">รายการ</th>
+                            <th style="width: 20%">รายละเอียด</th>
+                            <th class="amount" style="width: 20%">จำนวน (THB)</th>
+                            <th class="amount" style="width: 20%">จำนวน (USD)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="category-header">
+                            <td colspan="4">4.1 ค่าบุคลากร Offshore</td>
+                        </tr>
+                        <tr>
+                            <td>ช่างเทคนิค 2 คน</td>
+                            <td>7 วัน @ 6,000฿/วัน/คน</td>
+                            <td class="amount thb">84,000</td>
+                            <td class="amount usd">2,625</td>
+                        </tr>
+                        <tr>
+                            <td>Offshore Allowance</td>
+                            <td>7 วัน @ 2,000฿/วัน/คน</td>
+                            <td class="amount thb">28,000</td>
+                            <td class="amount usd">875</td>
+                        </tr>
+                        
+                        <tr class="category-header">
+                            <td colspan="4">4.2 HSE & Safety</td>
+                        </tr>
+                        <tr>
+                            <td>Basic Offshore Safety Training</td>
+                            <td>BOSIET Certificate</td>
+                            <td class="amount thb">35,000</td>
+                            <td class="amount usd">1,094</td>
+                        </tr>
+                        <tr>
+                            <td>PPE Equipment</td>
+                            <td>ชุดและอุปกรณ์ความปลอดภัย</td>
+                            <td class="amount thb">24,000</td>
+                            <td class="amount usd">750</td>
+                        </tr>
+                        <tr>
+                            <td>Medical Check-up</td>
+                            <td>ตรวจสุขภาพ Offshore</td>
+                            <td class="amount thb">12,000</td>
+                            <td class="amount usd">375</td>
+                        </tr>
+                        <tr>
+                            <td>ประกันชีวิต/อุบัติเหตุ</td>
+                            <td>ประกัน Offshore</td>
+                            <td class="amount thb">15,000</td>
+                            <td class="amount usd">469</td>
+                        </tr>
+                        
+                        <tr class="subtotal-row">
+                            <td colspan="2"><strong>รวมหมวด 4: Offshore และความปลอดภัย</strong></td>
+                            <td class="amount thb"><strong>198,000</strong></td>
+                            <td class="amount usd"><strong>6,188</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- หมวด 5: ค่าใบอนุญาตและประกัน -->
+            <div class="section">
+                <h2 class="section-title">📋 หมวดที่ 5: ค่าใบอนุญาตและประกัน</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 40%">รายการ</th>
+                            <th style="width: 20%">รายละเอียด</th>
+                            <th class="amount" style="width: 20%">จำนวน (THB)</th>
+                            <th class="amount" style="width: 20%">จำนวน (USD)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Work Permit Myanmar</td>
+                            <td>ใบอนุญาตทำงาน</td>
+                            <td class="amount thb">25,000</td>
+                            <td class="amount usd">781</td>
+                        </tr>
+                        <tr>
+                            <td>Radio License Coordination</td>
+                            <td>ประสานงานใบอนุญาตวิทยุ</td>
+                            <td class="amount thb">20,000</td>
+                            <td class="amount usd">625</td>
+                        </tr>
+                        <tr>
+                            <td>ATEX Certification Validation</td>
+                            <td>ตรวจสอบใบรับรอง</td>
+                            <td class="amount thb">18,000</td>
+                            <td class="amount usd">563</td>
+                        </tr>
+                        <tr>
+                            <td>Performance Bond (2%)</td>
+                            <td>หลักประกันผลงาน</td>
+                            <td class="amount thb">14,420</td>
+                            <td class="amount usd">451</td>
+                        </tr>
+                        <tr>
+                            <td>Equipment Insurance</td>
+                            <td>ประกันระหว่างขนส่ง</td>
+                            <td class="amount thb">12,000</td>
+                            <td class="amount usd">375</td>
+                        </tr>
+                        <tr>
+                            <td>Professional Indemnity</td>
+                            <td>ประกันความรับผิดวิชาชีพ</td>
+                            <td class="amount thb">15,000</td>
+                            <td class="amount usd">469</td>
+                        </tr>
+                        
+                        <tr class="subtotal-row">
+                            <td colspan="2"><strong>รวมหมวด 5: ใบอนุญาตและประกัน</strong></td>
+                            <td class="amount thb"><strong>104,420</strong></td>
+                            <td class="amount usd"><strong>3,263</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- หมวด 6: ค่าใช้จ่ายสำรองและอื่นๆ -->
+            <div class="section">
+                <h2 class="section-title">💼 หมวดที่ 6: ค่าใช้จ่ายสำรองและอื่นๆ</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 40%">รายการ</th>
+                            <th style="width: 20%">รายละเอียด</th>
+                            <th class="amount" style="width: 20%">จำนวน (THB)</th>
+                            <th class="amount" style="width: 20%">จำนวน (USD)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Weather Delay Contingency</td>
+                            <td>กรณีสภาพอากาศ</td>
+                            <td class="amount thb">20,000</td>
+                            <td class="amount usd">625</td>
+                        </tr>
+                        <tr>
+                            <td>Spare Parts (5%)</td>
+                            <td>อะไหล่สำรอง</td>
+                            <td class="amount thb">36,024</td>
+                            <td class="amount usd">1,126</td>
+                        </tr>
+                        <tr>
+                            <td>Working Capital (30%)</td>
+                            <td>เงินทุนหมุนเวียน</td>
+                            <td class="amount thb">516,594</td>
+                            <td class="amount usd">16,143</td>
+                        </tr>
+                        <tr>
+                            <td>Miscellaneous (2%)</td>
+                            <td>ค่าใช้จ่ายเบ็ดเตล็ด</td>
+                            <td class="amount thb">44,776</td>
+                            <td class="amount usd">1,399</td>
+                        </tr>
+                        
+                        <tr class="subtotal-row">
+                            <td colspan="2"><strong>รวมหมวด 6: สำรองและอื่นๆ</strong></td>
+                            <td class="amount thb"><strong>617,394</strong></td>
+                            <td class="amount usd"><strong>19,293</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- สรุปต้นทุนทั้งหมด -->
+            <div class="section">
+                <h2 class="section-title">📊 สรุปต้นทุนทั้งหมด</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 50%">หมวดหมู่</th>
+                            <th class="amount" style="width: 25%">จำนวน (THB)</th>
+                            <th class="amount" style="width: 25%">จำนวน (USD)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>หมวด 1: อุปกรณ์จาก NextG</td>
+                            <td class="amount thb">943,622</td>
+                            <td class="amount usd">29,488</td>
+                        </tr>
+                        <tr>
+                            <td>หมวด 2: นำเข้าและโลจิสติกส์</td>
+                            <td class="amount thb">287,409</td>
+                            <td class="amount usd">8,982</td>
+                        </tr>
+                        <tr>
+                            <td>หมวด 3: บริการและการติดตั้ง</td>
+                            <td class="amount thb">1,148,527</td>
+                            <td class="amount usd">35,891</td>
+                        </tr>
+                        <tr>
+                            <td>หมวด 4: Offshore และความปลอดภัย</td>
+                            <td class="amount thb">198,000</td>
+                            <td class="amount usd">6,188</td>
+                        </tr>
+                        <tr>
+                            <td>หมวด 5: ใบอนุญาตและประกัน</td>
+                            <td class="amount thb">104,420</td>
+                            <td class="amount usd">3,263</td>
+                        </tr>
+                        <tr>
+                            <td>หมวด 6: สำรองและอื่นๆ</td>
+                            <td class="amount thb">617,394</td>
+                            <td class="amount usd">19,293</td>
+                        </tr>
+                        
+                        <tr class="total-row">
+                            <td><strong>ต้นทุนรวมทั้งหมด</strong></td>
+                            <td class="amount"><strong>3,299,372</strong></td>
+                            <td class="amount"><strong>103,105</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <p class="note" style="margin-top: 15px;">
+                    * หมายเหตุ: ต้นทุนรวมนี้รวมค่าใช้จ่ายทั้งหมดที่พบจากการวิเคราะห์ ซึ่งสูงกว่าต้นทุนที่ประเมินไว้เดิมใน Cost Rev 4
+                </p>
+            </div>
+            
+            <!-- การวิเคราะห์กำไรขาดทุน -->
+            <div class="profit-section">
+                <h2 class="section-title">💰 การวิเคราะห์กำไรขาดทุน</h2>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 40%">Scenario</th>
+                            <th class="amount">ราคาขาย (USD)</th>
+                            <th class="amount">ต้นทุน (USD)</th>
+                            <th class="amount">กำไร/ขาดทุน (USD)</th>
+                            <th class="amount">Margin (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="background: #ffebee;">
+                            <td><strong>ราคาปัจจุบัน (ขาดทุน!)</strong></td>
+                            <td class="amount">30,267</td>
+                            <td class="amount">103,105</td>
+                            <td class="amount loss">-72,838</td>
+                            <td class="amount loss">-71%</td>
+                        </tr>
+                        <tr>
+                            <td>Breakeven (คุ้มทุน)</td>
+                            <td class="amount">103,105</td>
+                            <td class="amount">103,105</td>
+                            <td class="amount">0</td>
+                            <td class="amount">0%</td>
+                        </tr>
+                        <tr style="background: #fff3e0;">
+                            <td>กำไรขั้นต่ำ 15%</td>
+                            <td class="amount">118,571</td>
+                            <td class="amount">103,105</td>
+                            <td class="amount profit">15,466</td>
+                            <td class="amount profit">15%</td>
+                        </tr>
+                        <tr style="background: #e8f5e9;">
+                            <td><strong>✅ กำไรมาตรฐาน 25% (แนะนำ)</strong></td>
+                            <td class="amount"><strong>128,881</strong></td>
+                            <td class="amount">103,105</td>
+                            <td class="amount profit"><strong>25,776</strong></td>
+                            <td class="amount profit"><strong>25%</strong></td>
+                        </tr>
+                        <tr style="background: #e3f2fd;">
+                            <td>กำไรเป้าหมาย 35%</td>
+                            <td class="amount">139,192</td>
+                            <td class="amount">103,105</td>
+                            <td class="amount profit">36,087</td>
+                            <td class="amount profit">35%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Warning Box -->
+            <div class="warning-box">
+                <h3>⚠️ คำเตือนสำคัญ</h3>
+                <ul>
+                    <li>ราคาขายปัจจุบัน $30,267 <strong>ขาดทุน 71%</strong> หรือ $72,838</li>
+                    <li>ต้นทุนจริงสูงกว่าที่ประเมินไว้ใน Cost Rev 4 ถึง 47%</li>
+                    <li>ต้องปรับราคาขายเพิ่มอย่างน้อย <strong>4.26 เท่า</strong> เพื่อคุ้มทุน</li>
+                    <li>หากไม่ปรับราคา จะขาดทุน 2.33 ล้านบาท</li>
+                </ul>
+            </div>
+            
+            <!-- Recommendation Box -->
+            <div class="recommendation-box">
+                <h3>✅ ข้อเสนอแนะ</h3>
+                <ol>
+                    <li><strong>เจรจาราคาใหม่ทันที:</strong> ขั้นต่ำ $118,571 (กำไร 15%) แนะนำ $128,881 (กำไร 25%)</li>
+                    <li><strong>ลดต้นทุนด่วน:</strong> ดำเนินการตาม Quick Wins ประหยัดได้ 170,000 บาท</li>
+                    <li><strong>เจรจาส่วนลดจาก NextG:</strong> เป้าหมาย 10% = ประหยัด 94,362 บาท</li>
+                    <li><strong>พิจารณา Partnership Model:</strong> แบ่งต้นทุนและความเสี่ยงกับ Mytel</li>
+                    <li><strong>ขยายขอบเขต:</strong> เพิ่มบริการ Maintenance 5 ปี เพื่อเพิ่มมูลค่าโครงการ</li>
+                </ol>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>เอกสารอ้างอิง:</strong></p>
+            <p>• 0493-Estimate Costs Rev.4 | • 24-3018 AddValue Quote | • Pre-FEED Study Document</p>
+            <p>• NextG/Ceragon Price List | • Myanmar Offshore Requirements</p>
+            <br>
+            <p><strong>จัดทำโดย:</strong> Financial Analysis Team | <strong>วันที่:</strong> September 2025</p>
+            <p style="color: #dc3545; font-weight: bold;">⚠️ เอกสารนี้เป็นความลับทางการค้า - ห้ามเผยแพร่</p>
+        </div>
+    </div>
+</body>
+</html>

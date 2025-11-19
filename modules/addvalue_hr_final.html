@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Addvalue HR Management System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        header { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .logo { font-size: 24px; font-weight: bold; color: #764ba2; }
+        .nav-tabs { display: flex; gap: 10px; }
+        .tab-btn { padding: 10px 20px; background: #f0f0f0; border: none; border-radius: 5px; cursor: pointer; transition: all 0.3s; }
+        .tab-btn.active { background: #667eea; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .card { background: white; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        .stat-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 10px; }
+        .stat-number { font-size: 2em; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background: #f8f9fa; font-weight: 600; }
+        tr:hover { background: #f8f9fa; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 500; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; transition: all 0.3s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-success { background: #48bb78; color: white; }
+        .btn-danger { background: #f56565; color: white; }
+        .btn-warning { background: #ed8936; color: white; }
+        .btn:hover { opacity: 0.9; }
+        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        .search-box input { flex: 1; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; padding: 30px; border-radius: 10px; max-width: 500px; width: 90%; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .close-btn { font-size: 1.5em; cursor: pointer; }
+        .notification { position: fixed; top: 20px; right: 20px; padding: 15px 20px; border-radius: 5px; color: white; animation: slideIn 0.3s; z-index: 2000; }
+        .notification.success { background: #48bb78; }
+        .notification.error { background: #f56565; }
+        .notification.warning { background: #ed8936; }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        .file-ops { background: #f8f9fa; padding: 15px; border-radius: 10px; }
+        .file-ops-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+        .status-indicator { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; }
+        .status-indicator.saved { background: #48bb78; }
+        .status-indicator.unsaved { background: #ed8936; }
+        .info-card { background: white; padding: 10px; border-radius: 5px; margin: 5px 0; }
+        @media (max-width: 768px) { .stats-grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">🏢 Addvalue HR System</div>
+            <div class="nav-tabs">
+                <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+                <button class="tab-btn" data-tab="employees">พนักงาน</button>
+                <button class="tab-btn" data-tab="reports">รายงาน</button>
+            </div>
+        </header>
+
+        <div class="card file-ops">
+            <h3>📁 การจัดการไฟล์ข้อมูล</h3>
+            <div class="file-ops-grid">
+                <button class="btn btn-success" id="saveBtn">💾 บันทึกข้อมูล</button>
+                <button class="btn btn-primary" id="exportBtn">⬇️ Export (.json)</button>
+                <button class="btn btn-warning" id="importBtn">⬆️ Import</button>
+                <input type="file" id="importFile" accept=".json" style="display:none">
+                <button class="btn btn-danger" id="clearBtn">🗑️ ล้างข้อมูล</button>
+            </div>
+            <div style="margin-top: 15px; padding: 15px; background: white; border-radius: 8px;">
+                <div class="info-card">
+                    <strong>📄 ไฟล์ที่ใช้งาน:</strong> <span id="lastFileName">ยังไม่มีการ Import</span>
+                </div>
+                <div class="info-card">
+                    <strong>🔢 Version:</strong> <span id="fileVersion">v1.0</span>
+                </div>
+                <div class="info-card">
+                    <strong>📅 อัปเดตล่าสุด:</strong> <span id="lastUpdate">-</span>
+                </div>
+                <div class="info-card">
+                    <strong>💾 ที่จัดเก็บ:</strong> Browser LocalStorage
+                </div>
+                <div class="info-card">
+                    <strong>📍 Storage Path:</strong> <code id="storagePath">localStorage://addvalueHRData</code>
+                </div>
+            </div>
+        </div>
+
+        <div id="dashboard" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div>พนักงานทั้งหมด</div>
+                    <div class="stat-number" id="totalEmployees">0</div>
+                </div>
+                <div class="stat-card">
+                    <div>เงินเดือนรวม/เดือน</div>
+                    <div class="stat-number" id="totalSalary">฿0</div>
+                </div>
+                <div class="stat-card">
+                    <div>เงินเดือนเฉลี่ย</div>
+                    <div class="stat-number" id="avgSalary">฿0</div>
+                </div>
+                <div class="stat-card">
+                    <div>เงินเดือนรวม/ปี</div>
+                    <div class="stat-number" id="yearlySalary">฿0</div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 20px;">
+                <h3>💰 สรุปค่าใช้จ่ายด้านบุคลากร</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+                    <div style="padding: 15px; background: #e3f2fd; border-radius: 8px;">
+                        <div style="color: #1976d2;">ค่าแรงรวม/วัน</div>
+                        <div style="font-size: 1.5em; font-weight: bold;" id="dailySalary">฿0</div>
+                    </div>
+                    <div style="padding: 15px; background: #f3e5f5; border-radius: 8px;">
+                        <div style="color: #7b1fa2;">ค่าแรงรวม/ชั่วโมง</div>
+                        <div style="font-size: 1.5em; font-weight: bold;" id="hourlySalary">฿0</div>
+                    </div>
+                    <div style="padding: 15px; background: #fff3e0; border-radius: 8px;">
+                        <div style="color: #ef6c00;">ค่า OT เฉลี่ย/ชั่วโมง</div>
+                        <div style="font-size: 1.5em; font-weight: bold;" id="avgOT">฿0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>📊 สรุปตามแผนก</h3>
+                <table id="deptSummaryTable">
+                    <thead>
+                        <tr>
+                            <th>แผนก</th>
+                            <th>จำนวน</th>
+                            <th>เงินเดือนรวม</th>
+                            <th>เงินเดือนเฉลี่ย</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="employees" class="tab-content">
+            <div class="card">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="🔍 ค้นหาพนักงาน...">
+                    <button class="btn btn-primary" id="addEmployeeBtn">➕ เพิ่มพนักงาน</button>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table id="employeeTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>ชื่อ-นามสกุล</th>
+                                <th>แผนก</th>
+                                <th>ตำแหน่ง</th>
+                                <th>เงินเดือน/เดือน</th>
+                                <th>เงินเดือน/วัน</th>
+                                <th>เงินเดือน/ชม.</th>
+                                <th>OT/ชม.</th>
+                                <th>อีเมล</th>
+                                <th>การดำเนินการ</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                
+                <div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                    <small>
+                        <strong>📝 หมายเหตุ:</strong> 
+                        เงินเดือน/วัน = เงินเดือน ÷ 30 | 
+                        เงินเดือน/ชม. = เงินเดือน ÷ 240 | 
+                        OT = เงินเดือน/ชม. × 1.5
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <div id="reports" class="tab-content">
+            <div class="card">
+                <h3>📈 รายงานเงินเดือน</h3>
+                <button class="btn btn-success" id="exportCsvBtn">📥 Export CSV</button>
+                
+                <table id="reportTable" style="margin-top: 20px;">
+                    <thead>
+                        <tr>
+                            <th>แผนก</th>
+                            <th>จำนวน</th>
+                            <th>ต่ำสุด</th>
+                            <th>สูงสุด</th>
+                            <th>เฉลี่ย</th>
+                            <th>รวม/เดือน</th>
+                            <th>รวม/วัน</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="employeeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">เพิ่มพนักงาน</h2>
+                <span class="close-btn" id="closeModalBtn">&times;</span>
+            </div>
+            <div class="form-group">
+                <label>ชื่อ-นามสกุล *</label>
+                <input type="text" id="empName">
+            </div>
+            <div class="form-group">
+                <label>แผนก *</label>
+                <select id="empDepartment">
+                    <option value="">เลือกแผนก</option>
+                    <option value="Administration">Administration</option>
+                    <option value="Engineering">Engineering</option>
+                    <option value="Management">Management</option>
+                    <option value="Sales & Marketing">Sales & Marketing</option>
+                    <option value="Technical">Technical</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>ตำแหน่ง</label>
+                <input type="text" id="empPosition">
+            </div>
+            <div class="form-group">
+                <label>เงินเดือน *</label>
+                <input type="number" id="empSalary" min="0">
+            </div>
+            <div class="form-group">
+                <label>อีเมล *</label>
+                <input type="email" id="empEmail">
+            </div>
+            <input type="hidden" id="empId">
+            <button class="btn btn-success" id="saveEmployeeBtn">บันทึก</button>
+            <button class="btn btn-danger" id="cancelModalBtn">ยกเลิก</button>
+        </div>
+    </div>
+
+    <script>
+        // Initial data
+        const initialEmployees = [
+            { id: 1, name: 'ณัชชา ยอดอินทร์', department: 'Administration', position: 'Admin Officer', salary: 14000, email: 'natcha@hotmail.com' },
+            { id: 2, name: 'Aurnchalee Meenak', department: 'Management', position: 'Manager', salary: 50000, email: 'aurnchalee@addvaluesystem.com' },
+            { id: 3, name: 'Ratchaneekom Mo-on', department: 'Engineering', position: 'Telecommunication Engineer', salary: 24000, email: 'ratchaneekom@addvaluesystem.com' },
+            { id: 4, name: 'Sakda Wongjam', department: 'Engineering', position: 'Senior Engineer', salary: 82000, email: 'sakda@addvaluesystem.com' },
+            { id: 5, name: 'Suriyapong Yoo-om-sin', department: 'Management', position: 'Executive', salary: 120000, email: 'suriyapong@addvaluesystem.com' },
+            { id: 6, name: 'Suttirak Nunsong', department: 'Engineering', position: 'Senior Telecommunication Engineer', salary: 35000, email: 'suttirak@addvaluesystem.com' },
+            { id: 7, name: 'Wasupol Amonthat', department: 'Sales & Marketing', position: 'Sales Representative', salary: 18000, email: 'wasupol@addvaluesystem.com' },
+            { id: 8, name: 'Yuttapong Eakimphon', department: 'Technical', position: 'Technical Staff', salary: 37000, email: 'yuttapong@addvaluesystem.com' }
+        ];
+
+        let employees = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing Addvalue HR System...');
+            loadData();
+            setupEventListeners();
+            updateDashboard();
+            renderEmployees();
+            renderReports();
+            updateFileInfo();
+        });
+
+        // Load data
+        function loadData() {
+            try {
+                const data = localStorage.getItem('addvalueHRData');
+                if (data) {
+                    employees = JSON.parse(data);
+                } else {
+                    employees = [...initialEmployees];
+                    saveData();
+                }
+            } catch (e) {
+                employees = [...initialEmployees];
+            }
+        }
+
+        // Save data
+        function saveData() {
+            try {
+                localStorage.setItem('addvalueHRData', JSON.stringify(employees));
+                localStorage.setItem('lastSaved', new Date().toISOString());
+                showNotification('บันทึกข้อมูลสำเร็จ', 'success');
+            } catch (e) {
+                showNotification('ไม่สามารถบันทึกข้อมูลได้', 'error');
+            }
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    document.getElementById(this.dataset.tab).classList.add('active');
+                });
+            });
+
+            // File operations
+            document.getElementById('saveBtn').addEventListener('click', saveData);
+            document.getElementById('exportBtn').addEventListener('click', exportData);
+            document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
+            document.getElementById('importFile').addEventListener('change', importData);
+            document.getElementById('clearBtn').addEventListener('click', clearData);
+
+            // Employee operations
+            document.getElementById('addEmployeeBtn').addEventListener('click', showAddModal);
+            document.getElementById('searchInput').addEventListener('keyup', searchEmployees);
+            document.getElementById('saveEmployeeBtn').addEventListener('click', saveEmployee);
+            document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+            document.getElementById('cancelModalBtn').addEventListener('click', closeModal);
+            document.getElementById('exportCsvBtn').addEventListener('click', exportCSV);
+        }
+
+        // Update dashboard
+        function updateDashboard() {
+            const total = employees.reduce((sum, emp) => sum + emp.salary, 0);
+            const avg = employees.length > 0 ? Math.round(total / employees.length) : 0;
+            
+            document.getElementById('totalEmployees').textContent = employees.length;
+            document.getElementById('totalSalary').textContent = '฿' + total.toLocaleString();
+            document.getElementById('avgSalary').textContent = '฿' + avg.toLocaleString();
+            document.getElementById('yearlySalary').textContent = '฿' + (total * 12).toLocaleString();
+            
+            document.getElementById('dailySalary').textContent = '฿' + Math.round(total / 30).toLocaleString();
+            document.getElementById('hourlySalary').textContent = '฿' + Math.round(total / 240).toLocaleString();
+            document.getElementById('avgOT').textContent = '฿' + Math.round((total / 240 / employees.length) * 1.5).toLocaleString();
+
+            // Department summary
+            const deptStats = {};
+            employees.forEach(emp => {
+                if (!deptStats[emp.department]) {
+                    deptStats[emp.department] = { count: 0, total: 0 };
+                }
+                deptStats[emp.department].count++;
+                deptStats[emp.department].total += emp.salary;
+            });
+
+            const tbody = document.querySelector('#deptSummaryTable tbody');
+            tbody.innerHTML = '';
+            Object.entries(deptStats).forEach(([dept, stats]) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${dept}</td>
+                    <td>${stats.count}</td>
+                    <td>฿${stats.total.toLocaleString()}</td>
+                    <td>฿${Math.round(stats.total / stats.count).toLocaleString()}</td>
+                `;
+            });
+        }
+
+        // Render employees
+        function renderEmployees() {
+            const tbody = document.querySelector('#employeeTable tbody');
+            tbody.innerHTML = '';
+            
+            employees.forEach(emp => {
+                const dailySalary = Math.round(emp.salary / 30);
+                const hourlySalary = Math.round(emp.salary / 240);
+                const otRate = Math.round(hourlySalary * 1.5);
+                
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${emp.id}</td>
+                    <td>${emp.name}</td>
+                    <td>${emp.department}</td>
+                    <td>${emp.position || '-'}</td>
+                    <td style="color: #667eea; font-weight: bold;">฿${emp.salary.toLocaleString()}</td>
+                    <td style="color: #28a745;">฿${dailySalary.toLocaleString()}</td>
+                    <td style="color: #17a2b8;">฿${hourlySalary.toLocaleString()}</td>
+                    <td style="color: #ffc107;">฿${otRate.toLocaleString()}</td>
+                    <td>${emp.email}</td>
+                    <td>
+                        <button class="btn btn-warning" onclick="editEmployee(${emp.id})">✏️</button>
+                        <button class="btn btn-danger" onclick="deleteEmployee(${emp.id})">🗑️</button>
+                    </td>
+                `;
+            });
+        }
+
+        // Render reports
+        function renderReports() {
+            const deptStats = {};
+            employees.forEach(emp => {
+                if (!deptStats[emp.department]) {
+                    deptStats[emp.department] = { count: 0, salaries: [], total: 0 };
+                }
+                deptStats[emp.department].count++;
+                deptStats[emp.department].salaries.push(emp.salary);
+                deptStats[emp.department].total += emp.salary;
+            });
+
+            const tbody = document.querySelector('#reportTable tbody');
+            tbody.innerHTML = '';
+            
+            Object.entries(deptStats).forEach(([dept, stats]) => {
+                const min = Math.min(...stats.salaries);
+                const max = Math.max(...stats.salaries);
+                const avg = Math.round(stats.total / stats.count);
+                const daily = Math.round(stats.total / 30);
+                
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${dept}</td>
+                    <td>${stats.count}</td>
+                    <td>฿${min.toLocaleString()}</td>
+                    <td>฿${max.toLocaleString()}</td>
+                    <td>฿${avg.toLocaleString()}</td>
+                    <td>฿${stats.total.toLocaleString()}</td>
+                    <td>฿${daily.toLocaleString()}</td>
+                `;
+            });
+        }
+
+        // Search employees
+        function searchEmployees() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#employeeTable tbody tr');
+            rows.forEach(row => {
+                row.style.display = row.textContent.toLowerCase().includes(search) ? '' : 'none';
+            });
+        }
+
+        // Show add modal
+        function showAddModal() {
+            document.getElementById('modalTitle').textContent = 'เพิ่มพนักงานใหม่';
+            document.getElementById('empId').value = '';
+            document.getElementById('empName').value = '';
+            document.getElementById('empDepartment').value = '';
+            document.getElementById('empPosition').value = '';
+            document.getElementById('empSalary').value = '';
+            document.getElementById('empEmail').value = '';
+            document.getElementById('employeeModal').classList.add('show');
+        }
+
+        // Edit employee (global function for onclick)
+        window.editEmployee = function(id) {
+            const emp = employees.find(e => e.id === id);
+            if (!emp) return;
+            
+            document.getElementById('modalTitle').textContent = 'แก้ไขข้อมูลพนักงาน';
+            document.getElementById('empId').value = emp.id;
+            document.getElementById('empName').value = emp.name;
+            document.getElementById('empDepartment').value = emp.department;
+            document.getElementById('empPosition').value = emp.position || '';
+            document.getElementById('empSalary').value = emp.salary;
+            document.getElementById('empEmail').value = emp.email;
+            document.getElementById('employeeModal').classList.add('show');
+        }
+
+        // Delete employee (global function for onclick)
+        window.deleteEmployee = function(id) {
+            if (confirm('ต้องการลบพนักงานนี้หรือไม่?')) {
+                employees = employees.filter(e => e.id !== id);
+                saveData();
+                renderEmployees();
+                updateDashboard();
+                renderReports();
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('employeeModal').classList.remove('show');
+        }
+
+        // Save employee
+        function saveEmployee() {
+            const id = document.getElementById('empId').value;
+            const name = document.getElementById('empName').value.trim();
+            const department = document.getElementById('empDepartment').value;
+            const position = document.getElementById('empPosition').value.trim();
+            const salary = parseInt(document.getElementById('empSalary').value);
+            const email = document.getElementById('empEmail').value.trim();
+
+            if (!name || !department || !salary || !email) {
+                showNotification('กรุณากรอกข้อมูลให้ครบถ้วน', 'error');
+                return;
+            }
+
+            const empData = { name, department, position, salary, email };
+
+            if (id) {
+                const index = employees.findIndex(e => e.id == id);
+                employees[index] = { id: parseInt(id), ...empData };
+            } else {
+                const newId = Math.max(...employees.map(e => e.id), 0) + 1;
+                employees.push({ id: newId, ...empData });
+            }
+
+            saveData();
+            renderEmployees();
+            updateDashboard();
+            renderReports();
+            closeModal();
+        }
+
+        // Export data
+        function exportData() {
+            const dataStr = JSON.stringify({
+                employees: employees,
+                exportDate: new Date().toISOString(),
+                version: 'v1.0'
+            }, null, 2);
+            
+            const blob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'addvalue_hr_backup_' + new Date().toISOString().split('T')[0] + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('Export ข้อมูลสำเร็จ', 'success');
+        }
+
+        // Import data
+        function importData(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    if (data.employees) {
+                        employees = data.employees;
+                        saveData();
+                        updateDashboard();
+                        renderEmployees();
+                        renderReports();
+                        
+                        // Update file info
+                        localStorage.setItem('lastImport', JSON.stringify({
+                            fileName: file.name,
+                            date: new Date().toISOString()
+                        }));
+                        updateFileInfo();
+                        
+                        showNotification('Import ข้อมูลสำเร็จ', 'success');
+                    }
+                } catch (err) {
+                    showNotification('ไม่สามารถ Import ข้อมูลได้', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Clear data
+        function clearData() {
+            if (confirm('ต้องการล้างข้อมูลทั้งหมดหรือไม่?')) {
+                employees = [];
+                saveData();
+                updateDashboard();
+                renderEmployees();
+                renderReports();
+            }
+        }
+
+        // Export CSV
+        function exportCSV() {
+            let csv = 'ID,Name,Department,Position,Monthly Salary,Daily,Hourly,OT Rate,Email\n';
+            employees.forEach(emp => {
+                const daily = Math.round(emp.salary / 30);
+                const hourly = Math.round(emp.salary / 240);
+                const ot = Math.round(hourly * 1.5);
+                csv += `${emp.id},"${emp.name}","${emp.department}","${emp.position || ''}",${emp.salary},${daily},${hourly},${ot},"${emp.email}"\n`;
+            });
+            
+            const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'salary_report_' + new Date().toISOString().split('T')[0] + '.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('Export CSV สำเร็จ', 'success');
+        }
+
+        // Update file info
+        function updateFileInfo() {
+            const lastSaved = localStorage.getItem('lastSaved');
+            const lastImport = localStorage.getItem('lastImport');
+            
+            if (lastImport) {
+                try {
+                    const importInfo = JSON.parse(lastImport);
+                    document.getElementById('lastFileName').textContent = importInfo.fileName;
+                    document.getElementById('lastUpdate').textContent = new Date(importInfo.date).toLocaleString('th-TH');
+                } catch (e) {
+                    document.getElementById('lastFileName').textContent = 'ข้อมูลเริ่มต้น';
+                }
+            } else {
+                document.getElementById('lastFileName').textContent = 'ข้อมูลเริ่มต้น';
+            }
+            
+            if (lastSaved) {
+                document.getElementById('lastUpdate').textContent = new Date(lastSaved).toLocaleString('th-TH');
+            }
+            
+            document.getElementById('storagePath').textContent = 'localStorage://' + window.location.hostname + '/addvalueHRData';
+        }
+
+        // Show notification
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = 'notification ' + type;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

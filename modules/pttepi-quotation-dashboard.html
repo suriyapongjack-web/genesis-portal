@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PTTEPI ZPQ-ZWP4 Quotation Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .dashboard { max-width: 1800px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 30px; position: relative; }
+        .header h1 { font-size: 2.5em; margin-bottom: 10px; font-weight: 300; }
+        .header p { font-size: 1.2em; opacity: 0.9; }
+        .status-bar { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; }
+        .status-indicator { padding: 8px 16px; border-radius: 20px; font-size: 0.9em; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .status-online { background: rgba(40, 167, 69, 0.2); color: #155724; border: 1px solid rgba(40, 167, 69, 0.3); }
+        .status-offline { background: rgba(255, 193, 7, 0.2); color: #856404; border: 1px solid rgba(255, 193, 7, 0.3); }
+        .user-info { background: rgba(255, 255, 255, 0.2); color: white; }
+        .nav-tabs { display: flex; background: #f8f9fa; border-bottom: 2px solid #dee2e6; }
+        .nav-tab { flex: 1; padding: 15px 20px; background: none; border: none; cursor: pointer; font-size: 1.1em; font-weight: 600; color: #495057; transition: all 0.3s; }
+        .nav-tab.active { background: #667eea; color: white; }
+        .nav-tab:hover { background: #5a6fd8; color: white; }
+        .tab-content { display: none; padding: 30px; }
+        .tab-content.active { display: block; }
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #f8f9fa; padding: 15px; border-radius: 10px; }
+        .btn-group { display: flex; gap: 10px; }
+        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-info { background: #17a2b8; color: white; }
+        .btn-warning { background: #ffc107; color: #212529; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .search-box { padding: 10px 15px; border: 2px solid #dee2e6; border-radius: 5px; width: 300px; }
+        .table-container { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #1e3c72; color: white; padding: 15px; text-align: left; position: sticky; top: 0; z-index: 10; }
+        td { padding: 12px 15px; border-bottom: 1px solid #e9ecef; }
+        tr:hover { background: #f8f9fa; }
+        tr.selected { background: #e8f0fe; }
+        .editable { cursor: pointer; position: relative; }
+        .editable:hover { background: #fff3cd; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: white; border-radius: 15px; padding: 30px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h2 { color: #1e3c72; }
+        .close { font-size: 28px; cursor: pointer; color: #aaa; }
+        .close:hover { color: #000; }
+        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #495057; }
+        .form-control { width: 100%; padding: 10px; border: 2px solid #dee2e6; border-radius: 5px; }
+        .form-control:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+        .summary-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .summary-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 10px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .summary-card h3 { font-size: 1.2em; margin-bottom: 10px; opacity: 0.9; }
+        .summary-card .amount { font-size: 2.5em; font-weight: bold; margin-bottom: 5px; }
+        .summary-card .change { font-size: 0.9em; opacity: 0.8; }
+        .preview-container { background: white; padding: 30px; border: 1px solid #dee2e6; border-radius: 10px; }
+        .preview-header { text-align: center; margin-bottom: 30px; }
+        .preview-header h1 { color: #1e3c72; margin-bottom: 10px; }
+        .preview-section { margin-bottom: 20px; }
+        .preview-section h3 { color: #667eea; margin-bottom: 10px; border-bottom: 2px solid #e9ecef; padding-bottom: 5px; }
+        .preview-table { width: 100%; margin-top: 10px; }
+        .preview-table th { background: #f8f9fa; padding: 10px; text-align: left; }
+        .preview-table td { padding: 8px 10px; }
+        .preview-total { text-align: right; font-size: 1.2em; font-weight: bold; color: #1e3c72; margin-top: 20px; }
+        .notification { position: fixed; top: 20px; right: 20px; padding: 15px 20px; border-radius: 8px; color: white; font-weight: 600; z-index: 2000; transform: translateX(400px); transition: transform 0.3s ease; }
+        .notification.show { transform: translateX(0); }
+        .notification.success { background: #28a745; }
+        .notification.error { background: #dc3545; }
+        .notification.info { background: #17a2b8; }
+        .checkbox { width: 20px; height: 20px; cursor: pointer; }
+        .action-buttons { display: flex; gap: 5px; }
+        .action-btn { padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer; font-size: 0.9em; }
+        .action-edit { background: #17a2b8; color: white; }
+        .action-delete { background: #dc3545; color: white; }
+        .action-view { background: #28a745; color: white; }
+        .pagination { display: flex; justify-content: center; gap: 5px; margin-top: 20px; }
+        .page-btn { padding: 8px 12px; border: 1px solid #dee2e6; background: white; cursor: pointer; border-radius: 3px; }
+        .page-btn.active { background: #667eea; color: white; }
+        .sync-status { display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 15px; font-size: 0.85em; }
+        .sync-pending { background: #fff3cd; color: #856404; }
+        .sync-complete { background: #d4edda; color: #155724; }
+        @media (max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .summary-cards { grid-template-columns: 1fr; }
+            .toolbar { flex-direction: column; gap: 10px; }
+            .search-box { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>🚀 PTTEPI ZPQ-ZWP4 Quotation Management System</h1>
+            <p>Comprehensive Project Quotation Dashboard - Pre-FEED to Contract Award</p>
+            <div class="status-bar">
+                <div id="connectionStatus" class="status-indicator status-online">
+                    <span>🟢</span>
+                    <span>Online</span>
+                </div>
+                <div class="status-indicator user-info">
+                    <span>👤</span>
+                    <span id="currentUser">User: Admin</span>
+                </div>
+                <div class="status-indicator user-info">
+                    <span>👥</span>
+                    <span id="activeUsers">Active: 1</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('quotations')">📋 Quotations</button>
+            <button class="nav-tab" onclick="switchTab('dashboard')">📊 Dashboard</button>
+            <button class="nav-tab" onclick="switchTab('preview')">👁️ Preview</button>
+            <button class="nav-tab" onclick="switchTab('users')">👥 Users</button>
+            <button class="nav-tab" onclick="switchTab('sync')">🔄 Sync & Export</button>
+        </div>
+
+        <div id="quotations" class="tab-content active">
+            <div class="toolbar">
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="openModal('add')">➕ Add Quotation</button>
+                    <button class="btn btn-success" onclick="saveToLocal()">💾 Save</button>
+                    <button class="btn btn-info" onclick="loadFromLocal()">📂 Load</button>
+                    <button class="btn btn-warning" onclick="deleteSelected()">🗑️ Delete Selected</button>
+                </div>
+                <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search quotations..." onkeyup="filterQuotations()">
+            </div>
+
+            <div class="table-container">
+                <table id="quotationTable">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                            <th>Quote ID</th>
+                            <th>Date</th>
+                            <th>Client</th>
+                            <th>Project</th>
+                            <th>Equipment</th>
+                            <th>Service</th>
+                            <th>Total (USD)</th>
+                            <th>Status</th>
+                            <th>Sync</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="quotationList"></tbody>
+                </table>
+            </div>
+            <div class="pagination" id="pagination"></div>
+        </div>
+
+        <div id="dashboard" class="tab-content">
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <h3>Total Quotations</h3>
+                    <div class="amount" id="totalQuotes">0</div>
+                    <div class="change">Active Projects</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Total Value</h3>
+                    <div class="amount" id="totalValue">$0</div>
+                    <div class="change">All Quotations</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Approved</h3>
+                    <div class="amount" id="approvedQuotes">0</div>
+                    <div class="change">Ready for Contract</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Pending</h3>
+                    <div class="amount" id="pendingQuotes">0</div>
+                    <div class="change">Awaiting Review</div>
+                </div>
+            </div>
+            <canvas id="chartCanvas" width="400" height="200"></canvas>
+        </div>
+
+        <div id="preview" class="tab-content">
+            <div class="toolbar">
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="printPreview()">🖨️ Print</button>
+                    <button class="btn btn-success" onclick="exportPDF()">📄 Export PDF</button>
+                    <button class="btn btn-info" onclick="emailPreview()">✉️ Email</button>
+                </div>
+                <select id="previewSelect" class="form-control" style="width: 300px;" onchange="loadPreview()">
+                    <option value="">Select quotation to preview...</option>
+                </select>
+            </div>
+            <div id="previewContent" class="preview-container"></div>
+        </div>
+
+        <div id="users" class="tab-content">
+            <div class="toolbar">
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="addUser()">➕ Add User</button>
+                    <button class="btn btn-info" onclick="simulateMultiUser()">🔄 Simulate Multi-User</button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="userTable">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Name</th>
+                            <th>Role</th>
+                            <th>Last Active</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userList"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="sync" class="tab-content">
+            <div class="toolbar">
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="syncData()">🔄 Sync Now</button>
+                    <button class="btn btn-success" onclick="exportJSON()">📥 Export JSON</button>
+                    <button class="btn btn-info" onclick="exportCSV()">📊 Export CSV</button>
+                    <button class="btn btn-warning" onclick="importData()">📤 Import Data</button>
+                </div>
+            </div>
+            <div class="sync-info" style="padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                <h3>Synchronization Status</h3>
+                <p>Last Sync: <span id="lastSync">Never</span></p>
+                <p>Pending Changes: <span id="pendingChanges">0</span></p>
+                <p>Connection: <span id="connectionType">Online</span></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="quotationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Quotation</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <form id="quotationForm" onsubmit="saveQuotation(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Quote ID</label>
+                        <input type="text" id="quoteId" class="form-control" required readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="quoteDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Client</label>
+                        <select id="client" class="form-control" required>
+                            <option value="">Select Client</option>
+                            <option value="PTTEPI">PTTEPI Myanmar</option>
+                            <option value="Mytel">Mytel</option>
+                            <option value="AddValue">AddValue System</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Project</label>
+                        <input type="text" id="project" class="form-control" value="ZPQ-ZWP4 Microwave Link" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Equipment Cost (USD)</label>
+                        <input type="number" id="equipment" class="form-control" required onchange="calculateTotal()">
+                    </div>
+                    <div class="form-group">
+                        <label>Service Cost (USD)</label>
+                        <input type="number" id="service" class="form-control" required onchange="calculateTotal()">
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="status" class="form-control" required>
+                            <option value="Draft">Draft</option>
+                            <option value="Submitted">Submitted</option>
+                            <option value="Under Review">Under Review</option>
+                            <option value="Approved">Approved</option>
+                            <option value="Rejected">Rejected</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Total (USD)</label>
+                        <input type="text" id="total" class="form-control" readonly>
+                    </div>
+                </div>
+                <div style="margin-top: 20px; text-align: right;">
+                    <button type="button" class="btn btn-danger" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Quotation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+    <input type="file" id="fileInput" style="display: none;" accept=".json,.csv">
+
+    <script>
+        let quotations = [];
+        let users = [];
+        let currentUser = 'Admin';
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let editingId = null;
+
+        const DB_NAME = 'PTTEPIQuotations';
+        const STORE_NAME = 'quotations';
+        const USERS_STORE = 'users';
+
+        function initDB() {
+            if ('indexedDB' in window) {
+                const request = indexedDB.open(DB_NAME, 1);
+                request.onerror = () => console.error('DB Error');
+                request.onsuccess = () => {
+                    loadFromLocal();
+                    updateConnectionStatus();
+                };
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+                    }
+                    if (!db.objectStoreNames.contains(USERS_STORE)) {
+                        db.createObjectStore(USERS_STORE, { keyPath: 'id' });
+                    }
+                };
+            }
+        }
+
+        function generateQuoteId() {
+            const prefix = 'QT';
+            const date = new Date().toISOString().slice(0,10).replace(/-/g,'');
+            const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+            return `${prefix}-${date}-${random}`;
+        }
+
+        function openModal(mode, id = null) {
+            editingId = id;
+            const modal = document.getElementById('quotationModal');
+            const form = document.getElementById('quotationForm');
+            
+            if (mode === 'add') {
+                form.reset();
+                document.getElementById('modalTitle').textContent = 'Add New Quotation';
+                document.getElementById('quoteId').value = generateQuoteId();
+                document.getElementById('quoteDate').value = new Date().toISOString().slice(0,10);
+            } else if (mode === 'edit' && id) {
+                const quote = quotations.find(q => q.id === id);
+                if (quote) {
+                    document.getElementById('modalTitle').textContent = 'Edit Quotation';
+                    document.getElementById('quoteId').value = quote.id;
+                    document.getElementById('quoteDate').value = quote.date;
+                    document.getElementById('client').value = quote.client;
+                    document.getElementById('project').value = quote.project;
+                    document.getElementById('equipment').value = quote.equipment;
+                    document.getElementById('service').value = quote.service;
+                    document.getElementById('status').value = quote.status;
+                    calculateTotal();
+                }
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('quotationModal').classList.remove('active');
+            editingId = null;
+        }
+
+        function calculateTotal() {
+            const equipment = parseFloat(document.getElementById('equipment').value) || 0;
+            const service = parseFloat(document.getElementById('service').value) || 0;
+            const total = equipment + service;
+            document.getElementById('total').value = total.toFixed(2);
+        }
+
+        function saveQuotation(event) {
+            event.preventDefault();
+            
+            const quote = {
+                id: document.getElementById('quoteId').value,
+                date: document.getElementById('quoteDate').value,
+                client: document.getElementById('client').value,
+                project: document.getElementById('project').value,
+                equipment: parseFloat(document.getElementById('equipment').value),
+                service: parseFloat(document.getElementById('service').value),
+                total: parseFloat(document.getElementById('total').value),
+                status: document.getElementById('status').value,
+                sync: 'pending',
+                user: currentUser,
+                timestamp: new Date().toISOString()
+            };
+            
+            if (editingId) {
+                const index = quotations.findIndex(q => q.id === editingId);
+                if (index > -1) {
+                    quotations[index] = quote;
+                    showNotification('Quotation updated successfully', 'success');
+                }
+            } else {
+                quotations.push(quote);
+                showNotification('Quotation added successfully', 'success');
+            }
+            
+            saveToLocal();
+            renderQuotations();
+            updateDashboard();
+            closeModal();
+        }
+
+        function renderQuotations(page = 1) {
+            const tbody = document.getElementById('quotationList');
+            const start = (page - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const pageQuotes = quotations.slice(start, end);
+            
+            tbody.innerHTML = pageQuotes.map(quote => `
+                <tr>
+                    <td><input type="checkbox" class="checkbox" value="${quote.id}"></td>
+                    <td>${quote.id}</td>
+                    <td>${quote.date}</td>
+                    <td>${quote.client}</td>
+                    <td>${quote.project}</td>
+                    <td>$${quote.equipment.toLocaleString()}</td>
+                    <td>$${quote.service.toLocaleString()}</td>
+                    <td><strong>$${quote.total.toLocaleString()}</strong></td>
+                    <td><span class="status-indicator ${getStatusClass(quote.status)}">${quote.status}</span></td>
+                    <td><span class="sync-status ${quote.sync === 'complete' ? 'sync-complete' : 'sync-pending'}">${quote.sync === 'complete' ? '✓ Synced' : '⏳ Pending'}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn action-view" onclick="viewQuote('${quote.id}')">👁️</button>
+                            <button class="action-btn action-edit" onclick="openModal('edit', '${quote.id}')">✏️</button>
+                            <button class="action-btn action-delete" onclick="deleteQuote('${quote.id}')">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+            
+            renderPagination();
+            updatePreviewSelect();
+        }
+
+        function getStatusClass(status) {
+            const classes = {
+                'Draft': 'status-offline',
+                'Submitted': 'status-online',
+                'Under Review': 'status-offline',
+                'Approved': 'status-online',
+                'Rejected': 'status-offline'
+            };
+            return classes[status] || '';
+        }
+
+        function renderPagination() {
+            const totalPages = Math.ceil(quotations.length / itemsPerPage);
+            const pagination = document.getElementById('pagination');
+            
+            let html = '';
+            for (let i = 1; i <= totalPages; i++) {
+                html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+            }
+            pagination.innerHTML = html;
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            renderQuotations(page);
+        }
+
+        function deleteQuote(id) {
+            if (confirm('Are you sure you want to delete this quotation?')) {
+                quotations = quotations.filter(q => q.id !== id);
+                saveToLocal();
+                renderQuotations();
+                updateDashboard();
+                showNotification('Quotation deleted successfully', 'success');
+            }
+        }
+
+        function deleteSelected() {
+            const checkboxes = document.querySelectorAll('.checkbox:checked');
+            if (checkboxes.length === 0) {
+                showNotification('Please select quotations to delete', 'error');
+                return;
+            }
+            
+            if (confirm(`Delete ${checkboxes.length} selected quotations?`)) {
+                const ids = Array.from(checkboxes).map(cb => cb.value);
+                quotations = quotations.filter(q => !ids.includes(q.id));
+                saveToLocal();
+                renderQuotations();
+                updateDashboard();
+                showNotification(`${checkboxes.length} quotations deleted`, 'success');
+            }
+        }
+
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.checkbox');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        }
+
+        function filterQuotations() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            const filtered = quotations.filter(q => 
+                q.id.toLowerCase().includes(searchTerm) ||
+                q.client.toLowerCase().includes(searchTerm) ||
+                q.project.toLowerCase().includes(searchTerm) ||
+                q.status.toLowerCase().includes(searchTerm)
+            );
+            
+            const tbody = document.getElementById('quotationList');
+            tbody.innerHTML = filtered.map(quote => `
+                <tr>
+                    <td><input type="checkbox" class="checkbox" value="${quote.id}"></td>
+                    <td>${quote.id}</td>
+                    <td>${quote.date}</td>
+                    <td>${quote.client}</td>
+                    <td>${quote.project}</td>
+                    <td>$${quote.equipment.toLocaleString()}</td>
+                    <td>$${quote.service.toLocaleString()}</td>
+                    <td><strong>$${quote.total.toLocaleString()}</strong></td>
+                    <td><span class="status-indicator ${getStatusClass(quote.status)}">${quote.status}</span></td>
+                    <td><span class="sync-status ${quote.sync === 'complete' ? 'sync-complete' : 'sync-pending'}">${quote.sync === 'complete' ? '✓ Synced' : '⏳ Pending'}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="action-btn action-view" onclick="viewQuote('${quote.id}')">👁️</button>
+                            <button class="action-btn action-edit" onclick="openModal('edit', '${quote.id}')">✏️</button>
+                            <button class="action-btn action-delete" onclick="deleteQuote('${quote.id}')">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateDashboard() {
+            const totalQuotes = quotations.length;
+            const totalValue = quotations.reduce((sum, q) => sum + q.total, 0);
+            const approved = quotations.filter(q => q.status === 'Approved').length;
+            const pending = quotations.filter(q => q.status === 'Under Review' || q.status === 'Submitted').length;
+            
+            document.getElementById('totalQuotes').textContent = totalQuotes;
+            document.getElementById('totalValue').textContent = '$' + totalValue.toLocaleString();
+            document.getElementById('approvedQuotes').textContent = approved;
+            document.getElementById('pendingQuotes').textContent = pending;
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'dashboard') updateDashboard();
+            if (tabName === 'users') renderUsers();
+            if (tabName === 'sync') updateSyncInfo();
+        }
+
+        function saveToLocal() {
+            localStorage.setItem('pttepi_quotations', JSON.stringify(quotations));
+            localStorage.setItem('pttepi_users', JSON.stringify(users));
+            localStorage.setItem('pttepi_lastSave', new Date().toISOString());
+            
+            if ('indexedDB' in window) {
+                const request = indexedDB.open(DB_NAME, 1);
+                request.onsuccess = (event) => {
+                    const db = event.target.result;
+                    const transaction = db.transaction([STORE_NAME], 'readwrite');
+                    const store = transaction.objectStore(STORE_NAME);
+                    quotations.forEach(quote => store.put(quote));
+                };
+            }
+        }
+
+        function loadFromLocal() {
+            const saved = localStorage.getItem('pttepi_quotations');
+            const savedUsers = localStorage.getItem('pttepi_users');
+            
+            if (saved) {
+                quotations = JSON.parse(saved);
+                renderQuotations();
+                updateDashboard();
+            }
+            
+            if (savedUsers) {
+                users = JSON.parse(savedUsers);
+            } else {
+                initUsers();
+            }
+        }
+
+        function initUsers() {
+            users = [
+                { id: 'USR001', name: 'Admin', role: 'Administrator', lastActive: new Date().toISOString(), status: 'Active' },
+                { id: 'USR002', name: 'Engineer', role: 'Technical', lastActive: new Date().toISOString(), status: 'Active' },
+                { id: 'USR003', name: 'Manager', role: 'Management', lastActive: new Date().toISOString(), status: 'Active' }
+            ];
+        }
+
+        function renderUsers() {
+            const tbody = document.getElementById('userList');
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.role}</td>
+                    <td>${new Date(user.lastActive).toLocaleString()}</td>
+                    <td><span class="status-indicator ${user.status === 'Active' ? 'status-online' : 'status-offline'}">${user.status}</span></td>
+                    <td>
+                        <button class="action-btn action-edit" onclick="editUser('${user.id}')">✏️</button>
+                        <button class="action-btn action-delete" onclick="removeUser('${user.id}')">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function addUser() {
+            const name = prompt('Enter user name:');
+            if (name) {
+                const user = {
+                    id: 'USR' + String(users.length + 1).padStart(3, '0'),
+                    name: name,
+                    role: 'User',
+                    lastActive: new Date().toISOString(),
+                    status: 'Active'
+                };
+                users.push(user);
+                saveToLocal();
+                renderUsers();
+                showNotification('User added successfully', 'success');
+            }
+        }
+
+        function removeUser(id) {
+            if (confirm('Remove this user?')) {
+                users = users.filter(u => u.id !== id);
+                saveToLocal();
+                renderUsers();
+                showNotification('User removed', 'success');
+            }
+        }
+
+        function simulateMultiUser() {
+            const activeCount = Math.floor(Math.random() * 5) + 2;
+            document.getElementById('activeUsers').textContent = `Active: ${activeCount}`;
+            showNotification(`Simulating ${activeCount} active users`, 'info');
+            
+            setTimeout(() => {
+                const randomQuote = quotations[Math.floor(Math.random() * quotations.length)];
+                if (randomQuote) {
+                    randomQuote.status = 'Under Review';
+                    randomQuote.user = users[Math.floor(Math.random() * users.length)].name;
+                    randomQuote.timestamp = new Date().toISOString();
+                    renderQuotations();
+                    showNotification(`User ${randomQuote.user} updated quotation ${randomQuote.id}`, 'info');
+                }
+            }, 2000);
+        }
+
+        function viewQuote(id) {
+            const quote = quotations.find(q => q.id === id);
+            if (quote) {
+                switchTab('preview');
+                document.getElementById('previewSelect').value = id;
+                loadPreview();
+            }
+        }
+
+        function updatePreviewSelect() {
+            const select = document.getElementById('previewSelect');
+            select.innerHTML = '<option value="">Select quotation to preview...</option>' +
+                quotations.map(q => `<option value="${q.id}">${q.id} - ${q.client}</option>`).join('');
+        }
+
+        function loadPreview() {
+            const id = document.getElementById('previewSelect').value;
+            if (!id) return;
+            
+            const quote = quotations.find(q => q.id === id);
+            if (!quote) return;
+            
+            const content = document.getElementById('previewContent');
+            content.innerHTML = `
+                <div class="preview-header">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='50' viewBox='0 0 100 50'%3E%3Ctext x='50' y='30' font-family='Arial' font-size='20' text-anchor='middle' fill='%23667eea'%3EPTTEPI%3C/text%3E%3C/svg%3E" alt="Logo">
+                    <h1>QUOTATION</h1>
+                    <p>PTTEPI Myanmar - Zawtika Project</p>
+                </div>
+                
+                <div class="preview-section">
+                    <h3>Quotation Details</h3>
+                    <table class="preview-table">
+                        <tr><th>Quote ID:</th><td>${quote.id}</td><th>Date:</th><td>${quote.date}</td></tr>
+                        <tr><th>Client:</th><td>${quote.client}</td><th>Status:</th><td>${quote.status}</td></tr>
+                        <tr><th>Project:</th><td colspan="3">${quote.project}</td></tr>
+                    </table>
+                </div>
+                
+                <div class="preview-section">
+                    <h3>Cost Breakdown</h3>
+                    <table class="preview-table">
+                        <thead>
+                            <tr><th>Description</th><th>Category</th><th>Amount (USD)</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Ceragon IP-50CX Equipment</td><td>Equipment</td><td>$${quote.equipment.toLocaleString()}</td></tr>
+                            <tr><td>Installation & Services</td><td>Service</td><td>$${quote.service.toLocaleString()}</td></tr>
+                        </tbody>
+                    </table>
+                    <div class="preview-total">
+                        Total Amount: $${quote.total.toLocaleString()} USD
+                    </div>
+                </div>
+                
+                <div class="preview-section">
+                    <h3>Terms & Conditions</h3>
+                    <p>• Validity: 30 days from date of quotation</p>
+                    <p>• Payment Terms: 30% advance, 70% on completion</p>
+                    <p>• Delivery: 16 weeks from PO</p>
+                    <p>• Warranty: 12 months from commissioning</p>
+                </div>
+            `;
+        }
+
+        function printPreview() {
+            window.print();
+        }
+
+        function exportPDF() {
+            showNotification('PDF export feature ready for implementation', 'info');
+        }
+
+        function emailPreview() {
+            showNotification('Email feature ready for implementation', 'info');
+        }
+
+        function syncData() {
+            showNotification('Synchronizing data...', 'info');
+            
+            quotations = quotations.map(q => ({ ...q, sync: 'complete' }));
+            saveToLocal();
+            renderQuotations();
+            
+            setTimeout(() => {
+                document.getElementById('lastSync').textContent = new Date().toLocaleString();
+                document.getElementById('pendingChanges').textContent = '0';
+                showNotification('Data synchronized successfully', 'success');
+            }, 1500);
+        }
+
+        function updateSyncInfo() {
+            const lastSave = localStorage.getItem('pttepi_lastSave');
+            if (lastSave) {
+                document.getElementById('lastSync').textContent = new Date(lastSave).toLocaleString();
+            }
+            
+            const pending = quotations.filter(q => q.sync === 'pending').length;
+            document.getElementById('pendingChanges').textContent = pending;
+            document.getElementById('connectionType').textContent = navigator.onLine ? 'Online' : 'Offline';
+        }
+
+        function exportJSON() {
+            const data = {
+                quotations: quotations,
+                users: users,
+                exportDate: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `pttepi_quotations_${new Date().getTime()}.json`;
+            a.click();
+            
+            showNotification('Data exported to JSON', 'success');
+        }
+
+        function exportCSV() {
+            let csv = 'Quote ID,Date,Client,Project,Equipment,Service,Total,Status\n';
+            quotations.forEach(q => {
+                csv += `"${q.id}","${q.date}","${q.client}","${q.project}",${q.equipment},${q.service},${q.total},"${q.status}"\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `pttepi_quotations_${new Date().getTime()}.csv`;
+            a.click();
+            
+            showNotification('Data exported to CSV', 'success');
+        }
+
+        function importData() {
+            document.getElementById('fileInput').click();
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function updateConnectionStatus() {
+            const status = document.getElementById('connectionStatus');
+            const isOnline = navigator.onLine;
+            
+            if (isOnline) {
+                status.innerHTML = '<span>🟢</span><span>Online</span>';
+                status.className = 'status-indicator status-online';
+            } else {
+                status.innerHTML = '<span>🟡</span><span>Offline</span>';
+                status.className = 'status-indicator status-offline';
+            }
+        }
+
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+
+        document.getElementById('fileInput').addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.quotations) {
+                        quotations = data.quotations;
+                        saveToLocal();
+                        renderQuotations();
+                        updateDashboard();
+                        showNotification('Data imported successfully', 'success');
+                    }
+                } catch (error) {
+                    showNotification('Failed to import data', 'error');
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        const sampleData = [
+            { id: 'QT-20250104-0001', date: '2025-01-04', client: 'PTTEPI', project: 'ZPQ-ZWP4 Microwave Link', equipment: 22515, service: 7752, total: 30267, status: 'Approved', sync: 'complete', user: 'Admin', timestamp: '2025-01-04T10:00:00Z' },
+            { id: 'QT-20250104-0002', date: '2025-01-04', client: 'Mytel', project: 'ZPQ-ZWP4 5-Year Rental', equipment: 18500, service: 12000, total: 30500, status: 'Under Review', sync: 'pending', user: 'Engineer', timestamp: '2025-01-04T11:00:00Z' },
+            { id: 'QT-20250104-0003', date: '2025-01-04', client: 'AddValue', project: 'ATEX Equipment Supply', equipment: 15000, service: 5000, total: 20000, status: 'Draft', sync: 'pending', user: 'Manager', timestamp: '2025-01-04T12:00:00Z' }
+        ];
+
+        if (localStorage.getItem('pttepi_quotations') === null) {
+            quotations = sampleData;
+            saveToLocal();
+        }
+
+        initDB();
+        loadFromLocal();
+        renderQuotations();
+        updateDashboard();
+        updateConnectionStatus();
+    </script>
+</body>
+</html>

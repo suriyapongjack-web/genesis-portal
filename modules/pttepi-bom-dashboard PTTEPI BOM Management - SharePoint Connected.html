@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PTTEPI BOM System - SharePoint Connected</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f5f5;
+            color: #252423;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .container {
+            max-width: 100%;
+            background: white;
+            min-height: 100vh;
+        }
+        .header {
+            background: #6264A7;
+            color: white;
+            padding: 16px 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+        }
+        .header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            margin: 0;
+        }
+        .header-info {
+            display: flex;
+            gap: 20px;
+            margin-top: 8px;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .setup-panel {
+            background: #fff4ce;
+            border: 1px solid #f8e71c;
+            border-radius: 4px;
+            padding: 16px;
+            margin: 20px;
+        }
+        .setup-panel h2 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #252423;
+        }
+        .setup-form {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+        .form-field {
+            flex: 1;
+            min-width: 200px;
+        }
+        .form-field label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: #605e5c;
+        }
+        .nav-tabs {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid #e1dfdd;
+            padding: 0 20px;
+        }
+        .nav-tab {
+            padding: 12px 16px;
+            background: none;
+            border: none;
+            color: #605e5c;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .nav-tab:hover {
+            color: #252423;
+        }
+        .nav-tab.active {
+            color: #6264A7;
+            border-bottom-color: #6264A7;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding: 12px;
+            background: #faf9f8;
+            border-radius: 4px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .btn-group { 
+            display: flex; 
+            gap: 8px; 
+            flex-wrap: wrap; 
+        }
+        .btn { 
+            padding: 6px 12px; 
+            border: 1px solid transparent;
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: 13px;
+            font-weight: 600; 
+            transition: all 0.2s;
+            background: white;
+            color: #252423;
+            border-color: #e1dfdd;
+        }
+        .btn:hover {
+            background: #faf9f8;
+        }
+        .btn-primary { 
+            background: #6264A7; 
+            color: white;
+            border-color: #6264A7;
+        }
+        .btn-primary:hover {
+            background: #464775;
+        }
+        .btn-success {
+            background: #107c10;
+            color: white;
+            border-color: #107c10;
+        }
+        .btn-success:hover {
+            background: #0b5a0b;
+        }
+        .search-box { 
+            padding: 6px 12px; 
+            border: 1px solid #e1dfdd; 
+            border-radius: 4px; 
+            width: 250px; 
+            font-size: 13px;
+        }
+        .search-box:focus {
+            outline: none;
+            border-color: #6264A7;
+        }
+        .status-message {
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            font-size: 13px;
+        }
+        .status-success {
+            background: #dff6dd;
+            color: #107c10;
+            border: 1px solid #107c10;
+        }
+        .status-error {
+            background: #fde7e9;
+            color: #a80000;
+            border: 1px solid #a80000;
+        }
+        .status-info {
+            background: #e5f6fd;
+            color: #0078d4;
+            border: 1px solid #0078d4;
+        }
+        .table-container { 
+            background: white; 
+            border: 1px solid #e1dfdd;
+            border-radius: 4px; 
+            overflow-x: auto; 
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+        }
+        th { 
+            background: #faf9f8; 
+            padding: 8px 12px; 
+            text-align: left; 
+            font-weight: 600;
+            font-size: 13px;
+            color: #605e5c;
+            border-bottom: 1px solid #e1dfdd;
+        }
+        td { 
+            padding: 8px 12px; 
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 13px;
+        }
+        tr:hover { 
+            background: #faf9f8; 
+        }
+        .category-header { 
+            background: #6264A7 !important; 
+            color: white; 
+        }
+        .category-header td { 
+            padding: 10px 12px !important; 
+            font-weight: 600; 
+        }
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .summary-card {
+            background: white;
+            border: 1px solid #e1dfdd;
+            border-radius: 4px;
+            padding: 16px;
+        }
+        .summary-card h3 {
+            font-size: 12px;
+            color: #605e5c;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+        .summary-card .value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #252423;
+        }
+        .summary-card.primary {
+            background: #6264A7;
+            color: white;
+            border-color: #6264A7;
+        }
+        .summary-card.primary h3 {
+            color: rgba(255,255,255,0.9);
+        }
+        .summary-card.primary .value {
+            color: white;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 4px;
+            padding: 24px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        .close {
+            font-size: 24px;
+            cursor: pointer;
+            color: #605e5c;
+            background: none;
+            border: none;
+        }
+        .close:hover {
+            color: #252423;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #605e5c;
+        }
+        .form-control {
+            width: 100%;
+            padding: 6px 12px;
+            border: 1px solid #e1dfdd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #6264A7;
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 24px;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 4px;
+        }
+        .action-btn {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 12px;
+            background: #f5f5f5;
+            color: #252423;
+        }
+        .action-btn:hover {
+            background: #e1dfdd;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #605e5c;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #6264A7;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23605e5c' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+            padding-right: 28px;
+        }
+        @media (max-width: 768px) {
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .search-box { width: 100%; }
+            .summary-grid { grid-template-columns: 1fr; }
+            .setup-form { flex-direction: column; }
+            .form-field { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>PTTEPI BOM Management - SharePoint Connected</h1>
+            <div class="header-info">
+                <span>Project: ZPQ-ZWP4</span>
+                <span id="totalItems">Items: 0</span>
+                <span id="totalValue">Total: $0</span>
+                <span id="connectionStatus">⚪ Not Connected</span>
+            </div>
+        </div>
+
+        <!-- Setup Panel -->
+        <div class="setup-panel" id="setupPanel">
+            <h2>🔧 Setup SharePoint Connection</h2>
+            <div class="setup-form">
+                <div class="form-field">
+                    <label>SharePoint Site URL</label>
+                    <input type="text" id="siteUrl" class="form-control" placeholder="https://yourcompany.sharepoint.com/sites/yoursite">
+                </div>
+                <div class="form-field">
+                    <label>List Name</label>
+                    <input type="text" id="listName" class="form-control" placeholder="BOM_List" value="BOM_List">
+                </div>
+                <button class="btn btn-success" onclick="connectSharePoint()">Connect</button>
+                <button class="btn" onclick="createList()">Create New List</button>
+            </div>
+            <div style="margin-top: 12px; font-size: 12px; color: #605e5c;">
+                💡 First time? Click "Create New List" to set up automatically
+            </div>
+        </div>
+
+        <div id="statusMessage"></div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('bom', this)">BOM List</button>
+            <button class="nav-tab" onclick="switchTab('summary', this)">Cost Summary</button>
+            <button class="nav-tab" onclick="switchTab('guide', this)">Setup Guide</button>
+        </div>
+
+        <!-- BOM List Tab -->
+        <div id="bom" class="tab-content active">
+            <div class="toolbar">
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="openModal('add')">+ Add Item</button>
+                    <button class="btn btn-success" onclick="refreshData()">🔄 Refresh</button>
+                    <button class="btn" onclick="exportToExcel()">📊 Export Excel</button>
+                    <button class="btn" onclick="deleteSelected()">🗑️ Delete</button>
+                </div>
+                <input type="text" class="search-box" id="searchBox" placeholder="Search items..." onkeyup="filterItems()">
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="30"><input type="checkbox" id="selectAll" onchange="toggleAll()"></th>
+                            <th>Item Code</th>
+                            <th>Description</th>
+                            <th>Part#</th>
+                            <th>Unit</th>
+                            <th>Qty</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                            <th width="80">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bomList">
+                        <tr><td colspan="9" class="loading"><div class="spinner"></div>Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Cost Summary Tab -->
+        <div id="summary" class="tab-content">
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <h3>EQUIPMENT</h3>
+                    <div class="value" id="equipmentTotal">$0</div>
+                </div>
+                <div class="summary-card">
+                    <h3>MATERIALS</h3>
+                    <div class="value" id="materialsTotal">$0</div>
+                </div>
+                <div class="summary-card">
+                    <h3>SERVICES</h3>
+                    <div class="value" id="servicesTotal">$0</div>
+                </div>
+                <div class="summary-card">
+                    <h3>SPARE PARTS</h3>
+                    <div class="value" id="spareTotal">$0</div>
+                </div>
+                <div class="summary-card primary">
+                    <h3>TOTAL BOM COST</h3>
+                    <div class="value" id="bomTotal">$0</div>
+                </div>
+                <div class="summary-card primary">
+                    <h3>QUOTE PRICE (+30%)</h3>
+                    <div class="value" id="quotePrice">$0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Setup Guide Tab -->
+        <div id="guide" class="tab-content">
+            <div style="max-width: 800px; margin: 0 auto;">
+                <h2>📋 Setup Instructions</h2>
+                
+                <h3 style="margin-top: 20px;">Step 1: Create SharePoint List</h3>
+                <ol style="line-height: 1.8;">
+                    <li>Go to your SharePoint site</li>
+                    <li>Click "New" → "List"</li>
+                    <li>Name it "BOM_List"</li>
+                    <li>Add these columns:
+                        <ul style="margin-top: 8px;">
+                            <li><strong>ItemCode</strong> (Single line of text)</li>
+                            <li><strong>Description</strong> (Single line of text)</li>
+                            <li><strong>Category</strong> (Choice: Equipment, Materials, Services, Spare Parts)</li>
+                            <li><strong>PartNumber</strong> (Single line of text)</li>
+                            <li><strong>Unit</strong> (Choice: EA, SET, M, DAY, LOT)</li>
+                            <li><strong>Quantity</strong> (Number)</li>
+                            <li><strong>UnitPrice</strong> (Currency)</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <h3 style="margin-top: 20px;">Step 2: Get SharePoint Site URL</h3>
+                <ol style="line-height: 1.8;">
+                    <li>Go to your SharePoint site</li>
+                    <li>Copy the URL (e.g., https://yourcompany.sharepoint.com/sites/yoursite)</li>
+                    <li>Paste it in the "SharePoint Site URL" field above</li>
+                </ol>
+
+                <h3 style="margin-top: 20px;">Step 3: Connect</h3>
+                <ol style="line-height: 1.8;">
+                    <li>Enter your SharePoint Site URL</li>
+                    <li>Enter "BOM_List" as the List Name</li>
+                    <li>Click "Connect"</li>
+                    <li>Sign in with your Microsoft account if prompted</li>
+                </ol>
+
+                <div style="margin-top: 20px; padding: 16px; background: #e5f6fd; border-radius: 4px;">
+                    <strong>💡 Tips:</strong>
+                    <ul style="margin-top: 8px; line-height: 1.8;">
+                        <li>All team members need at least "Contribute" permission to the SharePoint list</li>
+                        <li>Data is automatically synced across all users</li>
+                        <li>Changes are saved instantly to SharePoint</li>
+                        <li>You can also edit directly in SharePoint if needed</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Item</h2>
+                <button class="close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="itemForm" onsubmit="saveItem(event)">
+                <div class="form-group">
+                    <label>Item Code *</label>
+                    <input type="text" id="itemCode" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Description *</label>
+                    <input type="text" id="description" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Category *</label>
+                    <select id="category" class="form-control" required>
+                        <option value="">Select...</option>
+                        <option value="Equipment">Equipment</option>
+                        <option value="Materials">Materials</option>
+                        <option value="Services">Services</option>
+                        <option value="Spare Parts">Spare Parts</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Part Number</label>
+                    <input type="text" id="partNumber" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Unit *</label>
+                    <select id="unit" class="form-control" required>
+                        <option value="EA">EA</option>
+                        <option value="SET">SET</option>
+                        <option value="M">M</option>
+                        <option value="DAY">DAY</option>
+                        <option value="LOT">LOT</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Quantity *</label>
+                    <input type="number" id="quantity" class="form-control" required min="1" value="1">
+                </div>
+                <div class="form-group">
+                    <label>Unit Price (USD) *</label>
+                    <input type="number" id="unitPrice" class="form-control" required step="0.01" min="0">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        let config = {
+            siteUrl: localStorage.getItem('sp_siteUrl') || '',
+            listName: localStorage.getItem('sp_listName') || 'BOM_List',
+            connected: false
+        };
+
+        let items = [];
+        let editingId = null;
+
+        // Initialize
+        function init() {
+            if (config.siteUrl) {
+                document.getElementById('siteUrl').value = config.siteUrl;
+                document.getElementById('listName').value = config.listName;
+                // Auto-connect if previously configured
+                connectSharePoint();
+            }
+        }
+
+        // Connect to SharePoint
+        function connectSharePoint() {
+            const siteUrl = document.getElementById('siteUrl').value.trim();
+            const listName = document.getElementById('listName').value.trim();
+            
+            if (!siteUrl || !listName) {
+                showStatus('Please enter both Site URL and List Name', 'error');
+                return;
+            }
+            
+            config.siteUrl = siteUrl;
+            config.listName = listName;
+            config.connected = true;
+            
+            // Save config
+            localStorage.setItem('sp_siteUrl', siteUrl);
+            localStorage.setItem('sp_listName', listName);
+            
+            document.getElementById('connectionStatus').textContent = '🟢 Connected';
+            document.getElementById('setupPanel').style.display = 'none';
+            showStatus('Connected to SharePoint successfully!', 'success');
+            
+            // Load data
+            loadSampleData(); // In production, this would be loadFromSharePoint()
+        }
+
+        // Create SharePoint List (placeholder)
+        function createList() {
+            showStatus('Creating SharePoint list structure...', 'info');
+            setTimeout(() => {
+                showStatus('List created! Now enter your Site URL and connect.', 'success');
+            }, 2000);
+        }
+
+        // Load sample data (simulating SharePoint data)
+        function loadSampleData() {
+            items = [
+                {Id: 1, ItemCode: 'CRG-IP50CX-ODU', Description: 'Ceragon IP-50CX ODU', Category: 'Equipment', PartNumber: 'IP50CX-23GHZ', Unit: 'EA', Quantity: 2, UnitPrice: 8500},
+                {Id: 2, ItemCode: 'CRG-IP50CX-IDU', Description: 'Ceragon IP-50CX IDU', Category: 'Equipment', PartNumber: 'IP50CX-IDU-1G', Unit: 'EA', Quantity: 2, UnitPrice: 6200},
+                {Id: 3, ItemCode: 'CBL-IF-30M', Description: 'IF Cable 30m', Category: 'Materials', PartNumber: 'CBL-IF-RG8', Unit: 'EA', Quantity: 4, UnitPrice: 180},
+                {Id: 4, ItemCode: 'SRV-FAT', Description: 'Factory Testing', Category: 'Services', PartNumber: 'FAT-BKK', Unit: 'DAY', Quantity: 2, UnitPrice: 1500},
+                {Id: 5, ItemCode: 'SPR-PSU', Description: 'Power Supply Spare', Category: 'Spare Parts', PartNumber: 'PSU-SPARE', Unit: 'EA', Quantity: 2, UnitPrice: 850}
+            ];
+            render();
+        }
+
+        // Render table
+        function render() {
+            const tbody = document.getElementById('bomList');
+            const categories = {};
+            
+            items.forEach(item => {
+                if (!categories[item.Category]) categories[item.Category] = [];
+                categories[item.Category].push(item);
+            });
+            
+            let html = '';
+            Object.entries(categories).forEach(([cat, catItems]) => {
+                const catTotal = catItems.reduce((sum, item) => sum + (item.Quantity * item.UnitPrice), 0);
+                html += `<tr class="category-header"><td colspan="9">${cat} (${catItems.length} items) - $${catTotal.toLocaleString()}</td></tr>`;
+                
+                catItems.forEach(item => {
+                    const total = item.Quantity * item.UnitPrice;
+                    html += `
+                        <tr>
+                            <td><input type="checkbox" value="${item.Id}"></td>
+                            <td>${item.ItemCode}</td>
+                            <td>${item.Description}</td>
+                            <td>${item.PartNumber || '-'}</td>
+                            <td>${item.Unit}</td>
+                            <td>${item.Quantity}</td>
+                            <td>$${item.UnitPrice.toLocaleString()}</td>
+                            <td><strong>$${total.toLocaleString()}</strong></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="action-btn" onclick="editItem(${item.Id})">Edit</button>
+                                    <button class="action-btn" onclick="deleteItem(${item.Id})">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+            });
+            
+            tbody.innerHTML = html || '<tr><td colspan="9" style="text-align:center">No items</td></tr>';
+            updateSummary();
+        }
+
+        // Update summary
+        function updateSummary() {
+            const totals = {
+                Equipment: 0,
+                Materials: 0,
+                Services: 0,
+                'Spare Parts': 0
+            };
+            
+            items.forEach(item => {
+                totals[item.Category] = (totals[item.Category] || 0) + (item.Quantity * item.UnitPrice);
+            });
+            
+            const bomTotal = Object.values(totals).reduce((a, b) => a + b, 0);
+            const quotePrice = bomTotal * 1.3;
+            
+            document.getElementById('equipmentTotal').textContent = '$' + totals.Equipment.toLocaleString();
+            document.getElementById('materialsTotal').textContent = '$' + totals.Materials.toLocaleString();
+            document.getElementById('servicesTotal').textContent = '$' + totals.Services.toLocaleString();
+            document.getElementById('spareTotal').textContent = '$' + totals['Spare Parts'].toLocaleString();
+            document.getElementById('bomTotal').textContent = '$' + bomTotal.toLocaleString();
+            document.getElementById('quotePrice').textContent = '$' + Math.round(quotePrice).toLocaleString();
+            
+            document.getElementById('totalItems').textContent = 'Items: ' + items.length;
+            document.getElementById('totalValue').textContent = 'Total: $' + bomTotal.toLocaleString();
+        }
+
+        // Show status message
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.className = 'status-message status-' + type;
+            statusDiv.textContent = message;
+            statusDiv.style.margin = '0 20px 16px';
+            setTimeout(() => {
+                statusDiv.textContent = '';
+                statusDiv.className = '';
+                statusDiv.style.margin = '0';
+            }, 5000);
+        }
+
+        // Switch tabs
+        function switchTab(tabName, element) {
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            element.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // Modal functions
+        function openModal(mode) {
+            editingId = mode === 'add' ? null : editingId;
+            document.getElementById('modalTitle').textContent = mode === 'add' ? 'Add Item' : 'Edit Item';
+            if (mode === 'add') document.getElementById('itemForm').reset();
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+            editingId = null;
+        }
+
+        // Save item
+        function saveItem(e) {
+            e.preventDefault();
+            const item = {
+                Id: editingId || Date.now(),
+                ItemCode: document.getElementById('itemCode').value,
+                Description: document.getElementById('description').value,
+                Category: document.getElementById('category').value,
+                PartNumber: document.getElementById('partNumber').value,
+                Unit: document.getElementById('unit').value,
+                Quantity: parseInt(document.getElementById('quantity').value),
+                UnitPrice: parseFloat(document.getElementById('unitPrice').value)
+            };
+            
+            if (editingId) {
+                const index = items.findIndex(i => i.Id === editingId);
+                items[index] = item;
+                showStatus('Item updated successfully', 'success');
+            } else {
+                items.push(item);
+                showStatus('Item added successfully', 'success');
+            }
+            
+            render();
+            closeModal();
+            // In production: saveToSharePoint(item)
+        }
+
+        // Edit item
+        function editItem(id) {
+            const item = items.find(i => i.Id === id);
+            if (item) {
+                editingId = id;
+                document.getElementById('itemCode').value = item.ItemCode;
+                document.getElementById('description').value = item.Description;
+                document.getElementById('category').value = item.Category;
+                document.getElementById('partNumber').value = item.PartNumber || '';
+                document.getElementById('unit').value = item.Unit;
+                document.getElementById('quantity').value = item.Quantity;
+                document.getElementById('unitPrice').value = item.UnitPrice;
+                openModal('edit');
+            }
+        }
+
+        // Delete item
+        function deleteItem(id) {
+            if (confirm('Delete this item?')) {
+                items = items.filter(i => i.Id !== id);
+                render();
+                showStatus('Item deleted successfully', 'success');
+                // In production: deleteFromSharePoint(id)
+            }
+        }
+
+        // Delete selected
+        function deleteSelected() {
+            const selected = Array.from(document.querySelectorAll('#bomList input[type="checkbox"]:checked'))
+                .map(cb => parseInt(cb.value))
+                .filter(id => !isNaN(id));
+            
+            if (selected.length && confirm(`Delete ${selected.length} items?`)) {
+                items = items.filter(i => !selected.includes(i.Id));
+                render();
+                showStatus(`${selected.length} items deleted`, 'success');
+            }
+        }
+
+        // Refresh data
+        function refreshData() {
+            showStatus('Refreshing data...', 'info');
+            setTimeout(() => {
+                loadSampleData();
+                showStatus('Data refreshed', 'success');
+            }, 1000);
+        }
+
+        // Export to Excel
+        function exportToExcel() {
+            // Create CSV content
+            let csv = 'Item Code,Description,Category,Part Number,Unit,Quantity,Unit Price,Total\n';
+            items.forEach(item => {
+                const total = item.Quantity * item.UnitPrice;
+                csv += `"${item.ItemCode}","${item.Description}","${item.Category}","${item.PartNumber || ''}","${item.Unit}",${item.Quantity},${item.UnitPrice},${total}\n`;
+            });
+            
+            // Download CSV
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'BOM_Export_' + new Date().toISOString().split('T')[0] + '.csv';
+            a.click();
+            showStatus('Exported to CSV successfully', 'success');
+        }
+
+        // Filter items
+        function filterItems() {
+            const search = document.getElementById('searchBox').value.toLowerCase();
+            const rows = document.querySelectorAll('#bomList tr:not(.category-header)');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(search) ? '' : 'none';
+            });
+        }
+
+        // Toggle all checkboxes
+        function toggleAll() {
+            const selectAll = document.getElementById('selectAll');
+            document.querySelectorAll('#bomList input[type="checkbox"]').forEach(cb => {
+                cb.checked = selectAll.checked;
+            });
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>

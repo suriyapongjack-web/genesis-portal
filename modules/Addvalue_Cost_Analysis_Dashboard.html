@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>การวิเคราะห์ต้นทุน Addvalue - Visual Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            animation: fadeIn 1s ease;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .alert-box {
+            background: linear-gradient(135deg, #ff6b6b, #ff5252);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .alert-box h2 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+        
+        .alert-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .alert-item {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .alert-item .value {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .alert-item .label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .chart-card h3 {
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            color: #333;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .summary-card .icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .summary-card .title {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        
+        .summary-card .amount {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .summary-card.loss {
+            background: linear-gradient(135deg, #fff5f5, #ffe0e0);
+        }
+        
+        .summary-card.loss .amount {
+            color: #ff4444;
+        }
+        
+        .recommendation-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        .recommendation-box h3 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .price-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .price-option {
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .price-option.minimum {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+        }
+        
+        .price-option.recommended {
+            background: #d4edda;
+            border: 3px solid #28a745;
+            transform: scale(1.05);
+        }
+        
+        .price-option.target {
+            background: #cce5ff;
+            border: 2px solid #004085;
+        }
+        
+        .price-option:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+        
+        .price-option .price {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .price-option .margin {
+            font-size: 1.1em;
+            color: #666;
+        }
+        
+        .price-option .label {
+            font-size: 0.9em;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+        
+        .cost-reduction-table {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .cost-reduction-table h4 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .reduction-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #dee2e6;
+            transition: background 0.3s ease;
+        }
+        
+        .reduction-item:hover {
+            background: white;
+            padding-left: 15px;
+        }
+        
+        .reduction-item .saving {
+            font-weight: bold;
+            color: #28a745;
+        }
+        
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+        }
+        
+        canvas {
+            max-height: 350px;
+        }
+        
+        .legend-custom {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 การวิเคราะห์ต้นทุน Addvalue</h1>
+            <p style="font-size: 1.2em;">โครงการ ZPQ-ZWP4 Telecommunications Link</p>
+        </div>
+        
+        <div class="alert-box">
+            <h2>⚠️ การแจ้งเตือนวิกฤติ</h2>
+            <div class="alert-grid">
+                <div class="alert-item">
+                    <div class="value">$84,212</div>
+                    <div class="label">ต้นทุนจริง</div>
+                </div>
+                <div class="alert-item">
+                    <div class="value">$30,267</div>
+                    <div class="label">ราคาขายปัจจุบัน</div>
+                </div>
+                <div class="alert-item">
+                    <div class="value">-$53,945</div>
+                    <div class="label">ขาดทุน!</div>
+                </div>
+                <div class="alert-item">
+                    <div class="value">-64%</div>
+                    <div class="label">อัตราขาดทุน</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="icon">📦</div>
+                <div class="title">ต้นทุนตาม Cost Rev 4</div>
+                <div class="amount">฿2,238,573</div>
+            </div>
+            <div class="summary-card">
+                <div class="icon">➕</div>
+                <div class="title">ค่าใช้จ่ายที่ขาดหาย</div>
+                <div class="amount">฿456,220</div>
+            </div>
+            <div class="summary-card">
+                <div class="icon">💰</div>
+                <div class="title">ต้นทุนรวมจริง</div>
+                <div class="amount">฿2,694,793</div>
+            </div>
+            <div class="summary-card loss">
+                <div class="icon">📉</div>
+                <div class="title">ผลขาดทุน</div>
+                <div class="amount">-฿1,726,249</div>
+            </div>
+        </div>
+        
+        <div class="dashboard">
+            <div class="chart-card">
+                <h3>📊 สัดส่วนต้นทุนปัจจุบัน (Cost Rev 4)</h3>
+                <canvas id="currentCostChart"></canvas>
+            </div>
+            
+            <div class="chart-card">
+                <h3>⚠️ ค่าใช้จ่ายที่ยังขาดหาย</h3>
+                <canvas id="missingCostChart"></canvas>
+            </div>
+            
+            <div class="chart-card">
+                <h3>💼 ต้นทุนรวมที่แท้จริง</h3>
+                <canvas id="totalCostChart"></canvas>
+            </div>
+            
+            <div class="chart-card">
+                <h3>📈 เปรียบเทียบราคาขาย vs ต้นทุน</h3>
+                <canvas id="comparisonChart"></canvas>
+            </div>
+        </div>
+        
+        <div class="recommendation-box">
+            <h3><span>💡</span> ราคาขายที่แนะนำ (จากต้นทุนจริง $84,212)</h3>
+            <div class="price-options">
+                <div class="price-option minimum">
+                    <div class="price">$96,844</div>
+                    <div class="margin">กำไร 15%</div>
+                    <div class="label">ขั้นต่ำ</div>
+                </div>
+                <div class="price-option recommended">
+                    <div class="price">$105,265</div>
+                    <div class="margin">กำไร 25%</div>
+                    <div class="label">✅ แนะนำ</div>
+                </div>
+                <div class="price-option target">
+                    <div class="price">$114,000</div>
+                    <div class="margin">กำไร 35%</div>
+                    <div class="label">เป้าหมาย</div>
+                </div>
+            </div>
+            
+            <div class="cost-reduction-table">
+                <h4>🎯 แนวทางลดต้นทุนด่วน (Quick Wins)</h4>
+                <div class="reduction-item">
+                    <span>ลด FAT Team จาก 7 เหลือ 3 คน</span>
+                    <span class="saving">ประหยัด ฿35,000</span>
+                </div>
+                <div class="reduction-item">
+                    <span>Training แบบ Virtual</span>
+                    <span class="saving">ประหยัด ฿60,000</span>
+                </div>
+                <div class="reduction-item">
+                    <span>ใช้อุปกรณ์ทดสอบของ PTTEP</span>
+                    <span class="saving">ประหยัด ฿45,000</span>
+                </div>
+                <div class="reduction-item">
+                    <span>รวมการเดินทาง</span>
+                    <span class="saving">ประหยัด ฿30,000</span>
+                </div>
+                <div class="reduction-item" style="background: #d4edda; font-weight: bold;">
+                    <span>รวมประหยัดได้ทันที</span>
+                    <span class="saving">฿170,000 ($5,313)</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>วิเคราะห์โดย:</strong> Financial Analysis Team | <strong>วันที่:</strong> September 2025</p>
+            <p><strong>อ้างอิง:</strong> 0493-Estimate Costs Rev.4 | <strong>อัตราแลกเปลี่ยน:</strong> 32 THB/USD</p>
+        </div>
+    </div>
+    
+    <script>
+        // ข้อมูลสำหรับกราฟ
+        const thbToUsd = 32;
+        
+        // 1. กราฟต้นทุนปัจจุบัน (Cost Rev 4)
+        const currentCostCtx = document.getElementById('currentCostChart').getContext('2d');
+        new Chart(currentCostCtx, {
+            type: 'pie',
+            data: {
+                labels: ['อุปกรณ์', 'นำเข้า/โลจิสติกส์', 'บริการ/ติดตั้ง', 'เงินทุนหมุนเวียน'],
+                datasets: [{
+                    data: [720480, 217409, 784090, 516594],
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#4BC0C0'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.raw;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                const formattedValue = new Intl.NumberFormat('th-TH').format(value);
+                                const usdValue = new Intl.NumberFormat('en-US').format(Math.round(value / thbToUsd));
+                                return `${context.label}: ฿${formattedValue} ($${usdValue}) - ${percentage}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 2. กราฟค่าใช้จ่ายที่ขาด
+        const missingCostCtx = document.getElementById('missingCostChart').getContext('2d');
+        new Chart(missingCostCtx, {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    'ค่าบุคลากร Offshore',
+                    'ค่า HSE & ความปลอดภัย',
+                    'ค่าขนส่งพิเศษ',
+                    'ค่าเครื่องมือทดสอบ',
+                    'ค่าใบอนุญาต/ประกัน',
+                    'ค่าสำรองอื่นๆ'
+                ],
+                datasets: [{
+                    data: [127000, 71000, 70000, 88000, 63220, 37000],
+                    backgroundColor: [
+                        '#FF9F40',
+                        '#FF6384',
+                        '#4BC0C0',
+                        '#9966FF',
+                        '#36A2EB',
+                        '#FFCE56'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.raw;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                const formattedValue = new Intl.NumberFormat('th-TH').format(value);
+                                const usdValue = new Intl.NumberFormat('en-US').format(Math.round(value / thbToUsd));
+                                return `${context.label}: ฿${formattedValue} ($${usdValue}) - ${percentage}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 3. กราฟต้นทุนรวมจริง
+        const totalCostCtx = document.getElementById('totalCostChart').getContext('2d');
+        new Chart(totalCostCtx, {
+            type: 'pie',
+            data: {
+                labels: [
+                    'อุปกรณ์',
+                    'นำเข้า/โลจิสติกส์',
+                    'บริการ/ติดตั้ง',
+                    'ค่าใช้จ่ายเพิ่มเติม',
+                    'เงินทุนหมุนเวียน'
+                ],
+                datasets: [{
+                    data: [720480, 217409, 784090, 456220, 516594],
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#FF9F40',
+                        '#4BC0C0'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.raw;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((value / total) * 100).toFixed(1);
+                                const formattedValue = new Intl.NumberFormat('th-TH').format(value);
+                                const usdValue = new Intl.NumberFormat('en-US').format(Math.round(value / thbToUsd));
+                                return `${context.label}: ฿${formattedValue} ($${usdValue}) - ${percentage}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 4. กราฟเปรียบเทียบ
+        const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
+        new Chart(comparisonCtx, {
+            type: 'bar',
+            data: {
+                labels: ['ราคาขายปัจจุบัน', 'ต้นทุนจริง', 'ราคาแนะนำ', 'ราคาเป้าหมาย'],
+                datasets: [{
+                    label: 'มูลค่า (USD)',
+                    data: [30267, 84212, 105265, 114000],
+                    backgroundColor: [
+                        '#ff4444',
+                        '#ff9f40',
+                        '#4caf50',
+                        '#2196f3'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + new Intl.NumberFormat('en-US').format(value);
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.raw;
+                                const formattedValue = new Intl.NumberFormat('en-US').format(value);
+                                let profitLoss = '';
+                                if (context.dataIndex === 0) {
+                                    profitLoss = ' (ขาดทุน $53,945)';
+                                } else if (context.dataIndex === 2) {
+                                    profitLoss = ' (กำไร 25%)';
+                                } else if (context.dataIndex === 3) {
+                                    profitLoss = ' (กำไร 35%)';
+                                }
+                                return `$${formattedValue}${profitLoss}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

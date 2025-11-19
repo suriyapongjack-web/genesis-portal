@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USD Pricing Table - PTTEPI Project</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 13px;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        .header {
+            background: linear-gradient(135deg, #1F4788, #366092);
+            color: white;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        .exchange-info {
+            background: #FFF9E6;
+            padding: 10px 20px;
+            border-bottom: 2px solid #FFB800;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .exchange-rate {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .rate-input {
+            padding: 5px 10px;
+            border: 2px solid #1F4788;
+            border-radius: 4px;
+            font-weight: bold;
+            width: 80px;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        th {
+            background: #E8E8E8;
+            padding: 8px 5px;
+            text-align: left;
+            border: 1px solid #ccc;
+            font-weight: 600;
+            font-size: 11px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        td {
+            padding: 6px 5px;
+            border: 1px solid #ddd;
+            vertical-align: middle;
+        }
+        .section-header {
+            background: #FFF3CD;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .section-header td {
+            padding: 8px 5px;
+            border-top: 2px solid #1F4788;
+        }
+        .item-row:hover {
+            background: #F8F9FA;
+        }
+        .icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            margin-right: 5px;
+            border-radius: 50%;
+            vertical-align: middle;
+        }
+        .icon-base { background: #4CAF50; }
+        .icon-remote { background: #2196F3; }
+        .description {
+            display: flex;
+            align-items: center;
+        }
+        .part-number {
+            font-size: 10px;
+            color: #666;
+            display: block;
+            margin-top: 2px;
+        }
+        .text-right { text-align: right !important; }
+        .text-center { text-align: center !important; }
+        .editable {
+            background: #E7F3FF;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        input.inline-edit {
+            width: 100%;
+            border: 1px solid #1F4788;
+            padding: 2px 4px;
+            text-align: right;
+            font-size: 11px;
+        }
+        .total-row {
+            background: #E8F4FF;
+            font-weight: bold;
+        }
+        .grand-total-row {
+            background: #1F4788;
+            color: white;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .grand-total-row td {
+            padding: 10px 5px;
+            border: 1px solid #1F4788;
+        }
+        .subtotal-row {
+            background: #F0F8FF;
+            font-weight: 600;
+        }
+        .currency-col {
+            background: #FFFBF0;
+            font-weight: 600;
+        }
+        .discount-applied {
+            color: #28A745;
+            font-weight: bold;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 0 5px;
+        }
+        .btn-primary {
+            background: #1F4788;
+            color: white;
+        }
+        .btn-success {
+            background: #28A745;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        .edit-icon {
+            cursor: pointer;
+            color: #1F4788;
+            font-size: 10px;
+            margin-left: 3px;
+        }
+        @media print {
+            .exchange-info { page-break-inside: avoid; }
+            table { page-break-inside: auto; }
+            tr { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 USD Pricing Table with THB Conversion</h1>
+            <div style="font-size: 13px; opacity: 0.9;">Project: PJ2509-0497 PTTEPI MM ZPQ Aviat</div>
+        </div>
+        
+        <div class="exchange-info">
+            <div class="exchange-rate">
+                <span>Exchange Rate:</span>
+                <input type="number" class="rate-input" id="exchangeRate" value="31.5" step="0.1" onchange="recalculateAll()">
+                <span>THB per USD</span>
+                <button class="btn btn-primary" onclick="applyDiscount(10)">Apply 10% Discount</button>
+                <button class="btn btn-success" onclick="optimizePricing()">Optimize for Win</button>
+            </div>
+            <div>
+                <span id="currentDate"></span>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th width="30%">Description</th>
+                    <th width="6%" class="text-center">Sales tax</th>
+                    <th width="8%" class="text-right">U.P. (net) USD</th>
+                    <th width="8%" class="text-right">U.P. (net) THB</th>
+                    <th width="8%" class="text-right">U.P. (inc. tax)</th>
+                    <th width="4%" class="text-center">Qty</th>
+                    <th width="6%" class="text-center">Disc. %</th>
+                    <th width="8%" class="text-right">Cost price USD</th>
+                    <th width="9%" class="text-right">Total (excl.) USD</th>
+                    <th width="9%" class="text-right currency-col">Total (excl.) THB</th>
+                    <th width="4%" class="text-center">📝</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Base Station Section -->
+                <tr class="section-header">
+                    <td colspan="11">
+                        <span class="icon icon-base"></span>
+                        <strong>5.8 GHz Base Station</strong>
+                    </td>
+                </tr>
+                
+                <!-- Base Station Items -->
+                <tr class="item-row" data-type="base" data-index="0">
+                    <td>
+                        3K-SC-HAZ-RF4958-GPS-01 - RDL3000 Ellipse Base Station
+                        <span class="part-number">2xN(f) eth-RJ45 GPS-TNC(f) Conduit Adapter HAZ Zone 2</span>
+                    </td>
+                    <td class="text-center">0%</td>
+                    <td class="text-right editable" onclick="editCell(this, 'price')">4,391.00</td>
+                    <td class="text-right">139,583.75</td>
+                    <td class="text-right">139,583.75</td>
+                    <td class="text-center">1</td>
+                    <td class="text-center editable discount-cell" onclick="editCell(this, 'discount')">0%</td>
+                    <td class="text-right">3,894.39</td>
+                    <td class="text-right">5,233.00</td>
+                    <td class="text-right currency-col">164,833.05</td>
+                    <td class="text-center">✏️</td>
+                </tr>
+                
+                <tr class="item-row" data-type="base" data-index="1">
+                    <td>
+                        OPK-3K-ELLIPSE-PMP10-G1 - Options Key PMP up to 10 Remotes
+                        <span class="part-number">Max Mbps - Only With Purchase of Ellipse Radio</span>
+                    </td>
+                    <td class="text-center">0%</td>
+                    <td class="text-right editable" onclick="editCell(this, 'price')">6,855.00</td>
+                    <td class="text-right">216,915.31</td>
+                    <td class="text-right">216,915.31</td>
+                    <td class="text-center">1</td>
+                    <td class="text-center editable discount-cell" onclick="editCell(this, 'discount')">0%</td>
+                    <td class="text-right">6,051.94</td>
+                    <td class="text-right">1,839.00</td>
+                    <td class="text-right currency-col">57,920.33</td>
+                    <td class="text-center">✏️</td>
+                </tr>
+                
+                <tr class="item-row" data-type="base" data-index="2">
+                    <td>
+                        OPK-REGION-3000-06 - Options Key Region Code 06
+                        <span class="part-number">for RDL3000 XP: US 4.9-5.15-5.85 GHz</span>
+                    </td>
+                    <td class="text-center">0%</td>
+                    <td class="text-right editable" onclick="editCell(this, 'price')">0.00</td>
+                    <td class="text-right">0.00</td>
+                    <td class="text-right">0.00</td>
+                    <td class="text-center">1</td>
+                    <td class="text-center editable discount-cell" onclick="editCell(this, 'discount')">0%</td>
+                    <td class="text-right">0.00</td>
+                    <td class="text-right">172.00</td>
+                    <td class="text-right currency-col">5,426.61</td>
+                    <td class="text-center">✏️</td>
+                </tr>
+                
+                <tr class="item-row" data-type="base" data-index="3">
+                    <td>
+                        PS-DCDC-HAZ-POE-IND-01 - Power Supply POE
+                        <span class="part-number">DC 10-60VDC 30W 802.3af/at DIN-Mnt Industrial GigE</span>
+                    </td>
+                    <td class="text-center">0%</td>
+                    <td class="text-right editable" onclick="editCell(this, 'price')">1,147.00</td>
+                    <td class="text-right">36,174.01</td>
+                    <td class="text-right">36,174.01</td>
+                    <td class="text-center">1</td>
+                    <td class="text-center editable discount-cell" onclick="editCell(this, 'discount')">0%</td>
+                    <td class="text-right">1,009.25</td>
+                    <td class="text-right">647.00</td>
+                    <td class="text-right currency-col">20,381.91</td>
+                    <td class="text-center">✏️</td>
+                </tr>
+                
+                <tr class="item-row" data-type="base" data-index="4">
+                    <td>
+                        SWW-EWXXA1001237 - Extended Warranty 12 Months
+                        <span class="part-number">Worldwide, RDL-3x00 Ellipse Base Stn</span>
+                    </td>
+                    <td class="text-center">0%</td>
+                    <td class="text-right editable" onclick="editCell(this, 'price')">1,953.00</td>
+                    <td class="text-right">61,549.06</td>
+                    <td class="text-right">61,549.06</td>
+                    <td class="text-center">1</td>
+                    <td class="text-center editable discount-cell" onclick="editCell(this, 'discount')">0%</td>
+                    <td class="text-right">1,717.22</td>
+                    <td class="text-right">646.00</td>
+                    <td class="text-right currency-col">20,348.70</td>
+                    <td class="text-center">✏️</td>
+                </tr>
+
+                <!-- Base Station Subtotal -->
+                <tr class="subtotal-row">
+                    <td colspan="8"><strong>Subtotal - Base Station</strong></td>
+                    <td class="text-right" id="baseSubtotalUSD">8,537.00</td>
+                    <td class="text-right currency-col" id="baseSubtotalTHB">268,910.60</td>
+                    <td></td>
+                </tr>
+
+                <!-- Remote Terminals Section -->
+                <tr class="section-header">
+                    <td colspan="11">
+                        <span class="icon icon-remote"></span>
+                        <strong>5.8GHz CON-OW-ER Remote Terminals</strong>
+                    </td>
+                </tr>
+                
+                <!-- Remote Terminal Items (6 units each) -->
+                <tr class="item-row" data-type="remote" data-index="0">
+                    <td>
+                        CONN-OW-HAZ-4958ER-01 - Connect-OW-ER Remote Terminal
+                        <span class="part-number">4.9-5.8GHz 2xN(f) Eth-RJ45 Conduit Adapter HAZ Zone-2</span>
+                    </td>
+                    <td class="text-center">0%</td>
+                    <td class="text-right editable" onclick="editCell(this, 'price')">3,953.00</td>
+                    <td class="text-right">124,601.72</td>
+                    <td class="text-right">124,601.72</td>
+                    <td class="text-center">6</td>
+                    <td class="text-center editable discount-cell" onclick="editCell(this, 'discount')">0%</td>
+                    <td class="text-right">3,476.39</td>
+                    <td class="text-right">27,990.00</td>
+                    <td class="text-right currency-col">882,844.56</td>
+                    <td class="text-center">✏️</td>
+                </tr>
+                
+                <tr class="item-row" data-type="remote" data-index="1">
+                    <td>
+                        OPK-3K-REM-UNLMBPS-01 - Options Key Unlimited Mbps
+                        <span class="part-number">RDL3000 XP PTP or PMP Remote Terminal</span>
+                    </td>
+                    <td class="text-center">0%</td>
+                    <td class="text-right editable" onclick="editCell(this, 'price')">379.00</td>
+                    <td class="text-right">11,942.27</td>
+                    <td class="text-right">11,942.27</td>
+                    <td class="text-center">6</td>
+                    <td class="text-center editable discount-cell" onclick="editCell(this, 'discount')">0%</td>
+                    <td class="text-right">333.19</td>
+                    <td class="text-right">9,264.00</td>
+                    <td class="text-right currency-col">291,923.52</td>
+                    <td class="text-center">✏️</td>
+                </tr>
+                
+                <tr class="item-row" data-type="remote" data-index="2">
+                    <td>
+                        OPK-REGION-3000-06 - Options Key Region Code 06
+                        <span class="part-number">for RDL3000 XP: US 4.9-5.15-5.85 GHz</span>
+                    </td>
+                    <td class="text-center">0%</td>
+                    <td class="text-right editable" onclick="editCell(this, 'price')">0.00</td>
+                    <td class="text-right">0.00</td>
+                    <td class="text-right">0.00</td>
+                    <td class="text-center">6</td>
+                    <td class="text-center editable discount-cell" onclick="editCell(this, 'discount')">0%</td>
+                    <td class="text-right">0.00</td>
+                    <td class="text-right">1,033.00</td>
+                    <td class="text-right currency-col">32,559.66</td>
+                    <td class="text-center">✏️</td>
+                </tr>
+                
+                <tr class="item-row" data-type="remote" data-index="3">
+                    <td>
+                        PS-DCDC-HAZ-POE-IND-01 - Power Supply POE
+                        <span class="part-number">DC 10-60VDC 30W 802.3af/at DIN-Mnt Industrial GigE</span>
+                    </td>
+                    <td class="text-center">0%</td>
+                    <td class="text-right editable" onclick="editCell(this, 'price')">1,147.00</td>
+                    <td class="text-right">36,174.01</td>
+                    <td class="text-right">36,174.01</td>
+                    <td class="text-center">6</td>
+                    <td class="text-center editable discount-cell" onclick="editCell(this, 'discount')">0%</td>
+                    <td class="text-right">1,009.25</td>
+                    <td class="text-right">3,882.00</td>
+                    <td class="text-right currency-col">122,291.46</td>
+                    <td class="text-center">✏️</td>
+                </tr>
+                
+                <tr class="item-row" data-type="remote" data-index="4">
+                    <td>
+                        SWW-EWXXA1001235 - Extended Warranty 12 Months
+                        <span class="part-number">Worldwide, RDL 3000 Connect/Edge/El TE</span>
+                    </td>
+                    <td class="text-center">0%</td>
+                    <td class="text-right editable" onclick="editCell(this, 'price')">538.00</td>
+                    <td class="text-right">16,958.35</td>
+                    <td class="text-right">16,958.35</td>
+                    <td class="text-center">6</td>
+                    <td class="text-center editable discount-cell" onclick="editCell(this, 'discount')">0%</td>
+                    <td class="text-right">473.21</td>
+                    <td class="text-right">3,224.00</td>
+                    <td class="text-right currency-col">101,555.94</td>
+                    <td class="text-center">✏️</td>
+                </tr>
+
+                <!-- Remote Terminals Subtotal -->
+                <tr class="subtotal-row">
+                    <td colspan="8"><strong>Subtotal - Remote Terminals</strong></td>
+                    <td class="text-right" id="remoteSubtotalUSD">45,393.00</td>
+                    <td class="text-right currency-col" id="remoteSubtotalTHB">1,431,175.14</td>
+                    <td></td>
+                </tr>
+
+                <!-- Grand Total Section -->
+                <tr class="total-row">
+                    <td colspan="8"><strong>SUBTOTAL (Excluding VAT)</strong></td>
+                    <td class="text-right" id="subtotalUSD">53,930.00</td>
+                    <td class="text-right currency-col" id="subtotalTHB">1,700,085.74</td>
+                    <td></td>
+                </tr>
+                
+                <tr>
+                    <td colspan="8">VAT 7%</td>
+                    <td class="text-right" id="vatUSD">3,775.10</td>
+                    <td class="text-right currency-col" id="vatTHB">119,006.00</td>
+                    <td></td>
+                </tr>
+                
+                <tr class="grand-total-row">
+                    <td colspan="8"><strong>GRAND TOTAL (Including VAT)</strong></td>
+                    <td class="text-right" id="totalUSD">57,705.10</td>
+                    <td class="text-right currency-col" id="totalTHB">1,819,091.74</td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Data structure for items
+        const baseItems = [
+            { 
+                partNumber: '3K-SC-HAZ-RF4958-GPS-01',
+                description: 'RDL3000 Ellipse Base Station',
+                costPrice: 3894.39,
+                sellingPrice: 5233.00,
+                qty: 1,
+                discount: 0
+            },
+            { 
+                partNumber: 'OPK-3K-ELLIPSE-PMP10-G1',
+                description: 'Options Key PMP up to 10 Remotes',
+                costPrice: 6051.94,
+                sellingPrice: 1839.00,
+                qty: 1,
+                discount: 0
+            },
+            { 
+                partNumber: 'OPK-REGION-3000-06',
+                description: 'Options Key Region Code 06',
+                costPrice: 0,
+                sellingPrice: 172.00,
+                qty: 1,
+                discount: 0
+            },
+            { 
+                partNumber: 'PS-DCDC-HAZ-POE-IND-01',
+                description: 'Power Supply POE',
+                costPrice: 1009.25,
+                sellingPrice: 647.00,
+                qty: 1,
+                discount: 0
+            },
+            { 
+                partNumber: 'SWW-EWXXA1001237',
+                description: 'Extended Warranty 12 Months',
+                costPrice: 1717.22,
+                sellingPrice: 646.00,
+                qty: 1,
+                discount: 0
+            }
+        ];
+
+        const remoteItems = [
+            { 
+                partNumber: 'CONN-OW-HAZ-4958ER-01',
+                description: 'Connect-OW-ER Remote Terminal',
+                costPrice: 3476.39,
+                sellingPrice: 4665.00,
+                qty: 6,
+                discount: 0
+            },
+            { 
+                partNumber: 'OPK-3K-REM-UNLMBPS-01',
+                description: 'Options Key Unlimited Mbps',
+                costPrice: 333.19,
+                sellingPrice: 1544.00,
+                qty: 6,
+                discount: 0
+            },
+            { 
+                partNumber: 'OPK-REGION-3000-06',
+                description: 'Options Key Region Code 06',
+                costPrice: 0,
+                sellingPrice: 172.00,
+                qty: 6,
+                discount: 0
+            },
+            { 
+                partNumber: 'PS-DCDC-HAZ-POE-IND-01',
+                description: 'Power Supply POE',
+                costPrice: 1009.25,
+                sellingPrice: 647.00,
+                qty: 6,
+                discount: 0
+            },
+            { 
+                partNumber: 'SWW-EWXXA1001235',
+                description: 'Extended Warranty 12 Months',
+                costPrice: 473.21,
+                sellingPrice: 537.00,
+                qty: 6,
+                discount: 0
+            }
+        ];
+
+        function editCell(cell, type) {
+            const currentValue = cell.textContent.replace('%', '').replace(',', '');
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.className = 'inline-edit';
+            input.value = parseFloat(currentValue) || 0;
+            
+            if (type === 'discount') {
+                input.max = 50;
+                input.min = 0;
+            }
+            
+            input.onblur = function() {
+                const newValue = parseFloat(input.value) || 0;
+                if (type === 'discount') {
+                    cell.textContent = newValue + '%';
+                } else {
+                    cell.textContent = newValue.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                }
+                recalculateRow(cell.parentElement);
+                updateTotals();
+            };
+            
+            input.onkeypress = function(e) {
+                if (e.key === 'Enter') {
+                    input.blur();
+                }
+            };
+            
+            cell.textContent = '';
+            cell.appendChild(input);
+            input.focus();
+            input.select();
+        }
+
+        function recalculateRow(row) {
+            const cells = row.querySelectorAll('td');
+            const exchangeRate = parseFloat(document.getElementById('exchangeRate').value);
+            
+            const unitPriceUSD = parseFloat(cells[2].textContent.replace(',', '')) || 0;
+            const qty = parseInt(cells[5].textContent);
+            const discount = parseFloat(cells[6].textContent.replace('%', '')) / 100 || 0;
+            
+            const discountedPrice = unitPriceUSD * (1 - discount);
+            const totalUSD = discountedPrice * qty;
+            const unitPriceTHB = discountedPrice * exchangeRate;
+            const totalTHB = totalUSD * exchangeRate;
+            
+            // Update THB columns
+            cells[3].textContent = unitPriceTHB.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            cells[4].textContent = unitPriceTHB.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            cells[8].textContent = totalUSD.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            cells[9].textContent = totalTHB.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
+        function updateTotals() {
+            const exchangeRate = parseFloat(document.getElementById('exchangeRate').value);
+            let baseTotal = 0;
+            let remoteTotal = 0;
+            
+            // Calculate base station totals
+            document.querySelectorAll('tr[data-type="base"]').forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const total = parseFloat(cells[8].textContent.replace(/,/g, '')) || 0;
+                baseTotal += total;
+            });
+            
+            // Calculate remote terminal totals
+            document.querySelectorAll('tr[data-type="remote"]').forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const total = parseFloat(cells[8].textContent.replace(/,/g, '')) || 0;
+                remoteTotal += total;
+            });
+            
+            // Update subtotals
+            document.getElementById('baseSubtotalUSD').textContent = 
+                baseTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('baseSubtotalTHB').textContent = 
+                (baseTotal * exchangeRate).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            
+            document.getElementById('remoteSubtotalUSD').textContent = 
+                remoteTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('remoteSubtotalTHB').textContent = 
+                (remoteTotal * exchangeRate).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            
+            // Grand totals
+            const subtotal = baseTotal + remoteTotal;
+            const vat = subtotal * 0.07;
+            const grandTotal = subtotal + vat;
+            
+            document.getElementById('subtotalUSD').textContent = 
+                subtotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('subtotalTHB').textContent = 
+                (subtotal * exchangeRate).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            
+            document.getElementById('vatUSD').textContent = 
+                vat.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('vatTHB').textContent = 
+                (vat * exchangeRate).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            
+            document.getElementById('totalUSD').textContent = 
+                grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('totalTHB').textContent = 
+                (grandTotal * exchangeRate).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
+        function recalculateAll() {
+            document.querySelectorAll('.item-row').forEach(row => {
+                recalculateRow(row);
+            });
+            updateTotals();
+        }
+
+        function applyDiscount(percentage) {
+            document.querySelectorAll('.discount-cell').forEach(cell => {
+                cell.textContent = percentage + '%';
+            });
+            recalculateAll();
+        }
+
+        function optimizePricing() {
+            // Apply optimal 10% discount for competitive pricing
+            applyDiscount(10);
+            alert('Pricing optimized with 10% discount for ~60% win probability');
+        }
+
+        // Set current date
+        document.getElementById('currentDate').textContent = 
+            new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        // Initial calculation
+        updateTotals();
+    </script>
+</body>
+</html>

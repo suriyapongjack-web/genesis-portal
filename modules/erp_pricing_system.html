@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP Pricing System - Quotation Calculator</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 11px;
+            background: #e9ecef;
+            color: #212529;
+        }
+        
+        .container {
+            max-width: 100%;
+            background: white;
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            background: #1e3a5f;
+            color: white;
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .header-info {
+            display: flex;
+            gap: 20px;
+            font-size: 10px;
+            opacity: 0.9;
+        }
+        
+        /* Control Bar */
+        .control-bar {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .control-group label {
+            font-size: 10px;
+            color: #495057;
+        }
+        
+        .control-group input,
+        .control-group select {
+            padding: 3px 6px;
+            border: 1px solid #ced4da;
+            border-radius: 2px;
+            font-size: 11px;
+            background: white;
+        }
+        
+        .control-group input:focus,
+        .control-group select:focus {
+            outline: none;
+            border-color: #0066cc;
+            box-shadow: 0 0 0 2px rgba(0,102,204,0.1);
+        }
+        
+        /* Action Buttons */
+        .btn-toolbar {
+            background: white;
+            padding: 8px 15px;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            gap: 5px;
+        }
+        
+        .btn {
+            padding: 5px 10px;
+            border: 1px solid;
+            border-radius: 2px;
+            font-size: 11px;
+            cursor: pointer;
+            background: white;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .btn-primary {
+            background: #0066cc;
+            border-color: #0056b3;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            border-color: #1e7e34;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            border-color: #d39e00;
+            color: #212529;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            border-color: #bd2130;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        /* Summary Cards */
+        .summary-bar {
+            background: white;
+            padding: 10px 15px;
+            border-bottom: 2px solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .summary-cards {
+            display: flex;
+            gap: 25px;
+        }
+        
+        .summary-card {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .summary-label {
+            font-size: 9px;
+            color: #6c757d;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        
+        .summary-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #212529;
+        }
+        
+        .summary-value.cost {
+            color: #dc3545;
+        }
+        
+        .summary-value.profit {
+            color: #28a745;
+        }
+        
+        .last-update {
+            font-size: 10px;
+            color: #6c757d;
+        }
+        
+        /* Main Table */
+        .table-wrapper {
+            overflow-x: auto;
+            background: white;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+        }
+        
+        thead {
+            background: #f1f3f5;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        th {
+            padding: 8px 6px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 10px;
+            border: 1px solid #dee2e6;
+            color: #495057;
+            white-space: nowrap;
+        }
+        
+        th .edit-icon {
+            color: #6c757d;
+            font-size: 9px;
+            margin-left: 2px;
+        }
+        
+        td {
+            padding: 5px 6px;
+            border: 1px solid #e9ecef;
+            vertical-align: middle;
+        }
+        
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+        
+        /* Section Headers */
+        .section-row {
+            background: #e7f1ff;
+        }
+        
+        .section-row td {
+            padding: 8px 6px;
+            font-weight: bold;
+            color: #004085;
+            font-size: 12px;
+            border: 1px solid #b8daff;
+        }
+        
+        .section-icon {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background: #004085;
+            color: white;
+            border-radius: 2px;
+            text-align: center;
+            line-height: 16px;
+            font-size: 10px;
+            margin-right: 6px;
+        }
+        
+        /* Item Description */
+        .item-desc {
+            max-width: 300px;
+        }
+        
+        .part-number {
+            font-weight: 600;
+            color: #004085;
+            font-size: 11px;
+        }
+        
+        .part-desc {
+            font-size: 10px;
+            color: #6c757d;
+            margin-top: 2px;
+        }
+        
+        /* Editable Cells */
+        .editable {
+            cursor: pointer;
+            position: relative;
+            background: white;
+        }
+        
+        .editable:hover {
+            background: #e7f1ff;
+        }
+        
+        .edit-input {
+            width: 100%;
+            padding: 2px 4px;
+            border: 1px solid #0066cc;
+            font-size: 11px;
+            background: white;
+        }
+        
+        .currency-select {
+            padding: 1px 3px;
+            border: 1px solid #ced4da;
+            font-size: 10px;
+            margin-right: 3px;
+        }
+        
+        /* Number Formatting */
+        .text-right {
+            text-align: right !important;
+        }
+        
+        .text-center {
+            text-align: center !important;
+        }
+        
+        .number {
+            font-family: 'Courier New', monospace;
+            color: #212529;
+        }
+        
+        .number-cost {
+            color: #dc3545;
+        }
+        
+        .number-price {
+            color: #004085;
+            font-weight: 600;
+        }
+        
+        /* Status Indicators */
+        .margin-badge {
+            display: inline-block;
+            padding: 1px 4px;
+            border-radius: 2px;
+            font-size: 9px;
+            font-weight: 600;
+            margin-left: 3px;
+        }
+        
+        .margin-good {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .margin-ok {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .margin-low {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        /* Action Icons */
+        .action-icons {
+            display: flex;
+            gap: 4px;
+            justify-content: center;
+        }
+        
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 2px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+            font-size: 12px;
+        }
+        
+        .icon-btn:hover {
+            opacity: 1;
+        }
+        
+        .icon-edit { color: #0066cc; }
+        .icon-copy { color: #28a745; }
+        .icon-delete { color: #dc3545; }
+        
+        /* Total Rows */
+        .subtotal-row {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        
+        .subtotal-row td {
+            border: 1px solid #dee2e6;
+            padding: 6px;
+        }
+        
+        .total-row {
+            background: #e7f1ff;
+            font-weight: bold;
+        }
+        
+        .grand-total-row {
+            background: #004085;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        
+        .grand-total-row td {
+            padding: 8px 6px;
+            border: 1px solid #004085;
+        }
+        
+        /* Rich Text Editor Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 4px;
+            width: 80%;
+            max-width: 800px;
+        }
+        
+        .editor-toolbar {
+            background: #f8f9fa;
+            padding: 8px;
+            border: 1px solid #dee2e6;
+            border-bottom: none;
+            display: flex;
+            gap: 5px;
+        }
+        
+        .editor-btn {
+            padding: 4px 8px;
+            background: white;
+            border: 1px solid #ced4da;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .editor-content {
+            min-height: 200px;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            background: white;
+            font-size: 12px;
+        }
+        
+        .close-modal {
+            float: right;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        @media print {
+            .control-bar, .btn-toolbar { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>ERP Pricing System - Quotation Management</h1>
+            <div class="header-info">
+                <span>Project: PJ2509-0497 PTTEPI MM ZPQ Aviat</span>
+                <span>Customer: Add Value System Company Limited</span>
+                <span>Quote: NG/250922-AD01</span>
+                <span>Valid Until: 21-Nov-25</span>
+            </div>
+        </div>
+        
+        <!-- Control Bar -->
+        <div class="control-bar">
+            <div class="control-group">
+                <label>Currency:</label>
+                <select id="displayCurrency" onchange="updateDisplay()">
+                    <option value="THB">THB - Thai Baht</option>
+                    <option value="USD">USD - US Dollar</option>
+                    <option value="BOTH" selected>Show Both</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Exchange Rate:</label>
+                <input type="number" id="exchangeRate" value="31.5" step="0.01" style="width: 60px;" onchange="recalculateAll()">
+                <span style="font-size: 9px; color: #6c757d;">THB/USD</span>
+            </div>
+            <div class="control-group">
+                <label>VAT %:</label>
+                <input type="number" id="vatRate" value="7" min="0" max="20" style="width: 50px;" onchange="recalculateAll()">
+            </div>
+            <div class="control-group">
+                <label>Margin Type:</label>
+                <select id="marginType">
+                    <option value="percentage" selected>Percentage %</option>
+                    <option value="amount">Fixed Amount</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label>Target Margin:</label>
+                <input type="number" id="targetMargin" value="0" step="1" style="width: 60px;">
+                <span style="font-size: 9px; color: #6c757d;">%</span>
+            </div>
+            <div class="control-group">
+                <label>Global Discount:</label>
+                <input type="number" id="globalDiscount" value="0" min="0" max="100" step="1" style="width: 60px;">
+                <span style="font-size: 9px; color: #6c757d;">%</span>
+            </div>
+        </div>
+        
+        <!-- Button Toolbar -->
+        <div class="btn-toolbar">
+            <button class="btn btn-primary" onclick="applyMargin()">💰 Apply Margin</button>
+            <button class="btn btn-success" onclick="applyDiscount()">🏷️ Apply Discount</button>
+            <button class="btn btn-warning" onclick="optimizeWinRate()">🎯 Optimize Win Rate</button>
+            <button class="btn btn-primary" onclick="addNewItem()">➕ Add Item</button>
+            <button class="btn btn-primary" onclick="exportExcel()">📊 Export Excel</button>
+            <button class="btn btn-primary" onclick="printQuote()">🖨️ Print Quote</button>
+            <button class="btn btn-danger" onclick="resetAll()">🔄 Reset</button>
+        </div>
+        
+        <!-- Summary Bar -->
+        <div class="summary-bar">
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <span class="summary-label">Total Cost</span>
+                    <span class="summary-value cost">฿<span id="totalCost">1,407,411.67</span></span>
+                </div>
+                <div class="summary-card">
+                    <span class="summary-label">Selling Price</span>
+                    <span class="summary-value">฿<span id="totalSelling">1,700,085.74</span></span>
+                </div>
+                <div class="summary-card">
+                    <span class="summary-label">Profit Margin</span>
+                    <span class="summary-value profit"><span id="profitMargin">17.2</span>%</span>
+                </div>
+                <div class="summary-card">
+                    <span class="summary-label">Total Profit</span>
+                    <span class="summary-value profit">฿<span id="totalProfit">292,674.07</span></span>
+                </div>
+                <div class="summary-card">
+                    <span class="summary-label">Grand Total (Inc VAT)</span>
+                    <span class="summary-value">฿<span id="grandTotal">1,819,091.74</span></span>
+                </div>
+            </div>
+            <div class="last-update">
+                Last Updated: <span id="lastUpdate">10:23:12 PM</span>
+            </div>
+        </div>
+        
+        <!-- Main Table -->
+        <div class="table-wrapper">
+            <table id="mainTable">
+                <thead>
+                    <tr>
+                        <th width="30%">Description <span class="edit-icon">✏️</span></th>
+                        <th width="10%" class="text-right">U.P. (net)</th>
+                        <th width="10%" class="text-right">U.P. (net) (currency)</th>
+                        <th width="10%" class="text-right">U.P. (inc. tax)</th>
+                        <th width="5%" class="text-center">Qty</th>
+                        <th width="6%" class="text-center">Disc. <span class="edit-icon">✏️</span></th>
+                        <th width="10%" class="text-right">Cost price</th>
+                        <th width="10%" class="text-right">Total (excl.)</th>
+                        <th width="10%" class="text-right">Total (excl. in currency)</th>
+                        <th width="5%" class="text-center"><span class="edit-icon">✏️</span></th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Dynamic content -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Text Editor Modal -->
+    <div id="editorModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeEditor()">&times;</span>
+            <h3 style="margin-bottom: 10px;">Edit Description</h3>
+            <div class="editor-toolbar">
+                <button class="editor-btn" onclick="formatText('bold')"><b>B</b></button>
+                <button class="editor-btn" onclick="formatText('italic')"><i>I</i></button>
+                <button class="editor-btn" onclick="formatText('underline')"><u>U</u></button>
+                <button class="editor-btn" onclick="formatText('strikethrough')"><s>S</s></button>
+                <select class="editor-btn" onchange="formatText('fontSize', this.value)">
+                    <option value="1">Small</option>
+                    <option value="3" selected>Normal</option>
+                    <option value="5">Large</option>
+                </select>
+            </div>
+            <div contenteditable="true" class="editor-content" id="richTextEditor"></div>
+            <div style="margin-top: 10px; text-align: right;">
+                <button class="btn btn-primary" onclick="saveDescription()">Save</button>
+                <button class="btn" onclick="closeEditor()">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Product Data - ข้อมูลสินค้าที่ถูกต้องตาม ERP
+        let products = [
+            // Base Station
+            {
+                id: 1,
+                category: '5.8 GHz Base Station',
+                partNumber: '3K-SC-HAZ-RF4958-GPS-01',
+                description: 'RDL3000 Ellipse 4.9-5.8GHz Base Station 2xN(f) eth-RJ45 GPS-TNC(f) Conduit Adapter HAZ Zone 2',
+                qty: 1,
+                costTHB: 139583.75,
+                priceUSD: 4478.55,
+                priceTHB: 141074.28,
+                discount: 0,
+                currency: 'THB'
+            },
+            {
+                id: 2,
+                category: '5.8 GHz Base Station',
+                partNumber: 'OPK-3K-ELLIPSE-PMP10-G1',
+                description: 'Options Key RDL3000 XP Ellipse PMP up to 10 Remotes Max Mbps - Only With Purchase of Ellipse Radio',
+                qty: 1,
+                costTHB: 216915.31,
+                priceUSD: 6959.73,
+                priceTHB: 219231.53,
+                discount: 0,
+                currency: 'THB'
+            },
+            {
+                id: 3,
+                category: '5.8 GHz Base Station',
+                partNumber: 'OPK-REGION-3000-06',
+                description: 'Options Key Region Code 06 for RDL3000 XP: US 4.9-5.15-5.85 GHz',
+                qty: 1,
+                costTHB: 0.00,
+                priceUSD: 0.00,
+                priceTHB: 0.00,
+                discount: 0,
+                currency: 'THB'
+            },
+            {
+                id: 4,
+                category: '5.8 GHz Base Station',
+                partNumber: 'PS-DCDC-HAZ-POE-IND-01',
+                description: 'Power Supply POE DC 10-60VDC 30W 802.3af/at (25W Max O/P) DIN-Mnt Industrial GigE 2xRJ45 HAZ Zone-2',
+                qty: 1,
+                costTHB: 36174.01,
+                priceUSD: 1160.64,
+                priceTHB: 36560.08,
+                discount: 0,
+                currency: 'THB'
+            },
+            {
+                id: 5,
+                category: '5.8 GHz Base Station',
+                partNumber: 'SWW-EWXXA1001237',
+                description: 'EXTENDED WARRANTY - WORLDWIDE, 12 MONTHS, RDL-3x00 Ellipse Base Stn - Per radio',
+                qty: 1,
+                costTHB: 61549.06,
+                priceUSD: 1974.80,
+                priceTHB: 62206.29,
+                discount: 0,
+                currency: 'THB'
+            },
+            // Remote Terminals
+            {
+                id: 6,
+                category: '5.8GHz CON-OW-ER',
+                partNumber: 'CONN-OW-HAZ-4958ER-01',
+                description: 'Connect-OW-ER 4.9-5.8GHz Remote Terminal 2xN(f) Eth-RJ45 Conduit Adapter HAZ Zone-2',
+                qty: 6,
+                costTHB: 124601.72,
+                priceUSD: 3997.85,
+                priceTHB: 125932.23,
+                discount: 0,
+                currency: 'THB'
+            },
+            {
+                id: 7,
+                category: '5.8GHz CON-OW-ER',
+                partNumber: 'OPK-3K-REM-UNLMBPS-01',
+                description: 'Options Key RDL3000 XP PTP or PMP Remote Terminal Unlimited Mbps',
+                qty: 6,
+                costTHB: 11942.27,
+                priceUSD: 383.17,
+                priceTHB: 12069.89,
+                discount: 0,
+                currency: 'THB'
+            },
+            {
+                id: 8,
+                category: '5.8GHz CON-OW-ER',
+                partNumber: 'OPK-REGION-3000-06',
+                description: 'Options Key Region Code 06 for RDL3000 XP: US 4.9-5.15-5.85 GHz',
+                qty: 6,
+                costTHB: 0.00,
+                priceUSD: 0.00,
+                priceTHB: 0.00,
+                discount: 0,
+                currency: 'THB'
+            },
+            {
+                id: 9,
+                category: '5.8GHz CON-OW-ER',
+                partNumber: 'PS-DCDC-HAZ-POE-IND-01',
+                description: 'Power Supply POE DC 10-60VDC 30W 802.3af/at (25W Max O/P) DIN-Mnt Industrial GigE 2xRJ45 HAZ Zone-2',
+                qty: 6,
+                costTHB: 36174.01,
+                priceUSD: 1160.64,
+                priceTHB: 36560.08,
+                discount: 0,
+                currency: 'THB'
+            },
+            {
+                id: 10,
+                category: '5.8GHz CON-OW-ER',
+                partNumber: 'SWW-EWXXA1001235',
+                description: 'EXTENDED WARRANTY -WORLDWIDE 12 MONTHS RDL 3000 CONNECT/EDGE/EL TE - PER RADIO',
+                qty: 6,
+                costTHB: 16925.99,
+                priceUSD: 544.19,
+                priceTHB: 17141.03,
+                discount: 0,
+                currency: 'THB'
+            }
+        ];
+        
+        let nextId = 11;
+        let currentEditItem = null;
+        
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            const exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 31.5;
+            const vatRate = parseFloat(document.getElementById('vatRate').value) / 100 || 0.07;
+            const displayCurrency = document.getElementById('displayCurrency').value;
+            
+            tbody.innerHTML = '';
+            
+            // Group by category
+            const categories = {};
+            products.forEach(p => {
+                if (!categories[p.category]) {
+                    categories[p.category] = [];
+                }
+                categories[p.category].push(p);
+            });
+            
+            let totalCost = 0;
+            let totalSelling = 0;
+            
+            // Render each category
+            Object.keys(categories).forEach(category => {
+                // Section header
+                const headerRow = tbody.insertRow();
+                headerRow.className = 'section-row';
+                headerRow.innerHTML = `
+                    <td colspan="10">
+                        <span class="section-icon">📡</span> ${category}
+                    </td>
+                `;
+                
+                let categoryCost = 0;
+                let categorySelling = 0;
+                
+                // Items
+                categories[category].forEach(item => {
+                    const row = tbody.insertRow();
+                    
+                    // Calculate prices
+                    const sellingPrice = item.currency === 'USD' ? item.priceUSD : item.priceTHB;
+                    const sellingPriceUSD = item.currency === 'USD' ? item.priceUSD : item.priceTHB / exchangeRate;
+                    const sellingPriceTHB = item.currency === 'THB' ? item.priceTHB : item.priceUSD * exchangeRate;
+                    const discountedPrice = sellingPrice * (1 - item.discount / 100);
+                    const discountedPriceTHB = sellingPriceTHB * (1 - item.discount / 100);
+                    const priceWithTax = discountedPriceTHB * (1 + vatRate);
+                    const totalItemCost = item.costTHB * item.qty;
+                    const totalItemSelling = discountedPriceTHB * item.qty;
+                    const margin = totalItemSelling > 0 ? ((totalItemSelling - totalItemCost) / totalItemSelling * 100) : 0;
+                    
+                    categoryCost += totalItemCost;
+                    categorySelling += totalItemSelling;
+                    
+                    // Format display based on currency selection
+                    let priceDisplay = '';
+                    let priceInCurrency = '';
+                    let totalDisplay = '';
+                    let totalInCurrency = '';
+                    
+                    if (displayCurrency === 'USD') {
+                        priceDisplay = sellingPriceUSD.toFixed(2);
+                        priceInCurrency = (sellingPriceUSD * exchangeRate).toFixed(2);
+                        totalDisplay = (sellingPriceUSD * item.qty * (1 - item.discount / 100)).toFixed(2);
+                        totalInCurrency = totalItemSelling.toFixed(2);
+                    } else if (displayCurrency === 'THB') {
+                        priceDisplay = discountedPriceTHB.toFixed(2);
+                        priceInCurrency = discountedPriceTHB.toFixed(2);
+                        totalDisplay = totalItemSelling.toFixed(2);
+                        totalInCurrency = totalItemSelling.toFixed(2);
+                    } else { // BOTH
+                        priceDisplay = sellingPriceUSD.toFixed(2);
+                        priceInCurrency = discountedPriceTHB.toFixed(2);
+                        totalDisplay = (sellingPriceUSD * item.qty * (1 - item.discount / 100)).toFixed(2);
+                        totalInCurrency = totalItemSelling.toFixed(2);
+                    }
+                    
+                    const marginClass = margin >= 15 ? 'margin-good' : margin >= 5 ? 'margin-ok' : 'margin-low';
+                    
+                    row.innerHTML = `
+                        <td class="item-desc">
+                            <div>
+                                <span class="part-number">${item.partNumber}</span>
+                                <div class="part-desc">${item.description}</div>
+                            </div>
+                        </td>
+                        <td class="text-right editable" onclick="editPrice(${item.id})">
+                            <span class="number number-price">${priceDisplay}</span>
+                        </td>
+                        <td class="text-right">
+                            <span class="number">${priceInCurrency}</span>
+                        </td>
+                        <td class="text-right">
+                            <span class="number">${priceWithTax.toFixed(2)}</span>
+                        </td>
+                        <td class="text-center editable" onclick="editQty(${item.id})">
+                            <span class="number">${item.qty}</span>
+                        </td>
+                        <td class="text-center editable" onclick="editDiscount(${item.id})">
+                            <span class="number">${item.discount.toFixed(2)}</span>
+                        </td>
+                        <td class="text-right">
+                            <span class="number number-cost">${item.costTHB.toFixed(2)}</span>
+                        </td>
+                        <td class="text-right">
+                            <span class="number number-price">${totalDisplay}</span>
+                        </td>
+                        <td class="text-right">
+                            <span class="number">${totalInCurrency}</span>
+                            <span class="margin-badge ${marginClass}">${margin.toFixed(1)}%</span>
+                        </td>
+                        <td>
+                            <div class="action-icons">
+                                <button class="icon-btn icon-edit" onclick="editDescription(${item.id})" title="Edit">✏️</button>
+                                <button class="icon-btn icon-copy" onclick="duplicateItem(${item.id})" title="Copy">📋</button>
+                                <button class="icon-btn icon-delete" onclick="deleteItem(${item.id})" title="Delete">🗑️</button>
+                            </div>
+                        </td>
+                    `;
+                });
+                
+                // Subtotal
+                const subtotalRow = tbody.insertRow();
+                subtotalRow.className = 'subtotal-row';
+                subtotalRow.innerHTML = `
+                    <td colspan="7">Subtotal - ${category}</td>
+                    <td class="text-right">${(categorySelling/exchangeRate).toFixed(2)}</td>
+                    <td class="text-right">${categorySelling.toFixed(2)}</td>
+                    <td></td>
+                `;
+                
+                totalCost += categoryCost;
+                totalSelling += categorySelling;
+            });
+            
+            // VAT Calculation
+            const vatAmount = totalSelling * vatRate;
+            const grandTotal = totalSelling + vatAmount;
+            const profit = totalSelling - totalCost;
+            const profitMargin = totalSelling > 0 ? (profit / totalSelling * 100) : 0;
+            
+            // Total rows
+            const totalRow = tbody.insertRow();
+            totalRow.className = 'total-row';
+            totalRow.innerHTML = `
+                <td colspan="7"><strong>SUBTOTAL (Excluding VAT)</strong></td>
+                <td class="text-right"><strong>${(totalSelling/exchangeRate).toFixed(2)}</strong></td>
+                <td class="text-right"><strong>${totalSelling.toFixed(2)}</strong></td>
+                <td></td>
+            `;
+            
+            const vatRow = tbody.insertRow();
+            vatRow.innerHTML = `
+                <td colspan="7">VAT ${(vatRate * 100).toFixed(0)}%</td>
+                <td class="text-right">${(vatAmount/exchangeRate).toFixed(2)}</td>
+                <td class="text-right">${vatAmount.toFixed(2)}</td>
+                <td></td>
+            `;
+            
+            const grandRow = tbody.insertRow();
+            grandRow.className = 'grand-total-row';
+            grandRow.innerHTML = `
+                <td colspan="7"><strong>TOTAL</strong></td>
+                <td class="text-right"><strong>${(grandTotal/exchangeRate).toFixed(2)}</strong></td>
+                <td class="text-right"><strong>${grandTotal.toFixed(2)}</strong></td>
+                <td></td>
+            `;
+            
+            // Update summary
+            updateSummary(totalCost, totalSelling, profit, profitMargin, grandTotal);
+        }
+        
+        function updateSummary(cost, selling, profit, margin, total) {
+            document.getElementById('totalCost').textContent = cost.toFixed(2);
+            document.getElementById('totalSelling').textContent = selling.toFixed(2);
+            document.getElementById('totalProfit').textContent = profit.toFixed(2);
+            document.getElementById('profitMargin').textContent = margin.toFixed(1);
+            document.getElementById('grandTotal').textContent = total.toFixed(2);
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString('en-US', {hour12: false});
+        }
+        
+        function editPrice(id) {
+            const item = products.find(p => p.id === id);
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.className = 'edit-input';
+            input.value = item.currency === 'USD' ? item.priceUSD : item.priceTHB;
+            input.step = '0.01';
+            
+            const select = document.createElement('select');
+            select.className = 'currency-select';
+            select.innerHTML = `
+                <option value="THB" ${item.currency === 'THB' ? 'selected' : ''}>฿</option>
+                <option value="USD" ${item.currency === 'USD' ? 'selected' : ''}>$</option>
+            `;
+            
+            input.onblur = function() {
+                const newValue = parseFloat(input.value) || 0;
+                item.currency = select.value;
+                if (item.currency === 'USD') {
+                    item.priceUSD = newValue;
+                    item.priceTHB = newValue * parseFloat(document.getElementById('exchangeRate').value);
+                } else {
+                    item.priceTHB = newValue;
+                    item.priceUSD = newValue / parseFloat(document.getElementById('exchangeRate').value);
+                }
+                renderTable();
+            };
+            
+            input.onkeypress = function(e) {
+                if (e.key === 'Enter') input.blur();
+            };
+            
+            const cell = event.target.parentElement;
+            cell.innerHTML = '';
+            cell.appendChild(select);
+            cell.appendChild(input);
+            input.focus();
+            input.select();
+        }
+        
+        function editQty(id) {
+            const item = products.find(p => p.id === id);
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.className = 'edit-input';
+            input.value = item.qty;
+            input.min = '1';
+            
+            input.onblur = function() {
+                item.qty = parseInt(input.value) || 1;
+                renderTable();
+            };
+            
+            input.onkeypress = function(e) {
+                if (e.key === 'Enter') input.blur();
+            };
+            
+            event.target.innerHTML = '';
+            event.target.appendChild(input);
+            input.focus();
+            input.select();
+        }
+        
+        function editDiscount(id) {
+            const item = products.find(p => p.id === id);
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.className = 'edit-input';
+            input.value = item.discount;
+            input.min = '0';
+            input.max = '100';
+            input.step = '0.01';
+            
+            input.onblur = function() {
+                item.discount = Math.min(100, Math.max(0, parseFloat(input.value) || 0));
+                renderTable();
+            };
+            
+            input.onkeypress = function(e) {
+                if (e.key === 'Enter') input.blur();
+            };
+            
+            event.target.innerHTML = '';
+            event.target.appendChild(input);
+            input.focus();
+            input.select();
+        }
+        
+        function editDescription(id) {
+            currentEditItem = products.find(p => p.id === id);
+            document.getElementById('richTextEditor').innerHTML = currentEditItem.description;
+            document.getElementById('editorModal').style.display = 'block';
+        }
+        
+        function saveDescription() {
+            if (currentEditItem) {
+                currentEditItem.description = document.getElementById('richTextEditor').innerHTML;
+                renderTable();
+            }
+            closeEditor();
+        }
+        
+        function closeEditor() {
+            document.getElementById('editorModal').style.display = 'none';
+            currentEditItem = null;
+        }
+        
+        function formatText(command, value) {
+            document.execCommand(command, false, value);
+        }
+        
+        function duplicateItem(id) {
+            const item = products.find(p => p.id === id);
+            const newItem = {
+                ...item,
+                id: nextId++,
+                description: item.description + ' (Copy)'
+            };
+            products.push(newItem);
+            renderTable();
+        }
+        
+        function deleteItem(id) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                products = products.filter(p => p.id !== id);
+                renderTable();
+            }
+        }
+        
+        function applyMargin() {
+            const margin = parseFloat(document.getElementById('targetMargin').value) || 0;
+            const marginType = document.getElementById('marginType').value;
+            const exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 31.5;
+            
+            products.forEach(item => {
+                if (marginType === 'percentage') {
+                    const newPriceTHB = item.costTHB / (1 - margin / 100);
+                    item.priceTHB = newPriceTHB;
+                    item.priceUSD = newPriceTHB / exchangeRate;
+                } else {
+                    item.priceTHB = item.costTHB + margin;
+                    item.priceUSD = item.priceTHB / exchangeRate;
+                }
+            });
+            
+            renderTable();
+        }
+        
+        function applyDiscount() {
+            const discount = parseFloat(document.getElementById('globalDiscount').value) || 0;
+            
+            products.forEach(item => {
+                item.discount = discount;
+            });
+            
+            renderTable();
+        }
+        
+        function optimizeWinRate() {
+            // Set competitive pricing
+            document.getElementById('targetMargin').value = 10;
+            document.getElementById('globalDiscount').value = 3;
+            applyMargin();
+            setTimeout(() => applyDiscount(), 100);
+        }
+        
+        function addNewItem() {
+            const newItem = {
+                id: nextId++,
+                category: '5.8 GHz Base Station',
+                partNumber: 'NEW-ITEM-' + nextId,
+                description: 'New Item Description',
+                qty: 1,
+                costTHB: 0,
+                priceUSD: 0,
+                priceTHB: 0,
+                discount: 0,
+                currency: 'THB'
+            };
+            products.push(newItem);
+            renderTable();
+        }
+        
+        function exportExcel() {
+            alert('Export to Excel - This would generate an Excel file');
+        }
+        
+        function printQuote() {
+            window.print();
+        }
+        
+        function resetAll() {
+            if (confirm('Reset all changes?')) {
+                location.reload();
+            }
+        }
+        
+        function recalculateAll() {
+            renderTable();
+        }
+        
+        function updateDisplay() {
+            renderTable();
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            renderTable();
+            
+            // Close modal on outside click
+            window.onclick = function(event) {
+                const modal = document.getElementById('editorModal');
+                if (event.target === modal) {
+                    closeEditor();
+                }
+            };
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Location Dashboard v4</title>
+<style>
+body{font-family:Arial,sans-serif;margin:0;padding:20px;background:#f5f5f5}
+.container{max-width:1200px;margin:0 auto}
+.header{background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:30px;border-radius:10px;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.card{background:white;padding:20px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+.card h3{margin:0 0 15px 0;color:#333}
+.location-item{padding:8px;margin:5px 0;background:#f9f9f9;border-left:3px solid #667eea;border-radius:4px}
+.stats{display:flex;justify-content:space-around;margin:20px 0}
+.stat{text-align:center}
+.stat-num{font-size:2em;font-weight:bold;color:#667eea}
+.stat-label{color:#666;font-size:0.9em}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{padding:8px;text-align:left;border-bottom:1px solid #ddd}
+th{background:#f0f0f0;font-weight:600}
+.offshore{border-left-color:#3498db}
+.onshore{border-left-color:#2ecc71}
+.document{border-left-color:#e74c3c}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<h1>📍 Client Location Dashboard v4</h1>
+<p style="margin:0">Standard Service Catalog & Pricing System - Compact Version</p>
+</div>
+
+<div class="stats">
+<div class="stat">
+<div class="stat-num">3</div>
+<div class="stat-label">Countries</div>
+</div>
+<div class="stat">
+<div class="stat-num">20</div>
+<div class="stat-label">Locations</div>
+</div>
+<div class="stat">
+<div class="stat-num">4</div>
+<div class="stat-label">Categories</div>
+</div>
+<div class="stat">
+<div class="stat-num">5</div>
+<div class="stat-label">Service Types</div>
+</div>
+</div>
+
+<div class="grid">
+<div class="card">
+<h3>🇹🇭 Thailand (12 locations)</h3>
+<div class="location-item offshore"><b>G1:</b> Platong, Erawan, Satun, Funan</div>
+<div class="location-item offshore"><b>G2:</b> G2N, G2S, Arthit</div>
+<div class="location-item offshore"><b>Bualuang:</b> Alpha, Bravo</div>
+<div class="location-item offshore"><b>GCME:</b> Arthit South</div>
+<div class="location-item document"><b>Bangkok DCC:</b> Main, VDRL, ESO, PMO</div>
+</div>
+
+<div class="card">
+<h3>🇲🇲 Myanmar (5 locations)</h3>
+<div class="location-item offshore"><b>ZAWTIKA Offshore:</b> ZPQ, Z1D, Z1E</div>
+<div class="location-item onshore"><b>ZAWTIKA Onshore:</b> ATL</div>
+<div class="location-item onshore"><b>YADANA:</b> PLC-MS</div>
+</div>
+
+<div class="card">
+<h3>🇲🇾 Malaysia (1 location)</h3>
+<div class="location-item offshore"><b>JDA:</b> CPOC</div>
+</div>
+
+<div class="card">
+<h3>💰 Pricing Structure</h3>
+<table>
+<tr><th>Category</th><th>Base Rate</th><th>Multiplier</th></tr>
+<tr><td>Offshore Platform</td><td>$600/day</td><td>1.3x</td></tr>
+<tr><td>Onshore Facility</td><td>$600/day</td><td>1.0x</td></tr>
+<tr><td>Document Center</td><td>$500/day</td><td>1.0x</td></tr>
+<tr><td>Overtime</td><td>-</td><td>1.5x</td></tr>
+</table>
+</div>
+
+<div class="card">
+<h3>📋 Bangkok Document Center</h3>
+<div style="background:#fff3cd;padding:10px;border-radius:5px;margin:10px 0">
+<b>Critical for Oil & Gas Projects:</b>
+<ul style="margin:5px 0;padding-left:20px">
+<li>VDRL Management</li>
+<li>Document Control</li>
+<li>Engineering Support</li>
+<li>Project Management</li>
+</ul>
+</div>
+</div>
+
+<div class="card">
+<h3>🚀 Implementation</h3>
+<div style="line-height:1.8">
+<b>Phase 1:</b> Bangkok DCC Setup<br>
+<b>Phase 2:</b> Field Locations<br>
+<b>Phase 3:</b> Integration<br>
+<b>Phase 4:</b> Go-Live
+</div>
+</div>
+</div>
+
+<div style="text-align:center;margin-top:30px;color:#666">
+<small>Generated: <script>document.write(new Date().toLocaleDateString())</script> | No Shore Base (as per requirement)</small>
+</div>
+</div>
+</body>
+</html>

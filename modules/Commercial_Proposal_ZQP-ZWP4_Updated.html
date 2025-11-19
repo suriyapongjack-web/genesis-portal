@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commercial Proposal - ZQP-ZWP4 Telecommunications Link Project</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            margin-bottom: 20px;
+        }
+        
+        .header .project-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .header .info-item {
+            background: rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .nav {
+            background: #f8f9fa;
+            padding: 20px 40px;
+            display: flex;
+            gap: 20px;
+            overflow-x: auto;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .nav-btn {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 25px;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            font-weight: 600;
+        }
+        
+        .nav-btn:hover, .nav-btn.active {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section h3 {
+            color: #764ba2;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .total-row {
+            background: #f1f3f5;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .total-row td {
+            padding: 15px;
+            color: #667eea;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .highlight-box h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .scope-separator {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px 0;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+        }
+        
+        .pttep-scope {
+            background: linear-gradient(135deg, rgba(255, 216, 155, 0.1) 0%, rgba(25, 84, 123, 0.1) 100%);
+            border: 2px dashed #19547b;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .pttep-scope h4 {
+            color: #19547b;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .addvalue-scope {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .addvalue-scope h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .price-summary {
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .price-summary h3 {
+            color: #667eea;
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+        }
+        
+        .price-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .price-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .price-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .price-value {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+        
+        .grand-total {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.5rem;
+            margin-top: 20px;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .note-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .note-box h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .note-box ul {
+            margin-left: 20px;
+            color: #856404;
+        }
+        
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+            position: relative;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            top: 25px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            z-index: 1;
+        }
+        
+        .timeline-item {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            flex: 1;
+        }
+        
+        .timeline-dot {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border: 3px solid #667eea;
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .timeline-label {
+            font-size: 0.9rem;
+            color: #495057;
+            font-weight: 600;
+        }
+        
+        .footer {
+            background: #343a40;
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+        }
+        
+        .footer .company-info {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+        
+        .footer .company {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .footer h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .footer p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .nav {
+                padding: 15px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .timeline {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .timeline::before {
+                display: none;
+            }
+        }
+        
+        .icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>📡 Commercial Proposal</h1>
+            <div class="subtitle">ZQP-ZWP4 Telecommunications Link Project</div>
+            <div class="subtitle" style="font-size: 1rem; opacity: 0.8;">PTTEP Myanmar • Mytel • AddValue Partnership</div>
+            
+            <div class="project-info">
+                <div class="info-item">
+                    <strong>Project No:</strong> PJ25080493
+                </div>
+                <div class="info-item">
+                    <strong>Date:</strong> September 2025
+                </div>
+                <div class="info-item">
+                    <strong>Validity:</strong> 60 Days
+                </div>
+                <div class="info-item">
+                    <strong>Rev:</strong> Updated
+                </div>
+            </div>
+        </div>
+        
+        <!-- Navigation -->
+        <div class="nav">
+            <button class="nav-btn active" onclick="showSection('executive')">Executive Summary</button>
+            <button class="nav-btn" onclick="showSection('scope')">Scope of Work</button>
+            <button class="nav-btn" onclick="showSection('equipment')">Equipment Cost</button>
+            <button class="nav-btn" onclick="showSection('services')">Services Cost</button>
+            <button class="nav-btn" onclick="showSection('maintenance')">Maintenance</button>
+            <button class="nav-btn" onclick="showSection('financial')">Financial Summary</button>
+            <button class="nav-btn" onclick="showSection('terms')">Terms & Conditions</button>
+        </div>
+        
+        <!-- Content Sections -->
+        <div class="content">
+            
+            <!-- Executive Summary -->
+            <div class="section active" id="executive">
+                <h2>📊 Executive Summary</h2>
+                
+                <div class="highlight-box">
+                    <h4>🎯 Project Overview</h4>
+                    <p><strong>Project Name:</strong> ZQP-ZWP4 Telecommunications Link Implementation</p>
+                    <p><strong>Service Model:</strong> 5-Year Equipment Rental with Full Service Support</p>
+                    <p><strong>Technology:</strong> Ceragon IP-50CX 7GHz Microwave Radio System</p>
+                    <p><strong>Locations:</strong></p>
+                    <ul>
+                        <li>Offshore Platform: Zawtika WP4 (ATEX Zone 2)</li>
+                        <li>Onshore Station: ZPQ Operating Center</li>
+                    </ul>
+                    <p><strong>Distance:</strong> 31 km point-to-point link</p>
+                    <p><strong>Capacity:</strong> 105-128 Mbps guaranteed throughput</p>
+                    <p><strong>Availability:</strong> 99.95% SLA guaranteed</p>
+                </div>
+                
+                <div class="highlight-box">
+                    <h4>💰 Investment Summary</h4>
+                    <div class="price-item">
+                        <span class="price-label">Total Project Investment (5 Years):</span>
+                        <span class="price-value">$167,074</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-label">Monthly Rental to PTTEP:</span>
+                        <span class="price-value">$5,000</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-label">Total Revenue (5 Years):</span>
+                        <span class="price-value">$300,000</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-label">Project Margin:</span>
+                        <span class="price-value">79.4%</span>
+                    </div>
+                </div>
+                
+                <h3>Key Benefits for PTTEP</h3>
+                <ul>
+                    <li>✅ Zero capital investment requirement</li>
+                    <li>✅ Complete operational responsibility by service provider</li>
+                    <li>✅ Licensed spectrum (7-8GHz) through Mytel</li>
+                    <li>✅ 24/7 NOC monitoring and support included</li>
+                    <li>✅ All spare equipment and maintenance included</li>
+                    <li>✅ Technology refresh during contract period</li>
+                    <li>✅ Risk transfer to service provider</li>
+                    <li>✅ Predictable monthly operational expense</li>
+                </ul>
+            </div>
+            
+            <!-- Scope of Work -->
+            <div class="section" id="scope">
+                <h2>🔧 Scope of Work & Responsibility Matrix</h2>
+                
+                <div class="scope-separator">
+                    ⚡ CLEAR SCOPE SEPARATION ⚡
+                </div>
+                
+                <!-- AddValue Scope -->
+                <div class="addvalue-scope">
+                    <h4>✅ ADDVALUE SCOPE (Included in Service)</h4>
+                    <table>
+                        <tr>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Responsibility</th>
+                            <th>Status</th>
+                        </tr>
+                        <tr>
+                            <td>Equipment Supply</td>
+                            <td>
+                                • Ceragon IP-50CX Radio Units<br>
+                                • Antennas & RF Components<br>
+                                • ATEX Zone 2 Certified Equipment<br>
+                                • Software Licenses
+                            </td>
+                            <td>AddValue</td>
+                            <td>✅ Included</td>
+                        </tr>
+                        <tr>
+                            <td>Engineering Services</td>
+                            <td>
+                                • System Design & Documentation<br>
+                                • Link Budget Calculation<br>
+                                • Frequency Planning<br>
+                                • As-built Documentation
+                            </td>
+                            <td>AddValue</td>
+                            <td>✅ Included</td>
+                        </tr>
+                        <tr>
+                            <td>Project Management</td>
+                            <td>
+                                • End-to-end Project Coordination<br>
+                                • Vendor Management<br>
+                                • Progress Reporting<br>
+                                • Risk Management
+                            </td>
+                            <td>AddValue</td>
+                            <td>✅ Included</td>
+                        </tr>
+                        <tr>
+                            <td>Testing & Commissioning</td>
+                            <td>
+                                • Factory Acceptance Test (FAT)<br>
+                                • Site Acceptance Test (SAT)<br>
+                                • Performance Testing<br>
+                                • Optimization
+                            </td>
+                            <td>AddValue</td>
+                            <td>✅ Included</td>
+                        </tr>
+                        <tr>
+                            <td>Training</td>
+                            <td>
+                                • Operator Training (10 persons)<br>
+                                • Maintenance Training<br>
+                                • Training Materials<br>
+                                • Certification
+                            </td>
+                            <td>AddValue</td>
+                            <td>✅ Included</td>
+                        </tr>
+                        <tr>
+                            <td>5-Year Maintenance</td>
+                            <td>
+                                • 24/7 NOC Monitoring<br>
+                                • Preventive Maintenance<br>
+                                • Corrective Maintenance<br>
+                                • Spare Parts Management
+                            </td>
+                            <td>AddValue</td>
+                            <td>✅ Included</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <!-- PTTEP Scope -->
+                <div class="pttep-scope">
+                    <h4>🔨 PTTEP SCOPE (Customer Responsibility)</h4>
+                    <table>
+                        <tr>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Estimated Days</th>
+                            <th>Responsibility</th>
+                        </tr>
+                        <tr>
+                            <td>Site Preparation</td>
+                            <td>
+                                • Site Survey Coordination<br>
+                                • Equipment Staging Area<br>
+                                • Access Permissions<br>
+                                • HSE Clearances
+                            </td>
+                            <td>3-5 days</td>
+                            <td>PTTEP</td>
+                        </tr>
+                        <tr style="background: #fff3cd;">
+                            <td><strong>Installation Works</strong></td>
+                            <td>
+                                <strong>• Offshore Platform (WP4) Installation</strong><br>
+                                <strong>• Onshore Station (ZPQ) Installation</strong><br>
+                                <strong>• System Configuration Support</strong><br>
+                                <strong>• Integration & Alignment Works</strong>
+                            </td>
+                            <td><strong>12 days total</strong></td>
+                            <td><strong>PTTEP</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Infrastructure</td>
+                            <td>
+                                • Power Supply Provision<br>
+                                • Equipment Room/Shelter<br>
+                                • Cable Pathways<br>
+                                • Grounding System
+                            </td>
+                            <td>Existing</td>
+                            <td>PTTEP</td>
+                        </tr>
+                        <tr>
+                            <td>Operations Support</td>
+                            <td>
+                                • Site Access for Maintenance<br>
+                                • Helicopter/Boat Transport<br>
+                                • Accommodation (if required)<br>
+                                • Safety Orientation
+                            </td>
+                            <td>As needed</td>
+                            <td>PTTEP</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="note-box">
+                    <h4>⚠️ Important Notes on Installation Scope:</h4>
+                    <ul>
+                        <li><strong>PTTEP will perform physical installation</strong> using their own crews and resources</li>
+                        <li><strong>AddValue provides:</strong> Technical supervision, installation procedures, and remote support</li>
+                        <li><strong>Cost Impact:</strong> Installation by PTTEP crews reduces project cost by approximately $8,000</li>
+                        <li><strong>Timeline:</strong> Installation duration depends on PTTEP crew availability and weather conditions</li>
+                        <li><strong>Support Level:</strong> AddValue engineers available for video call support during installation</li>
+                    </ul>
+                </div>
+                
+                <!-- Timeline -->
+                <h3>📅 Implementation Timeline</h3>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-dot">W1</div>
+                        <div class="timeline-label">Contract<br>Signing</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot">W2-4</div>
+                        <div class="timeline-label">Engineering<br>& Design</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot">W5-24</div>
+                        <div class="timeline-label">Equipment<br>Procurement</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot">W25-26</div>
+                        <div class="timeline-label">FAT<br>Testing</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot">W27-28</div>
+                        <div class="timeline-label">Delivery<br>to Site</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot">W29-30</div>
+                        <div class="timeline-label">Installation<br>(PTTEP)</div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-dot">W31</div>
+                        <div class="timeline-label">SAT &<br>Go-Live</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Equipment Cost -->
+            <div class="section" id="equipment">
+                <h2>💻 Equipment Cost Breakdown</h2>
+                
+                <h3>Section A: CERAGON Equipment (Base Cost)</h3>
+                <table>
+                    <tr>
+                        <th>Item Description</th>
+                        <th>Quantity</th>
+                        <th>Unit Price ($)</th>
+                        <th>Total ($)</th>
+                    </tr>
+                    <tr>
+                        <td><strong>A1. Radio Equipment</strong></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>• IP-50CX ODU 7GHz ATEX Zone-2 (WP4)</td>
+                        <td>1</td>
+                        <td>8,500</td>
+                        <td>8,500</td>
+                    </tr>
+                    <tr>
+                        <td>• IP-50CX ODU 7GHz Standard (ZPQ)</td>
+                        <td>1</td>
+                        <td>7,500</td>
+                        <td>7,500</td>
+                    </tr>
+                    <tr>
+                        <td>• Antenna 7GHz, 1.2m diameter</td>
+                        <td>2</td>
+                        <td>1,500</td>
+                        <td>3,000</td>
+                    </tr>
+                    <tr>
+                        <td>• Diplexer Units</td>
+                        <td>2</td>
+                        <td>800</td>
+                        <td>1,600</td>
+                    </tr>
+                    <tr>
+                        <td>• RF & ATEX Components</td>
+                        <td>1</td>
+                        <td>1,215</td>
+                        <td>1,215</td>
+                    </tr>
+                    <tr>
+                        <td>• Software Licenses</td>
+                        <td>2</td>
+                        <td>500</td>
+                        <td>1,000</td>
+                    </tr>
+                    <tr>
+                        <td>• Cables & Connectors</td>
+                        <td>1</td>
+                        <td>700</td>
+                        <td>700</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td colspan="3"><strong>Subtotal Ceragon Equipment</strong></td>
+                        <td><strong>23,515</strong></td>
+                    </tr>
+                </table>
+                
+                <h3>Section B: NextG Distribution</h3>
+                <table>
+                    <tr>
+                        <th>Component</th>
+                        <th>Calculation</th>
+                        <th>Amount ($)</th>
+                    </tr>
+                    <tr>
+                        <td>NextG Distribution Margin</td>
+                        <td>25% of 30,267</td>
+                        <td>7,567</td>
+                    </tr>
+                    <tr>
+                        <td>Technical Support from NextG</td>
+                        <td>Fixed</td>
+                        <td>500</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td colspan="2"><strong>Total Equipment Cost to AddValue</strong></td>
+                        <td><strong>38,334</strong></td>
+                    </tr>
+                </table>
+                
+                <h3>Section C: Spare Equipment</h3>
+                <table>
+                    <tr>
+                        <th>Spare Parts Category</th>
+                        <th>Calculation</th>
+                        <th>Amount ($)</th>
+                    </tr>
+                    <tr>
+                        <td>Critical Spares (20% of main equipment)</td>
+                        <td>20% of 23,515</td>
+                        <td>4,703</td>
+                    </tr>
+                    <tr>
+                        <td>Spare Management & Storage</td>
+                        <td>Fixed</td>
+                        <td>500</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td colspan="2"><strong>Total Spare Equipment</strong></td>
+                        <td><strong>5,203</strong></td>
+                    </tr>
+                </table>
+                
+                <div class="price-summary">
+                    <h3>Equipment Cost Summary</h3>
+                    <div class="price-item">
+                        <span class="price-label">Main Equipment + Distribution:</span>
+                        <span class="price-value">$38,334</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-label">Spare Equipment:</span>
+                        <span class="price-value">$5,203</span>
+                    </div>
+                    <div class="grand-total">
+                        TOTAL EQUIPMENT COST: $43,537
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Services Cost -->
+            <div class="section" id="services">
+                <h2>🛠️ Implementation Services Cost</h2>
+                
+                <h3>Section D: Installation & Commissioning</h3>
+                
+                <div class="addvalue-scope">
+                    <h4>D1. Site Preparation (AddValue Services)</h4>
+                    <table>
+                        <tr>
+                            <th>Service Description</th>
+                            <th>Days</th>
+                            <th>$/Day</th>
+                            <th>Total ($)</th>
+                        </tr>
+                        <tr>
+                            <td>Site Survey & Planning</td>
+                            <td>3</td>
+                            <td>500</td>
+                            <td>1,500</td>
+                        </tr>
+                        <tr>
+                            <td>Equipment Staging Bangkok</td>
+                            <td>2</td>
+                            <td>400</td>
+                            <td>800</td>
+                        </tr>
+                        <tr>
+                            <td>Pre-installation Testing</td>
+                            <td>2</td>
+                            <td>500</td>
+                            <td>1,000</td>
+                        </tr>
+                        <tr class="total-row">
+                            <td colspan="3"><strong>Subtotal Site Preparation</strong></td>
+                            <td><strong>3,300</strong></td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="pttep-scope">
+                    <h4>D2. Installation (PTTEP Responsibility - NOT CHARGED)</h4>
+                    <table style="opacity: 0.7;">
+                        <tr>
+                            <th>Service Description</th>
+                            <th>Days</th>
+                            <th>PTTEP Resources</th>
+                            <th>Value (Not Charged)</th>
+                        </tr>
+                        <tr>
+                            <td>• Offshore Platform (WP4)</td>
+                            <td>5</td>
+                            <td>PTTEP Crew</td>
+                            <td style="text-decoration: line-through;">4,000</td>
+                        </tr>
+                        <tr>
+                            <td>• Onshore Station (ZPQ)</td>
+                            <td>3</td>
+                            <td>PTTEP Crew</td>
+                            <td style="text-decoration: line-through;">1,800</td>
+                        </tr>
+                        <tr>
+                            <td>• System Configuration</td>
+                            <td>2</td>
+                            <td>PTTEP + Remote Support</td>
+                            <td style="text-decoration: line-through;">1,000</td>
+                        </tr>
+                        <tr>
+                            <td>• Integration & Alignment</td>
+                            <td>2</td>
+                            <td>PTTEP + Remote Support</td>
+                            <td style="text-decoration: line-through;">1,200</td>
+                        </tr>
+                        <tr style="background: #fff3cd;">
+                            <td colspan="3"><strong>Installation by PTTEP (Cost Saving)</strong></td>
+                            <td><strong style="color: red;">-$8,000</strong></td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <h3>Section E: Testing & Acceptance</h3>
+                <table>
+                    <tr>
+                        <th>Testing Phase</th>
+                        <th>Days</th>
+                        <th>$/Day</th>
+                        <th>Total ($)</th>
+                    </tr>
+                    <tr>
+                        <td>Factory Acceptance Test (FAT)</td>
+                        <td>5</td>
+                        <td>634</td>
+                        <td>3,170</td>
+                    </tr>
+                    <tr>
+                        <td>Pre-shipment Testing</td>
+                        <td>2</td>
+                        <td>500</td>
+                        <td>1,000</td>
+                    </tr>
+                    <tr>
+                        <td>Site Acceptance Test (SAT)</td>
+                        <td>5</td>
+                        <td>820</td>
+                        <td>4,100</td>
+                    </tr>
+                    <tr>
+                        <td>Performance Testing & Optimization</td>
+                        <td>3</td>
+                        <td>600</td>
+                        <td>1,800</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td colspan="3"><strong>Subtotal Testing</strong></td>
+                        <td><strong>10,070</strong></td>
+                    </tr>
+                </table>
+                
+                <h3>Section F: Training & Documentation</h3>
+                <table>
+                    <tr>
+                        <th>Training Component</th>
+                        <th>Days</th>
+                        <th>$/Day</th>
+                        <th>Total ($)</th>
+                    </tr>
+                    <tr>
+                        <td>Operator Training (10 persons)</td>
+                        <td>5</td>
+                        <td>450</td>
+                        <td>2,250</td>
+                    </tr>
+                    <tr>
+                        <td>Maintenance Training</td>
+                        <td>3</td>
+                        <td>450</td>
+                        <td>1,350</td>
+                    </tr>
+                    <tr>
+                        <td>Documentation Package</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>1,500</td>
+                    </tr>
+                    <tr>
+                        <td>As-built Drawings</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>500</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td colspan="3"><strong>Subtotal Training & Documentation</strong></td>
+                        <td><strong>5,600</strong></td>
+                    </tr>
+                </table>
+                
+                <h3>Section G: Project Management</h3>
+                <table>
+                    <tr>
+                        <th>PM Services</th>
+                        <th>Duration</th>
+                        <th>$/Week</th>
+                        <th>Total ($)</th>
+                    </tr>
+                    <tr>
+                        <td>Project Management (30 weeks)</td>
+                        <td>30 weeks</td>
+                        <td>100</td>
+                        <td>3,000</td>
+                    </tr>
+                    <tr>
+                        <td>Technical Coordination</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>1,500</td>
+                    </tr>
+                    <tr>
+                        <td>Regulatory Compliance Support</td>
+                        <td>-</td>
+                        <td>-</td>
+                        <td>723</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td colspan="3"><strong>Subtotal Project Management</strong></td>
+                        <td><strong>5,223</strong></td>
+                    </tr>
+                </table>
+                
+                <div class="price-summary">
+                    <h3>Implementation Services Summary</h3>
+                    <div class="price-item">
+                        <span class="price-label">Site Preparation (D1):</span>
+                        <span class="price-value">$3,300</span>
+                    </div>
+                    <div class="price-item" style="background: #fff3cd;">
+                        <span class="price-label">Installation (D2 - PTTEP Scope):</span>
+                        <span class="price-value" style="text-decoration: line-through;">$8,000</span>
+                        <span style="color: green; font-weight: bold;"> → $0</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-label">Testing & Acceptance:</span>
+                        <span class="price-value">$10,070</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-label">Training & Documentation:</span>
+                        <span class="price-value">$5,600</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-label">Project Management:</span>
+                        <span class="price-value">$5,223</span>
+                    </div>
+                    <div class="grand-total">
+                        TOTAL IMPLEMENTATION SERVICES: $24,193
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Maintenance -->
+            <div class="section" id="maintenance">
+                <h2>🔧 5-Year Maintenance & Support Services</h2>
+                
+                <h3>Annual Maintenance Breakdown</h3>
+                <table>
+                    <tr>
+                        <th>Service Component</th>
+                        <th>Annual Cost ($)</th>
+                        <th>5-Year Total ($)</th>
+                        <th>Service Level</th>
+                    </tr>
+                    <tr>
+                        <td><strong>24/7 NOC Monitoring</strong><br>
+                        • Real-time performance monitoring<br>
+                        • Alarm management<br>
+                        • Incident detection</td>
+                        <td>3,600</td>
+                        <td>18,000</td>
+                        <td>24x7x365</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Preventive Maintenance</strong><br>
+                        • Quarterly site visits<br>
+                        • Equipment health checks<br>
+                        • Performance optimization</td>
+                        <td>4,000</td>
+                        <td>20,000</td>
+                        <td>4 visits/year</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Corrective Maintenance</strong><br>
+                        • Emergency response<br>
+                        • Fault resolution<br>
+                        • Parts replacement</td>
+                        <td>2,400</td>
+                        <td>12,000</td>
+                        <td>4-hour response</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Spare Parts Management</strong><br>
+                        • Myanmar-based inventory<br>
+                        • Quick replacement<br>
+                        • Logistics management</td>
+                        <td>3,000</td>
+                        <td>15,000</td>
+                        <td>Local stock</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Technical Support</strong><br>
+                        • Remote assistance<br>
+                        • Software updates<br>
+                        • Performance reporting</td>
+                        <td>1,600</td>
+                        <td>8,000</td>
+                        <td>Business hours</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td><strong>TOTAL MAINTENANCE</strong></td>
+                        <td><strong>14,600</strong></td>
+                        <td><strong>73,000</strong></td>
+                        <td><strong>99.95% SLA</strong></td>
+                    </tr>
+                </table>
+                
+                <div class="highlight-box">
+                    <h4>📊 Service Level Agreement (SLA)</h4>
+                    <table>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Target</th>
+                            <th>Penalty</th>
+                        </tr>
+                        <tr>
+                            <td>System Availability</td>
+                            <td>≥ 99.95%</td>
+                            <td>5% monthly fee per 0.1% below</td>
+                        </tr>
+                        <tr>
+                            <td>Response Time (Critical)</td>
+                            <td>≤ 15 minutes</td>
+                            <td>$500 per hour delayed</td>
+                        </tr>
+                        <tr>
+                            <td>Resolution Time (Critical)</td>
+                            <td>≤ 4 hours</td>
+                            <td>10% monthly fee</td>
+                        </tr>
+                        <tr>
+                            <td>Preventive Maintenance</td>
+                            <td>4 visits/year</td>
+                            <td>$1,000 per missed visit</td>
+                        </tr>
+                        <tr>
+                            <td>Reporting</td>
+                            <td>Monthly</td>
+                            <td>$200 per delayed report</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <div class="note-box">
+                    <h4>✅ Maintenance Coverage Includes:</h4>
+                    <ul>
+                        <li>All labor and travel costs for maintenance visits</li>
+                        <li>Replacement parts from spare inventory</li>
+                        <li>Software license renewals and updates</li>
+                        <li>Performance optimization and tuning</li>
+                        <li>Technology refresh at Year 3 (if required)</li>
+                        <li>End-of-contract equipment decommissioning</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Financial Summary -->
+            <div class="section" id="financial">
+                <h2>💰 Financial Summary</h2>
+                
+                <h3>Total Project Investment</h3>
+                <table>
+                    <tr>
+                        <th>Cost Category</th>
+                        <th>Amount ($)</th>
+                        <th>% of Total</th>
+                    </tr>
+                    <tr>
+                        <td>Equipment (Main + Spares)</td>
+                        <td>43,537</td>
+                        <td>26.1%</td>
+                    </tr>
+                    <tr>
+                        <td>Implementation Services</td>
+                        <td>24,193</td>
+                        <td>14.5%</td>
+                    </tr>
+                    <tr style="background: #fff3cd;">
+                        <td>Installation by PTTEP (Savings)</td>
+                        <td style="color: green;">-8,000</td>
+                        <td>-4.8%</td>
+                    </tr>
+                    <tr>
+                        <td>5-Year Maintenance</td>
+                        <td>73,000</td>
+                        <td>43.7%</td>
+                    </tr>
+                    <tr>
+                        <td>Margins & Contingency</td>
+                        <td>34,344</td>
+                        <td>20.6%</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td><strong>GRAND TOTAL</strong></td>
+                        <td><strong>167,074</strong></td>
+                        <td><strong>100.0%</strong></td>
+                    </tr>
+                </table>
+                
+                <h3>Rental Pricing Structure</h3>
+                <div class="price-summary">
+                    <div class="price-item">
+                        <span class="price-label">Total 5-Year Investment:</span>
+                        <span class="price-value">$167,074</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-label">Break-even Monthly Cost:</span>
+                        <span class="price-value">$2,785</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-label">AddValue to Mytel (Monthly):</span>
+                        <span class="price-value">$3,500</span>
+                    </div>
+                    <div class="price-item">
+                        <span class="price-label">Mytel to PTTEP (Monthly):</span>
+                        <span class="price-value">$5,000</span>
+                    </div>
+                    <div class="grand-total">
+                        5-YEAR REVENUE: $300,000<br>
+                        NET PROFIT: $132,926 (79.4%)
+                    </div>
+                </div>
+                
+                <h3>Return on Investment Analysis</h3>
+                <table>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Value</th>
+                        <th>Comment</th>
+                    </tr>
+                    <tr>
+                        <td>Initial Investment</td>
+                        <td>$67,730</td>
+                        <td>Equipment + Implementation</td>
+                    </tr>
+                    <tr>
+                        <td>Monthly Revenue</td>
+                        <td>$5,000</td>
+                        <td>From PTTEP</td>
+                    </tr>
+                    <tr>
+                        <td>Monthly Operating Cost</td>
+                        <td>$1,217</td>
+                        <td>Maintenance only</td>
+                    </tr>
+                    <tr>
+                        <td>Monthly Net Profit</td>
+                        <td>$3,783</td>
+                        <td>After all costs</td>
+                    </tr>
+                    <tr>
+                        <td>Payback Period</td>
+                        <td>17.9 months</td>
+                        <td>Full investment recovery</td>
+                    </tr>
+                    <tr>
+                        <td>5-Year ROI</td>
+                        <td>196%</td>
+                        <td>Excellent return</td>
+                    </tr>
+                </table>
+                
+                <div class="highlight-box">
+                    <h4>💡 Value Proposition Comparison</h4>
+                    <table>
+                        <tr>
+                            <th>Scenario</th>
+                            <th>PTTEP Cost (5 Years)</th>
+                            <th>Benefits</th>
+                        </tr>
+                        <tr>
+                            <td>CAPEX Model (Own Equipment)</td>
+                            <td>~$180,000</td>
+                            <td>Asset ownership, Full control</td>
+                        </tr>
+                        <tr style="background: #d4edda;">
+                            <td><strong>OPEX Model (Rental)</strong></td>
+                            <td><strong>$300,000</strong></td>
+                            <td><strong>Zero CAPEX, Full service, Risk transfer, Guaranteed performance</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Premium for Full Service</td>
+                            <td>+$120,000</td>
+                            <td>Complete peace of mind, No operational burden</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Terms & Conditions -->
+            <div class="section" id="terms">
+                <h2>📋 Terms & Conditions</h2>
+                
+                <h3>Commercial Terms</h3>
+                <table>
+                    <tr>
+                        <th>Term</th>
+                        <th>Details</th>
+                    </tr>
+                    <tr>
+                        <td>Contract Duration</td>
+                        <td>5 years (60 months) with automatic renewal option</td>
+                    </tr>
+                    <tr>
+                        <td>Payment Terms</td>
+                        <td>Monthly in advance, NET 30 days</td>
+                    </tr>
+                    <tr>
+                        <td>Currency</td>
+                        <td>USD (United States Dollars)</td>
+                    </tr>
+                    <tr>
+                        <td>Price Validity</td>
+                        <td>60 days from proposal date</td>
+                    </tr>
+                    <tr>
+                        <td>Price Escalation</td>
+                        <td>Fixed for first 3 years, then 3% annual adjustment</td>
+                    </tr>
+                    <tr>
+                        <td>Delivery Terms</td>
+                        <td>EXW Bangkok (Incoterms 2020)</td>
+                    </tr>
+                    <tr>
+                        <td>Lead Time</td>
+                        <td>24 weeks after Purchase Order</td>
+                    </tr>
+                </table>
+                
+                <h3>Service Terms</h3>
+                <ul>
+                    <li><strong>Service Commencement:</strong> Upon successful Site Acceptance Test (SAT)</li>
+                    <li><strong>Service Hours:</strong> 24x7x365 for critical support</li>
+                    <li><strong>Maintenance Windows:</strong> Scheduled quarterly with 14 days advance notice</li>
+                    <li><strong>Technology Refresh:</strong> Included at Year 3 if required</li>
+                    <li><strong>End of Contract:</strong> Equipment remains property of service provider</li>
+                </ul>
+                
+                <h3>Legal & Compliance</h3>
+                <ul>
+                    <li><strong>Governing Law:</strong> Laws of Thailand</li>
+                    <li><strong>Dispute Resolution:</strong> Thailand Arbitration Center (THAC)</li>
+                    <li><strong>Force Majeure:</strong> Standard international provisions apply</li>
+                    <li><strong>Licenses:</strong> Mytel holds all required Myanmar telecommunications licenses</li>
+                    <li><strong>Insurance:</strong> Comprehensive coverage by service provider</li>
+                    <li><strong>Liability Cap:</strong> 12 months of service fees</li>
+                </ul>
+                
+                <h3>Special Conditions</h3>
+                <div class="note-box">
+                    <h4>📌 Important Conditions:</h4>
+                    <ul>
+                        <li><strong>PTTEP Installation:</strong> Customer performs physical installation with remote support</li>
+                        <li><strong>Site Access:</strong> PTTEP provides unrestricted access for maintenance</li>
+                        <li><strong>Transport:</strong> PTTEP provides helicopter/boat transport to offshore platform</li>
+                        <li><strong>Power & Infrastructure:</strong> PTTEP provides power, shelter, and pathways</li>
+                        <li><strong>HSE Compliance:</strong> All personnel must complete PTTEP safety orientation</li>
+                        <li><strong>Exclusive Service:</strong> Mytel/AddValue exclusive for PTTEP offshore telecom</li>
+                    </ul>
+                </div>
+                
+                <h3>Acceptance Criteria</h3>
+                <table>
+                    <tr>
+                        <th>Test Phase</th>
+                        <th>Success Criteria</th>
+                        <th>Duration</th>
+                    </tr>
+                    <tr>
+                        <td>Factory Acceptance Test (FAT)</td>
+                        <td>100% functionality in controlled environment</td>
+                        <td>5 days</td>
+                    </tr>
+                    <tr>
+                        <td>Site Acceptance Test (SAT)</td>
+                        <td>
+                            • Link availability ≥ 99.95%<br>
+                            • Throughput ≥ 105 Mbps<br>
+                            • BER ≤ 10^-6<br>
+                            • Latency ≤ 5ms
+                        </td>
+                        <td>5 days</td>
+                    </tr>
+                    <tr>
+                        <td>Performance Test</td>
+                        <td>72-hour continuous operation at full capacity</td>
+                        <td>3 days</td>
+                    </tr>
+                </table>
+                
+                <div class="highlight-box" style="margin-top: 30px;">
+                    <h4>✍️ Authorization</h4>
+                    <p>This Commercial Proposal is submitted for your review and approval.</p>
+                    <p style="margin-top: 20px;">
+                        <strong>Prepared by:</strong> AddValue System Co., Ltd.<br>
+                        <strong>Partnership:</strong> Mytel - AddValue - NextG<br>
+                        <strong>For:</strong> PTTEP International Limited, Myanmar Branch<br>
+                        <strong>Date:</strong> September 2025<br>
+                        <strong>Valid Until:</strong> November 2025
+                    </p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
+            <div class="company-info">
+                <div class="company">
+                    <h4>AddValue System Co., Ltd.</h4>
+                    <p>Engineering Service Provider<br>
+                    Bangkok, Thailand<br>
+                    Tel: +66 2 XXX XXXX<br>
+                    Email: info@addvalue.co.th</p>
+                </div>
+                <div class="company">
+                    <h4>Mytel</h4>
+                    <p>Telecom International Myanmar<br>
+                    Licensed Operator<br>
+                    Yangon, Myanmar<br>
+                    www.mytel.com.mm</p>
+                </div>
+                <div class="company">
+                    <h4>PTTEP International</h4>
+                    <p>End User<br>
+                    Zawtika Field Operations<br>
+                    Myanmar<br>
+                    www.pttep.com</p>
+                </div>
+            </div>
+            <hr style="margin: 20px 0; border-color: #667eea; opacity: 0.3;">
+            <p style="font-size: 0.8rem; opacity: 0.7;">
+                © 2025 AddValue System Co., Ltd. | Confidential and Proprietary | Project Reference: PJ25080493
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update nav buttons
+            const navBtns = document.querySelectorAll('.nav-btn');
+            navBtns.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // Print function
+        function printProposal() {
+            window.print();
+        }
+    </script>
+</body>
+</html>

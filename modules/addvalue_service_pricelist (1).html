@@ -1,0 +1,1721 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Addvalue Standard Service Price List System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            min-height: 100vh; 
+        }
+        .container { max-width: 1600px; margin: 0 auto; padding: 20px; }
+        
+        /* Header */
+        header { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin-bottom: 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        .logo { 
+            font-size: 24px; 
+            font-weight: bold; 
+            color: #764ba2; 
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Navigation */
+        .nav-tabs { display: flex; gap: 10px; }
+        .tab-btn { 
+            padding: 10px 20px; 
+            background: #f0f0f0; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+        }
+        .tab-btn.active { 
+            background: linear-gradient(135deg, #667eea, #764ba2); 
+            color: white; 
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* Cards */
+        .card { 
+            background: white; 
+            border-radius: 10px; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        
+        /* Stats Grid */
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 20px; 
+            margin-bottom: 20px;
+        }
+        .stat-card { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            padding: 20px; 
+            border-radius: 10px; 
+        }
+        .stat-number { font-size: 2em; font-weight: bold; }
+        
+        /* Tables */
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+        }
+        th, td { 
+            padding: 10px; 
+            text-align: left; 
+            border-bottom: 1px solid #ddd; 
+        }
+        th { 
+            background: #f8f9fa; 
+            font-weight: 600; 
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        tr:hover { background: #f8f9fa; }
+        
+        /* Forms */
+        .form-group { margin-bottom: 15px; }
+        .form-row { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 15px; 
+        }
+        label { 
+            display: block; 
+            margin-bottom: 5px; 
+            font-weight: 500; 
+        }
+        input, select, textarea { 
+            width: 100%; 
+            padding: 10px; 
+            border: 1px solid #ddd; 
+            border-radius: 5px; 
+        }
+        
+        /* Buttons */
+        .btn { 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            transition: all 0.3s; 
+            font-weight: 500;
+        }
+        .btn-primary { background: #667eea; color: white; }
+        .btn-success { background: #48bb78; color: white; }
+        .btn-danger { background: #f56565; color: white; }
+        .btn-warning { background: #ed8936; color: white; }
+        .btn-info { background: #4299e1; color: white; }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        /* Search Box */
+        .search-box { 
+            display: flex; 
+            gap: 10px; 
+            margin-bottom: 20px; 
+        }
+        .search-box input { flex: 1; }
+        
+        /* Modal */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.5); 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 1000; 
+        }
+        .modal.show { display: flex; }
+        .modal-content { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 10px; 
+            width: 90%;
+            max-width: 800px; 
+            max-height: 90vh; 
+            overflow-y: auto; 
+        }
+        .modal-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+        }
+        .close-btn { 
+            font-size: 1.5em; 
+            cursor: pointer; 
+        }
+        
+        /* Notification */
+        .notification { 
+            position: fixed; 
+            top: 20px; 
+            right: 20px; 
+            padding: 15px 20px; 
+            border-radius: 5px; 
+            color: white; 
+            animation: slideIn 0.3s; 
+            z-index: 2000; 
+        }
+        .notification.success { background: #48bb78; }
+        .notification.error { background: #f56565; }
+        .notification.warning { background: #ed8936; }
+        @keyframes slideIn { 
+            from { transform: translateX(100%); } 
+            to { transform: translateX(0); } 
+        }
+        
+        /* Service Groups */
+        .service-groups {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .service-group-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .service-group-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+        .service-group-card.active {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #f0f4ff 0%, #f8f0ff 100%);
+        }
+        
+        /* Document Type Badges */
+        .doc-type {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            margin: 2px;
+        }
+        .doc-type.common { background: #e3f2fd; color: #1976d2; }
+        .doc-type.generic { background: #f3e5f5; color: #7b1fa2; }
+        .doc-type.particular { background: #fff3e0; color: #ef6c00; }
+        
+        /* Revision Status Badges */
+        .rev-status {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            margin: 2px;
+        }
+        .rev-status.IFR { background: #e8f5e9; color: #388e3c; }
+        .rev-status.IFA { background: #fff3e0; color: #f57c00; }
+        .rev-status.AFC { background: #e3f2fd; color: #1976d2; }
+        .rev-status.AFD { background: #f3e5f5; color: #7b1fa2; }
+        .rev-status.IFC { background: #c8e6c9; color: #2e7d32; }
+        
+        /* Resource List */
+        .resource-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .resource-tag {
+            background: #f0f0f0;
+            padding: 5px 10px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .resource-tag .remove {
+            cursor: pointer;
+            color: #f56565;
+            font-weight: bold;
+        }
+        
+        /* File Operations */
+        .file-ops { 
+            background: #f8f9fa; 
+            padding: 15px; 
+            border-radius: 10px; 
+        }
+        .file-ops-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 10px; 
+        }
+        
+        /* Price Summary */
+        .price-summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+        .price-total {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 2px solid white;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) { 
+            .stats-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                📋 Addvalue Standard Service Price List
+            </div>
+            <div class="nav-tabs">
+                <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+                <button class="tab-btn" data-tab="services">Services Database</button>
+                <button class="tab-btn" data-tab="resources">Resources</button>
+                <button class="tab-btn" data-tab="quotation">Create Quotation</button>
+                <button class="tab-btn" data-tab="reports">Reports</button>
+            </div>
+        </header>
+
+        <!-- File Management -->
+        <div class="card file-ops">
+            <h3>📁 Data Management</h3>
+            <div class="file-ops-grid">
+                <button class="btn btn-success" id="saveBtn">💾 Save Data</button>
+                <button class="btn btn-primary" id="exportBtn">⬇️ Export (.json)</button>
+                <button class="btn btn-warning" id="importBtn">⬆️ Import</button>
+                <input type="file" id="importFile" accept=".json" style="display:none">
+                <button class="btn btn-danger" id="clearBtn">🗑️ Clear All Data</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div>Total Services</div>
+                    <div class="stat-number" id="totalServices">0</div>
+                </div>
+                <div class="stat-card">
+                    <div>Total Resources</div>
+                    <div class="stat-number" id="totalResources">0</div>
+                </div>
+                <div class="stat-card">
+                    <div>Active Quotations</div>
+                    <div class="stat-number" id="activeQuotations">0</div>
+                </div>
+                <div class="stat-card">
+                    <div>Avg. Rate/Hour</div>
+                    <div class="stat-number" id="avgRate">฿0</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>📊 Service Group Summary</h3>
+                <div id="groupSummary" class="service-groups">
+                    <!-- Service groups will be rendered here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Services Database Tab -->
+        <div id="services" class="tab-content">
+            <div class="card">
+                <div class="search-box">
+                    <input type="text" id="serviceSearchInput" placeholder="🔍 Search services...">
+                    <select id="filterGroup">
+                        <option value="">All Groups</option>
+                        <option value="Field Engineering">Field Engineering</option>
+                        <option value="Document Engineering">Document Engineering</option>
+                        <option value="Project Management">Project Management</option>
+                        <option value="Commissioning">Commissioning</option>
+                    </select>
+                    <button class="btn btn-primary" id="addServiceBtn">➕ Add Service</button>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table id="servicesTable">
+                        <thead>
+                            <tr>
+                                <th>Service Code</th>
+                                <th>Service Name</th>
+                                <th>Group</th>
+                                <th>Type</th>
+                                <th>Description</th>
+                                <th>Unit</th>
+                                <th>Rate</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Engineering Documents Details -->
+            <div class="card">
+                <h3>📄 Engineering Documents Database</h3>
+                <div class="search-box">
+                    <input type="text" id="docSearchInput" placeholder="🔍 Search documents...">
+                    <button class="btn btn-info" id="addDocBtn">➕ Add Document Type</button>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table id="documentsTable">
+                        <thead>
+                            <tr>
+                                <th>Doc Code</th>
+                                <th>Document Name</th>
+                                <th>Category</th>
+                                <th>Type</th>
+                                <th>Rev Status</th>
+                                <th>Est. Man-hours</th>
+                                <th>Required Skills</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resources Tab -->
+        <div id="resources" class="tab-content">
+            <div class="card">
+                <h3>👷 Resource Management</h3>
+                <div class="search-box">
+                    <input type="text" id="resourceSearchInput" placeholder="🔍 Search resources...">
+                    <button class="btn btn-primary" id="addResourceBtn">➕ Add Resource</button>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table id="resourcesTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Position</th>
+                                <th>Department</th>
+                                <th>Skills</th>
+                                <th>Daily Rate</th>
+                                <th>Hourly Rate</th>
+                                <th>OT Rate</th>
+                                <th>Availability</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Quotation Tab -->
+        <div id="quotation" class="tab-content">
+            <div class="card">
+                <h3>📝 Create Service Quotation</h3>
+                
+                <!-- Client Information -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Client Name *</label>
+                        <input type="text" id="clientName" placeholder="Enter client name">
+                    </div>
+                    <div class="form-group">
+                        <label>Project Name *</label>
+                        <input type="text" id="projectName" placeholder="Enter project name">
+                    </div>
+                </div>
+                
+                <!-- Service Selection -->
+                <h4>Select Service Group</h4>
+                <div class="service-groups" id="serviceGroupSelector">
+                    <!-- Service groups for selection -->
+                </div>
+                
+                <!-- Selected Services List -->
+                <div id="selectedServicesList" style="margin-top: 20px;">
+                    <h4>Selected Services</h4>
+                    <table id="quotationServicesTable">
+                        <thead>
+                            <tr>
+                                <th>Service</th>
+                                <th>Resource</th>
+                                <th>Days</th>
+                                <th>Hours/Day</th>
+                                <th>Total Hours</th>
+                                <th>Rate</th>
+                                <th>Amount</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                
+                <!-- Price Summary -->
+                <div class="price-summary">
+                    <h3>💰 Price Summary</h3>
+                    <div class="price-row">
+                        <span>Subtotal:</span>
+                        <span id="subtotal">฿0</span>
+                    </div>
+                    <div class="price-row">
+                        <span>Discount:</span>
+                        <input type="number" id="discount" value="0" min="0" max="100" style="width: 80px; background: white; color: black;">
+                        <span>%</span>
+                    </div>
+                    <div class="price-row">
+                        <span>VAT (7%):</span>
+                        <span id="vat">฿0</span>
+                    </div>
+                    <div class="price-total">
+                        <span>Total:</span>
+                        <span id="total">฿0</span>
+                    </div>
+                </div>
+                
+                <div class="btn-group" style="margin-top: 20px;">
+                    <button class="btn btn-success" id="saveQuotationBtn">💾 Save Quotation</button>
+                    <button class="btn btn-primary" id="exportQuotationBtn">📄 Export to PDF</button>
+                    <button class="btn btn-warning" id="clearQuotationBtn">🔄 Clear</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reports Tab -->
+        <div id="reports" class="tab-content">
+            <div class="card">
+                <h3>📈 Service Usage Report</h3>
+                <button class="btn btn-success" id="exportReportBtn">📥 Export Report</button>
+                
+                <table id="reportsTable" style="margin-top: 20px;">
+                    <thead>
+                        <tr>
+                            <th>Service Group</th>
+                            <th>Service Count</th>
+                            <th>Total Man-hours</th>
+                            <th>Avg. Rate</th>
+                            <th>Total Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Service Modal -->
+    <div id="serviceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="serviceModalTitle">Add Service</h2>
+                <span class="close-btn" onclick="closeServiceModal()">&times;</span>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Service Code *</label>
+                    <input type="text" id="serviceCode" placeholder="e.g., FE-SS-001">
+                </div>
+                <div class="form-group">
+                    <label>Service Name *</label>
+                    <input type="text" id="serviceName" placeholder="e.g., Site Survey">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Service Group *</label>
+                    <select id="serviceGroup">
+                        <option value="">Select Group</option>
+                        <option value="Field Engineering">Field Engineering</option>
+                        <option value="Document Engineering">Document Engineering</option>
+                        <option value="Project Management">Project Management</option>
+                        <option value="Commissioning">Commissioning</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Service Type *</label>
+                    <select id="serviceType">
+                        <option value="">Select Type</option>
+                        <option value="Field">Field Service</option>
+                        <option value="Office">Office Work</option>
+                        <option value="Remote">Remote Support</option>
+                        <option value="Hybrid">Hybrid</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="serviceDescription" rows="3" placeholder="Service description..."></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Unit *</label>
+                    <select id="serviceUnit">
+                        <option value="Day">Day</option>
+                        <option value="Hour">Hour</option>
+                        <option value="Trip">Trip</option>
+                        <option value="Document">Document</option>
+                        <option value="Package">Package</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Standard Rate *</label>
+                    <input type="number" id="serviceRate" min="0" placeholder="Rate per unit">
+                </div>
+            </div>
+            <input type="hidden" id="serviceId">
+            <div class="btn-group">
+                <button class="btn btn-success" onclick="saveService()">Save Service</button>
+                <button class="btn btn-danger" onclick="closeServiceModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Modal -->
+    <div id="documentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="documentModalTitle">Add Document Type</h2>
+                <span class="close-btn" onclick="closeDocumentModal()">&times;</span>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Document Code *</label>
+                    <input type="text" id="docCode" placeholder="e.g., DOC-VDRL-001">
+                </div>
+                <div class="form-group">
+                    <label>Document Name *</label>
+                    <input type="text" id="docName" placeholder="e.g., P&ID Drawing">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Category *</label>
+                    <select id="docCategory">
+                        <option value="">Select Category</option>
+                        <option value="Pre-FEED">Pre-FEED</option>
+                        <option value="FEED">FEED</option>
+                        <option value="VDRL">VDRL</option>
+                        <option value="Detail Design">Detail Design</option>
+                        <option value="As-Built">As-Built</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Document Type *</label>
+                    <select id="docType">
+                        <option value="">Select Type</option>
+                        <option value="Common">Common</option>
+                        <option value="Generic">Generic</option>
+                        <option value="Particular">Particular</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Revision Status</label>
+                    <select id="docRevStatus">
+                        <option value="">Select Status</option>
+                        <option value="IFR">IFR - Issue for Review</option>
+                        <option value="IFA">IFA - Issue for Approval</option>
+                        <option value="AFC">AFC - Approved for Construction</option>
+                        <option value="AFD">AFD - Approved for Design</option>
+                        <option value="IFC">IFC - Issue for Construction</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Estimated Man-hours *</label>
+                    <input type="number" id="docManHours" min="0" placeholder="Hours">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Required Skills</label>
+                <input type="text" id="docSkills" placeholder="e.g., AutoCAD, Process Engineering">
+            </div>
+            <input type="hidden" id="docId">
+            <div class="btn-group">
+                <button class="btn btn-success" onclick="saveDocument()">Save Document</button>
+                <button class="btn btn-danger" onclick="closeDocumentModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resource Modal -->
+    <div id="resourceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="resourceModalTitle">Add Resource</h2>
+                <span class="close-btn" onclick="closeResourceModal()">&times;</span>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Name *</label>
+                    <input type="text" id="resourceName" placeholder="Full name">
+                </div>
+                <div class="form-group">
+                    <label>Position *</label>
+                    <input type="text" id="resourcePosition" placeholder="e.g., Senior Engineer">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Department *</label>
+                    <select id="resourceDepartment">
+                        <option value="">Select Department</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Field Services">Field Services</option>
+                        <option value="Documentation">Documentation</option>
+                        <option value="Project Management">Project Management</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Skills</label>
+                    <input type="text" id="resourceSkills" placeholder="e.g., AutoCAD, SAP, Commissioning">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Daily Rate *</label>
+                    <input type="number" id="resourceDailyRate" min="0" placeholder="฿/day">
+                </div>
+                <div class="form-group">
+                    <label>Hourly Rate *</label>
+                    <input type="number" id="resourceHourlyRate" min="0" placeholder="฿/hour">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>OT Rate (1.5x)</label>
+                    <input type="number" id="resourceOTRate" min="0" placeholder="฿/hour" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Availability</label>
+                    <select id="resourceAvailability">
+                        <option value="Available">Available</option>
+                        <option value="Busy">Busy</option>
+                        <option value="On Leave">On Leave</option>
+                    </select>
+                </div>
+            </div>
+            <input type="hidden" id="resourceId">
+            <div class="btn-group">
+                <button class="btn btn-success" onclick="saveResource()">Save Resource</button>
+                <button class="btn btn-danger" onclick="closeResourceModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Storage
+        let services = [];
+        let documents = [];
+        let resources = [];
+        let quotations = [];
+        let currentQuotationItems = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Initializing Addvalue Service Price List System...');
+            loadData();
+            setupEventListeners();
+            initializeDefaultData();
+            updateDashboard();
+            renderServices();
+            renderDocuments();
+            renderResources();
+        });
+
+        // Setup Event Listeners
+        function setupEventListeners() {
+            // Navigation tabs
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    this.classList.add('active');
+                    document.getElementById(this.dataset.tab).classList.add('active');
+                    
+                    // Refresh data when switching tabs
+                    if (this.dataset.tab === 'quotation') {
+                        renderServiceGroups();
+                    } else if (this.dataset.tab === 'reports') {
+                        renderReports();
+                    }
+                });
+            });
+
+            // File operations
+            document.getElementById('saveBtn').addEventListener('click', saveData);
+            document.getElementById('exportBtn').addEventListener('click', exportData);
+            document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
+            document.getElementById('importFile').addEventListener('change', importData);
+            document.getElementById('clearBtn').addEventListener('click', clearAllData);
+
+            // Service operations
+            document.getElementById('addServiceBtn').addEventListener('click', () => openServiceModal());
+            document.getElementById('serviceSearchInput').addEventListener('keyup', filterServices);
+            document.getElementById('filterGroup').addEventListener('change', filterServices);
+
+            // Document operations
+            document.getElementById('addDocBtn').addEventListener('click', () => openDocumentModal());
+            document.getElementById('docSearchInput').addEventListener('keyup', filterDocuments);
+
+            // Resource operations
+            document.getElementById('addResourceBtn').addEventListener('click', () => openResourceModal());
+            document.getElementById('resourceSearchInput').addEventListener('keyup', filterResources);
+            
+            // Calculate OT Rate automatically
+            const hourlyRateInput = document.getElementById('resourceHourlyRate');
+            if (hourlyRateInput) {
+                hourlyRateInput.addEventListener('input', function() {
+                    const hourlyRate = parseFloat(this.value) || 0;
+                    document.getElementById('resourceOTRate').value = Math.round(hourlyRate * 1.5);
+                });
+            }
+
+            // Quotation operations
+            document.getElementById('saveQuotationBtn').addEventListener('click', saveQuotation);
+            document.getElementById('exportQuotationBtn').addEventListener('click', exportQuotation);
+            document.getElementById('clearQuotationBtn').addEventListener('click', clearQuotation);
+            document.getElementById('discount').addEventListener('input', calculateQuotationTotal);
+
+            // Export report
+            document.getElementById('exportReportBtn').addEventListener('click', exportReport);
+        }
+
+        // Initialize Default Data
+        function initializeDefaultData() {
+            if (services.length === 0) {
+                // Default Services
+                services = [
+                    {
+                        id: 1,
+                        code: 'FE-SS-001',
+                        name: 'Site Survey',
+                        group: 'Field Engineering',
+                        type: 'Field',
+                        description: 'On-site survey and assessment',
+                        unit: 'Day',
+                        rate: 15000
+                    },
+                    {
+                        id: 2,
+                        code: 'FE-FAT-001',
+                        name: 'Factory Acceptance Test',
+                        group: 'Field Engineering',
+                        type: 'Field',
+                        description: 'FAT at manufacturer facility',
+                        unit: 'Day',
+                        rate: 18000
+                    },
+                    {
+                        id: 3,
+                        code: 'FE-SAT-001',
+                        name: 'Site Acceptance Test',
+                        group: 'Field Engineering',
+                        type: 'Field',
+                        description: 'SAT at project site',
+                        unit: 'Day',
+                        rate: 20000
+                    },
+                    {
+                        id: 4,
+                        code: 'DE-VDRL-001',
+                        name: 'VDRL Document Package',
+                        group: 'Document Engineering',
+                        type: 'Office',
+                        description: 'Vendor Document Review List preparation',
+                        unit: 'Package',
+                        rate: 50000
+                    },
+                    {
+                        id: 5,
+                        code: 'DE-PFD-001',
+                        name: 'Pre-FEED Documentation',
+                        group: 'Document Engineering',
+                        type: 'Office',
+                        description: 'Pre-FEED engineering documents',
+                        unit: 'Package',
+                        rate: 80000
+                    }
+                ];
+            }
+
+            if (documents.length === 0) {
+                // Default Documents
+                documents = [
+                    {
+                        id: 1,
+                        code: 'DOC-PID-001',
+                        name: 'P&ID Drawing',
+                        category: 'VDRL',
+                        type: 'Common',
+                        revStatus: 'IFA',
+                        manHours: 40,
+                        skills: 'AutoCAD, Process Engineering'
+                    },
+                    {
+                        id: 2,
+                        code: 'DOC-PFD-001',
+                        name: 'Process Flow Diagram',
+                        category: 'Pre-FEED',
+                        type: 'Generic',
+                        revStatus: 'IFR',
+                        manHours: 32,
+                        skills: 'Process Engineering, AspenPlus'
+                    },
+                    {
+                        id: 3,
+                        code: 'DOC-ISO-001',
+                        name: 'Isometric Drawing',
+                        category: 'Detail Design',
+                        type: 'Particular',
+                        revStatus: 'AFC',
+                        manHours: 24,
+                        skills: 'AutoCAD Plant 3D, Piping Design'
+                    },
+                    {
+                        id: 4,
+                        code: 'DOC-HMB-001',
+                        name: 'Heat & Material Balance',
+                        category: 'FEED',
+                        type: 'Common',
+                        revStatus: 'AFD',
+                        manHours: 48,
+                        skills: 'Process Simulation, Excel'
+                    },
+                    {
+                        id: 5,
+                        code: 'DOC-DWG-001',
+                        name: 'Equipment Layout Drawing',
+                        category: 'VDRL',
+                        type: 'Generic',
+                        revStatus: 'IFC',
+                        manHours: 36,
+                        skills: 'AutoCAD, 3D Modeling'
+                    }
+                ];
+            }
+
+            if (resources.length === 0) {
+                // Default Resources from the HR data
+                resources = [
+                    {
+                        id: 1,
+                        name: 'Sakda Wongjam',
+                        position: 'Senior Engineer',
+                        department: 'Engineering',
+                        skills: 'AutoCAD, Process Engineering, Commissioning',
+                        dailyRate: 4000,
+                        hourlyRate: 500,
+                        otRate: 750,
+                        availability: 'Available'
+                    },
+                    {
+                        id: 2,
+                        name: 'Ratchaneekom Mo-on',
+                        position: 'Telecommunication Engineer',
+                        department: 'Engineering',
+                        skills: 'Telecom Systems, Network Design',
+                        dailyRate: 2500,
+                        hourlyRate: 315,
+                        otRate: 473,
+                        availability: 'Available'
+                    },
+                    {
+                        id: 3,
+                        name: 'Suttirak Nunsong',
+                        position: 'Senior Telecommunication Engineer',
+                        department: 'Engineering',
+                        skills: 'Telecom, Project Management',
+                        dailyRate: 3200,
+                        hourlyRate: 400,
+                        otRate: 600,
+                        availability: 'Busy'
+                    },
+                    {
+                        id: 4,
+                        name: 'Yuttapong Eakimphon',
+                        position: 'Technical Staff',
+                        department: 'Field Services',
+                        skills: 'Field Support, Testing, Documentation',
+                        dailyRate: 2000,
+                        hourlyRate: 250,
+                        otRate: 375,
+                        availability: 'Available'
+                    },
+                    {
+                        id: 5,
+                        name: 'Aurnchalee Meenak',
+                        position: 'Manager',
+                        department: 'Project Management',
+                        skills: 'Project Management, Client Relations',
+                        dailyRate: 5000,
+                        hourlyRate: 625,
+                        otRate: 938,
+                        availability: 'Available'
+                    }
+                ];
+            }
+
+            saveData();
+        }
+
+        // Load Data
+        function loadData() {
+            try {
+                const data = localStorage.getItem('addvalueServiceData');
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    services = parsed.services || [];
+                    documents = parsed.documents || [];
+                    resources = parsed.resources || [];
+                    quotations = parsed.quotations || [];
+                }
+            } catch (e) {
+                console.error('Error loading data:', e);
+            }
+        }
+
+        // Save Data
+        function saveData() {
+            try {
+                const data = {
+                    services,
+                    documents,
+                    resources,
+                    quotations,
+                    savedAt: new Date().toISOString()
+                };
+                localStorage.setItem('addvalueServiceData', JSON.stringify(data));
+                showNotification('Data saved successfully', 'success');
+            } catch (e) {
+                showNotification('Error saving data', 'error');
+            }
+        }
+
+        // Export Data
+        function exportData() {
+            const data = {
+                services,
+                documents,
+                resources,
+                quotations,
+                exportDate: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'addvalue_service_data_' + new Date().toISOString().split('T')[0] + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('Data exported successfully', 'success');
+        }
+
+        // Import Data
+        function importData(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    services = data.services || [];
+                    documents = data.documents || [];
+                    resources = data.resources || [];
+                    quotations = data.quotations || [];
+                    saveData();
+                    location.reload();
+                } catch (err) {
+                    showNotification('Error importing data', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Clear All Data
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all data? This cannot be undone!')) {
+                services = [];
+                documents = [];
+                resources = [];
+                quotations = [];
+                currentQuotationItems = [];
+                saveData();
+                location.reload();
+            }
+        }
+
+        // Update Dashboard
+        function updateDashboard() {
+            document.getElementById('totalServices').textContent = services.length;
+            document.getElementById('totalResources').textContent = resources.length;
+            document.getElementById('activeQuotations').textContent = quotations.length;
+            
+            // Calculate average rate
+            const totalRate = resources.reduce((sum, r) => sum + r.hourlyRate, 0);
+            const avgRate = resources.length > 0 ? Math.round(totalRate / resources.length) : 0;
+            document.getElementById('avgRate').textContent = '฿' + avgRate.toLocaleString();
+            
+            // Render service group summary
+            const groupSummary = document.getElementById('groupSummary');
+            const groups = ['Field Engineering', 'Document Engineering', 'Project Management', 'Commissioning'];
+            
+            groupSummary.innerHTML = groups.map(group => {
+                const groupServices = services.filter(s => s.group === group);
+                return `
+                    <div class="service-group-card">
+                        <h4>${group}</h4>
+                        <p>${groupServices.length} Services</p>
+                        <small>Click to view details</small>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Render Services
+        function renderServices() {
+            const tbody = document.querySelector('#servicesTable tbody');
+            tbody.innerHTML = '';
+            
+            services.forEach(service => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${service.code}</td>
+                    <td>${service.name}</td>
+                    <td>${service.group}</td>
+                    <td>${service.type}</td>
+                    <td>${service.description}</td>
+                    <td>${service.unit}</td>
+                    <td>฿${service.rate.toLocaleString()}</td>
+                    <td>
+                        <button class="btn btn-warning" onclick="editService(${service.id})">✏️</button>
+                        <button class="btn btn-danger" onclick="deleteService(${service.id})">🗑️</button>
+                    </td>
+                `;
+            });
+        }
+
+        // Render Documents
+        function renderDocuments() {
+            const tbody = document.querySelector('#documentsTable tbody');
+            tbody.innerHTML = '';
+            
+            documents.forEach(doc => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${doc.code}</td>
+                    <td>${doc.name}</td>
+                    <td>${doc.category}</td>
+                    <td><span class="doc-type ${doc.type.toLowerCase()}">${doc.type}</span></td>
+                    <td><span class="rev-status ${doc.revStatus}">${doc.revStatus}</span></td>
+                    <td>${doc.manHours} hrs</td>
+                    <td>${doc.skills}</td>
+                    <td>
+                        <button class="btn btn-warning" onclick="editDocument(${doc.id})">✏️</button>
+                        <button class="btn btn-danger" onclick="deleteDocument(${doc.id})">🗑️</button>
+                    </td>
+                `;
+            });
+        }
+
+        // Render Resources
+        function renderResources() {
+            const tbody = document.querySelector('#resourcesTable tbody');
+            tbody.innerHTML = '';
+            
+            resources.forEach(resource => {
+                const row = tbody.insertRow();
+                const availabilityColor = resource.availability === 'Available' ? '#48bb78' : 
+                                         resource.availability === 'Busy' ? '#ed8936' : '#718096';
+                row.innerHTML = `
+                    <td>${resource.id}</td>
+                    <td>${resource.name}</td>
+                    <td>${resource.position}</td>
+                    <td>${resource.department}</td>
+                    <td>${resource.skills}</td>
+                    <td>฿${resource.dailyRate.toLocaleString()}</td>
+                    <td>฿${resource.hourlyRate.toLocaleString()}</td>
+                    <td>฿${resource.otRate.toLocaleString()}</td>
+                    <td><span style="color: ${availabilityColor};">● ${resource.availability}</span></td>
+                    <td>
+                        <button class="btn btn-warning" onclick="editResource(${resource.id})">✏️</button>
+                        <button class="btn btn-danger" onclick="deleteResource(${resource.id})">🗑️</button>
+                    </td>
+                `;
+            });
+        }
+
+        // Service Modal Functions
+        function openServiceModal(id = null) {
+            const modal = document.getElementById('serviceModal');
+            const title = document.getElementById('serviceModalTitle');
+            
+            if (id) {
+                const service = services.find(s => s.id === id);
+                if (service) {
+                    title.textContent = 'Edit Service';
+                    document.getElementById('serviceId').value = service.id;
+                    document.getElementById('serviceCode').value = service.code;
+                    document.getElementById('serviceName').value = service.name;
+                    document.getElementById('serviceGroup').value = service.group;
+                    document.getElementById('serviceType').value = service.type;
+                    document.getElementById('serviceDescription').value = service.description;
+                    document.getElementById('serviceUnit').value = service.unit;
+                    document.getElementById('serviceRate').value = service.rate;
+                }
+            } else {
+                title.textContent = 'Add Service';
+                document.getElementById('serviceId').value = '';
+                document.getElementById('serviceCode').value = '';
+                document.getElementById('serviceName').value = '';
+                document.getElementById('serviceGroup').value = '';
+                document.getElementById('serviceType').value = '';
+                document.getElementById('serviceDescription').value = '';
+                document.getElementById('serviceUnit').value = 'Day';
+                document.getElementById('serviceRate').value = '';
+            }
+            
+            modal.classList.add('show');
+        }
+
+        function closeServiceModal() {
+            document.getElementById('serviceModal').classList.remove('show');
+        }
+
+        function saveService() {
+            const id = document.getElementById('serviceId').value;
+            const service = {
+                code: document.getElementById('serviceCode').value,
+                name: document.getElementById('serviceName').value,
+                group: document.getElementById('serviceGroup').value,
+                type: document.getElementById('serviceType').value,
+                description: document.getElementById('serviceDescription').value,
+                unit: document.getElementById('serviceUnit').value,
+                rate: parseFloat(document.getElementById('serviceRate').value)
+            };
+            
+            if (!service.code || !service.name || !service.group || !service.type || !service.rate) {
+                showNotification('Please fill all required fields', 'error');
+                return;
+            }
+            
+            if (id) {
+                const index = services.findIndex(s => s.id == id);
+                services[index] = { ...services[index], ...service };
+            } else {
+                service.id = services.length > 0 ? Math.max(...services.map(s => s.id)) + 1 : 1;
+                services.push(service);
+            }
+            
+            saveData();
+            renderServices();
+            updateDashboard();
+            closeServiceModal();
+        }
+
+        function editService(id) {
+            openServiceModal(id);
+        }
+
+        function deleteService(id) {
+            if (confirm('Are you sure you want to delete this service?')) {
+                services = services.filter(s => s.id !== id);
+                saveData();
+                renderServices();
+                updateDashboard();
+            }
+        }
+
+        // Document Modal Functions
+        function openDocumentModal(id = null) {
+            const modal = document.getElementById('documentModal');
+            const title = document.getElementById('documentModalTitle');
+            
+            if (id) {
+                const doc = documents.find(d => d.id === id);
+                if (doc) {
+                    title.textContent = 'Edit Document Type';
+                    document.getElementById('docId').value = doc.id;
+                    document.getElementById('docCode').value = doc.code;
+                    document.getElementById('docName').value = doc.name;
+                    document.getElementById('docCategory').value = doc.category;
+                    document.getElementById('docType').value = doc.type;
+                    document.getElementById('docRevStatus').value = doc.revStatus;
+                    document.getElementById('docManHours').value = doc.manHours;
+                    document.getElementById('docSkills').value = doc.skills;
+                }
+            } else {
+                title.textContent = 'Add Document Type';
+                document.getElementById('docId').value = '';
+                document.getElementById('docCode').value = '';
+                document.getElementById('docName').value = '';
+                document.getElementById('docCategory').value = '';
+                document.getElementById('docType').value = '';
+                document.getElementById('docRevStatus').value = '';
+                document.getElementById('docManHours').value = '';
+                document.getElementById('docSkills').value = '';
+            }
+            
+            modal.classList.add('show');
+        }
+
+        function closeDocumentModal() {
+            document.getElementById('documentModal').classList.remove('show');
+        }
+
+        function saveDocument() {
+            const id = document.getElementById('docId').value;
+            const doc = {
+                code: document.getElementById('docCode').value,
+                name: document.getElementById('docName').value,
+                category: document.getElementById('docCategory').value,
+                type: document.getElementById('docType').value,
+                revStatus: document.getElementById('docRevStatus').value,
+                manHours: parseInt(document.getElementById('docManHours').value),
+                skills: document.getElementById('docSkills').value
+            };
+            
+            if (!doc.code || !doc.name || !doc.category || !doc.type || !doc.manHours) {
+                showNotification('Please fill all required fields', 'error');
+                return;
+            }
+            
+            if (id) {
+                const index = documents.findIndex(d => d.id == id);
+                documents[index] = { ...documents[index], ...doc };
+            } else {
+                doc.id = documents.length > 0 ? Math.max(...documents.map(d => d.id)) + 1 : 1;
+                documents.push(doc);
+            }
+            
+            saveData();
+            renderDocuments();
+            closeDocumentModal();
+        }
+
+        function editDocument(id) {
+            openDocumentModal(id);
+        }
+
+        function deleteDocument(id) {
+            if (confirm('Are you sure you want to delete this document type?')) {
+                documents = documents.filter(d => d.id !== id);
+                saveData();
+                renderDocuments();
+            }
+        }
+
+        // Resource Modal Functions
+        function openResourceModal(id = null) {
+            const modal = document.getElementById('resourceModal');
+            const title = document.getElementById('resourceModalTitle');
+            
+            if (id) {
+                const resource = resources.find(r => r.id === id);
+                if (resource) {
+                    title.textContent = 'Edit Resource';
+                    document.getElementById('resourceId').value = resource.id;
+                    document.getElementById('resourceName').value = resource.name;
+                    document.getElementById('resourcePosition').value = resource.position;
+                    document.getElementById('resourceDepartment').value = resource.department;
+                    document.getElementById('resourceSkills').value = resource.skills;
+                    document.getElementById('resourceDailyRate').value = resource.dailyRate;
+                    document.getElementById('resourceHourlyRate').value = resource.hourlyRate;
+                    document.getElementById('resourceOTRate').value = resource.otRate;
+                    document.getElementById('resourceAvailability').value = resource.availability;
+                }
+            } else {
+                title.textContent = 'Add Resource';
+                document.getElementById('resourceId').value = '';
+                document.getElementById('resourceName').value = '';
+                document.getElementById('resourcePosition').value = '';
+                document.getElementById('resourceDepartment').value = '';
+                document.getElementById('resourceSkills').value = '';
+                document.getElementById('resourceDailyRate').value = '';
+                document.getElementById('resourceHourlyRate').value = '';
+                document.getElementById('resourceOTRate').value = '';
+                document.getElementById('resourceAvailability').value = 'Available';
+            }
+            
+            modal.classList.add('show');
+        }
+
+        function closeResourceModal() {
+            document.getElementById('resourceModal').classList.remove('show');
+        }
+
+        function saveResource() {
+            const id = document.getElementById('resourceId').value;
+            const resource = {
+                name: document.getElementById('resourceName').value,
+                position: document.getElementById('resourcePosition').value,
+                department: document.getElementById('resourceDepartment').value,
+                skills: document.getElementById('resourceSkills').value,
+                dailyRate: parseFloat(document.getElementById('resourceDailyRate').value),
+                hourlyRate: parseFloat(document.getElementById('resourceHourlyRate').value),
+                otRate: parseFloat(document.getElementById('resourceOTRate').value),
+                availability: document.getElementById('resourceAvailability').value
+            };
+            
+            if (!resource.name || !resource.position || !resource.department || !resource.dailyRate || !resource.hourlyRate) {
+                showNotification('Please fill all required fields', 'error');
+                return;
+            }
+            
+            if (id) {
+                const index = resources.findIndex(r => r.id == id);
+                resources[index] = { ...resources[index], ...resource };
+            } else {
+                resource.id = resources.length > 0 ? Math.max(...resources.map(r => r.id)) + 1 : 1;
+                resources.push(resource);
+            }
+            
+            saveData();
+            renderResources();
+            updateDashboard();
+            closeResourceModal();
+        }
+
+        function editResource(id) {
+            openResourceModal(id);
+        }
+
+        function deleteResource(id) {
+            if (confirm('Are you sure you want to delete this resource?')) {
+                resources = resources.filter(r => r.id !== id);
+                saveData();
+                renderResources();
+                updateDashboard();
+            }
+        }
+
+        // Filter Functions
+        function filterServices() {
+            const searchTerm = document.getElementById('serviceSearchInput').value.toLowerCase();
+            const filterGroup = document.getElementById('filterGroup').value;
+            const rows = document.querySelectorAll('#servicesTable tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                const groupMatch = !filterGroup || row.cells[2].textContent === filterGroup;
+                const searchMatch = !searchTerm || text.includes(searchTerm);
+                row.style.display = groupMatch && searchMatch ? '' : 'none';
+            });
+        }
+
+        function filterDocuments() {
+            const searchTerm = document.getElementById('docSearchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#documentsTable tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        }
+
+        function filterResources() {
+            const searchTerm = document.getElementById('resourceSearchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#resourcesTable tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        }
+
+        // Quotation Functions
+        function renderServiceGroups() {
+            const selector = document.getElementById('serviceGroupSelector');
+            const groups = ['Field Engineering', 'Document Engineering', 'Project Management', 'Commissioning'];
+            
+            selector.innerHTML = groups.map(group => {
+                const groupServices = services.filter(s => s.group === group);
+                return `
+                    <div class="service-group-card" onclick="selectServiceGroup('${group}')">
+                        <h4>${group}</h4>
+                        <p>${groupServices.length} Services Available</p>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function selectServiceGroup(group) {
+            const groupServices = services.filter(s => s.group === group);
+            
+            // Add service selection interface
+            const modal = document.createElement('div');
+            modal.className = 'modal show';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>Select ${group} Service</h2>
+                        <span class="close-btn" onclick="this.parentElement.parentElement.parentElement.remove()">&times;</span>
+                    </div>
+                    <select id="tempServiceSelect" class="form-control">
+                        <option value="">Select a service</option>
+                        ${groupServices.map(s => `<option value="${s.id}">${s.name} - ${s.unit} (฿${s.rate.toLocaleString()})</option>`).join('')}
+                    </select>
+                    <div class="form-row" style="margin-top: 15px;">
+                        <div class="form-group">
+                            <label>Select Resource</label>
+                            <select id="tempResourceSelect">
+                                <option value="">Select resource</option>
+                                ${resources.filter(r => r.availability === 'Available').map(r => 
+                                    `<option value="${r.id}">${r.name} - ${r.position}</option>`
+                                ).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Days</label>
+                            <input type="number" id="tempDays" value="1" min="1">
+                        </div>
+                    </div>
+                    <button class="btn btn-success" onclick="addQuotationItem()">Add to Quotation</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function addQuotationItem() {
+            const serviceId = document.getElementById('tempServiceSelect').value;
+            const resourceId = document.getElementById('tempResourceSelect').value;
+            const days = document.getElementById('tempDays').value;
+            
+            if (!serviceId || !resourceId || !days) {
+                showNotification('Please select service, resource and specify days', 'error');
+                return;
+            }
+            
+            const service = services.find(s => s.id == serviceId);
+            const resource = resources.find(r => r.id == resourceId);
+            
+            const item = {
+                id: currentQuotationItems.length + 1,
+                service: service,
+                resource: resource,
+                days: parseInt(days),
+                hoursPerDay: 8,
+                totalHours: parseInt(days) * 8,
+                rate: resource.hourlyRate,
+                amount: parseInt(days) * 8 * resource.hourlyRate
+            };
+            
+            currentQuotationItems.push(item);
+            renderQuotationItems();
+            calculateQuotationTotal();
+            
+            // Close modal
+            document.querySelector('.modal.show').remove();
+        }
+
+        function renderQuotationItems() {
+            const tbody = document.querySelector('#quotationServicesTable tbody');
+            tbody.innerHTML = '';
+            
+            currentQuotationItems.forEach((item, index) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${item.service.name}</td>
+                    <td>${item.resource.name}</td>
+                    <td>${item.days}</td>
+                    <td>${item.hoursPerDay}</td>
+                    <td>${item.totalHours}</td>
+                    <td>฿${item.rate.toLocaleString()}</td>
+                    <td>฿${item.amount.toLocaleString()}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="removeQuotationItem(${index})">❌</button>
+                    </td>
+                `;
+            });
+        }
+
+        function removeQuotationItem(index) {
+            currentQuotationItems.splice(index, 1);
+            renderQuotationItems();
+            calculateQuotationTotal();
+        }
+
+        function calculateQuotationTotal() {
+            const subtotal = currentQuotationItems.reduce((sum, item) => sum + item.amount, 0);
+            const discount = parseFloat(document.getElementById('discount').value) || 0;
+            const discountAmount = subtotal * (discount / 100);
+            const afterDiscount = subtotal - discountAmount;
+            const vat = afterDiscount * 0.07;
+            const total = afterDiscount + vat;
+            
+            document.getElementById('subtotal').textContent = '฿' + subtotal.toLocaleString();
+            document.getElementById('vat').textContent = '฿' + Math.round(vat).toLocaleString();
+            document.getElementById('total').textContent = '฿' + Math.round(total).toLocaleString();
+        }
+
+        function saveQuotation() {
+            const clientName = document.getElementById('clientName').value;
+            const projectName = document.getElementById('projectName').value;
+            
+            if (!clientName || !projectName) {
+                showNotification('Please enter client and project name', 'error');
+                return;
+            }
+            
+            if (currentQuotationItems.length === 0) {
+                showNotification('Please add at least one service', 'error');
+                return;
+            }
+            
+            const quotation = {
+                id: quotations.length + 1,
+                clientName,
+                projectName,
+                items: [...currentQuotationItems],
+                discount: parseFloat(document.getElementById('discount').value) || 0,
+                subtotal: currentQuotationItems.reduce((sum, item) => sum + item.amount, 0),
+                total: parseFloat(document.getElementById('total').textContent.replace('฿', '').replace(/,/g, '')),
+                createdAt: new Date().toISOString()
+            };
+            
+            quotations.push(quotation);
+            saveData();
+            showNotification('Quotation saved successfully', 'success');
+            clearQuotation();
+        }
+
+        function exportQuotation() {
+            // Simple CSV export
+            let csv = 'Service,Resource,Days,Hours,Rate,Amount\n';
+            currentQuotationItems.forEach(item => {
+                csv += `"${item.service.name}","${item.resource.name}",${item.days},${item.totalHours},${item.rate},${item.amount}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'quotation_' + new Date().toISOString().split('T')[0] + '.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('Quotation exported', 'success');
+        }
+
+        function clearQuotation() {
+            currentQuotationItems = [];
+            document.getElementById('clientName').value = '';
+            document.getElementById('projectName').value = '';
+            document.getElementById('discount').value = 0;
+            renderQuotationItems();
+            calculateQuotationTotal();
+        }
+
+        // Reports Functions
+        function renderReports() {
+            const tbody = document.querySelector('#reportsTable tbody');
+            tbody.innerHTML = '';
+            
+            const groups = ['Field Engineering', 'Document Engineering', 'Project Management', 'Commissioning'];
+            
+            groups.forEach(group => {
+                const groupServices = services.filter(s => s.group === group);
+                const avgRate = groupServices.length > 0 ? 
+                    Math.round(groupServices.reduce((sum, s) => sum + s.rate, 0) / groupServices.length) : 0;
+                
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${group}</td>
+                    <td>${groupServices.length}</td>
+                    <td>-</td>
+                    <td>฿${avgRate.toLocaleString()}</td>
+                    <td>-</td>
+                `;
+            });
+        }
+
+        function exportReport() {
+            let csv = 'Service Group,Service Count,Total Man-hours,Avg Rate,Total Revenue\n';
+            const groups = ['Field Engineering', 'Document Engineering', 'Project Management', 'Commissioning'];
+            
+            groups.forEach(group => {
+                const groupServices = services.filter(s => s.group === group);
+                const avgRate = groupServices.length > 0 ? 
+                    Math.round(groupServices.reduce((sum, s) => sum + s.rate, 0) / groupServices.length) : 0;
+                csv += `"${group}",${groupServices.length},0,${avgRate},0\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'service_report_' + new Date().toISOString().split('T')[0] + '.csv';
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showNotification('Report exported', 'success');
+        }
+
+        // Show Notification
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = 'notification ' + type;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

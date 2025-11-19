@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Addvalue HRMS – Full Modular System (Personnel • Passport • Training • Health • Experience • Import/Export)</title>
+<style>
+  body { background: #0b1325; color: #e8eeff; font-family: 'Segoe UI', sans-serif; margin: 0; }
+  header { background: #101c3a; padding: 12px 20px; border-bottom: 2px solid #1f2d4d; }
+  h1 { font-size: 20px; color: #4cc9f0; }
+  nav { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  button { padding: 8px 14px; border-radius: 6px; background: #1d2f5a; color: #fff; border: 1px solid #3353a0; cursor: pointer; }
+  button:hover { background: #28457d; }
+  .active { background: #3d6ef5; border-color: #5585ff; }
+  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  th, td { padding: 8px; border-bottom: 1px solid #2a3c66; }
+  section { display: none; padding: 20px; max-width: 1100px; margin: auto; }
+  section.active { display: block; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Addvalue HRMS – Modular Database</h1>
+  <nav id="tabs"></nav>
+</header>
+
+<section id="personnel" class="active">
+  <h2>บุคลากร (Personnel)</h2>
+  <button onclick="addPersonnel()">+ เพิ่มพนักงาน</button>
+  <table id="tblPersonnel"><thead><tr><th>ID</th><th>ชื่อ-สกุล</th><th>ตำแหน่ง</th><th>แผนก</th></tr></thead><tbody></tbody></table>
+</section>
+
+<section id="passport">
+  <h2>เอกสารประจำตัว (Passport / ID)</h2>
+  <table id="tblPassport"><thead><tr><th>ID</th><th>ชื่อพนักงาน</th><th>ประเภท</th><th>เลขที่เอกสาร</th></tr></thead><tbody></tbody></table>
+</section>
+
+<section id="training">
+  <h2>อบรม/ใบรับรอง (Training / Certificates)</h2>
+  <table id="tblTraining"><thead><tr><th>ID</th><th>ชื่อพนักงาน</th><th>หลักสูตร</th><th>หมดอายุ</th></tr></thead><tbody></tbody></table>
+</section>
+
+<section id="health">
+  <h2>สุขภาพ (Medical)</h2>
+  <table id="tblHealth"><thead><tr><th>ID</th><th>ชื่อพนักงาน</th><th>โรงพยาบาล</th><th>ผลตรวจ</th></tr></thead><tbody></tbody></table>
+</section>
+
+<section id="experience">
+  <h2>ประวัติการทำงาน (Experience)</h2>
+  <table id="tblExp"><thead><tr><th>ID</th><th>ชื่อพนักงาน</th><th>บริษัท/ลูกค้า</th><th>โครงการ</th></tr></thead><tbody></tbody></table>
+</section>
+
+<section id="export">
+  <h2>นำเข้า / ส่งออก (Import / Export / Save As)</h2>
+  <button onclick="exportJSON()">⬇️ Export JSON</button>
+  <button onclick="exportCSV()">⬇️ Export CSV</button>
+  <button onclick="exportExcel()">⬇️ Export Excel (.xlsx)</button>
+  <input type="file" id="importFile" accept=".json,.csv,.xlsx" onchange="importFile(event)">
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+const db = {
+  personnel: [
+    {id:1, full_name_th:'สุริยพงศ์ อยู่ออมสิน', position:'Senior Telecom Engineer', department:'Telecom'},
+    {id:2, full_name_th:'ยุทธพงษ์ เอกอิ่มผล', position:'Chief TeleC Technician', department:'Telecom'}
+  ],
+  passport: [
+    {id:1, pid:1, type:'Passport', number:'AC3883510'},
+    {id:2, pid:2, type:'Passport', number:'AC3883473'}
+  ],
+  training: [
+    {id:1, pid:1, title:'BOSIET with EBS', expiry:'2024-11-17'},
+    {id:2, pid:2, title:'FOET with EBS', expiry:'2028-11-16'}
+  ],
+  health: [
+    {id:1, pid:1, hospital:'Bangkok Hospital', fit:'Fit to work'},
+    {id:2, pid:2, hospital:'PTTEP PAD Clinic', fit:'Fit to work'}
+  ],
+  experience: [
+    {id:1, pid:1, company:'Add Value System Co., Ltd.', project:'Telecom Engineer / Offshore Projects'},
+    {id:2, pid:2, company:'Add Value System Co., Ltd.', project:'Chief TeleC Technician'}
+  ]
+};
+
+function renderTable(){
+  const perT = document.querySelector('#tblPersonnel tbody');
+  perT.innerHTML = '';
+  db.personnel.forEach(p => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${p.id}</td><td>${p.full_name_th}</td><td>${p.position}</td><td>${p.department}</td>`;
+    perT.appendChild(tr);
+  });
+  const passT = document.querySelector('#tblPassport tbody');
+  passT.innerHTML = '';
+  db.passport.forEach(ps => {
+    const p = db.personnel.find(x=>x.id===ps.pid);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${ps.id}</td><td>${p?p.full_name_th:'-'}</td><td>${ps.type}</td><td>${ps.number}</td>`;
+    passT.appendChild(tr);
+  });
+  const trainT = document.querySelector('#tblTraining tbody');
+  trainT.innerHTML = '';
+  db.training.forEach(t => {
+    const p = db.personnel.find(x=>x.id===t.pid);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${t.id}</td><td>${p?p.full_name_th:'-'}</td><td>${t.title}</td><td>${t.expiry}</td>`;
+    trainT.appendChild(tr);
+  });
+  const medT = document.querySelector('#tblHealth tbody');
+  medT.innerHTML = '';
+  db.health.forEach(h => {
+    const p = db.personnel.find(x=>x.id===h.pid);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${h.id}</td><td>${p?p.full_name_th:'-'}</td><td>${h.hospital}</td><td>${h.fit}</td>`;
+    medT.appendChild(tr);
+  });
+  const expT = document.querySelector('#tblExp tbody');
+  expT.innerHTML = '';
+  db.experience.forEach(e => {
+    const p = db.personnel.find(x=>x.id===e.pid);
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${e.id}</td><td>${p?p.full_name_th:'-'}</td><td>${e.company}</td><td>${e.project}</td>`;
+    expT.appendChild(tr);
+  });
+}
+renderTable();
+
+// ========== Export / Import ==========
+function exportJSON(){
+  const blob = new Blob([JSON.stringify(db,null,2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'addvalue_hrms_full.json';
+  a.click();
+}
+function exportCSV(){
+  let rows = [['Module','ID','Name','Field1','Field2']];
+  db.personnel.forEach(p=>rows.push(['Personnel',p.id,p.full_name_th,p.position,p.department]));
+  db.passport.forEach(p=>rows.push(['Passport',p.id,db.personnel.find(x=>x.id===p.pid)?.full_name_th,p.type,p.number]));
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'addvalue_hrms_full.csv';
+  a.click();
+}
+function exportExcel(){
+  const wb = XLSX.utils.book_new();
+  for(let [k,v] of Object.entries(db)){
+    const ws = XLSX.utils.json_to_sheet(v);
+    XLSX.utils.book_append_sheet(wb, ws, k);
+  }
+  XLSX.writeFile(wb, 'addvalue_hrms_full.xlsx');
+}
+function importFile(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  const reader = new FileReader();
+  if(ext==='json'){
+    reader.onload = () => { dbAll = JSON.parse(reader.result); Object.assign(db,dbAll); renderTable(); alert('นำเข้า JSON สำเร็จ'); };
+    reader.readAsText(file);
+  } else if(ext==='xlsx'){
+    reader.onload = (ev) => {
+      const data = new Uint8Array(ev.target.result);
+      const wb = XLSX.read(data,{type:'array'});
+      wb.SheetNames.forEach(name => db[name] = XLSX.utils.sheet_to_json(wb.Sheets[name]));
+      renderTable(); alert('นำเข้า Excel สำเร็จ');
+    };
+    reader.readAsArrayBuffer(file);
+  }
+}
+
+// ========== Tabs ==========
+const tabs = ["personnel","passport","training","health","experience","export"];
+const nav = document.getElementById('tabs');
+tabs.forEach(id=>{
+  const b=document.createElement('button'); b.textContent=id.toUpperCase(); b.onclick=()=>switchTab(id); nav.appendChild(b);
+});
+function switchTab(id){
+  document.querySelectorAll('section').forEach(s=>s.classList.remove('active'));
+  document.querySelector(`#${id}`).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  [...nav.children].find(b=>b.textContent.toLowerCase().includes(id)).classList.add('active');
+}
+</script>
+</body>
+</html>

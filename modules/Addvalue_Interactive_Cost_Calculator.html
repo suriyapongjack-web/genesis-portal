@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Cost Calculator - Addvalue Project</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .panel {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .panel h2 {
+            color: #333;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .input-section h3 {
+            color: #495057;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .input-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 8px;
+            background: white;
+            border-radius: 5px;
+        }
+        
+        .input-row label {
+            font-size: 0.95em;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .input-row input {
+            padding: 8px 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            font-size: 0.95em;
+            text-align: right;
+            transition: all 0.3s ease;
+        }
+        
+        .input-row input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .input-row input:disabled {
+            background: #e9ecef;
+            cursor: not-allowed;
+        }
+        
+        .input-row .result {
+            font-weight: bold;
+            color: #007bff;
+            text-align: right;
+            padding: 8px 12px;
+            background: #e3f2fd;
+            border-radius: 5px;
+        }
+        
+        .summary-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .summary-item {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 8px;
+        }
+        
+        .summary-item .value {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .summary-item .label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 350px;
+            margin-top: 20px;
+        }
+        
+        .pricing-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        
+        .pricing-table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .pricing-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .pricing-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .pricing-table .recommended {
+            background: #d4edda;
+        }
+        
+        .profit {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .loss {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .slider-container {
+            margin: 20px 0;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #dee2e6;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .export-section {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.85em;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Interactive Cost Calculator - Addvalue Project</h1>
+            <p>ZQP-ZWP4 Telecommunications Link | Real-time Cost Analysis</p>
+        </div>
+        
+        <div class="main-grid">
+            <!-- Left Panel: Inputs -->
+            <div class="panel">
+                <h2>📝 Cost Inputs (แก้ไขได้ทันที)</h2>
+                
+                <!-- Equipment Section -->
+                <div class="input-section">
+                    <h3>📦 หมวด 1: Equipment (NextG/Ceragon)</h3>
+                    <div class="input-row">
+                        <label>IP-50CX Radio (2 units)</label>
+                        <input type="number" id="radio-cost" value="18667" step="100">
+                        <span class="result" id="radio-total">$23,334</span>
+                    </div>
+                    <div class="input-row">
+                        <label>OMT Kit & RF Components</label>
+                        <input type="number" id="rf-cost" value="1243" step="50">
+                        <span class="result" id="rf-total">$1,554</span>
+                    </div>
+                    <div class="input-row">
+                        <label>Antennas 1.2m (2 units)</label>
+                        <input type="number" id="antenna-cost" value="3200" step="100">
+                        <span class="result" id="antenna-total">$4,000</span>
+                    </div>
+                    <div class="input-row">
+                        <label>Installation Materials</label>
+                        <input type="number" id="materials-cost" value="640" step="50">
+                        <span class="result" id="materials-total">$800</span>
+                    </div>
+                    <div class="input-row">
+                        <label><strong>Equipment Margin (%)</strong></label>
+                        <input type="number" id="equipment-margin" value="25" min="0" max="100" step="5">
+                        <span class="result" id="equipment-margin-amount">$5,938</span>
+                    </div>
+                </div>
+                
+                <!-- PM/CM Section -->
+                <div class="input-section">
+                    <h3>👷 หมวด 3: PM/CM & Engineering</h3>
+                    <div class="input-row">
+                        <label>Project Management</label>
+                        <input type="number" id="pm-cost" value="10500" step="500">
+                        <span class="result">$10,500</span>
+                    </div>
+                    <div class="input-row">
+                        <label>Construction Management</label>
+                        <input type="number" id="cm-cost" value="6100" step="500">
+                        <span class="result">$6,100</span>
+                    </div>
+                    <div class="input-row">
+                        <label>Engineering Services</label>
+                        <input type="number" id="eng-cost" value="7000" step="500">
+                        <span class="result">$7,000</span>
+                    </div>
+                </div>
+                
+                <!-- Testing Section -->
+                <div class="input-section">
+                    <h3>🔬 หมวด 4: Testing & Commissioning</h3>
+                    <div class="input-row">
+                        <label>FAT & Pre-FAT</label>
+                        <input type="number" id="fat-cost" value="3500" step="250">
+                        <span class="result">$3,500</span>
+                    </div>
+                    <div class="input-row">
+                        <label>SAT Offshore (7 days)</label>
+                        <input type="number" id="sat-cost" value="7000" step="500">
+                        <span class="result">$7,000</span>
+                    </div>
+                    <div class="input-row">
+                        <label>Training (5 days)</label>
+                        <input type="number" id="training-cost" value="3500" step="250">
+                        <span class="result">$3,500</span>
+                    </div>
+                </div>
+                
+                <!-- SLA Service Section -->
+                <div class="input-section">
+                    <h3>🛡️ หมวด 6: SLA 5-Year Service</h3>
+                    <div class="input-row">
+                        <label>24/7 NOC (per year)</label>
+                        <input type="number" id="noc-cost" value="4200" step="100">
+                        <span class="result" id="noc-5year">$21,000</span>
+                    </div>
+                    <div class="input-row">
+                        <label>Preventive Maint. (per year)</label>
+                        <input type="number" id="pm-maint-cost" value="4000" step="250">
+                        <span class="result" id="pm-5year">$20,000</span>
+                    </div>
+                    <div class="input-row">
+                        <label>Corrective Maint. (per year)</label>
+                        <input type="number" id="cm-maint-cost" value="2400" step="200">
+                        <span class="result" id="cm-5year">$12,000</span>
+                    </div>
+                    <div class="input-row">
+                        <label>Spare Radio Unit (one-time)</label>
+                        <input type="number" id="spare-cost" value="12000" step="1000">
+                        <span class="result">$12,000</span>
+                    </div>
+                </div>
+                
+                <!-- Pricing Strategy -->
+                <div class="input-section" style="background: #e3f2fd;">
+                    <h3>💰 Pricing Strategy</h3>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Target Margin:</span>
+                            <span id="margin-display" style="font-weight: bold; color: #007bff;">25%</span>
+                        </div>
+                        <input type="range" class="slider" id="target-margin" min="0" max="50" value="25" step="5">
+                    </div>
+                    <div class="input-row">
+                        <label><strong>Custom Monthly Price</strong></label>
+                        <input type="number" id="custom-price" value="3500" step="100">
+                        <span class="result" id="custom-margin">25%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Panel: Results -->
+            <div class="panel">
+                <h2>📊 Real-time Analysis</h2>
+                
+                <!-- Summary Box -->
+                <div class="summary-box">
+                    <h3>Executive Summary</h3>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="value" id="total-cost">$167,456</div>
+                            <div class="label">Total Cost (5Y)</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="value" id="monthly-cost">$2,791</div>
+                            <div class="label">Cost/Month</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="value" id="recommended-price">$3,500</div>
+                            <div class="label">Recommended</div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="value" id="profit-5year">$42,544</div>
+                            <div class="label">Profit (5Y)</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pie Chart -->
+                <div class="chart-container">
+                    <canvas id="costChart"></canvas>
+                </div>
+                
+                <!-- Pricing Table -->
+                <table class="pricing-table">
+                    <thead>
+                        <tr>
+                            <th>Pricing Model</th>
+                            <th>Monthly</th>
+                            <th>5-Year Revenue</th>
+                            <th>Net Profit</th>
+                            <th>Margin</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pricing-table-body">
+                        <!-- Will be populated by JavaScript -->
+                    </tbody>
+                </table>
+                
+                <!-- Bar Chart -->
+                <div class="chart-container">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+                
+                <!-- Export Buttons -->
+                <div class="export-section">
+                    <h3>📤 Export Options</h3>
+                    <div class="button-group">
+                        <button class="btn btn-primary" onclick="exportToCSV()">📊 Export to CSV</button>
+                        <button class="btn btn-success" onclick="saveConfiguration()">💾 Save Config</button>
+                        <button class="btn btn-secondary" onclick="resetDefaults()">🔄 Reset Defaults</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bottom Analysis Panel -->
+        <div class="panel">
+            <h2>📈 Detailed Cost Breakdown</h2>
+            <div id="detailed-breakdown">
+                <!-- Will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Global variables
+        let costChart, comparisonChart;
+        
+        // Initialize charts and calculations
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            attachEventListeners();
+            updateCalculations();
+        });
+        
+        function attachEventListeners() {
+            // Add event listeners to all inputs
+            const inputs = document.querySelectorAll('input[type="number"]');
+            inputs.forEach(input => {
+                input.addEventListener('input', updateCalculations);
+            });
+            
+            // Slider event
+            document.getElementById('target-margin').addEventListener('input', function(e) {
+                document.getElementById('margin-display').textContent = e.target.value + '%';
+                updateCalculations();
+            });
+            
+            // Custom price input
+            document.getElementById('custom-price').addEventListener('input', updateCustomMargin);
+        }
+        
+        function updateCalculations() {
+            // Get all input values
+            const radioCost = parseFloat(document.getElementById('radio-cost').value) || 0;
+            const rfCost = parseFloat(document.getElementById('rf-cost').value) || 0;
+            const antennaCost = parseFloat(document.getElementById('antenna-cost').value) || 0;
+            const materialsCost = parseFloat(document.getElementById('materials-cost').value) || 0;
+            const equipmentMargin = parseFloat(document.getElementById('equipment-margin').value) / 100 || 0;
+            
+            const pmCost = parseFloat(document.getElementById('pm-cost').value) || 0;
+            const cmCost = parseFloat(document.getElementById('cm-cost').value) || 0;
+            const engCost = parseFloat(document.getElementById('eng-cost').value) || 0;
+            
+            const fatCost = parseFloat(document.getElementById('fat-cost').value) || 0;
+            const satCost = parseFloat(document.getElementById('sat-cost').value) || 0;
+            const trainingCost = parseFloat(document.getElementById('training-cost').value) || 0;
+            
+            const nocCost = parseFloat(document.getElementById('noc-cost').value) || 0;
+            const pmMaintCost = parseFloat(document.getElementById('pm-maint-cost').value) || 0;
+            const cmMaintCost = parseFloat(document.getElementById('cm-maint-cost').value) || 0;
+            const spareCost = parseFloat(document.getElementById('spare-cost').value) || 0;
+            
+            // Calculate equipment totals with margin
+            const equipmentBase = radioCost + rfCost + antennaCost + materialsCost;
+            const equipmentMarginAmount = equipmentBase * equipmentMargin;
+            const equipmentTotal = equipmentBase + equipmentMarginAmount;
+            
+            // Update equipment displays
+            document.getElementById('radio-total').textContent = `$${((radioCost * 1.25).toLocaleString())}`;
+            document.getElementById('rf-total').textContent = `$${((rfCost * 1.25).toLocaleString())}`;
+            document.getElementById('antenna-total').textContent = `$${((antennaCost * 1.25).toLocaleString())}`;
+            document.getElementById('materials-total').textContent = `$${((materialsCost * 1.25).toLocaleString())}`;
+            document.getElementById('equipment-margin-amount').textContent = `$${(equipmentMarginAmount.toLocaleString())}`;
+            
+            // Calculate 5-year SLA costs
+            const noc5Year = nocCost * 5;
+            const pmMaint5Year = pmMaintCost * 5;
+            const cmMaint5Year = cmMaintCost * 5;
+            const sla5YearTotal = noc5Year + pmMaint5Year + cmMaint5Year + spareCost + 10500; // includes other support
+            
+            document.getElementById('noc-5year').textContent = `$${(noc5Year.toLocaleString())}`;
+            document.getElementById('pm-5year').textContent = `$${(pmMaint5Year.toLocaleString())}`;
+            document.getElementById('cm-5year').textContent = `$${(cmMaint5Year.toLocaleString())}`;
+            
+            // Calculate total costs
+            const oneTimeCosts = equipmentTotal + 500 + // logistics
+                                pmCost + cmCost + engCost +
+                                fatCost + satCost + trainingCost + 1500 + // performance testing
+                                2500 + // licenses
+                                12668; // contingency
+            
+            const totalCost5Year = oneTimeCosts + sla5YearTotal;
+            const monthlyCost = totalCost5Year / 60;
+            
+            // Update summary
+            document.getElementById('total-cost').textContent = `$${(totalCost5Year.toLocaleString())}`;
+            document.getElementById('monthly-cost').textContent = `$${(monthlyCost.toFixed(0))}`;
+            
+            // Calculate recommended price based on target margin
+            const targetMargin = parseFloat(document.getElementById('target-margin').value) / 100;
+            const recommendedPrice = monthlyCost * (1 + targetMargin);
+            document.getElementById('recommended-price').textContent = `$${(recommendedPrice.toFixed(0))}`;
+            
+            const profit5Year = (recommendedPrice * 60) - totalCost5Year;
+            document.getElementById('profit-5year').textContent = `$${(profit5Year.toFixed(0))}`;
+            
+            // Update charts
+            updateCharts(equipmentTotal, pmCost + cmCost + engCost, fatCost + satCost + trainingCost, sla5YearTotal, totalCost5Year);
+            
+            // Update pricing table
+            updatePricingTable(totalCost5Year, monthlyCost);
+            
+            // Update detailed breakdown
+            updateDetailedBreakdown(equipmentTotal, oneTimeCosts, sla5YearTotal, totalCost5Year);
+        }
+        
+        function updateCustomMargin() {
+            const customPrice = parseFloat(document.getElementById('custom-price').value) || 0;
+            const totalCost = parseFloat(document.getElementById('total-cost').textContent.replace('$', '').replace(',', '')) || 0;
+            const monthlyCost = totalCost / 60;
+            const customMargin = ((customPrice - monthlyCost) / monthlyCost * 100).toFixed(1);
+            document.getElementById('custom-margin').textContent = customMargin + '%';
+        }
+        
+        function initializeCharts() {
+            // Cost breakdown pie chart
+            const ctx1 = document.getElementById('costChart').getContext('2d');
+            costChart = new Chart(ctx1, {
+                type: 'pie',
+                data: {
+                    labels: ['Equipment', 'PM/CM/Eng', 'Testing', 'SLA Service', 'Others'],
+                    datasets: [{
+                        data: [29688, 23600, 15500, 81500, 17168],
+                        backgroundColor: [
+                            '#FF6384',
+                            '#36A2EB',
+                            '#FFCE56',
+                            '#4BC0C0',
+                            '#9966FF'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((value / total) * 100).toFixed(1);
+                                    return `${label}: $${value.toLocaleString()} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Comparison bar chart
+            const ctx2 = document.getElementById('comparisonChart').getContext('2d');
+            comparisonChart = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['Total Cost', 'Break-even', 'Conservative', 'Recommended', 'Aggressive'],
+                    datasets: [{
+                        label: '5-Year Value',
+                        data: [167456, 167456, 200947, 210000, 225333],
+                        backgroundColor: [
+                            '#6c757d',
+                            '#ffc107',
+                            '#17a2b8',
+                            '#28a745',
+                            '#007bff'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateCharts(equipment, pmcm, testing, sla, total) {
+            // Update pie chart
+            const others = total - equipment - pmcm - testing - sla;
+            costChart.data.datasets[0].data = [equipment, pmcm, testing, sla, others];
+            costChart.update();
+            
+            // Update bar chart based on new total
+            const breakeven = total;
+            const conservative = total * 1.20;
+            const recommended = total * 1.25;
+            const aggressive = total * 1.35;
+            
+            comparisonChart.data.datasets[0].data = [total, breakeven, conservative, recommended, aggressive];
+            comparisonChart.update();
+        }
+        
+        function updatePricingTable(totalCost, monthlyCost) {
+            const tbody = document.getElementById('pricing-table-body');
+            const models = [
+                { name: 'Break-even', margin: 0 },
+                { name: 'Conservative', margin: 0.20 },
+                { name: 'Recommended', margin: 0.25, recommended: true },
+                { name: 'Aggressive', margin: 0.35 }
+            ];
+            
+            let html = '';
+            models.forEach(model => {
+                const monthlyPrice = monthlyCost * (1 + model.margin);
+                const revenue5Year = monthlyPrice * 60;
+                const profit = revenue5Year - totalCost;
+                const profitClass = profit > 0 ? 'profit' : (profit < 0 ? 'loss' : '');
+                const rowClass = model.recommended ? 'recommended' : '';
+                
+                html += `
+                    <tr class="${rowClass}">
+                        <td><strong>${model.name}</strong></td>
+                        <td>$${monthlyPrice.toFixed(0)}</td>
+                        <td>$${revenue5Year.toLocaleString()}</td>
+                        <td class="${profitClass}">$${profit.toFixed(0)}</td>
+                        <td>${(model.margin * 100).toFixed(0)}%</td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = html;
+        }
+        
+        function updateDetailedBreakdown(equipment, oneTime, sla, total) {
+            const breakdown = document.getElementById('detailed-breakdown');
+            
+            const html = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px;">
+                        <h4 style="color: #495057; margin-bottom: 10px;">One-time Costs</h4>
+                        <p style="font-size: 1.5em; font-weight: bold; color: #007bff;">$${oneTime.toLocaleString()}</p>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px;">
+                        <h4 style="color: #495057; margin-bottom: 10px;">5-Year Service</h4>
+                        <p style="font-size: 1.5em; font-weight: bold; color: #28a745;">$${sla.toLocaleString()}</p>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px;">
+                        <h4 style="color: #495057; margin-bottom: 10px;">Total 5-Year</h4>
+                        <p style="font-size: 1.5em; font-weight: bold; color: #dc3545;">$${total.toLocaleString()}</p>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px;">
+                        <h4 style="color: #495057; margin-bottom: 10px;">Break-even Month</h4>
+                        <p style="font-size: 1.5em; font-weight: bold; color: #6c757d;">Month ${Math.ceil(oneTime / (total/60))}</p>
+                    </div>
+                </div>
+            `;
+            
+            breakdown.innerHTML = html;
+        }
+        
+        function exportToCSV() {
+            const totalCost = document.getElementById('total-cost').textContent;
+            const monthlyCost = document.getElementById('monthly-cost').textContent;
+            const recommendedPrice = document.getElementById('recommended-price').textContent;
+            
+            let csv = 'Category,Item,Value\n';
+            csv += `Summary,Total Cost (5Y),${totalCost}\n`;
+            csv += `Summary,Monthly Cost,${monthlyCost}\n`;
+            csv += `Summary,Recommended Price,${recommendedPrice}\n`;
+            csv += '\n';
+            
+            // Add all input values
+            const inputs = document.querySelectorAll('input[type="number"]');
+            inputs.forEach(input => {
+                const label = input.parentElement.querySelector('label').textContent;
+                csv += `Input,${label},${input.value}\n`;
+            });
+            
+            // Create download link
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'addvalue_cost_analysis.csv';
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+        
+        function saveConfiguration() {
+            const config = {};
+            const inputs = document.querySelectorAll('input[type="number"]');
+            inputs.forEach(input => {
+                config[input.id] = input.value;
+            });
+            
+            const json = JSON.stringify(config, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'addvalue_config.json';
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            alert('Configuration saved! You can load this file later to restore these values.');
+        }
+        
+        function resetDefaults() {
+            if (confirm('Reset all values to defaults?')) {
+                document.getElementById('radio-cost').value = 18667;
+                document.getElementById('rf-cost').value = 1243;
+                document.getElementById('antenna-cost').value = 3200;
+                document.getElementById('materials-cost').value = 640;
+                document.getElementById('equipment-margin').value = 25;
+                document.getElementById('pm-cost').value = 10500;
+                document.getElementById('cm-cost').value = 6100;
+                document.getElementById('eng-cost').value = 7000;
+                document.getElementById('fat-cost').value = 3500;
+                document.getElementById('sat-cost').value = 7000;
+                document.getElementById('training-cost').value = 3500;
+                document.getElementById('noc-cost').value = 4200;
+                document.getElementById('pm-maint-cost').value = 4000;
+                document.getElementById('cm-maint-cost').value = 2400;
+                document.getElementById('spare-cost').value = 12000;
+                document.getElementById('target-margin').value = 25;
+                document.getElementById('custom-price').value = 3500;
+                document.getElementById('margin-display').textContent = '25%';
+                
+                updateCalculations();
+            }
+        }
+    </script>
+</body>
+</html>

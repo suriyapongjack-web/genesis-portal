@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Addvalue ERP Service & Product Code System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .logo { 
+            font-size: 24px; 
+            font-weight: bold; 
+            color: #764ba2;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle { 
+            color: #666; 
+            font-size: 14px; 
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+        }
+        
+        .sidebar {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-height: calc(100vh - 140px);
+            overflow-y: auto;
+        }
+        
+        .content {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .code-builder {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .code-result {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .code-display {
+            font-size: 32px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-success {
+            background: #48bb78;
+            color: white;
+        }
+        
+        .btn-warning {
+            background: #ed8936;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #f56565;
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .code-tree {
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            color: #333;
+        }
+        
+        .tree-item {
+            padding: 3px 0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .tree-item:hover {
+            background: #f0f0f0;
+            border-radius: 3px;
+        }
+        
+        .tree-item.selected {
+            background: #667eea;
+            color: white;
+            border-radius: 3px;
+            padding: 3px 5px;
+        }
+        
+        .code-badge {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .history-table th,
+        .history-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .history-table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        .history-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 5px;
+        }
+        
+        .modifier-chips {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        
+        .chip {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .chip.selected {
+            background: #667eea;
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🏢 Addvalue ERP Service & Product Code System</div>
+            <div class="subtitle">ระบบจัดการรหัสบริการและผลิตภัณฑ์ | Version 2.0</div>
+        </div>
+        
+        <div class="main-grid">
+            <div class="sidebar">
+                <h3 style="margin-bottom: 15px; color: #667eea;">📋 โครงสร้างรหัส</h3>
+                <div class="code-tree" id="codeTree">
+                    <div class="tree-item" data-code="SV" data-desc="Service">├─ SV (Service)</div>
+                    <div class="tree-item" data-code="SV-FLD" data-desc="Field Service">│ ├─ FLD (Field Service)</div>
+                    <div class="tree-item" data-code="SV-FLD-SSUR" data-desc="Site Survey">│ │ ├─ SSUR (Site Survey)</div>
+                    <div class="tree-item" data-code="SV-FLD-INST" data-desc="Installation">│ │ ├─ INST (Installation)</div>
+                    <div class="tree-item" data-code="SV-FLD-COMM" data-desc="Commissioning">│ │ ├─ COMM (Commissioning)</div>
+                    <div class="tree-item" data-code="SV-FLD-PFAT" data-desc="Pre-FAT">│ │ ├─ PFAT (Pre-FAT)</div>
+                    <div class="tree-item" data-code="SV-FLD-FAT" data-desc="Factory Acceptance Test">│ │ ├─ FAT (Factory Acceptance Test)</div>
+                    <div class="tree-item" data-code="SV-FLD-SAT" data-desc="Site Acceptance Test">│ │ ├─ SAT (Site Acceptance Test)</div>
+                    <div class="tree-item" data-code="SV-FLD-PREV" data-desc="Preventive Maintenance">│ │ ├─ PREV (Preventive Maintenance)</div>
+                    <div class="tree-item" data-code="SV-FLD-CORR" data-desc="Corrective Maintenance">│ │ ├─ CORR (Corrective Maintenance)</div>
+                    <div class="tree-item" data-code="SV-FLD-MOBI" data-desc="Mobilization">│ │ ├─ MOBI (Mobilization)</div>
+                    <div class="tree-item" data-code="SV-FLD-DEMO" data-desc="Demobilization">│ │ └─ DEMO (Demobilization)</div>
+                    <div class="tree-item" data-code="SV-WKS" data-desc="Workshop Service">│ ├─ WKS (Workshop Service)</div>
+                    <div class="tree-item" data-code="SV-WKS-CNFG" data-desc="Configuration">│ │ ├─ CNFG (Configuration)</div>
+                    <div class="tree-item" data-code="SV-WKS-RPR" data-desc="Repair">│ │ ├─ RPR (Repair)</div>
+                    <div class="tree-item" data-code="SV-WKS-TEST" data-desc="Internal Testing">│ │ └─ TEST (Internal Testing)</div>
+                    <div class="tree-item" data-code="SV-REM" data-desc="Remote Service">│ └─ REM (Remote Service)</div>
+                    <div class="tree-item" data-code="SV-REM-SUPP" data-desc="Remote Support">│   ├─ SUPP (Remote Support)</div>
+                    <div class="tree-item" data-code="SV-REM-DIAG" data-desc="Remote Diagnostic">│   └─ DIAG (Remote Diagnostic)</div>
+                    <div class="tree-item" data-code="DC" data-desc="Document">├─ DC (Document)</div>
+                    <div class="tree-item" data-code="DC-GA" data-desc="General Arrangement Drawing">│ ├─ GA (General Arrangement)</div>
+                    <div class="tree-item" data-code="DC-SCH" data-desc="Schematic Diagrams">│ ├─ SCH (Schematic Diagrams)</div>
+                    <div class="tree-item" data-code="DC-DTS" data-desc="Data Sheets">│ ├─ DTS (Data Sheets)</div>
+                    <div class="tree-item" data-code="DC-CAL" data-desc="Calculation Sheet">│ ├─ CAL (Calculation Sheet)</div>
+                    <div class="tree-item" data-code="DC-PDR" data-desc="Procedure Document">│ ├─ PDR (Procedure Document)</div>
+                    <div class="tree-item" data-code="DC-ITP" data-desc="Inspection and Test Plan">│ ├─ ITP (Inspection & Test Plan)</div>
+                    <div class="tree-item" data-code="DC-RPT" data-desc="Report">│ ├─ RPT (Report)</div>
+                    <div class="tree-item" data-code="DC-MNL" data-desc="Manual">│ └─ MNL (Manual)</div>
+                    <div class="tree-item" data-code="PM" data-desc="Project Management">├─ PM (Project Management)</div>
+                    <div class="tree-item" data-code="PM-GEN" data-desc="General Project Management">│ ├─ GEN (General PM)</div>
+                    <div class="tree-item" data-code="PM-REP" data-desc="Reporting & Progress Update">│ ├─ REP (Reporting)</div>
+                    <div class="tree-item" data-code="PM-SCHD" data-desc="Scheduling">│ └─ SCHD (Scheduling)</div>
+                    <div class="tree-item" data-code="EX" data-desc="Expense">├─ EX (Expense)</div>
+                    <div class="tree-item" data-code="EX-TRV" data-desc="Travel">│ ├─ TRV (Travel)</div>
+                    <div class="tree-item" data-code="EX-TRV-FLT-DOM" data-desc="Domestic Flight">│ │ ├─ FLT-DOM (Domestic Flight)</div>
+                    <div class="tree-item" data-code="EX-TRV-FLT-INT" data-desc="International Flight">│ │ ├─ FLT-INT (Int'l Flight)</div>
+                    <div class="tree-item" data-code="EX-TRV-CAR-RNT" data-desc="Car Rental">│ │ └─ CAR-RNT (Car Rental)</div>
+                    <div class="tree-item" data-code="EX-ACC" data-desc="Accommodation">│ └─ ACC (Accommodation)</div>
+                    <div class="tree-item" data-code="EX-ACC-HTL" data-desc="Hotel">│   └─ HTL (Hotel)</div>
+                </div>
+            </div>
+            
+            <div class="content">
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('builder')">🔨 Code Builder</button>
+                    <button class="tab" onclick="switchTab('lookup')">🔍 Code Lookup</button>
+                    <button class="tab" onclick="switchTab('history')">📊 History</button>
+                </div>
+                
+                <div id="builderTab" class="tab-content active">
+                    <div class="code-builder">
+                        <h3 style="margin-bottom: 20px; color: #667eea;">สร้างรหัสบริการ</h3>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div class="form-group">
+                                <label>หมวดหลัก</label>
+                                <select id="mainCategory" onchange="updateSubCategory()">
+                                    <option value="">เลือกหมวดหลัก</option>
+                                    <option value="SV">SV - Service</option>
+                                    <option value="DC">DC - Document</option>
+                                    <option value="PM">PM - Project Management</option>
+                                    <option value="EX">EX - Expense</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>หมวดย่อย</label>
+                                <select id="subCategory" onchange="updateServiceType()">
+                                    <option value="">เลือกหมวดย่อย</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>ประเภทบริการ</label>
+                                <select id="serviceType" onchange="generateCode()">
+                                    <option value="">เลือกประเภทบริการ</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>Project Code</label>
+                                <input type="text" id="projectCode" placeholder="เช่น P2025-001" onkeyup="generateCode()">
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 20px;">
+                            <label>Modifiers (เลือกได้หลายตัว)</label>
+                            <div class="modifier-chips">
+                                <div class="chip" data-mod="L1">L1 - Technician</div>
+                                <div class="chip" data-mod="L2">L2 - Engineer</div>
+                                <div class="chip" data-mod="L3">L3 - Sr. Engineer</div>
+                                <div class="chip" data-mod="ON">ON - Onshore</div>
+                                <div class="chip" data-mod="OFF">OFF - Offshore</div>
+                                <div class="chip" data-mod="D">D - Day Unit</div>
+                                <div class="chip" data-mod="H">H - Hour Unit</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label>Quantity</label>
+                            <input type="number" id="quantity" value="1" min="1" onchange="generateCode()">
+                        </div>
+                    </div>
+                    
+                    <div class="code-result">
+                        <div>Generated Code</div>
+                        <div class="code-display" id="generatedCode">-</div>
+                        <div id="codeDescription" style="font-size: 14px; margin-top: 10px;">กรุณาเลือกข้อมูลเพื่อสร้างรหัส</div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-success" onclick="saveCode()">💾 บันทึกรหัส</button>
+                        <button class="btn btn-primary" onclick="copyCode()">📋 Copy รหัส</button>
+                        <button class="btn btn-warning" onclick="clearForm()">🔄 Clear</button>
+                    </div>
+                </div>
+                
+                <div id="lookupTab" class="tab-content">
+                    <div class="code-builder">
+                        <h3 style="margin-bottom: 20px; color: #667eea;">ค้นหารหัส</h3>
+                        <div class="form-group">
+                            <label>ใส่รหัสที่ต้องการค้นหา</label>
+                            <input type="text" id="lookupCode" placeholder="เช่น SV-FLD-INST-L2-ON-D">
+                        </div>
+                        <button class="btn btn-primary" onclick="lookupCode()">🔍 ค้นหา</button>
+                        
+                        <div id="lookupResult" style="margin-top: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px; display: none;">
+                            <!-- Lookup results will appear here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="historyTab" class="tab-content">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalCodes">0</div>
+                            <div class="stat-label">Total Codes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="todaysCodes">0</div>
+                            <div class="stat-label">Today's Codes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="mostUsed">-</div>
+                            <div class="stat-label">Most Used Category</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px;">
+                        <h3 style="margin-bottom: 15px;">📜 ประวัติการสร้างรหัส</h3>
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Description</th>
+                                    <th>Project</th>
+                                    <th>Date/Time</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTable">
+                                <!-- History rows will be added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Data structure for categories
+        const categoryData = {
+            'SV': {
+                name: 'Service',
+                subcategories: {
+                    'FLD': {
+                        name: 'Field Service',
+                        types: {
+                            'SSUR': 'Site Survey',
+                            'INST': 'Installation',
+                            'COMM': 'Commissioning',
+                            'PFAT': 'Pre-FAT',
+                            'FAT': 'Factory Acceptance Test',
+                            'SAT': 'Site Acceptance Test',
+                            'PREV': 'Preventive Maintenance',
+                            'CORR': 'Corrective Maintenance',
+                            'MOBI': 'Mobilization',
+                            'DEMO': 'Demobilization'
+                        }
+                    },
+                    'WKS': {
+                        name: 'Workshop Service',
+                        types: {
+                            'CNFG': 'Configuration',
+                            'RPR': 'Repair',
+                            'TEST': 'Internal Testing'
+                        }
+                    },
+                    'REM': {
+                        name: 'Remote Service',
+                        types: {
+                            'SUPP': 'Remote Support',
+                            'DIAG': 'Remote Diagnostic'
+                        }
+                    }
+                }
+            },
+            'DC': {
+                name: 'Document',
+                subcategories: {
+                    'VDRS': {
+                        name: 'VDRS Documents',
+                        types: {
+                            'GA': 'General Arrangement Drawing',
+                            'SCH': 'Schematic Diagrams',
+                            'DTS': 'Data Sheets',
+                            'CAL': 'Calculation Sheet',
+                            'PDR': 'Procedure Document',
+                            'ITP': 'Inspection and Test Plan',
+                            'RPT': 'Report',
+                            'MNL': 'Manual'
+                        }
+                    }
+                }
+            },
+            'PM': {
+                name: 'Project Management',
+                subcategories: {
+                    'MGMT': {
+                        name: 'Management',
+                        types: {
+                            'GEN': 'General Project Management',
+                            'REP': 'Reporting & Progress Update',
+                            'SCHD': 'Scheduling'
+                        }
+                    }
+                }
+            },
+            'EX': {
+                name: 'Expense',
+                subcategories: {
+                    'TRV': {
+                        name: 'Travel',
+                        types: {
+                            'FLT-DOM': 'Domestic Flight',
+                            'FLT-INT': 'International Flight',
+                            'CAR-RNT': 'Car Rental'
+                        }
+                    },
+                    'ACC': {
+                        name: 'Accommodation',
+                        types: {
+                            'HTL': 'Hotel'
+                        }
+                    }
+                }
+            }
+        };
+        
+        let codeHistory = [];
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadHistory();
+            updateStats();
+            
+            // Setup modifier chips
+            document.querySelectorAll('.chip').forEach(chip => {
+                chip.addEventListener('click', function() {
+                    this.classList.toggle('selected');
+                    generateCode();
+                });
+            });
+            
+            // Setup tree item clicks
+            document.querySelectorAll('.tree-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    document.querySelectorAll('.tree-item').forEach(i => i.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    const code = this.dataset.code;
+                    const desc = this.dataset.desc;
+                    
+                    // Auto-fill builder
+                    autoFillBuilder(code);
+                });
+            });
+        });
+        
+        function updateSubCategory() {
+            const main = document.getElementById('mainCategory').value;
+            const subSelect = document.getElementById('subCategory');
+            const typeSelect = document.getElementById('serviceType');
+            
+            subSelect.innerHTML = '<option value="">เลือกหมวดย่อย</option>';
+            typeSelect.innerHTML = '<option value="">เลือกประเภทบริการ</option>';
+            
+            if (main && categoryData[main]) {
+                Object.keys(categoryData[main].subcategories).forEach(key => {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = key + ' - ' + categoryData[main].subcategories[key].name;
+                    subSelect.appendChild(option);
+                });
+            }
+            
+            generateCode();
+        }
+        
+        function updateServiceType() {
+            const main = document.getElementById('mainCategory').value;
+            const sub = document.getElementById('subCategory').value;
+            const typeSelect = document.getElementById('serviceType');
+            
+            typeSelect.innerHTML = '<option value="">เลือกประเภทบริการ</option>';
+            
+            if (main && sub && categoryData[main] && categoryData[main].subcategories[sub]) {
+                const types = categoryData[main].subcategories[sub].types;
+                Object.keys(types).forEach(key => {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = key + ' - ' + types[key];
+                    typeSelect.appendChild(option);
+                });
+            }
+            
+            generateCode();
+        }
+        
+        function generateCode() {
+            const main = document.getElementById('mainCategory').value;
+            const sub = document.getElementById('subCategory').value;
+            const type = document.getElementById('serviceType').value;
+            const project = document.getElementById('projectCode').value;
+            const quantity = document.getElementById('quantity').value;
+            
+            let code = '';
+            let description = '';
+            
+            if (main) {
+                code = main;
+                description = categoryData[main].name;
+                
+                if (sub) {
+                    code += '-' + sub;
+                    description += ' > ' + categoryData[main].subcategories[sub].name;
+                    
+                    if (type) {
+                        code += '-' + type;
+                        description += ' > ' + categoryData[main].subcategories[sub].types[type];
+                    }
+                }
+            }
+            
+            // Add modifiers
+            const selectedModifiers = [];
+            document.querySelectorAll('.chip.selected').forEach(chip => {
+                selectedModifiers.push(chip.dataset.mod);
+            });
+            
+            if (selectedModifiers.length > 0) {
+                code += '-' + selectedModifiers.join('-');
+            }
+            
+            // Add project code if provided
+            if (project) {
+                code += '-[' + project + ']';
+            }
+            
+            // Add quantity if more than 1
+            if (quantity && quantity > 1) {
+                code += '-QTY' + quantity;
+            }
+            
+            document.getElementById('generatedCode').textContent = code || '-';
+            document.getElementById('codeDescription').textContent = description || 'กรุณาเลือกข้อมูลเพื่อสร้างรหัส';
+        }
+        
+        function saveCode() {
+            const code = document.getElementById('generatedCode').textContent;
+            if (code === '-') {
+                alert('กรุณาสร้างรหัสก่อนบันทึก');
+                return;
+            }
+            
+            const description = document.getElementById('codeDescription').textContent;
+            const project = document.getElementById('projectCode').value || 'N/A';
+            
+            const entry = {
+                code: code,
+                description: description,
+                project: project,
+                datetime: new Date().toISOString()
+            };
+            
+            codeHistory.unshift(entry);
+            saveHistory();
+            updateHistoryTable();
+            updateStats();
+            
+            alert('บันทึกรหัส ' + code + ' สำเร็จ!');
+        }
+        
+        function copyCode() {
+            const code = document.getElementById('generatedCode').textContent;
+            if (code === '-') {
+                alert('ไม่มีรหัสให้ copy');
+                return;
+            }
+            
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Copy รหัส ' + code + ' สำเร็จ!');
+            });
+        }
+        
+        function clearForm() {
+            document.getElementById('mainCategory').value = '';
+            document.getElementById('subCategory').innerHTML = '<option value="">เลือกหมวดย่อย</option>';
+            document.getElementById('serviceType').innerHTML = '<option value="">เลือกประเภทบริการ</option>';
+            document.getElementById('projectCode').value = '';
+            document.getElementById('quantity').value = '1';
+            document.querySelectorAll('.chip.selected').forEach(chip => {
+                chip.classList.remove('selected');
+            });
+            generateCode();
+        }
+        
+        function autoFillBuilder(code) {
+            const parts = code.split('-');
+            
+            // Clear form first
+            clearForm();
+            
+            // Fill main category
+            if (parts[0] && categoryData[parts[0]]) {
+                document.getElementById('mainCategory').value = parts[0];
+                updateSubCategory();
+                
+                // Fill subcategory
+                if (parts[1] && categoryData[parts[0]].subcategories[parts[1]]) {
+                    document.getElementById('subCategory').value = parts[1];
+                    updateServiceType();
+                    
+                    // Fill service type
+                    if (parts[2]) {
+                        const possibleType = parts.slice(2).join('-');
+                        const types = categoryData[parts[0]].subcategories[parts[1]].types;
+                        if (types[possibleType]) {
+                            document.getElementById('serviceType').value = possibleType;
+                        } else if (types[parts[2]]) {
+                            document.getElementById('serviceType').value = parts[2];
+                        }
+                    }
+                }
+            }
+            
+            generateCode();
+        }
+        
+        function lookupCode() {
+            const code = document.getElementById('lookupCode').value.trim();
+            const resultDiv = document.getElementById('lookupResult');
+            
+            if (!code) {
+                alert('กรุณาใส่รหัสที่ต้องการค้นหา');
+                return;
+            }
+            
+            resultDiv.style.display = 'block';
+            
+            const parts = code.split('-');
+            let breakdown = '<h4>📊 การแยกส่วนประกอบรหัส</h4>';
+            breakdown += '<table style="width: 100%; margin-top: 10px;">';
+            breakdown += '<tr><th style="background: #667eea; color: white; padding: 10px;">ส่วนประกอบ</th>';
+            breakdown += '<th style="background: #667eea; color: white; padding: 10px;">ความหมาย</th></tr>';
+            
+            parts.forEach((part, index) => {
+                let meaning = 'Unknown';
+                
+                // Check main categories
+                if (index === 0 && categoryData[part]) {
+                    meaning = categoryData[part].name;
+                }
+                // Check subcategories
+                else if (index === 1) {
+                    const main = parts[0];
+                    if (categoryData[main] && categoryData[main].subcategories[part]) {
+                        meaning = categoryData[main].subcategories[part].name;
+                    }
+                }
+                // Check modifiers
+                else if (['L1', 'L2', 'L3', 'ON', 'OFF', 'D', 'H'].includes(part)) {
+                    const modifierMeanings = {
+                        'L1': 'Technician Level',
+                        'L2': 'Engineer Level',
+                        'L3': 'Senior Engineer Level',
+                        'ON': 'Onshore',
+                        'OFF': 'Offshore',
+                        'D': 'Day Unit',
+                        'H': 'Hour Unit'
+                    };
+                    meaning = modifierMeanings[part] || part;
+                }
+                // Check if it's a project code
+                else if (part.startsWith('[') && part.endsWith(']')) {
+                    meaning = 'Project Code: ' + part.slice(1, -1);
+                }
+                // Check if it's quantity
+                else if (part.startsWith('QTY')) {
+                    meaning = 'Quantity: ' + part.slice(3);
+                }
+                else {
+                    meaning = part;
+                }
+                
+                breakdown += `<tr><td style="padding: 10px; border: 1px solid #ddd;">${part}</td>`;
+                breakdown += `<td style="padding: 10px; border: 1px solid #ddd;">${meaning}</td></tr>`;
+            });
+            
+            breakdown += '</table>';
+            
+            // Check if code exists in history
+            const exists = codeHistory.find(h => h.code === code);
+            if (exists) {
+                breakdown += '<div style="margin-top: 15px; padding: 10px; background: #48bb78; color: white; border-radius: 5px;">';
+                breakdown += '✅ รหัสนี้เคยถูกใช้งาน: ' + new Date(exists.datetime).toLocaleString('th-TH');
+                breakdown += '</div>';
+            }
+            
+            resultDiv.innerHTML = breakdown;
+        }
+        
+        function switchTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(tab + 'Tab').classList.add('active');
+            
+            if (tab === 'history') {
+                updateHistoryTable();
+                updateStats();
+            }
+        }
+        
+        function updateHistoryTable() {
+            const tbody = document.getElementById('historyTable');
+            tbody.innerHTML = '';
+            
+            codeHistory.slice(0, 10).forEach(entry => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td style="font-family: monospace; font-weight: bold;">${entry.code}</td>
+                    <td>${entry.description}</td>
+                    <td>${entry.project}</td>
+                    <td>${new Date(entry.datetime).toLocaleString('th-TH')}</td>
+                    <td>
+                        <button class="btn btn-primary" style="padding: 5px 10px;" onclick="copyHistoryCode('${entry.code}')">📋</button>
+                    </td>
+                `;
+            });
+            
+            if (codeHistory.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px;">ยังไม่มีประวัติการใช้งาน</td></tr>';
+            }
+        }
+        
+        function copyHistoryCode(code) {
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Copy รหัส ' + code + ' สำเร็จ!');
+            });
+        }
+        
+        function updateStats() {
+            // Total codes
+            document.getElementById('totalCodes').textContent = codeHistory.length;
+            
+            // Today's codes
+            const today = new Date().toDateString();
+            const todaysCodes = codeHistory.filter(h => 
+                new Date(h.datetime).toDateString() === today
+            ).length;
+            document.getElementById('todaysCodes').textContent = todaysCodes;
+            
+            // Most used category
+            if (codeHistory.length > 0) {
+                const categories = {};
+                codeHistory.forEach(h => {
+                    const mainCat = h.code.split('-')[0];
+                    categories[mainCat] = (categories[mainCat] || 0) + 1;
+                });
+                
+                const mostUsed = Object.keys(categories).reduce((a, b) => 
+                    categories[a] > categories[b] ? a : b
+                );
+                document.getElementById('mostUsed').textContent = mostUsed;
+            } else {
+                document.getElementById('mostUsed').textContent = '-';
+            }
+        }
+        
+        function saveHistory() {
+            localStorage.setItem('erpCodeHistory', JSON.stringify(codeHistory));
+        }
+        
+        function loadHistory() {
+            const saved = localStorage.getItem('erpCodeHistory');
+            if (saved) {
+                codeHistory = JSON.parse(saved);
+            }
+        }
+        
+        // Export/Import functions
+        function exportData() {
+            const data = {
+                history: codeHistory,
+                exportDate: new Date().toISOString(),
+                version: '2.0'
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'erp_codes_' + new Date().toISOString().split('T')[0] + '.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>

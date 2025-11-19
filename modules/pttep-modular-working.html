@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PTTEP Portfolio Management System - Modular</title>
+    
+    <!-- External Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        /* Embedded CSS to avoid 404 */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        #app-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        #app-header h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        
+        #app-header p {
+            color: #64748b;
+        }
+        
+        #app-navigation {
+            background: white;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        .tab-button {
+            padding: 15px 30px;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .tab-button:hover {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .tab-button.active {
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.08);
+        }
+        
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+        
+        #app-content {
+            background: white;
+            border-radius: 0 0 12px 12px;
+            padding: 30px;
+            min-height: 500px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        
+        #loading-spinner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        #loading-spinner.hidden {
+            display: none;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #fff, #f9fafb);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .data-table th {
+            background: #f8fafc;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+        }
+        
+        .data-table td {
+            padding: 12px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .data-table tbody tr:hover {
+            background: #f8fafc;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-info {
+            background: #3b82f6;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div id="app-header">
+            <h1>PTTEP Portfolio Management System</h1>
+            <p>Modular Architecture with External Database</p>
+        </div>
+
+        <!-- Navigation -->
+        <nav id="app-navigation">
+            <button class="tab-button active" data-tab="dashboard">Dashboard</button>
+            <button class="tab-button" data-tab="data">Data Management</button>
+            <button class="tab-button" data-tab="analytics">Analytics</button>
+            <button class="tab-button" data-tab="reports">Reports</button>
+        </nav>
+
+        <!-- Content -->
+        <main id="app-content">
+            <!-- Content will be loaded here -->
+        </main>
+
+        <!-- Loading Spinner -->
+        <div id="loading-spinner" class="hidden">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <script>
+    // Embedded Database Configuration
+    const DatabaseConfig = {
+        connection: {
+            type: 'localStorage',
+            dbName: 'PTTEP_Portfolio_DB',
+            version: 1.0
+        },
+        tables: {
+            purchase_orders: 'purchase_orders'
+        }
+    };
+
+    // Embedded App Configuration  
+    const AppConfig = {
+        app: {
+            name: 'PTTEP Portfolio Management System',
+            version: '2.0.0'
+        },
+        ui: {
+            itemsPerPage: 10,
+            primaryColor: '#667eea',
+            secondaryColor: '#764ba2'
+        }
+    };
+
+    // Sample Data
+    const sampleData = [
+        {
+            item: 31,
+            date: '2023-05-25',
+            po: '4700028986',
+            client: 'Carigali-PTTEPI Operating Company Sdn Bhd',
+            project: 'MOD-19/010',
+            title: 'PROVISION OF MANPOWER AND EQUIPMENT SUPPLY',
+            value_thb: 475000,
+            value_usd: 13571.43,
+            status: 'delivered'
+        },
+        {
+            item: 30,
+            date: '2023-05-03',
+            po: '3450044753',
+            client: 'PTTEP Energy Development Company Limited',
+            project: '1602 PTTEP ED BG2',
+            title: 'Provision of Site Survey ATEX CCTV',
+            value_thb: 384000,
+            value_usd: 11294.12,
+            status: 'delivered'
+        },
+        {
+            item: 29,
+            date: '2019-12-11',
+            po: '3500058102',
+            client: 'PTT Exploration and Production Public Co., Ltd.',
+            project: '1201 PTTEP Arthit',
+            title: 'LTE-U Connectorized Equipment',
+            value_thb: 198316.2,
+            value_usd: 6610.54,
+            status: 'delivered'
+        }
+    ];
+
+    // Simple Database Handler
+    class DatabaseConnection {
+        constructor() {
+            this.config = DatabaseConfig;
+            this.db = window.localStorage;
+        }
+
+        async connect() {
+            // Initialize with sample data if empty
+            if (!this.db.getItem(this.config.tables.purchase_orders)) {
+                this.db.setItem(this.config.tables.purchase_orders, JSON.stringify(sampleData));
+            }
+            return true;
+        }
+
+        async query(operation) {
+            const tableName = this.config.tables.purchase_orders;
+            const data = JSON.parse(this.db.getItem(tableName) || '[]');
+            
+            switch(operation) {
+                case 'getAll':
+                    return data;
+                case 'getStats':
+                    return {
+                        total: data.length,
+                        totalValue: data.reduce((sum, item) => sum + item.value_thb, 0),
+                        totalUSD: data.reduce((sum, item) => sum + item.value_usd, 0)
+                    };
+                default:
+                    return data;
+            }
+        }
+    }
+
+    // Main Application
+    const PTTEPApp = {
+        db: new DatabaseConnection(),
+        currentTab: 'dashboard',
+        data: [],
+
+        async init() {
+            console.log('Initializing PTTEP Modular System...');
+            
+            // Connect to database
+            await this.db.connect();
+            
+            // Load data
+            this.data = await this.db.query('getAll');
+            
+            // Setup event listeners
+            this.setupEventListeners();
+            
+            // Render initial view
+            this.renderTab('dashboard');
+            
+            console.log('System initialized successfully');
+        },
+
+        setupEventListeners() {
+            // Tab navigation
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const tab = e.target.dataset.tab;
+                    this.switchTab(tab);
+                });
+            });
+        },
+
+        switchTab(tab) {
+            // Update active tab
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tab);
+            });
+            
+            this.currentTab = tab;
+            this.renderTab(tab);
+        },
+
+        renderTab(tab) {
+            const content = document.getElementById('app-content');
+            
+            switch(tab) {
+                case 'dashboard':
+                    this.renderDashboard(content);
+                    break;
+                case 'data':
+                    this.renderDataManagement(content);
+                    break;
+                case 'analytics':
+                    this.renderAnalytics(content);
+                    break;
+                case 'reports':
+                    this.renderReports(content);
+                    break;
+            }
+        },
+
+        renderDashboard(container) {
+            const stats = {
+                total: this.data.length,
+                totalValue: this.data.reduce((sum, item) => sum + item.value_thb, 0),
+                totalUSD: this.data.reduce((sum, item) => sum + item.value_usd, 0),
+                clients: new Set(this.data.map(item => item.client.split('(')[0])).size
+            };
+
+            container.innerHTML = `
+                <h2>Dashboard Overview</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.total}</div>
+                        <div class="stat-label">Total Orders</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">฿${(stats.totalValue/1000000).toFixed(1)}M</div>
+                        <div class="stat-label">Total THB</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">$${(stats.totalUSD/1000).toFixed(0)}K</div>
+                        <div class="stat-label">Total USD</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${stats.clients}</div>
+                        <div class="stat-label">Clients</div>
+                    </div>
+                </div>
+                
+                <h3 style="margin-top: 30px;">Recent Orders</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>PO Number</th>
+                            <th>Client</th>
+                            <th>Value (THB)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${this.data.slice(0, 5).map(item => `
+                            <tr>
+                                <td style="color: #667eea; font-weight: 600;">${item.po}</td>
+                                <td>${item.client}</td>
+                                <td>฿${item.value_thb.toLocaleString()}</td>
+                                <td><span style="background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">${item.status}</span></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        },
+
+        renderDataManagement(container) {
+            container.innerHTML = `
+                <h2>Data Management</h2>
+                <div style="margin: 20px 0;">
+                    <button class="btn btn-primary" onclick="PTTEPApp.addNewRecord()">Add New PO</button>
+                    <button class="btn btn-success" onclick="PTTEPApp.exportData()">Export CSV</button>
+                    <button class="btn btn-info" onclick="PTTEPApp.refreshData()">Refresh</button>
+                </div>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Date</th>
+                            <th>PO Number</th>
+                            <th>Client</th>
+                            <th>Project</th>
+                            <th>THB</th>
+                            <th>USD</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${this.data.map(item => `
+                            <tr>
+                                <td>${item.item}</td>
+                                <td>${item.date}</td>
+                                <td style="color: #667eea; font-weight: 600;">${item.po}</td>
+                                <td>${item.client.length > 30 ? item.client.substring(0, 30) + '...' : item.client}</td>
+                                <td>${item.project}</td>
+                                <td>฿${item.value_thb.toLocaleString()}</td>
+                                <td>$${item.value_usd.toLocaleString()}</td>
+                                <td><span style="background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">${item.status}</span></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        },
+
+        renderAnalytics(container) {
+            container.innerHTML = `
+                <h2>Analytics</h2>
+                <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <canvas id="analyticsChart" width="400" height="200"></canvas>
+                </div>
+                <p style="text-align: center; color: #64748b;">Chart visualization would appear here with Chart.js</p>
+            `;
+
+            // Simple chart example
+            setTimeout(() => {
+                const canvas = document.getElementById('analyticsChart');
+                if (canvas && typeof Chart !== 'undefined') {
+                    new Chart(canvas.getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: ['2019', '2023'],
+                            datasets: [{
+                                label: 'Revenue (Million THB)',
+                                data: [0.2, 0.86],
+                                backgroundColor: ['#667eea', '#764ba2']
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
+                    });
+                }
+            }, 100);
+        },
+
+        renderReports(container) {
+            const totalTHB = this.data.reduce((sum, item) => sum + item.value_thb, 0);
+            const totalUSD = this.data.reduce((sum, item) => sum + item.value_usd, 0);
+
+            container.innerHTML = `
+                <h2>Reports</h2>
+                <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
+                    <h3>Executive Summary</h3>
+                    <p style="margin: 10px 0;">Report Generated: ${new Date().toLocaleString()}</p>
+                    <hr style="margin: 15px 0; border: none; border-top: 1px solid #e2e8f0;">
+                    <p><strong>Total Portfolio Value:</strong> ฿${totalTHB.toLocaleString()} ($${totalUSD.toLocaleString()})</p>
+                    <p><strong>Total Orders:</strong> ${this.data.length}</p>
+                    <p><strong>Date Range:</strong> 2019 - 2023</p>
+                </div>
+                <button class="btn btn-primary" onclick="window.print()">Print Report</button>
+                <button class="btn btn-success" onclick="PTTEPApp.exportData()">Export Data</button>
+            `;
+        },
+
+        addNewRecord() {
+            alert('Add new record functionality - would open a modal form');
+        },
+
+        exportData() {
+            const csv = 'Item,Date,PO,Client,Project,THB,USD,Status\n' +
+                this.data.map(item => 
+                    `${item.item},${item.date},${item.po},"${item.client}","${item.project}",${item.value_thb},${item.value_usd},${item.status}`
+                ).join('\n');
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `PTTEP_Export_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+        },
+
+        refreshData() {
+            location.reload();
+        }
+    };
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+        PTTEPApp.init();
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ใบเสนอราคา - จังหวัดเชียงใหม่</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 15px;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.6rem;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .project-info {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f0f8ff 100%);
+            padding: 20px;
+            border-bottom: 3px solid #2196f3;
+        }
+
+        .project-title {
+            color: #1565c0;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .project-details {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-icon {
+            width: 35px;
+            height: 35px;
+            background: #2196f3;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .detail-text {
+            flex: 1;
+        }
+
+        .detail-number {
+            font-weight: 700;
+            color: #1565c0;
+            font-size: 1.1rem;
+        }
+
+        .equipment-breakdown {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .form-section {
+            padding: 25px;
+        }
+
+        .section-title {
+            color: #2c3e50;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .required {
+            color: #dc3545;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .service-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #28a745;
+        }
+
+        .service-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .service-title {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+
+        .service-subtitle {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
+        .price-input {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 15px;
+            align-items: end;
+            margin-bottom: 15px;
+        }
+
+        .price-label {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .unit-display {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .optional-section {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 50%);
+            border-left: 4px solid #ffc107;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 12px;
+            margin-top: 3px;
+            transform: scale(1.3);
+            accent-color: #007bff;
+        }
+
+        .checkbox-content {
+            flex: 1;
+        }
+
+        .checkbox-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .checkbox-desc {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 8px;
+        }
+
+        .submit-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            text-align: center;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 16px 40px;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .timer {
+            background: #fff3cd;
+            color: #856404;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .contact-info {
+            background: #e3f2fd;
+            padding: 20px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .contact-title {
+            color: #1565c0;
+            font-weight: 700;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 600px) {
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .price-input {
+                grid-template-columns: 1fr;
+            }
+
+            .service-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💼 ใบเสนอราคา</h1>
+            <p>โครงการติดตั้งระบบเครือข่าย (LAN)</p>
+        </div>
+
+        <div class="project-info">
+            <div class="project-title">🗺️ จังหวัดเชียงใหม่</div>
+            <div class="project-details">
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-icon">🔌</div>
+                        <div class="detail-text">
+                            <div class="detail-number">53 จุด</div>
+                            <div>เดิน Cabling UTP Cat.6</div>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon">🔀</div>
+                        <div class="detail-text">
+                            <div class="detail-number">3 ตัว</div>
+                            <div>Switch 24 Port</div>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon">🏗️</div>
+                        <div class="detail-text">
+                            <div class="detail-number">1 ตู้</div>
+                            <div>Rack Cabinet 27U</div>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-icon">⚡</div>
+                        <div class="detail-text">
+                            <div class="detail-number">1 งาน</div>
+                            <div>เดินสายไฟ + เบรกเกอร์</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="equipment-breakdown">
+                    <strong>📊 รายละเอียดจุดติดตั้ง 53 จุด:</strong><br>
+                    • คอมพิวเตอร์: <strong>38 เครื่อง</strong><br>
+                    • เครื่องพิมพ์: <strong>4 เครื่อง</strong><br>
+                    • เครื่องถ่ายเอกสาร: <strong>2 เครื่อง</strong><br>
+                    • ห้องประชุม: <strong>2 ห้อง</strong><br>
+                    • Wi-Fi Access Point: <strong>6 จุด</strong><br>
+                    • เครื่องสแกนลายนิ้วมือ: <strong>1 เครื่อง</strong><br>
+                    <br>
+                    <strong>🕒 ระยะเวลาดำเนินการ:</strong> 8-11 วันทำการ<br>
+                    <strong>🛡️ การรับประกัน:</strong> 1 ปี
+                </div>
+            </div>
+        </div>
+
+        <form id="quotationForm">
+            <div class="form-section">
+                <div class="timer">
+                    ⏱️ เป้าหมาย: กรอกให้เสร็จภายใน 2 นาที
+                </div>
+
+                <div class="section-title">
+                    📋 ข้อมูลผู้เสนอราคา
+                </div>
+                
+                <div class="form-group">
+                    <label>ชื่อบริษัท/ร้าน/ห้างหุ้นส่วน <span class="required">*</span></label>
+                    <input type="text" class="form-control" name="company_name" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>ชื่อผู้ติดต่อ <span class="required">*</span></label>
+                        <input type="text" class="form-control" name="contact_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>เบอร์โทรศัพท์ <span class="required">*</span></label>
+                        <input type="tel" class="form-control" name="phone" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>อีเมล <span class="required">*</span></label>
+                    <input type="email" class="form-control" name="email" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>ประสบการณ์งาน LAN (ปี)</label>
+                        <select class="form-control" name="experience">
+                            <option value="">เลือก</option>
+                            <option value="1-2">1-2 ปี</option>
+                            <option value="3-5">3-5 ปี</option>
+                            <option value="5-10">5-10 ปี</option>
+                            <option value="10+">มากกว่า 10 ปี</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>จำนวนช่างเทคนิค</label>
+                        <select class="form-control" name="technicians">
+                            <option value="">เลือก</option>
+                            <option value="1-2">1-2 คน</option>
+                            <option value="3-5">3-5 คน</option>
+                            <option value="6-10">6-10 คน</option>
+                            <option value="10+">มากกว่า 10 คน</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section-title">
+                    💰 รายการเสนอราคา - จังหวัดเชียงใหม่
+                </div>
+
+                <!-- 1. งานสำรวจ -->
+                <div class="service-section">
+                    <div class="service-header">
+                        <div>
+                            <div class="service-title">🔍 1. งานสำรวจ (Site Survey)</div>
+                            <div class="service-subtitle">
+                                • สำรวจจุดติดตั้งทั้ง 53 จุด<br>
+                                • กำหนดเส้นทางเดินสายและจุดจ่ายไฟฟ้า<br>
+                                • จัดทำแบบแปลนการติดตั้ง (AutoCAD + PDF)<br>
+                                • ระยะเวลา: 1-2 วันทำการ
+                            </div>
+                        </div>
+                    </div>
+                    <div class="price-input">
+                        <div>
+                            <div class="price-label">ราคาเสนอต่อวัน</div>
+                            <div class="unit-display">วันละ (บาท)</div>
+                        </div>
+                        <input type="number" class="form-control" name="survey_price_per_day" placeholder="0">
+                    </div>
+                    <div style="font-size: 0.85rem; color: #6c757d; margin-top: 8px;">
+                        * ระยะเวลาประมาณ 1-2 วันทำการ (ขึ้นอยู่กับความซับซ้อนของพื้นที่)
+                    </div>
+                </div>
+
+                <!-- 2. งานเดิน Cabling -->
+                <div class="service-section">
+                    <div class="service-header">
+                        <div>
+                            <div class="service-title">🔌 2. งานเดิน Cabling (UTP Cat.6)</div>
+                            <div class="service-subtitle">
+                                • เดินสาย UTP Cat.6 ตามมาตรฐาน TIA/EIA-568<br>
+                                • ติดตั้ง Face Plate + RJ45 Jack ทุกจุด<br>
+                                • จัดระเบียบสายและติด Label<br>
+                                • รวมอุปกรณ์: Wall Box, Patch Cord 3M
+                            </div>
+                        </div>
+                    </div>
+                    <div class="price-input">
+                        <div>
+                            <div class="price-label">ราคาเสนอต่อจุด</div>
+                            <div class="unit-display">จุดละ (บาท)</div>
+                        </div>
+                        <input type="number" class="form-control" name="cabling_price_per_point" placeholder="0" id="cablingPerPoint">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; font-size: 0.9rem;">
+                        <div style="background: #e3f2fd; padding: 8px; border-radius: 6px; text-align: center;">
+                            จำนวนจุดติดตั้ง: <strong>53 จุด</strong>
+                        </div>
+                        <div style="background: #e8f5e8; padding: 8px; border-radius: 6px; text-align: center;">
+                            ราคารวม: <strong id="cablingTotal">0</strong> บาท
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. งานติดตั้ง Rack Cabinet -->
+                <div class="service-section">
+                    <div class="service-header">
+                        <div>
+                            <div class="service-title">🏗️ 3. งานติดตั้ง Rack Cabinet 27U</div>
+                            <div class="service-subtitle">
+                                • ติดตั้ง Rack Cabinet 27U (60x60x139 ซม.)<br>
+                                • จัดเก็บสายด้วย Cable Management Panel<br>
+                                • ระบบ Cooling Fan และ Power Distribution<br>
+                                • ไม่รวม Switch (แยกเป็นหัวข้อถัดไป)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="price-input">
+                        <div>
+                            <div class="price-label">ค่าติดตั้ง Rack Cabinet</div>
+                            <div class="unit-display">1 ตู้</div>
+                        </div>
+                        <input type="number" class="form-control" name="rack_price" placeholder="0">
+                    </div>
+                </div>
+
+                <!-- 4. งานติดตั้ง Switch -->
+                <div class="service-section">
+                    <div class="service-header">
+                        <div>
+                            <div class="service-title">🔀 4. งานติดตั้ง Switch</div>
+                            <div class="service-subtitle">
+                                • ติดตั้ง Ethernet Switch 24 Port<br>
+                                • Configuration และ Testing<br>
+                                • ต่อสาย Patch Cord จาก Rack เข้า Switch<br>
+                                • ติด Label และจัดเก็บสายเป็นระเบียบ
+                            </div>
+                        </div>
+                    </div>
+                    <div class="price-input">
+                        <div>
+                            <div class="price-label">ค่าติดตั้ง Switch</div>
+                            <div class="unit-display">3 ตัว</div>
+                        </div>
+                        <input type="number" class="form-control" name="switch_price" placeholder="0">
+                    </div>
+                </div>
+
+                <!-- 5. งานระบบไฟฟ้า -->
+                <div class="service-section">
+                    <div class="service-header">
+                        <div>
+                            <div class="service-title">⚡ 5. งานระบบไฟฟ้าสำหรับ Rack Cabinet</div>
+                            <div class="service-subtitle">
+                                • เพิ่มเบรกเกอร์ 1 Phase 15A จากตู้เมนเดิม<br>
+                                • เดินสายไฟ 3x2.5 sq.mm. THW ร้อยในท่อ EMT/PVC<br>
+                                • ติดตั้งเต้ารับยึดผนัง 15A สำหรับ Rack<br>
+                                • งานต่อลงดินและทดสอบระบบไฟฟ้า
+                            </div>
+                        </div>
+                    </div>
+                    <div class="price-input">
+                        <div>
+                            <div class="price-label">ค่างานระบบไฟฟ้า (รวมอุปกรณ์)</div>
+                            <div class="unit-display">1 งานเหมาจ่าย</div>
+                        </div>
+                        <input type="number" class="form-control" name="electrical_price" placeholder="0">
+                    </div>
+                </div>
+
+                <!-- 6. งานทดสอบสาย UTP Cat.6 -->
+                <div class="service-section">
+                    <div class="service-header">
+                        <div>
+                            <div class="service-title">🧪 6. งานทดสอบสาย UTP Cat.6</div>
+                            <div class="service-subtitle">
+                                • ทดสอบสัญญาณทุกเส้น (53 เส้น) ด้วยเครื่องมือมาตรฐาน<br>
+                                • Certificate Report ตาม TIA/EIA-568<br>
+                                • รายงานผลการทดสอบแต่ละเส้น<br>
+                                • ใบรับรองคุณภาพสายสัญญาณ
+                            </div>
+                        </div>
+                    </div>
+                    <div class="price-input">
+                        <div>
+                            <div class="price-label">ค่าทดสอบสาย UTP Cat.6</div>
+                            <div class="unit-display">53 เส้น</div>
+                        </div>
+                        <input type="number" class="form-control" name="testing_price" placeholder="0">
+                    </div>
+                    <div style="font-size: 0.85rem; color: #6c757d; margin-top: 8px;">
+                        * เสนอราคาหากต้องการบริการทดสอบสาย (ไม่บังคับ)
+                    </div>
+                </div>
+
+                <!-- 7. อุปกรณ์ประกอบการติดตั้ง -->
+                <div class="service-section">
+                    <div class="service-header">
+                        <div>
+                            <div class="service-title">📦 7. อุปกรณ์ประกอบการติดตั้ง</div>
+                            <div class="service-subtitle">
+                                • Flexible Conduit (1/2", 3/4", 1") - ตามความต้องการ<br>
+                                • PVC Wireway 2x4" สีเทา - ระบบจัดเก็บสาย<br>
+                                • Junction Box Square ICT - จุดดึงสาย<br>
+                                • EMT Conduit + Clamps - ท่อเหล็กและอุปกรณ์ยึด<br>
+                                • Cable Labeling System 6.2mm - ระบบติด Label<br>
+                                • อุปกรณ์ยึด, ข้อต่อ, และอุปกรณ์ประกอบอื่นๆ
+                            </div>
+                        </div>
+                    </div>
+                    <div class="price-input">
+                        <div>
+                            <div class="price-label">ค่าอุปกรณ์ประกอบ (ตามผลสำรวจ)</div>
+                            <div class="unit-display">1 ชุด</div>
+                        </div>
+                        <input type="number" class="form-control" name="accessories_price" placeholder="0">
+                    </div>
+                    <div style="font-size: 0.85rem; color: #6c757d; margin-top: 8px;">
+                        * ราคาจะชัดเจนหลังจากการสำรวจพื้นที่จริง
+                    </div>
+                </div>
+
+                <div class="section-title">
+                    ✅ การยืนยัน
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="confirm_join" name="confirmations[]" value="join_bidding" required>
+                    <div class="checkbox-content">
+                        <div class="checkbox-title">ยืนยันเข้าร่วมเสนอราคาจังหวัดเชียงใหม่</div>
+                    </div>
+                </div>
+                
+                <div class="checkbox-group">
+                    <input type="checkbox" id="confirm_ready" name="confirmations[]" value="ready_to_start">
+                    <div class="checkbox-content">
+                        <div class="checkbox-title">พร้อมเริ่มงานทันทีหลังได้รับมอบหมาย (8-11 วันทำการ)</div>
+                    </div>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="confirm_system" name="confirmations[]" value="use_reporting_system">
+                    <div class="checkbox-content">
+                        <div class="checkbox-title">ยินยอมใช้ระบบรายงานออนไลน์ของ Add Value System</div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="submit-section">
+                <button type="submit" class="btn-submit">
+                    📤 ส่งใบเสนอราคา - จังหวัดเชียงใหม่
+                </button>
+                <p style="margin-top: 15px; font-size: 0.85rem; color: #6c757d;">
+                    หลังส่งแล้ว ทีมงานจะติดต่อกลับภายใน 24 ชั่วโมง<br>
+                    เพื่อนัดหมายเข้าสำรวจพื้นที่และยืนยันรายละเอียด
+                </p>
+            </div>
+        </form>
+
+        <div class="contact-info">
+            <div class="contact-title">📞 ติดต่อสอบถามข้อมูลเพิ่มเติม</div>
+            <p><strong>ฝ่ายจัดซื้อ (Procurement):</strong><br>
+               คุณเอกชัญญา บุญเฉลียว<br>
+               📱 092-708-2329<br>
+               📧 addvalue-procurement@addvaluesystemcompany.onmicrosoft.com</p>
+            <p style="margin-top: 10px;"><strong>ฝ่ายเทคนิค (Project ICT Administrator):</strong><br>
+               Addvalue Admin<br>
+               📱 061-083-7991<br>
+               📧 addvalue-admin@addvaluesystemcompany.onmicrosoft.com</p>
+        </div>
+    </div>
+
+    <script>
+        // Optional services toggle
+        document.getElementById('test_utp').addEventListener('change', function() {
+            const priceInput = document.querySelector('input[name="test_utp_price"]');
+            priceInput.disabled = !this.checked;
+            if (!this.checked) {
+                priceInput.value = '';
+                priceInput.style.opacity = '0.5';
+            } else {
+                priceInput.style.opacity = '1';
+            }
+        });
+
+        document.getElementById('accessories').addEventListener('change', function() {
+            const priceInput = document.querySelector('input[name="accessories_price"]');
+            priceInput.disabled = !this.checked;
+            if (!this.checked) {
+                priceInput.value = '';
+                priceInput.style.opacity = '0.5';
+            } else {
+                priceInput.style.opacity = '1';
+            }
+        });
+
+        // Form submission
+        let startTime = Date.now();
+
+        document.getElementById('quotationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const data = {};
+            
+            // Convert FormData to object
+            for (let [key, value] of formData.entries()) {
+                if (data[key]) {
+                    if (Array.isArray(data[key])) {
+                        data[key].push(value);
+                    } else {
+                        data[key] = [data[key], value];
+                    }
+                } else {
+                    data[key] = value;
+                }
+            }
+            
+            // Add project-specific data
+            data.province = 'เชียงใหม่';
+            data.total_points = 53;
+            data.switches = 3;
+            data.racks = 1;
+            data.completion_time = Math.round((Date.now() - startTime) / 1000);
+            data.submission_datetime = new Date().toISOString();
+            
+            // Calculate total price
+            let totalPrice = 0;
+            const prices = ['survey_price', 'cabling_price', 'rack_price', 'electrical_price', 'test_utp_price', 'accessories_price'];
+            prices.forEach(priceField => {
+                const value = parseFloat(data[priceField]) || 0;
+                totalPrice += value;
+            });
+            
+            console.log('Chiang Mai Quotation Data:', data);
+            
+            // Success message
+            alert(`✅ ส่งใบเสนอราคาสำเร็จ!\n\n🗺️ จังหวัด: เชียงใหม่\n🔌 จุดติดตั้ง: 53 จุด\n💰 ราคารวม: ${totalPrice.toLocaleString()} บาท\n⏱️ ใช้เวลากรอก: ${data.completion_time} วินาที\n\nทีมงาน Add Value System จะติดต่อกลับภายใน 24 ชม.\nเพื่อนัดหมายเข้าสำรวจพื้นที่จริง`);
+            
+            // In real implementation: send to backend
+            // fetch('/api/submit-quotation/chiangmai', { method: 'POST', body: formData })
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial disabled state for optional services
+            document.querySelector('input[name="test_utp_price"]').style.opacity = '0.5';
+            document.querySelector('input[name="accessories_price"]').style.opacity = '0.5';
+            
+            // Phone number formatting
+            const phoneInput = document.querySelector('input[name="phone"]');
+            phoneInput.addEventListener('input', function() {
+                let value = this.value.replace(/\D/g, '');
+                if (value.length >= 10) {
+                    value = value.substring(0, 10);
+                    this.value = value.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

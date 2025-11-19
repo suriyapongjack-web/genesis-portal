@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modular Pricing Calculator v3.0</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, 'Segoe UI', Arial, sans-serif;
+            font-size: 14px;
+            background: #f5f6fa;
+            padding: 20px;
+            color: #2c3e50;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px 12px 0 0;
+        }
+        h1 { font-size: 22px; margin-bottom: 10px; }
+        .project-info {
+            display: flex;
+            gap: 30px;
+            font-size: 13px;
+            opacity: 0.9;
+        }
+        .version-bar {
+            background: #fff3cd;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .controls {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .control-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .control-item label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #6c757d;
+        }
+        .control-item input, .control-item select {
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        .control-item input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+        .card-title {
+            font-size: 11px;
+            color: #6c757d;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .card-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .card-subtitle {
+            font-size: 12px;
+            color: #667eea;
+            margin-top: 3px;
+        }
+        table {
+            width: 100%;
+            font-size: 13px;
+            border-collapse: collapse;
+        }
+        th {
+            background: #6c757d;
+            color: white;
+            padding: 10px 8px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        tr:hover { background: #f8f9fa; }
+        .section-header {
+            background: #e8f4f8;
+            font-weight: bold;
+        }
+        .text-right { text-align: right; }
+        .text-center { text-align: center; }
+        .editable {
+            background: #e7f1ff;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            background: #667eea;
+            color: white;
+            transition: all 0.3s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.3);
+        }
+        .btn-success { background: #28a745; }
+        .btn-warning { background: #ffc107; color: #000; }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+        .subtotal-row {
+            background: #f0f8ff;
+            font-weight: bold;
+        }
+        .total-row {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+        }
+        .margin-good { color: #28a745; }
+        .margin-ok { color: #ffc107; }
+        .margin-bad { color: #dc3545; }
+        .import-section {
+            padding: 20px;
+            background: #e8f4f8;
+            border-bottom: 2px solid #667eea;
+        }
+        .file-input {
+            padding: 10px;
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            text-align: center;
+        }
+        .file-input:hover {
+            background: #f8f9fa;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        @media (max-width: 768px) {
+            .summary-cards { grid-template-columns: repeat(2, 1fr); }
+            .controls { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 id="projectTitle">📊 Modular Pricing Calculator</h1>
+            <div class="project-info">
+                <span>Project: <strong id="projectName">New Project</strong></span>
+                <span>Version: <strong id="versionNum">3.0.0</strong></span>
+                <span>Last Update: <strong id="lastUpdate">-</strong></span>
+            </div>
+        </div>
+
+        <div class="version-bar">
+            <div>
+                <strong>📅 Created:</strong> <span id="createdDate">-</span> | 
+                <strong>✏️ Modified:</strong> <span id="modifiedDate">-</span>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-success" onclick="exportToExcel()">📑 Export Excel</button>
+                <button class="btn btn-warning" onclick="document.getElementById('fileInput').click()">📂 Import Excel</button>
+                <input type="file" id="fileInput" accept=".xlsx,.xls" onchange="importExcel(event)">
+            </div>
+        </div>
+
+        <div class="import-section">
+            <label class="file-input" for="fileInput">
+                📤 Click to Import Excel File (Part Number, Description, Qty, Cost/Unit THB)
+            </label>
+        </div>
+
+        <div class="controls">
+            <div class="control-item">
+                <label>Exchange Rate</label>
+                <input type="number" id="exchangeRate" value="31.5" step="0.01" oninput="recalculateAll()">
+            </div>
+            <div class="control-item">
+                <label>Target Markup %</label>
+                <input type="number" id="targetMarkup" value="0" step="0.1" oninput="applyMarkupRealtime()">
+            </div>
+            <div class="control-item">
+                <label>Display</label>
+                <select id="displayMode" onchange="toggleDisplay()">
+                    <option value="both">THB + USD</option>
+                    <option value="thb">THB Only</option>
+                    <option value="usd">USD Only</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-title">Total Cost</div>
+                <div class="card-value">$<span id="totalCost">0.00</span></div>
+                <div class="card-subtitle">฿<span id="totalCostTHB">0</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Selling Price</div>
+                <div class="card-value">$<span id="totalSelling">0.00</span></div>
+                <div class="card-subtitle">฿<span id="totalSellingTHB">0</span></div>
+            </div>
+            <div class="card">
+                <div class="card-title">Total Markup</div>
+                <div class="card-value">$<span id="totalMarkup">0.00</span></div>
+                <div class="card-subtitle"><span id="markupPercent">0.0</span>%</div>
+            </div>
+            <div class="card">
+                <div class="card-title">Grand Total</div>
+                <div class="card-value">$<span id="grandTotal">0.00</span></div>
+                <div class="card-subtitle">฿<span id="grandTotalTHB">0</span></div>
+            </div>
+        </div>
+
+        <div style="padding: 20px; overflow-x: auto;">
+            <table id="pricingTable">
+                <thead>
+                    <tr>
+                        <th width="3%">#</th>
+                        <th width="15%">Part Number</th>
+                        <th width="25%">Description</th>
+                        <th width="5%" class="text-center">Qty</th>
+                        <th width="10%" class="text-right thb-col">Cost/Unit (THB)</th>
+                        <th width="10%" class="text-right thb-col">Total Cost (THB)</th>
+                        <th width="8%" class="text-center">Markup %</th>
+                        <th width="10%" class="text-right thb-col">Sell/Unit (THB)</th>
+                        <th width="10%" class="text-right usd-col">Sell/Unit (USD)</th>
+                        <th width="10%" class="text-right usd-col">Total (USD)</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Data Module
+        const PricingData = {
+            items: [],
+            exchangeRate: 31.5,
+            targetMarkup: 0,
+            
+            addItem(partNumber, description, qty, costTHB) {
+                this.items.push({ partNumber, description, qty: parseInt(qty), costTHB: parseFloat(costTHB) });
+            },
+            
+            clearItems() {
+                this.items = [];
+            },
+            
+            calculateItem(item) {
+                const sellTHB = item.costTHB * (1 + this.targetMarkup / 100);
+                const sellUSD = sellTHB / this.exchangeRate;
+                const totalCostTHB = item.costTHB * item.qty;
+                const totalSellUSD = sellUSD * item.qty;
+                const markup = item.costTHB > 0 ? ((sellTHB - item.costTHB) / item.costTHB * 100) : 0;
+                
+                return {
+                    ...item,
+                    sellTHB: sellTHB,
+                    sellUSD: sellUSD,
+                    totalCostTHB: totalCostTHB,
+                    totalSellUSD: totalSellUSD,
+                    markup: Math.abs(markup) < 0.01 ? 0 : markup
+                };
+            },
+            
+            getTotals() {
+                let totalCostTHB = 0;
+                let totalSellUSD = 0;
+                
+                this.items.forEach(item => {
+                    const calc = this.calculateItem(item);
+                    totalCostTHB += calc.totalCostTHB;
+                    totalSellUSD += calc.totalSellUSD;
+                });
+                
+                const totalCostUSD = totalCostTHB / this.exchangeRate;
+                const totalSellTHB = totalSellUSD * this.exchangeRate;
+                const markupUSD = totalSellUSD - totalCostUSD;
+                const markupPercent = totalCostUSD > 0 ? (markupUSD / totalCostUSD * 100) : 0;
+                
+                return {
+                    totalCostUSD: totalCostUSD,
+                    totalCostTHB: totalCostTHB,
+                    totalSellUSD: totalSellUSD,
+                    totalSellTHB: totalSellTHB,
+                    markupUSD: Math.abs(markupUSD) < 0.01 ? 0 : markupUSD,
+                    markupPercent: Math.abs(markupPercent) < 0.01 ? 0 : markupPercent
+                };
+            }
+        };
+
+        // UI Module
+        const UI = {
+            updateTable() {
+                const tbody = document.getElementById('tableBody');
+                tbody.innerHTML = '';
+                
+                PricingData.items.forEach((item, index) => {
+                    const calc = PricingData.calculateItem(item);
+                    const row = tbody.insertRow();
+                    
+                    const markupClass = calc.markup >= 25 ? 'margin-good' : 
+                                       calc.markup >= 15 ? 'margin-ok' : 'margin-bad';
+                    
+                    row.innerHTML = `
+                        <td class="text-center">${index + 1}</td>
+                        <td>${item.partNumber}</td>
+                        <td>${item.description}</td>
+                        <td class="text-center">${item.qty}</td>
+                        <td class="text-right thb-col">${item.costTHB.toLocaleString()}</td>
+                        <td class="text-right thb-col">${calc.totalCostTHB.toLocaleString()}</td>
+                        <td class="text-center ${markupClass}">${calc.markup.toFixed(1)}%</td>
+                        <td class="text-right thb-col">${Math.round(calc.sellTHB).toLocaleString()}</td>
+                        <td class="text-right usd-col">${calc.sellUSD.toFixed(2)}</td>
+                        <td class="text-right usd-col">${calc.totalSellUSD.toFixed(2)}</td>
+                    `;
+                });
+                
+                this.addTotalRows(tbody);
+            },
+            
+            addTotalRows(tbody) {
+                const totals = PricingData.getTotals();
+                
+                // Subtotal row
+                const subtotalRow = tbody.insertRow();
+                subtotalRow.className = 'subtotal-row';
+                subtotalRow.innerHTML = `
+                    <td colspan="5"><strong>SUBTOTAL</strong></td>
+                    <td class="text-right thb-col"><strong>${totals.totalCostTHB.toLocaleString()}</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="text-right usd-col"><strong>$${totals.totalSellUSD.toFixed(2)}</strong></td>
+                `;
+                
+                // Grand total row
+                const totalRow = tbody.insertRow();
+                totalRow.className = 'total-row';
+                totalRow.innerHTML = `
+                    <td colspan="5"><strong>GRAND TOTAL</strong></td>
+                    <td class="text-right thb-col"><strong>${totals.totalCostTHB.toLocaleString()}</strong></td>
+                    <td class="text-center"><strong>${totals.markupPercent.toFixed(1)}%</strong></td>
+                    <td class="text-right thb-col"><strong>${totals.totalSellTHB.toLocaleString()}</strong></td>
+                    <td></td>
+                    <td class="text-right usd-col"><strong>$${totals.totalSellUSD.toFixed(2)}</strong></td>
+                `;
+            },
+            
+            updateSummary() {
+                const totals = PricingData.getTotals();
+                
+                document.getElementById('totalCost').textContent = totals.totalCostUSD.toFixed(2);
+                document.getElementById('totalCostTHB').textContent = totals.totalCostTHB.toLocaleString();
+                document.getElementById('totalSelling').textContent = totals.totalSellUSD.toFixed(2);
+                document.getElementById('totalSellingTHB').textContent = totals.totalSellTHB.toLocaleString();
+                document.getElementById('totalMarkup').textContent = totals.markupUSD.toFixed(2);
+                document.getElementById('markupPercent').textContent = totals.markupPercent.toFixed(1);
+                document.getElementById('grandTotal').textContent = totals.totalSellUSD.toFixed(2);
+                document.getElementById('grandTotalTHB').textContent = totals.totalSellTHB.toLocaleString();
+            },
+            
+            updateTimestamp() {
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('th-TH') + ' ' + now.toLocaleTimeString('th-TH');
+                document.getElementById('modifiedDate').textContent = dateStr;
+                document.getElementById('lastUpdate').textContent = dateStr;
+                
+                if (document.getElementById('createdDate').textContent === '-') {
+                    document.getElementById('createdDate').textContent = dateStr;
+                }
+            }
+        };
+
+        // Excel Module
+        const ExcelHandler = {
+            export() {
+                const projectName = document.getElementById('projectName').textContent;
+                const now = new Date();
+                const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '');
+                const timeStr = now.toTimeString().slice(0, 8).replace(/:/g, '');
+                const fileName = `${projectName}_${dateStr}_${timeStr}.xlsx`;
+                
+                const data = [
+                    ['Project', projectName],
+                    ['Version', document.getElementById('versionNum').textContent],
+                    ['Export Date', now.toLocaleString('th-TH')],
+                    ['Exchange Rate', PricingData.exchangeRate + ' THB/USD'],
+                    ['Markup %', PricingData.targetMarkup + '%'],
+                    [],
+                    ['#', 'Part Number', 'Description', 'Qty', 'Cost/Unit (THB)', 'Total Cost (THB)', 
+                     'Markup %', 'Sell/Unit (THB)', 'Sell/Unit (USD)', 'Total (USD)']
+                ];
+                
+                PricingData.items.forEach((item, index) => {
+                    const calc = PricingData.calculateItem(item);
+                    data.push([
+                        index + 1,
+                        item.partNumber,
+                        item.description,
+                        item.qty,
+                        item.costTHB,
+                        calc.totalCostTHB,
+                        calc.markup.toFixed(1),
+                        Math.round(calc.sellTHB),
+                        calc.sellUSD.toFixed(2),
+                        calc.totalSellUSD.toFixed(2)
+                    ]);
+                });
+                
+                const totals = PricingData.getTotals();
+                data.push([]);
+                data.push(['SUMMARY']);
+                data.push(['Total Cost (USD)', totals.totalCostUSD.toFixed(2)]);
+                data.push(['Total Selling (USD)', totals.totalSellUSD.toFixed(2)]);
+                data.push(['Total Markup (USD)', totals.markupUSD.toFixed(2)]);
+                data.push(['Markup %', totals.markupPercent.toFixed(1) + '%']);
+                data.push(['Grand Total (USD)', totals.totalSellUSD.toFixed(2)]);
+                
+                const ws = XLSX.utils.aoa_to_sheet(data);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Pricing');
+                XLSX.writeFile(wb, fileName);
+            },
+            
+            import(file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(sheet);
+                    
+                    PricingData.clearItems();
+                    
+                    jsonData.forEach(row => {
+                        const partNumber = row['Part Number'] || row['part number'] || row['PART NUMBER'] || '';
+                        const description = row['Description'] || row['description'] || row['DESCRIPTION'] || '';
+                        const qty = parseInt(row['Qty'] || row['qty'] || row['QTY'] || row['Quantity'] || 1);
+                        const cost = parseFloat(row['Cost/Unit (THB)'] || row['Cost/Unit'] || row['cost'] || row['COST'] || 0);
+                        
+                        if (partNumber && cost > 0) {
+                            PricingData.addItem(partNumber, description, qty, cost);
+                        }
+                    });
+                    
+                    recalculateAll();
+                    alert(`Imported ${PricingData.items.length} items successfully!`);
+                };
+                reader.readAsArrayBuffer(file);
+            }
+        };
+
+        // Main Functions
+        function recalculateAll() {
+            PricingData.exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 31.5;
+            PricingData.targetMarkup = parseFloat(document.getElementById('targetMarkup').value) || 0;
+            
+            UI.updateTable();
+            UI.updateSummary();
+            UI.updateTimestamp();
+        }
+
+        function applyMarkupRealtime() {
+            recalculateAll();
+        }
+
+        function toggleDisplay() {
+            const mode = document.getElementById('displayMode').value;
+            const thbCols = document.querySelectorAll('.thb-col');
+            const usdCols = document.querySelectorAll('.usd-col');
+            
+            if (mode === 'thb') {
+                usdCols.forEach(col => col.style.display = 'none');
+                thbCols.forEach(col => col.style.display = '');
+            } else if (mode === 'usd') {
+                thbCols.forEach(col => col.style.display = 'none');
+                usdCols.forEach(col => col.style.display = '');
+            } else {
+                thbCols.forEach(col => col.style.display = '');
+                usdCols.forEach(col => col.style.display = '');
+            }
+        }
+
+        function exportToExcel() {
+            ExcelHandler.export();
+        }
+
+        function importExcel(event) {
+            const file = event.target.files[0];
+            if (file) {
+                ExcelHandler.import(file);
+            }
+        }
+
+        // Initialize with sample data
+        function initializeSampleData() {
+            // Base Station
+            PricingData.addItem('3K-SC-HAZ-RF4958-GPS-01', 'RDL3000 Ellipse Base Station', 1, 164833);
+            PricingData.addItem('OPK-3K-ELLIPSE-PMP10-G1', 'Options Key PMP 10 Remotes', 1, 57920);
+            PricingData.addItem('OPK-REGION-3000-06', 'Region Code 06', 1, 5427);
+            PricingData.addItem('PS-DCDC-HAZ-POE-IND-01', 'Power Supply POE', 1, 20382);
+            PricingData.addItem('SWW-EWXXA1001237', 'Extended Warranty 12M', 1, 20349);
+            
+            // Remote Terminals
+            PricingData.addItem('CONN-OW-HAZ-4958ER-01', 'Connect-OW-ER Remote Terminal', 6, 147141);
+            PricingData.addItem('OPK-3K-REM-UNLMBPS-01', 'Options Key Unlimited Mbps', 6, 48654);
+            PricingData.addItem('OPK-REGION-3000-06', 'Region Code 06', 6, 5427);
+            PricingData.addItem('PS-DCDC-HAZ-POE-IND-01', 'Power Supply POE', 6, 20382);
+            PricingData.addItem('SWW-EWXXA1001235', 'Extended Warranty 12M', 6, 16926);
+            
+            recalculateAll();
+        }
+
+        // Initialize
+        window.onload = function() {
+            initializeSampleData();
+            UI.updateTimestamp();
+        };
+    </script>
+</body>
+</html>

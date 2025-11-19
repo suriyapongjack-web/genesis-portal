@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio Dashboard</title>
+<style>
+body{font-family:Arial,sans-serif;margin:20px;background:#f5f5f5}
+.container{max-width:1400px;margin:0 auto;background:white;padding:20px;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1)}
+h1{color:#333;text-align:center;margin-bottom:30px}
+.controls{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:10px;flex-wrap:wrap}
+.search-box{display:flex;gap:10px;align-items:center;flex:1;min-width:300px}
+.search-box input,select{padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px}
+.search-box input{width:200px}
+.search-box select{width:180px}
+.import-export{display:flex;gap:10px;align-items:center}
+.timestamp{color:#666;font-size:14px}
+button{background:#007bff;color:white;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}
+button:hover{background:#0056b3}
+button.clear{background:#6c757d;padding:8px 16px}
+button.clear:hover{background:#5a6268}
+button.export{background:#17a2b8}
+button.export:hover{background:#138496}
+button.import{background:#ffc107;color:#212529}
+button.import:hover{background:#e0a800}
+button.delete{background:#dc3545}
+button.delete:hover{background:#c82333}
+#errorMessage{background:#f8d7da;color:#721c24;padding:10px;border-radius:4px;margin-bottom:20px;display:none}
+#successMessage{background:#d4edda;color:#155724;padding:10px;border-radius:4px;margin-bottom:20px;display:none}
+table{width:100%;border-collapse:collapse}
+th{background:#007bff;color:white;padding:12px;text-align:left;font-weight:normal}
+td{padding:12px;border-bottom:1px solid #ddd}
+tr:hover{background:#f8f9fa}
+.amount{text-align:right;font-weight:bold;color:#28a745}
+.count{text-align:center;background:#e7f3ff;border-radius:4px;padding:5px 10px;display:inline-block}
+.stats{background:#f8f9fa;padding:15px;border-radius:4px;margin-bottom:20px;display:flex;justify-content:space-around}
+.stat-item{text-align:center}
+.stat-value{font-size:24px;font-weight:bold;color:#007bff}
+.stat-label{color:#666;font-size:14px}
+.modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,0.5)}
+.modal-content{background:white;margin:50px auto;padding:20px;width:80%;max-width:600px;border-radius:8px}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.modal-header h2{margin:0}
+.close{font-size:28px;font-weight:bold;cursor:pointer;color:#999}
+.close:hover{color:#000}
+textarea{width:100%;height:300px;padding:10px;border:1px solid #ddd;border-radius:4px;font-family:monospace;font-size:12px}
+.file-input{margin-bottom:10px}
+.action-buttons{display:flex;gap:10px;margin-top:10px}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>Portfolio Management Dashboard</h1>
+<div class="controls">
+<div class="search-box">
+<input type="text" id="searchInput" placeholder="ค้นหา PO Number หรือ Client">
+<select id="projectFilter">
+<option value="">ทุก Project</option>
+</select>
+<button onclick="searchData()" style="background:#28a745">ค้นหา</button>
+<button onclick="clearSearch()" class="clear">ล้าง</button>
+</div>
+<div class="import-export">
+<button onclick="showImportModal()" class="import">Import SQL</button>
+<button onclick="exportSQL()" class="export">Export SQL</button>
+<button onclick="exportJSON()" class="export">Export JSON</button>
+<button onclick="exportCSV()" class="export">Export CSV</button>
+</div>
+<div class="timestamp">อัปเดตล่าสุด: <span id="lastUpdate">-</span></div>
+<button onclick="loadPortfolios()">Refresh</button>
+</div>
+<div id="successMessage"></div>
+<div id="errorMessage"></div>
+<div class="stats">
+<div class="stat-item">
+<div class="stat-value" id="totalOrders">0</div>
+<div class="stat-label">จำนวน PO ทั้งหมด</div>
+</div>
+<div class="stat-item">
+<div class="stat-value" id="totalAmount">0</div>
+<div class="stat-label">มูลค่ารวม (บาท)</div>
+</div>
+<div class="stat-item">
+<div class="stat-value" id="totalProjects">0</div>
+<div class="stat-label">จำนวน Project</div>
+</div>
+</div>
+<table>
+<thead>
+<tr>
+<th>PO Number</th>
+<th>วันที่ (พ.ศ.)</th>
+<th>Client Name</th>
+<th>Project</th>
+<th>Total Amount (THB)</th>
+<th>Items Count</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="portfolioTable"></tbody>
+</table>
+</div>
+<div id="importModal" class="modal">
+<div class="modal-content">
+<div class="modal-header">
+<h2>Import SQL Data</h2>
+<span class="close" onclick="closeImportModal()">&times;</span>
+</div>
+<div class="file-input">
+<label>เลือกไฟล์ SQL หรือวาง SQL Script:</label>
+<input type="file" id="sqlFile" accept=".sql" onchange="loadSQLFile()">
+</div>
+<textarea id="sqlInput" placeholder="วาง SQL INSERT statements ที่นี่...
+ตัวอย่าง:
+INSERT INTO portfolios (po_number, issue_date, total_amount, client_name, project, items_count) VALUES
+('PO123456','2024-01-15',500000.00,'Client Name','Project Name',5);"></textarea>
+<div class="action-buttons">
+<button onclick="importSQL()">Import Data</button>
+<button onclick="clearImportData()" class="clear">Clear</button>
+<button onclick="closeImportModal()" class="delete">Cancel</button>
+</div>
+</div>
+</div>
+<script>
+let mockData = [
+  {
+    po_number: 'OB130278',
+    issue_date: '2008-09-05',
+    total_amount: 1070000.00,
+    client_name: 'PTT Exploration and Production',
+    project: 'Bangkok Project',
+    items_count: 6
+  },
+  {
+    po_number: 'OB126282',
+    issue_date: '2008-08-28',
+    total_amount: 110000.00,
+    client_name: 'PTT Exploration and Production',
+    project: 'Bangkok Project',
+    items_count: 2
+  },
+  {
+    po_number: 'OB133728',
+    issue_date: '2009-03-19',
+    total_amount: 458000.00,
+    client_name: 'PTT Exploration and Production',
+    project: 'Bangkok Project',
+    items_count: 13
+  },
+  {
+    po_number: 'OA119706',
+    issue_date: '2010-04-06',
+    total_amount: 510000.00,
+    client_name: 'PTT Exploration and Production',
+    project: 'Arthit Project',
+    items_count: 12
+  }
+];
+let filteredData = [...mockData];
+function formatDateThai(dateString){
+const date=new Date(dateString);
+const day=date.getDate().toString().padStart(2,'0');
+const month=(date.getMonth()+1).toString().padStart(2,'0');
+const yearBE=date.getFullYear()+543;
+return `${day}/${month}/${yearBE}`;
+}
+function formatAmount(amount){
+return new Intl.NumberFormat('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2}).format(amount);
+}
+function updateTimestamp(){
+const now=new Date();
+const thaiDate=formatDateThai(now.toISOString().split('T')[0]);
+const time=now.toLocaleTimeString('th-TH');
+document.getElementById('lastUpdate').textContent=`${thaiDate} ${time}`;
+}
+function updateStats(){
+const totalOrders=filteredData.length;
+const totalAmount=filteredData.reduce((sum,item)=>sum+item.total_amount,0);
+const projects=new Set(filteredData.map(item=>item.project));
+document.getElementById('totalOrders').textContent=totalOrders;
+document.getElementById('totalAmount').textContent=formatAmount(totalAmount);
+document.getElementById('totalProjects').textContent=projects.size;
+}
+function populateProjectFilter(){
+const projects=new Set(mockData.map(item=>item.project));
+const select=document.getElementById('projectFilter');
+select.innerHTML='<option value="">ทุก Project</option>';
+projects.forEach(project=>{
+const option=document.createElement('option');
+option.value=project;
+option.textContent=project;
+select.appendChild(option);
+});
+}
+function deleteItem(po_number){
+if(confirm(`ต้องการลบ PO: ${po_number} หรือไม่?`)){
+mockData=mockData.filter(item=>item.po_number!==po_number);
+filteredData=filteredData.filter(item=>item.po_number!==po_number);
+loadPortfolios();
+showSuccess('ลบข้อมูลสำเร็จ');
+populateProjectFilter();
+}
+}
+function loadPortfolios(){
+const tbody=document.getElementById('portfolioTable');
+tbody.innerHTML='';
+filteredData.forEach(portfolio=>{
+const row=tbody.insertRow();
+row.insertCell(0).textContent=portfolio.po_number;
+row.insertCell(1).textContent=formatDateThai(portfolio.issue_date);
+row.insertCell(2).textContent=portfolio.client_name;
+row.insertCell(3).textContent=portfolio.project;
+const amountCell=row.insertCell(4);
+amountCell.className='amount';
+amountCell.textContent=formatAmount(portfolio.total_amount);
+const countCell=row.insertCell(5);
+countCell.innerHTML=`<span class="count">${portfolio.items_count}</span>`;
+const actionCell=row.insertCell(6);
+actionCell.innerHTML=`<button onclick="deleteItem('${portfolio.po_number}')" class="delete" style="padding:5px 10px;font-size:12px">ลบ</button>`;
+});
+updateTimestamp();
+updateStats();
+}
+function searchData(){
+const searchText=document.getElementById('searchInput').value.toLowerCase();
+const projectFilter=document.getElementById('projectFilter').value;
+filteredData=mockData.filter(item=>{
+const matchSearch=!searchText||(
+item.po_number.toLowerCase().includes(searchText)||
+item.client_name.toLowerCase().includes(searchText)
+);
+const matchProject=!projectFilter||item.project===projectFilter;
+return matchSearch&&matchProject;
+});
+loadPortfolios();
+}
+function clearSearch(){
+document.getElementById('searchInput').value='';
+document.getElementById('projectFilter').value='';
+filteredData=[...mockData];
+loadPortfolios();
+}
+function showImportModal(){
+document.getElementById('importModal').style.display='block';
+}
+function closeImportModal(){
+document.getElementById('importModal').style.display='none';
+}
+function clearImportData(){
+document.getElementById('sqlInput').value='';
+document.getElementById('sqlFile').value='';
+}
+function loadSQLFile(){
+const file=document.getElementById('sqlFile').files[0];
+if(file){
+const reader=new FileReader();
+reader.onload=function(e){
+document.getElementById('sqlInput').value=e.target.result;
+};
+reader.readAsText(file);
+}
+}
+function parseSQLInsert(sql){
+const regex=/INSERT INTO portfolios.*VALUES\s*\((.*?)\);/gi;
+const matches=sql.matchAll(regex);
+const newData=[];
+for(const match of matches){
+const values=match[1];
+const parts=values.split(',').map(p=>p.trim().replace(/'/g,''));
+if(parts.length>=6){
+newData.push({
+po_number:parts[0],
+issue_date:parts[1],
+total_amount:parseFloat(parts[2]),
+client_name:parts[3],
+project:parts[4],
+items_count:parseInt(parts[5])||0
+});
+}
+}
+return newData;
+}
+function importSQL(){
+const sqlText=document.getElementById('sqlInput').value;
+if(!sqlText){
+showError('กรุณาใส่ SQL statements');
+return;
+}
+try{
+const newData=parseSQLInsert(sqlText);
+if(newData.length===0){
+showError('ไม่พบข้อมูลที่ถูกต้องใน SQL');
+return;
+}
+mockData=[...mockData,...newData];
+filteredData=[...mockData];
+populateProjectFilter();
+loadPortfolios();
+closeImportModal();
+clearImportData();
+showSuccess(`Import สำเร็จ ${newData.length} รายการ`);
+}catch(error){
+showError('เกิดข้อผิดพลาดในการ Import: '+error.message);
+}
+}
+function exportSQL(){
+let sql='-- Portfolio Database Export\n';
+sql+='-- Generated: '+new Date().toISOString()+'\n\n';
+sql+='CREATE DATABASE IF NOT EXISTS portfolio_db;\n';
+sql+='USE portfolio_db;\n\n';
+sql+='CREATE TABLE IF NOT EXISTS portfolios (\n';
+sql+='  id INT AUTO_INCREMENT PRIMARY KEY,\n';
+sql+='  po_number VARCHAR(50),\n';
+sql+='  issue_date DATE,\n';
+sql+='  total_amount DECIMAL(15,2),\n';
+sql+='  client_name VARCHAR(100),\n';
+sql+='  project VARCHAR(100),\n';
+sql+='  items_count INT\n';
+sql+=');\n\n';
+sql+='INSERT INTO portfolios (po_number, issue_date, total_amount, client_name, project, items_count) VALUES\n';
+const values=mockData.map((item,index)=>{
+const comma=index<mockData.length-1?',':'';
+return `('${item.po_number}','${item.issue_date}',${item.total_amount},'${item.client_name}','${item.project}',${item.items_count})${comma}`;
+});
+sql+=values.join('\n')+';';
+downloadFile(sql,'portfolio_export.sql','text/sql');
+showSuccess('Export SQL สำเร็จ');
+}
+function exportJSON(){
+const json=JSON.stringify(mockData,null,2);
+downloadFile(json,'portfolio_export.json','application/json');
+showSuccess('Export JSON สำเร็จ');
+}
+function exportCSV(){
+let csv='PO Number,Issue Date,Client Name,Project,Total Amount,Items Count\n';
+mockData.forEach(item=>{
+csv+=`"${item.po_number}","${item.issue_date}","${item.client_name}","${item.project}",${item.total_amount},${item.items_count}\n`;
+});
+downloadFile(csv,'portfolio_export.csv','text/csv');
+showSuccess('Export CSV สำเร็จ');
+}
+function downloadFile(content,filename,type){
+const blob=new Blob([content],{type:type});
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+a.href=url;
+a.download=filename;
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+URL.revokeObjectURL(url);
+}
+function showSuccess(message){
+const div=document.getElementById('successMessage');
+div.textContent=message;
+div.style.display='block';
+setTimeout(()=>div.style.display='none',3000);
+}
+function showError(message){
+const div=document.getElementById('errorMessage');
+div.textContent=message;
+div.style.display='block';
+setTimeout(()=>div.style.display='none',5000);
+}
+function saveToLocalStorage(){
+localStorage.setItem('portfolioData',JSON.stringify(mockData));
+}
+function loadFromLocalStorage(){
+const saved=localStorage.getItem('portfolioData');
+if(saved){
+mockData=JSON.parse(saved);
+filteredData=[...mockData];
+}
+}
+window.addEventListener('beforeunload',saveToLocalStorage);
+loadFromLocalStorage();
+populateProjectFilter();
+loadPortfolios();
+setInterval(updateTimestamp,1000);
+</script>
+</body>
+</html>

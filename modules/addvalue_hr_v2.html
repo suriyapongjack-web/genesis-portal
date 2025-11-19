@@ -1,0 +1,1896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Addvalue HR Management System v2.0</title>
+    <meta name="description" content="Modular HR Management System with Enhanced Import/Export">
+    <meta name="author" content="Addvalue System Co., Ltd.">
+    <meta name="version" content="2.0.0">
+    <meta name="project" content="HR-MGMT-2025">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #107c10;
+            --warning: #ca5010;
+            --danger: #d13438;
+            --info: #0078d4;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        /* System Info Bar */
+        .system-info {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .system-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            font-size: 0.85rem;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* File Operations Panel */
+        .file-ops-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .file-ops-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .file-ops-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        
+        /* Navigation */
+        .nav-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .breadcrumb-item {
+            cursor: pointer;
+            color: var(--info);
+            text-decoration: none;
+        }
+        
+        .breadcrumb-item:hover {
+            text-decoration: underline;
+        }
+        
+        /* Main Program */
+        .main-program {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .search-filters {
+            display: flex;
+            gap: 1rem;
+            flex: 1;
+            max-width: 600px;
+        }
+        
+        /* Employee Cards */
+        .employee-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .employee-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .employee-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary);
+        }
+        
+        .employee-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        
+        .employee-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.25rem;
+        }
+        
+        .employee-id-badge {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        /* Sub Program */
+        .sub-program {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sub-program.active {
+            display: block;
+        }
+        
+        .sub-menu {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .sub-menu-btn {
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            background: #f8f9fa;
+            color: #333;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .sub-menu-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .sub-content {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sub-content.active {
+            display: block;
+        }
+        
+        /* Personal Info Grid */
+        .personal-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .info-section {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+        }
+        
+        .info-section h3 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 0.5rem;
+        }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        /* Form Styles */
+        .form-input, .form-select {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            width: 100%;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-info {
+            background: var(--info);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            background: #f8f9fa;
+            border-radius: 0 0 15px 15px;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            z-index: 1001;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: linear-gradient(135deg, var(--success), #0e6e0e);
+        }
+        
+        .notification.error {
+            background: linear-gradient(135deg, var(--danger), #b92b2b);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .system-info-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-filters {
+                max-width: none;
+                flex-direction: column;
+            }
+            
+            .employee-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- System Information Bar -->
+        <div class="system-info" id="systemInfo">
+            <div class="system-info-grid">
+                <div class="info-item">
+                    <span class="info-label">📁 Project:</span>
+                    <span id="projectName">Addvalue HR Management</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">💬 Chat:</span>
+                    <span id="chatName">HR-MGMT-2025</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">📍 Location:</span>
+                    <span id="location">Bangkok, Thailand</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">📅 Modified:</span>
+                    <span id="lastModified">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">💾 Storage:</span>
+                    <span id="storageType">LocalStorage</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">📂 Path:</span>
+                    <span id="storagePath">addvalueHRv2</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">🔢 Version:</span>
+                    <span id="systemVersion">v2.0.0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">👥 Records:</span>
+                    <span id="totalRecords">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Header -->
+        <div class="header">
+            <h1>Addvalue HR Management System</h1>
+            <p>ระบบจัดการทรัพยากรบุคคลแบบครบวงจร v2.0</p>
+        </div>
+        
+        <!-- File Operations Panel -->
+        <div class="file-ops-panel">
+            <div class="file-ops-header">
+                <h3>📊 Data Management Center</h3>
+                <span id="dataStatus" style="color: var(--success); font-weight: 600;">
+                    ● System Ready
+                </span>
+            </div>
+            <div class="file-ops-grid">
+                <button class="btn btn-success" onclick="HRSystem.saveData()">
+                    💾 Save All
+                </button>
+                <button class="btn btn-info" onclick="HRSystem.exportJSON()">
+                    📥 Export JSON
+                </button>
+                <button class="btn btn-info" onclick="HRSystem.importJSON()">
+                    📤 Import JSON
+                </button>
+                <button class="btn btn-success" onclick="HRSystem.exportExcel()">
+                    📊 Export Excel
+                </button>
+                <button class="btn btn-warning" onclick="HRSystem.importExcel()">
+                    📈 Import Excel
+                </button>
+                <button class="btn btn-danger" onclick="HRSystem.clearData()">
+                    🗑️ Clear Data
+                </button>
+            </div>
+            <input type="file" id="importFile" style="display:none" accept=".json,.xlsx,.xls">
+        </div>
+        
+        <!-- Navigation -->
+        <div class="nav-section">
+            <div class="breadcrumb" id="breadcrumb">
+                <span class="breadcrumb-item" onclick="HRSystem.showMainProgram()">หน้าหลัก</span>
+            </div>
+        </div>
+        
+        <!-- Main Program -->
+        <div class="main-program" id="mainProgram">
+            <!-- Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalEmployees">0</div>
+                    <div class="stat-label">จำนวนพนักงาน</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgSalary">฿0</div>
+                    <div class="stat-label">เงินเดือนเฉลี่ย</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgDailyRate">฿0</div>
+                    <div class="stat-label">ค่าแรงเฉลี่ย/วัน</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalPayroll">฿0</div>
+                    <div class="stat-label">เงินเดือนรวม/เดือน</div>
+                </div>
+            </div>
+            
+            <!-- Controls -->
+            <div class="controls">
+                <div class="search-filters">
+                    <input type="text" class="form-input" placeholder="ค้นหาด้วยชื่อ, ID Card, แผนก..." 
+                           oninput="HRSystem.searchEmployees(this.value)" id="searchInput">
+                    <select class="form-select" onchange="HRSystem.filterByDepartment(this.value)" id="departmentFilter">
+                        <option value="">ทุกแผนก</option>
+                        <option value="Management">ผู้บริหาร</option>
+                        <option value="Engineering">วิศวกรรม</option>
+                        <option value="Technical">เทคนิค</option>
+                        <option value="Sales & Marketing">ขายและการตลาด</option>
+                        <option value="Accounting & Finance">บัญชีและการเงิน</option>
+                        <option value="Administration">ธุรการ</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="HRSystem.openAddModal()">
+                    ➕ เพิ่มพนักงานใหม่
+                </button>
+            </div>
+            
+            <!-- Employee List -->
+            <div class="employee-grid" id="employeeGrid">
+                <!-- Employee cards will be populated here -->
+            </div>
+        </div>
+        
+        <!-- Sub Program -->
+        <div class="sub-program" id="subProgram">
+            <!-- Employee Details Header -->
+            <div class="employee-details-header" id="employeeDetailsHeader"
+                 style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; 
+                        padding: 1.5rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); 
+                        color: white; border-radius: 12px;">
+                <!-- Will be populated when employee is selected -->
+            </div>
+            
+            <!-- Sub Menu -->
+            <div class="sub-menu">
+                <button class="sub-menu-btn active" onclick="HRSystem.showSubContent('personal')">
+                    👤 ประวัติข้อมูลส่วนบุคคล
+                </button>
+                <button class="sub-menu-btn" onclick="HRSystem.showSubContent('salary')">
+                    💰 เงินเดือนปัจจุบัน
+                </button>
+                <button class="sub-menu-btn" onclick="HRSystem.showSubContent('history')">
+                    📈 ประวัติการขึ้นเงินเดือน
+                </button>
+                <button class="sub-menu-btn" onclick="HRSystem.showSubContent('notes')">
+                    📝 หมายเหตุ
+                </button>
+            </div>
+            
+            <!-- Personal Information Content -->
+            <div class="sub-content active" id="personalContent">
+                <h3>ข้อมูลส่วนบุคคล</h3>
+                <div class="personal-info-grid" id="personalInfoGrid">
+                    <!-- Personal info will be populated here -->
+                </div>
+                <div style="margin-top: 2rem; text-align: right;">
+                    <button class="btn btn-warning" onclick="HRSystem.editSelectedEmployee()">
+                        ✏️ แก้ไขข้อมูล
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Salary Content -->
+            <div class="sub-content" id="salaryContent">
+                <h3>ข้อมูลเงินเดือนปัจจุบัน</h3>
+                <div id="salaryInfoGrid">
+                    <!-- Salary info will be populated here -->
+                </div>
+            </div>
+            
+            <!-- Salary History Content -->
+            <div class="sub-content" id="historyContent">
+                <h3>ประวัติการขึ้นเงินเดือน</h3>
+                <div style="margin-bottom: 1rem;">
+                    <button class="btn btn-primary" onclick="HRSystem.addSalaryHistory()">
+                        ➕ เพิ่มประวัติเงินเดือน
+                    </button>
+                </div>
+                <div id="salaryHistoryList">
+                    <!-- Salary history will be populated here -->
+                </div>
+            </div>
+            
+            <!-- Notes Content -->
+            <div class="sub-content" id="notesContent">
+                <h3>หมายเหตุ</h3>
+                <div style="margin-bottom: 1rem; display: flex; gap: 1rem;">
+                    <input type="text" class="form-input" id="newNote" placeholder="เพิ่มหมายเหตุใหม่..." style="flex: 1;">
+                    <button class="btn btn-primary" onclick="HRSystem.addNote()">เพิ่ม</button>
+                </div>
+                <div class="notes-list" id="notesList">
+                    <!-- Notes will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add/Edit Employee Modal -->
+    <div class="modal" id="employeeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">เพิ่มพนักงานใหม่</h2>
+                <button class="btn" style="background: rgba(255,255,255,0.2)" onclick="HRSystem.closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="employeeForm">
+                    <div class="form-group">
+                        <label class="form-label">เลขบัตรประชาชน (ID Card) *</label>
+                        <input type="text" class="form-input" id="idCard" maxlength="13" required 
+                               placeholder="1234567890123">
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">ชื่อ-นามสกุล *</label>
+                            <input type="text" class="form-input" id="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Login *</label>
+                            <input type="text" class="form-input" id="login" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Username</label>
+                            <input type="text" class="form-input" id="emp_username">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">อีเมล *</label>
+                            <input type="email" class="form-input" id="email" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">เบอร์โทรศัพท์</label>
+                            <input type="tel" class="form-input" id="phone">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">วันเกิด</label>
+                            <input type="date" class="form-input" id="dateOfBirth">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">ที่อยู่</label>
+                        <textarea class="form-input" id="address" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">ตำแหน่งงาน *</label>
+                            <input type="text" class="form-input" id="jobPosition" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">แผนก *</label>
+                            <select class="form-select" id="department" required>
+                                <option value="">เลือกแผนก</option>
+                                <option value="Management">ผู้บริหาร</option>
+                                <option value="Engineering">วิศวกรรม</option>
+                                <option value="Technical">เทคนิค</option>
+                                <option value="Sales & Marketing">ขายและการตลาด</option>
+                                <option value="Accounting & Finance">บัญชีและการเงิน</option>
+                                <option value="Administration">ธุรการ</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">วันที่เริ่มงาน</label>
+                            <input type="date" class="form-input" id="employmentDate">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">ชั่วโมง/สัปดาห์</label>
+                            <input type="number" class="form-input" id="hoursPerWeek" value="48">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">เงินเดือน (฿) *</label>
+                            <input type="number" class="form-input" id="salary" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">ประเภทพนักงาน</label>
+                            <select class="form-select" id="type">
+                                <option value="Internal">ประจำ</option>
+                                <option value="External">ภายนอก</option>
+                                <option value="Contract">สัญญาจ้าง</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Extensible Fields Section -->
+                    <div id="extensibleFields">
+                        <!-- Additional fields can be added dynamically here -->
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="HRSystem.closeModal()">ยกเลิก</button>
+                <button class="btn btn-success" onclick="HRSystem.saveEmployee()">บันทึก</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modular HR System
+        const HRSystem = (function() {
+            // System Configuration
+            const CONFIG = {
+                projectName: 'Addvalue HR Management System',
+                chatName: 'HR-MGMT-2025',
+                location: 'Bangkok, Thailand',
+                version: 'v2.0.0',
+                storageKey: 'addvalueHRv2',
+                storageType: 'LocalStorage'
+            };
+            
+            // Data Store
+            let employees = [];
+            let filteredEmployees = [];
+            let selectedEmployee = null;
+            let editingEmployeeId = null;
+            let selectedDepartment = '';
+            
+            // Initialize default employees with ID cards
+            const defaultEmployees = [
+                {
+                    id: 1,
+                    idCard: '1234567890123',
+                    name: 'ณัชชา ยอดอินทร์ (Natcha)',
+                    login: 'Natcha',
+                    username: 'addvalue-natcha',
+                    email: 'addvalue-natcha@hotmail.com',
+                    phone: '0956653833',
+                    address: '111/270 หมู่ที่ 5 ตำบลคลองสาม อำเภอเมืองนครปฐม, 12000',
+                    dateOfBirth: '1990-06-11',
+                    jobPosition: 'เจ้าหน้าที่ธุรการโรงงานการบิน',
+                    department: 'Administration',
+                    employmentDate: '2013-01-01',
+                    hoursPerWeek: 48,
+                    salary: 14000,
+                    type: 'Internal',
+                    salaryHistory: [],
+                    notes: [],
+                    metadata: {
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                        createdBy: 'System',
+                        updatedBy: 'System'
+                    }
+                },
+                {
+                    id: 2,
+                    idCard: '2345678901234',
+                    name: 'Ratchaneekom Mo-on',
+                    login: 'Ratchaneekom',
+                    username: '',
+                    email: 'ratchaneekom@addvaluesystem.com',
+                    phone: '0953096914',
+                    address: '49/18 Moo 8 Soi Bearing48 Sukhumvit 107 Samrong Nuea',
+                    dateOfBirth: '1992-01-23',
+                    jobPosition: 'Telecommunication Technician',
+                    department: 'Engineering',
+                    employmentDate: '2024-04-11',
+                    hoursPerWeek: 48,
+                    salary: 24000,
+                    type: 'Internal',
+                    salaryHistory: [],
+                    notes: [],
+                    metadata: {
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                        createdBy: 'System',
+                        updatedBy: 'System'
+                    }
+                },
+                {
+                    id: 3,
+                    idCard: '3456789012345',
+                    name: 'Sakda Wongjam',
+                    login: 'Sakda',
+                    username: 'addvalue_sakda',
+                    email: 'sakda@addvaluesystem.com',
+                    phone: '0894446913',
+                    address: '59/1 m12, ตำบลเชิงใน, Thailand',
+                    dateOfBirth: '1978-01-22',
+                    jobPosition: 'Chief Engineer',
+                    department: 'Engineering',
+                    employmentDate: '2001-10-03',
+                    hoursPerWeek: 48,
+                    salary: 82000,
+                    type: 'Internal',
+                    salaryHistory: [],
+                    notes: [],
+                    metadata: {
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                        createdBy: 'System',
+                        updatedBy: 'System'
+                    }
+                },
+                {
+                    id: 4,
+                    idCard: '4567890123456',
+                    name: 'Suriyapong Yoo-om-sin',
+                    login: 'Suriyapong',
+                    username: 'addvaluesystem-suriyapong',
+                    email: 'suriyapong@addvaluesystem.com',
+                    phone: '025820114, +66061465616',
+                    address: '59/66 Moo 1 Ban Mai, Pak Kret, Nonthaburi',
+                    dateOfBirth: '1980-04-15',
+                    jobPosition: 'Manager',
+                    department: 'Management',
+                    employmentDate: '2000-10-03',
+                    hoursPerWeek: 48,
+                    salary: 120000,
+                    type: 'Internal',
+                    salaryHistory: [],
+                    notes: [],
+                    metadata: {
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                        createdBy: 'System',
+                        updatedBy: 'System'
+                    }
+                },
+                {
+                    id: 5,
+                    idCard: '5678901234567',
+                    name: 'Aurnchalee Meenak',
+                    login: 'Aurnchalee',
+                    username: 'addvaluesystem-aurnchalee',
+                    email: 'aurnchalee@addvaluesystem.com',
+                    phone: '0877194378',
+                    address: 'Thailand',
+                    dateOfBirth: '1978-11-24',
+                    jobPosition: 'Account Manager',
+                    department: 'Sales & Marketing',
+                    employmentDate: '2000-10-03',
+                    hoursPerWeek: 48,
+                    salary: 50000,
+                    type: 'Internal',
+                    salaryHistory: [],
+                    notes: [],
+                    metadata: {
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                        createdBy: 'System',
+                        updatedBy: 'System'
+                    }
+                },
+                {
+                    id: 6,
+                    idCard: '6789012345678',
+                    name: 'Suttirak Nunsong',
+                    login: 'suttirak',
+                    username: '',
+                    email: 'suttirak@addvaluesystem.com',
+                    phone: '0929286017',
+                    address: '619/21 หมู่ที่ 8 ตำบลราชาฯ อำเภอธัญบุรี จ.ปทุมธานี',
+                    dateOfBirth: '1989-06-21',
+                    jobPosition: 'Telecommunication Engineer',
+                    department: 'Engineering',
+                    employmentDate: '2023-06-10',
+                    hoursPerWeek: 48,
+                    salary: 33000,
+                    type: 'Internal',
+                    salaryHistory: [],
+                    notes: [],
+                    metadata: {
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                        createdBy: 'System',
+                        updatedBy: 'System'
+                    }
+                },
+                {
+                    id: 7,
+                    idCard: '7890123456789',
+                    name: 'Wasupol Amonthat',
+                    login: 'wasupol',
+                    username: '',
+                    email: 'wasupol@addvaluesystem.com',
+                    phone: '0944592666',
+                    address: '145/594 ลาดกระบัง กรุงเทพฯ',
+                    dateOfBirth: '1990-10-10',
+                    jobPosition: 'Sales Manager',
+                    department: 'Sales & Marketing',
+                    employmentDate: '2021-06-16',
+                    hoursPerWeek: 48,
+                    salary: 18000,
+                    type: 'Internal',
+                    salaryHistory: [],
+                    notes: [],
+                    metadata: {
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                        createdBy: 'System',
+                        updatedBy: 'System'
+                    }
+                },
+                {
+                    id: 8,
+                    idCard: '8901234567890',
+                    name: 'Yuttapong Eakimphon',
+                    login: 'Yuttapong',
+                    username: 'addvalue-yuttapong',
+                    email: 'yuttapong@addvaluesystem.com',
+                    phone: '0846998570',
+                    address: '7/203 ตำบลท่าราม แขวงดินแดง',
+                    dateOfBirth: '1980-04-23',
+                    jobPosition: 'Chief Technical',
+                    department: 'Technical',
+                    employmentDate: '2001-10-03',
+                    hoursPerWeek: 48,
+                    salary: 37000,
+                    type: 'Internal',
+                    salaryHistory: [],
+                    notes: [],
+                    metadata: {
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                        createdBy: 'System',
+                        updatedBy: 'System'
+                    }
+                }
+            ];
+            
+            // Core Functions Module
+            const Core = {
+                init() {
+                    this.loadData();
+                    this.setupEventListeners();
+                    this.updateSystemInfo();
+                    UI.updateStatistics();
+                    UI.renderEmployees();
+                },
+                
+                loadData() {
+                    try {
+                        const data = localStorage.getItem(CONFIG.storageKey);
+                        if (data) {
+                            const parsed = JSON.parse(data);
+                            employees = parsed.employees || parsed;
+                            showNotification('ข้อมูลถูกโหลดเรียบร้อย', 'success');
+                        } else {
+                            employees = [...defaultEmployees];
+                            this.saveData();
+                        }
+                        filteredEmployees = [...employees];
+                    } catch (e) {
+                        console.error('Load data error:', e);
+                        employees = [...defaultEmployees];
+                        filteredEmployees = [...employees];
+                    }
+                },
+                
+                saveData() {
+                    try {
+                        const dataToSave = {
+                            project: CONFIG.projectName,
+                            version: CONFIG.version,
+                            employees: employees,
+                            lastModified: new Date().toISOString(),
+                            totalRecords: employees.length
+                        };
+                        localStorage.setItem(CONFIG.storageKey, JSON.stringify(dataToSave));
+                        this.updateSystemInfo();
+                        showNotification('บันทึกข้อมูลสำเร็จ', 'success');
+                    } catch (e) {
+                        console.error('Save error:', e);
+                        showNotification('ไม่สามารถบันทึกข้อมูลได้', 'error');
+                    }
+                },
+                
+                clearData() {
+                    if (confirm('ต้องการลบข้อมูลทั้งหมด? การกระทำนี้ไม่สามารถย้อนกลับได้')) {
+                        employees = [];
+                        filteredEmployees = [];
+                        selectedEmployee = null;
+                        this.saveData();
+                        UI.updateStatistics();
+                        UI.renderEmployees();
+                        showNotification('ลบข้อมูลทั้งหมดเรียบร้อย', 'success');
+                    }
+                },
+                
+                setupEventListeners() {
+                    // Close modal on outside click
+                    document.getElementById('employeeModal').addEventListener('click', function(e) {
+                        if (e.target === this) {
+                            HRSystem.closeModal();
+                        }
+                    });
+                    
+                    // Import file handler
+                    document.getElementById('importFile').addEventListener('change', function(e) {
+                        const file = e.target.files[0];
+                        if (file) {
+                            if (file.name.endsWith('.json')) {
+                                ImportExport.handleJSONImport(file);
+                            } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                                ImportExport.handleExcelImport(file);
+                            }
+                        }
+                    });
+                },
+                
+                updateSystemInfo() {
+                    document.getElementById('projectName').textContent = CONFIG.projectName;
+                    document.getElementById('chatName').textContent = CONFIG.chatName;
+                    document.getElementById('location').textContent = CONFIG.location;
+                    document.getElementById('lastModified').textContent = new Date().toLocaleString('th-TH');
+                    document.getElementById('storageType').textContent = CONFIG.storageType;
+                    document.getElementById('storagePath').textContent = CONFIG.storageKey;
+                    document.getElementById('systemVersion').textContent = CONFIG.version;
+                    document.getElementById('totalRecords').textContent = employees.length;
+                }
+            };
+            
+            // UI Module
+            const UI = {
+                updateStatistics() {
+                    const totalEmployees = employees.length;
+                    const totalSalary = employees.reduce((sum, emp) => sum + emp.salary, 0);
+                    const avgSalary = totalEmployees > 0 ? totalSalary / totalEmployees : 0;
+                    const avgDailyRate = totalEmployees > 0 ? 
+                        employees.reduce((sum, emp) => sum + (emp.salary / 30), 0) / totalEmployees : 0;
+                    
+                    document.getElementById('totalEmployees').textContent = totalEmployees;
+                    document.getElementById('avgSalary').textContent = '฿' + Math.round(avgSalary).toLocaleString();
+                    document.getElementById('avgDailyRate').textContent = '฿' + Math.round(avgDailyRate).toLocaleString();
+                    document.getElementById('totalPayroll').textContent = '฿' + totalSalary.toLocaleString();
+                },
+                
+                renderEmployees() {
+                    const container = document.getElementById('employeeGrid');
+                    container.innerHTML = '';
+                    
+                    const sortedEmployees = Utils.sortEmployees([...filteredEmployees]);
+                    
+                    sortedEmployees.forEach((employee, index) => {
+                        const dailyRate = Math.round(employee.salary / 30);
+                        
+                        const card = document.createElement('div');
+                        card.className = 'employee-card';
+                        card.onclick = () => this.showSubProgram(employee);
+                        
+                        card.innerHTML = `
+                            <div class="employee-header">
+                                <div>
+                                    <div class="employee-name">${employee.name}</div>
+                                    <div style="font-size: 0.9rem; color: #666;">
+                                        ${employee.jobPosition}
+                                    </div>
+                                    <div style="font-size: 0.8rem; color: #999; margin-top: 0.25rem;">
+                                        ID: ${employee.idCard}
+                                    </div>
+                                </div>
+                                <div class="employee-id-badge">#${index + 1}</div>
+                            </div>
+                            
+                            <div style="margin-top: 1rem;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span style="color: #666;">แผนก:</span>
+                                    <span>${Utils.getDepartmentBadge(employee.department)}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span style="color: #666;">อีเมล:</span>
+                                    <span style="font-size: 0.9rem;">${employee.email}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                    <span style="color: #666;">เงินเดือน:</span>
+                                    <span style="color: var(--success); font-weight: 600;">
+                                        ฿${employee.salary.toLocaleString()}
+                                    </span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span style="color: #666;">ค่าแรง/วัน:</span>
+                                    <span>฿${dailyRate.toLocaleString()}</span>
+                                </div>
+                            </div>
+                        `;
+                        
+                        container.appendChild(card);
+                    });
+                },
+                
+                showMainProgram() {
+                    document.getElementById('mainProgram').style.display = 'block';
+                    document.getElementById('subProgram').classList.remove('active');
+                    document.getElementById('breadcrumb').innerHTML = 
+                        '<span class="breadcrumb-item" onclick="HRSystem.showMainProgram()">หน้าหลัก</span>';
+                    selectedEmployee = null;
+                    filteredEmployees = [...employees];
+                    this.renderEmployees();
+                },
+                
+                showSubProgram(employee) {
+                    selectedEmployee = employee;
+                    document.getElementById('mainProgram').style.display = 'none';
+                    document.getElementById('subProgram').classList.add('active');
+                    
+                    document.getElementById('breadcrumb').innerHTML = `
+                        <span class="breadcrumb-item" onclick="HRSystem.showMainProgram()">หน้าหลัก</span>
+                        <span style="color: #999;"> > </span>
+                        <span>${employee.name}</span>
+                    `;
+                    
+                    document.getElementById('employeeDetailsHeader').innerHTML = `
+                        <div>
+                            <h2>${employee.name}</h2>
+                            <p style="opacity: 0.9;">
+                                ${employee.jobPosition} • ID: ${employee.idCard}
+                            </p>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.25rem;">
+                                ฿${employee.salary.toLocaleString()}
+                            </div>
+                            <div style="opacity: 0.9;">เงินเดือน/เดือน</div>
+                        </div>
+                    `;
+                    
+                    this.showSubContent('personal');
+                },
+                
+                showSubContent(contentType) {
+                    document.querySelectorAll('.sub-menu-btn').forEach(btn => btn.classList.remove('active'));
+                    event.target.classList.add('active');
+                    
+                    document.querySelectorAll('.sub-content').forEach(content => content.classList.remove('active'));
+                    document.getElementById(contentType + 'Content').classList.add('active');
+                    
+                    switch(contentType) {
+                        case 'personal':
+                            this.loadPersonalInfo();
+                            break;
+                        case 'salary':
+                            this.loadSalaryInfo();
+                            break;
+                        case 'history':
+                            this.loadSalaryHistory();
+                            break;
+                        case 'notes':
+                            this.loadNotes();
+                            break;
+                    }
+                },
+                
+                loadPersonalInfo() {
+                    if (!selectedEmployee) return;
+                    
+                    const container = document.getElementById('personalInfoGrid');
+                    container.innerHTML = `
+                        <div class="info-section">
+                            <h3>🆔 ข้อมูลประจำตัว</h3>
+                            <div class="detail-item">
+                                <span style="color: #666;">เลขบัตรประชาชน:</span>
+                                <span style="font-weight: 600;">${selectedEmployee.idCard}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span style="color: #666;">ชื่อ-นามสกุล:</span>
+                                <span>${selectedEmployee.name}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span style="color: #666;">วันเกิด:</span>
+                                <span>${selectedEmployee.dateOfBirth || '-'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span style="color: #666;">อายุ:</span>
+                                <span>${Utils.calculateAge(selectedEmployee.dateOfBirth) + ' ปี'}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-section">
+                            <h3>📞 ข้อมูลติดต่อ</h3>
+                            <div class="detail-item">
+                                <span style="color: #666;">อีเมล:</span>
+                                <span>${selectedEmployee.email}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span style="color: #666;">โทรศัพท์:</span>
+                                <span>${selectedEmployee.phone || '-'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span style="color: #666;">ที่อยู่:</span>
+                                <span>${selectedEmployee.address || '-'}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="info-section">
+                            <h3>💼 ข้อมูลการทำงาน</h3>
+                            <div class="detail-item">
+                                <span style="color: #666;">Login:</span>
+                                <span>${selectedEmployee.login}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span style="color: #666;">Username:</span>
+                                <span>${selectedEmployee.username || '-'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span style="color: #666;">แผนก:</span>
+                                <span>${selectedEmployee.department}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span style="color: #666;">ตำแหน่ง:</span>
+                                <span>${selectedEmployee.jobPosition}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span style="color: #666;">วันเริ่มงาน:</span>
+                                <span>${selectedEmployee.employmentDate || '-'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span style="color: #666;">อายุงาน:</span>
+                                <span>${Utils.calculateWorkExperience(selectedEmployee.employmentDate)}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span style="color: #666;">ประเภท:</span>
+                                <span>${selectedEmployee.type}</span>
+                            </div>
+                        </div>
+                    `;
+                },
+                
+                loadSalaryInfo() {
+                    if (!selectedEmployee) return;
+                    
+                    const monthlyRate = selectedEmployee.salary;
+                    const yearlyRate = monthlyRate * 12;
+                    const dailyRate = Math.round(monthlyRate / 30);
+                    const hourlyRate = Math.round(monthlyRate / (selectedEmployee.hoursPerWeek * 4.33));
+                    
+                    const container = document.getElementById('salaryInfoGrid');
+                    container.innerHTML = `
+                        <div class="info-section">
+                            <h3>💰 รายละเอียดเงินเดือน</h3>
+                            <div class="detail-item">
+                                <span style="color: #666;">เงินเดือน/เดือน:</span>
+                                <span style="color: var(--success); font-weight: 600; font-size: 1.1rem;">
+                                    ฿${monthlyRate.toLocaleString()}
+                                </span>
+                            </div>
+                            <div class="detail-item">
+                                <span style="color: #666;">เงินเดือน/ปี:</span>
+                                <span>฿${yearlyRate.toLocaleString()}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span style="color: #666;">ค่าแรง/วัน:</span>
+                                <span>฿${dailyRate.toLocaleString()}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span style="color: #666;">ค่าแรง/ชั่วโมง:</span>
+                                <span>฿${hourlyRate.toLocaleString()}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span style="color: #666;">ชั่วโมง/สัปดาห์:</span>
+                                <span>${selectedEmployee.hoursPerWeek} ชั่วโมง</span>
+                            </div>
+                        </div>
+                    `;
+                },
+                
+                loadSalaryHistory() {
+                    if (!selectedEmployee) return;
+                    
+                    const container = document.getElementById('salaryHistoryList');
+                    const history = selectedEmployee.salaryHistory || [];
+                    
+                    if (history.length === 0) {
+                        container.innerHTML = '<div class="info-section"><p>ยังไม่มีประวัติการขึ้นเงินเดือน</p></div>';
+                        return;
+                    }
+                    
+                    let html = '';
+                    history.forEach(item => {
+                        const increase = item.newSalary - item.oldSalary;
+                        const percent = ((increase / item.oldSalary) * 100).toFixed(1);
+                        
+                        html += `
+                            <div style="background: white; border: 1px solid #e9ecef; border-radius: 10px; 
+                                        padding: 1.5rem; margin-bottom: 1rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <span style="color: #d13438; text-decoration: line-through; font-size: 1.1rem;">
+                                            ฿${item.oldSalary.toLocaleString()}
+                                        </span>
+                                        <span style="color: #666; margin: 0 0.5rem;">→</span>
+                                        <span style="color: var(--success); font-weight: 600; font-size: 1.2rem;">
+                                            ฿${item.newSalary.toLocaleString()}
+                                        </span>
+                                    </div>
+                                    <span style="color: #666; font-size: 0.9rem;">
+                                        ${item.effectiveDate}
+                                    </span>
+                                </div>
+                                <div style="margin-top: 0.5rem; color: #333; font-style: italic;">
+                                    ${item.reason}
+                                </div>
+                                <div style="margin-top: 0.5rem; padding: 0.5rem; background: #d4edda; 
+                                            border-radius: 5px; color: #155724;">
+                                    เพิ่มขึ้น: +฿${increase.toLocaleString()} (+${percent}%)
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    container.innerHTML = html;
+                },
+                
+                loadNotes() {
+                    if (!selectedEmployee) return;
+                    
+                    const container = document.getElementById('notesList');
+                    const notes = selectedEmployee.notes || [];
+                    
+                    if (notes.length === 0) {
+                        container.innerHTML = '<div class="info-section"><p>ยังไม่มีหมายเหตุ</p></div>';
+                        return;
+                    }
+                    
+                    let html = '';
+                    notes.forEach(note => {
+                        html += `
+                            <div style="background: white; border: 1px solid #e9ecef; border-radius: 10px; 
+                                        padding: 1rem; margin-bottom: 1rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; 
+                                            margin-bottom: 0.5rem;">
+                                    <span style="color: #666; font-size: 0.8rem;">${note.date}</span>
+                                    <span style="background: var(--primary); color: white; padding: 0.25rem 0.5rem; 
+                                                border-radius: 10px; font-size: 0.7rem;">
+                                        ${note.createdBy || 'Admin'}
+                                    </span>
+                                </div>
+                                <div style="color: #333; line-height: 1.5;">${note.content}</div>
+                            </div>
+                        `;
+                    });
+                    
+                    container.innerHTML = html;
+                }
+            };
+            
+            // Employee Management Module
+            const EmployeeManager = {
+                openAddModal() {
+                    editingEmployeeId = null;
+                    document.getElementById('modalTitle').textContent = 'เพิ่มพนักงานใหม่';
+                    document.getElementById('employeeForm').reset();
+                    document.getElementById('employeeModal').classList.add('active');
+                },
+                
+                editSelectedEmployee() {
+                    if (!selectedEmployee) return;
+                    
+                    editingEmployeeId = selectedEmployee.id;
+                    document.getElementById('modalTitle').textContent = 'แก้ไขข้อมูลพนักงาน';
+                    
+                    // Populate form
+                    document.getElementById('idCard').value = selectedEmployee.idCard;
+                    document.getElementById('name').value = selectedEmployee.name;
+                    document.getElementById('login').value = selectedEmployee.login;
+                    document.getElementById('emp_username').value = selectedEmployee.username;
+                    document.getElementById('email').value = selectedEmployee.email;
+                    document.getElementById('phone').value = selectedEmployee.phone;
+                    document.getElementById('dateOfBirth').value = selectedEmployee.dateOfBirth;
+                    document.getElementById('address').value = selectedEmployee.address;
+                    document.getElementById('jobPosition').value = selectedEmployee.jobPosition;
+                    document.getElementById('department').value = selectedEmployee.department;
+                    document.getElementById('employmentDate').value = selectedEmployee.employmentDate;
+                    document.getElementById('hoursPerWeek').value = selectedEmployee.hoursPerWeek;
+                    document.getElementById('salary').value = selectedEmployee.salary;
+                    document.getElementById('type').value = selectedEmployee.type;
+                    
+                    document.getElementById('employeeModal').classList.add('active');
+                },
+                
+                closeModal() {
+                    document.getElementById('employeeModal').classList.remove('active');
+                    editingEmployeeId = null;
+                },
+                
+                saveEmployee() {
+                    const form = document.getElementById('employeeForm');
+                    if (!form.checkValidity()) {
+                        form.reportValidity();
+                        return;
+                    }
+                    
+                    const employeeData = {
+                        idCard: document.getElementById('idCard').value,
+                        name: document.getElementById('name').value,
+                        login: document.getElementById('login').value,
+                        username: document.getElementById('emp_username').value,
+                        email: document.getElementById('email').value,
+                        phone: document.getElementById('phone').value,
+                        dateOfBirth: document.getElementById('dateOfBirth').value,
+                        address: document.getElementById('address').value,
+                        jobPosition: document.getElementById('jobPosition').value,
+                        department: document.getElementById('department').value,
+                        employmentDate: document.getElementById('employmentDate').value,
+                        hoursPerWeek: parseInt(document.getElementById('hoursPerWeek').value),
+                        salary: parseInt(document.getElementById('salary').value),
+                        type: document.getElementById('type').value
+                    };
+                    
+                    if (editingEmployeeId) {
+                        // Update existing
+                        const index = employees.findIndex(e => e.id === editingEmployeeId);
+                        employees[index] = {
+                            ...employees[index],
+                            ...employeeData,
+                            metadata: {
+                                ...employees[index].metadata,
+                                updatedAt: new Date().toISOString(),
+                                updatedBy: 'User'
+                            }
+                        };
+                        
+                        if (selectedEmployee && selectedEmployee.id === editingEmployeeId) {
+                            selectedEmployee = employees[index];
+                            UI.loadPersonalInfo();
+                        }
+                        
+                        showNotification('อัปเดตข้อมูลพนักงานเรียบร้อย', 'success');
+                    } else {
+                        // Add new
+                        const newId = Math.max(...employees.map(e => e.id), 0) + 1;
+                        employees.push({
+                            id: newId,
+                            ...employeeData,
+                            salaryHistory: [],
+                            notes: [],
+                            metadata: {
+                                createdAt: new Date().toISOString(),
+                                updatedAt: new Date().toISOString(),
+                                createdBy: 'User',
+                                updatedBy: 'User'
+                            }
+                        });
+                        showNotification('เพิ่มพนักงานใหม่เรียบร้อย', 'success');
+                    }
+                    
+                    filteredEmployees = [...employees];
+                    Core.saveData();
+                    UI.updateStatistics();
+                    UI.renderEmployees();
+                    this.closeModal();
+                },
+                
+                searchEmployees(query) {
+                    if (!query) {
+                        filteredEmployees = [...employees];
+                    } else {
+                        const searchTerm = query.toLowerCase();
+                        filteredEmployees = employees.filter(emp =>
+                            emp.name.toLowerCase().includes(searchTerm) ||
+                            emp.idCard.includes(searchTerm) ||
+                            emp.jobPosition.toLowerCase().includes(searchTerm) ||
+                            emp.department.toLowerCase().includes(searchTerm) ||
+                            emp.email.toLowerCase().includes(searchTerm)
+                        );
+                    }
+                    UI.renderEmployees();
+                },
+                
+                filterByDepartment(department) {
+                    if (!department) {
+                        filteredEmployees = [...employees];
+                    } else {
+                        filteredEmployees = employees.filter(emp => emp.department === department);
+                    }
+                    UI.renderEmployees();
+                },
+                
+                addSalaryHistory() {
+                    // Implementation for salary history modal
+                    alert('Salary History Modal - To be implemented');
+                },
+                
+                addNote() {
+                    const noteText = document.getElementById('newNote').value.trim();
+                    if (!noteText || !selectedEmployee) return;
+                    
+                    const noteItem = {
+                        date: new Date().toLocaleString('th-TH'),
+                        content: noteText,
+                        createdBy: 'User'
+                    };
+                    
+                    if (!selectedEmployee.notes) {
+                        selectedEmployee.notes = [];
+                    }
+                    
+                    selectedEmployee.notes.push(noteItem);
+                    
+                    const index = employees.findIndex(e => e.id === selectedEmployee.id);
+                    employees[index] = selectedEmployee;
+                    
+                    Core.saveData();
+                    UI.loadNotes();
+                    document.getElementById('newNote').value = '';
+                    showNotification('เพิ่มหมายเหตุเรียบร้อย', 'success');
+                }
+            };
+            
+            // Import/Export Module
+            const ImportExport = {
+                exportJSON() {
+                    const exportData = {
+                        project: CONFIG.projectName,
+                        version: CONFIG.version,
+                        chatName: CONFIG.chatName,
+                        location: CONFIG.location,
+                        exportDate: new Date().toISOString(),
+                        employees: employees,
+                        metadata: {
+                            totalRecords: employees.length,
+                            totalSalary: employees.reduce((sum, emp) => sum + emp.salary, 0),
+                            departments: [...new Set(employees.map(emp => emp.department))]
+                        }
+                    };
+                    
+                    const blob = new Blob([JSON.stringify(exportData, null, 2)], {type: 'application/json'});
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `HR_Data_${new Date().toISOString().split('T')[0]}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    
+                    showNotification('Export JSON สำเร็จ', 'success');
+                },
+                
+                importJSON() {
+                    document.getElementById('importFile').accept = '.json';
+                    document.getElementById('importFile').click();
+                },
+                
+                handleJSONImport(file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const data = JSON.parse(e.target.result);
+                            employees = data.employees || data;
+                            filteredEmployees = [...employees];
+                            Core.saveData();
+                            UI.updateStatistics();
+                            UI.renderEmployees();
+                            showNotification('Import JSON สำเร็จ', 'success');
+                        } catch (err) {
+                            console.error('Import error:', err);
+                            showNotification('ไม่สามารถ import ไฟล์ได้', 'error');
+                        }
+                    };
+                    reader.readAsText(file);
+                },
+                
+                exportExcel() {
+                    try {
+                        // Main sheet
+                        const mainData = employees.map((emp, idx) => ({
+                            'ลำดับ': idx + 1,
+                            'ID Card': emp.idCard,
+                            'ชื่อ-นามสกุล': emp.name,
+                            'Login': emp.login,
+                            'Username': emp.username || '',
+                            'อีเมล': emp.email,
+                            'โทรศัพท์': emp.phone || '',
+                            'วันเกิด': emp.dateOfBirth || '',
+                            'ที่อยู่': emp.address || '',
+                            'แผนก': emp.department,
+                            'ตำแหน่ง': emp.jobPosition,
+                            'วันเริ่มงาน': emp.employmentDate || '',
+                            'ชั่วโมง/สัปดาห์': emp.hoursPerWeek,
+                            'เงินเดือน': emp.salary,
+                            'ประเภท': emp.type
+                        }));
+                        
+                        // Summary sheet
+                        const summaryData = [
+                            { 'รายการ': 'Project Name', 'ข้อมูล': CONFIG.projectName },
+                            { 'รายการ': 'Version', 'ข้อมูล': CONFIG.version },
+                            { 'รายการ': 'Export Date', 'ข้อมูล': new Date().toLocaleString('th-TH') },
+                            { 'รายการ': 'Total Employees', 'ข้อมูล': employees.length },
+                            { 'รายการ': 'Total Salary', 'ข้อมูล': employees.reduce((sum, emp) => sum + emp.salary, 0) },
+                            { 'รายการ': 'Average Salary', 'ข้อมูล': Math.round(employees.reduce((sum, emp) => sum + emp.salary, 0) / employees.length) }
+                        ];
+                        
+                        const wb = XLSX.utils.book_new();
+                        const ws1 = XLSX.utils.json_to_sheet(mainData);
+                        const ws2 = XLSX.utils.json_to_sheet(summaryData);
+                        
+                        XLSX.utils.book_append_sheet(wb, ws1, "Employees");
+                        XLSX.utils.book_append_sheet(wb, ws2, "Summary");
+                        
+                        XLSX.writeFile(wb, `HR_Data_${new Date().toISOString().split('T')[0]}.xlsx`);
+                        showNotification('Export Excel สำเร็จ', 'success');
+                    } catch (err) {
+                        console.error('Export Excel error:', err);
+                        showNotification('ไม่สามารถ export Excel ได้', 'error');
+                    }
+                },
+                
+                importExcel() {
+                    document.getElementById('importFile').accept = '.xlsx,.xls';
+                    document.getElementById('importFile').click();
+                },
+                
+                handleExcelImport(file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        try {
+                            const data = new Uint8Array(e.target.result);
+                            const workbook = XLSX.read(data, {type: 'array'});
+                            const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                            const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                            
+                            // Map Excel data to employee structure
+                            employees = jsonData.map((row, idx) => ({
+                                id: idx + 1,
+                                idCard: row['ID Card'] || row['เลขบัตรประชาชน'] || '',
+                                name: row['ชื่อ-นามสกุล'] || row['Name'] || '',
+                                login: row['Login'] || '',
+                                username: row['Username'] || '',
+                                email: row['อีเมล'] || row['Email'] || '',
+                                phone: row['โทรศัพท์'] || row['Phone'] || '',
+                                dateOfBirth: row['วันเกิด'] || row['Birth Date'] || '',
+                                address: row['ที่อยู่'] || row['Address'] || '',
+                                department: row['แผนก'] || row['Department'] || '',
+                                jobPosition: row['ตำแหน่ง'] || row['Position'] || '',
+                                employmentDate: row['วันเริ่มงาน'] || row['Start Date'] || '',
+                                hoursPerWeek: parseInt(row['ชั่วโมง/สัปดาห์'] || row['Hours/Week'] || 48),
+                                salary: parseInt(row['เงินเดือน'] || row['Salary'] || 0),
+                                type: row['ประเภท'] || row['Type'] || 'Internal',
+                                salaryHistory: [],
+                                notes: [],
+                                metadata: {
+                                    createdAt: new Date().toISOString(),
+                                    updatedAt: new Date().toISOString(),
+                                    createdBy: 'Import',
+                                    updatedBy: 'Import'
+                                }
+                            }));
+                            
+                            filteredEmployees = [...employees];
+                            Core.saveData();
+                            UI.updateStatistics();
+                            UI.renderEmployees();
+                            showNotification('Import Excel สำเร็จ', 'success');
+                        } catch (err) {
+                            console.error('Import Excel error:', err);
+                            showNotification('ไม่สามารถ import Excel ได้', 'error');
+                        }
+                    };
+                    reader.readAsArrayBuffer(file);
+                }
+            };
+            
+            // Utils Module
+            const Utils = {
+                sortEmployees(employeeList) {
+                    return employeeList.sort((a, b) => {
+                        let nameA = a.name;
+                        let nameB = b.name;
+                        
+                        // Extract English name if exists
+                        if (nameA.includes('(')) {
+                            const match = nameA.match(/\(([^)]+)\)/);
+                            if (match) nameA = match[1];
+                        }
+                        if (nameB.includes('(')) {
+                            const match = nameB.match(/\(([^)]+)\)/);
+                            if (match) nameB = match[1];
+                        }
+                        
+                        return nameA.toLowerCase().localeCompare(nameB.toLowerCase());
+                    });
+                },
+                
+                getDepartmentBadge(department) {
+                    const badges = {
+                        'Management': { bg: '#0078d4', text: 'ผู้บริหาร' },
+                        'Engineering': { bg: '#107c10', text: 'วิศวกรรม' },
+                        'Technical': { bg: '#ca5010', text: 'เทคนิค' },
+                        'Sales & Marketing': { bg: '#8764b8', text: 'ขาย/ตลาด' },
+                        'Accounting & Finance': { bg: '#d83b01', text: 'บัญชี' },
+                        'Administration': { bg: '#d13438', text: 'ธุรการ' }
+                    };
+                    
+                    const badge = badges[department] || { bg: '#666', text: department };
+                    return `<span style="background: ${badge.bg}; color: white; padding: 0.25rem 0.5rem; 
+                                         border-radius: 10px; font-size: 0.75rem;">${badge.text}</span>`;
+                },
+                
+                calculateAge(birthDate) {
+                    if (!birthDate) return '-';
+                    const today = new Date();
+                    const birth = new Date(birthDate);
+                    let age = today.getFullYear() - birth.getFullYear();
+                    const m = today.getMonth() - birth.getMonth();
+                    if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+                        age--;
+                    }
+                    return age;
+                },
+                
+                calculateWorkExperience(startDate) {
+                    if (!startDate) return '-';
+                    const today = new Date();
+                    const start = new Date(startDate);
+                    const years = today.getFullYear() - start.getFullYear();
+                    const months = today.getMonth() - start.getMonth();
+                    
+                    let totalMonths = years * 12 + months;
+                    if (today.getDate() < start.getDate()) {
+                        totalMonths--;
+                    }
+                    
+                    const expYears = Math.floor(totalMonths / 12);
+                    const expMonths = totalMonths % 12;
+                    
+                    if (expYears > 0 && expMonths > 0) {
+                        return `${expYears} ปี ${expMonths} เดือน`;
+                    } else if (expYears > 0) {
+                        return `${expYears} ปี`;
+                    } else {
+                        return `${expMonths} เดือน`;
+                    }
+                }
+            };
+            
+            // Notification function
+            function showNotification(message, type) {
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+                
+                setTimeout(() => notification.classList.add('show'), 100);
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                    setTimeout(() => document.body.removeChild(notification), 300);
+                }, 3000);
+            }
+            
+            // Public API
+            return {
+                init: () => Core.init(),
+                saveData: () => Core.saveData(),
+                clearData: () => Core.clearData(),
+                exportJSON: () => ImportExport.exportJSON(),
+                importJSON: () => ImportExport.importJSON(),
+                exportExcel: () => ImportExport.exportExcel(),
+                importExcel: () => ImportExport.importExcel(),
+                showMainProgram: () => UI.showMainProgram(),
+                showSubContent: (content) => UI.showSubContent(content),
+                openAddModal: () => EmployeeManager.openAddModal(),
+                editSelectedEmployee: () => EmployeeManager.editSelectedEmployee(),
+                closeModal: () => EmployeeManager.closeModal(),
+                saveEmployee: () => EmployeeManager.saveEmployee(),
+                searchEmployees: (query) => EmployeeManager.searchEmployees(query),
+                filterByDepartment: (dept) => EmployeeManager.filterByDepartment(dept),
+                addSalaryHistory: () => EmployeeManager.addSalaryHistory(),
+                addNote: () => EmployeeManager.addNote()
+            };
+        })();
+        
+        // Initialize on DOM ready
+        document.addEventListener('DOMContentLoaded', function() {
+            HRSystem.init();
+        });
+    </script>
+</body>
+</html>

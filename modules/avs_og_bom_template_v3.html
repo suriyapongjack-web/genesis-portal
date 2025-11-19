@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AVS O&G Service BOM Template v3.0</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font:12px Arial,sans-serif;background:#f5f5f5;padding:10px}
+.header{background:#1e3a5f;color:#fff;padding:20px;text-align:center;border-radius:5px;margin-bottom:15px}
+.header h1{font-size:22px;margin-bottom:5px}
+.header p{font-size:12px;opacity:0.9}
+.container{max-width:1400px;margin:0 auto}
+.section{background:#fff;margin:15px 0;border-radius:5px;box-shadow:0 2px 5px rgba(0,0,0,0.1)}
+.section-title{background:#2c5282;color:#fff;padding:12px;font-weight:bold;font-size:14px;border-radius:5px 5px 0 0}
+.table{width:100%;border-collapse:collapse}
+.table th{background:#e8f4fd;padding:10px;border:1px solid #cbd5e0;font-size:11px;text-align:left;font-weight:600}
+.table td{padding:8px;border:1px solid #cbd5e0;font-size:11px}
+.table tr:hover{background:#f7fafc}
+.code{background:#2b6cb0;color:#fff;padding:3px 8px;border-radius:3px;font-size:10px;font-weight:bold}
+.price-green{color:#22c55e;font-weight:bold;text-align:right}
+.price-red{color:#ef4444;font-weight:bold;text-align:right}
+.price-blue{color:#3b82f6;font-weight:bold;text-align:right}
+.highlight{background:#fef3c7}
+.subtotal{background:#f0f9ff;font-weight:bold}
+.total{background:#dbeafe;font-weight:bold;font-size:12px}
+.note{background:#fef3c7;padding:12px;margin:15px 0;border-left:4px solid #f59e0b;border-radius:3px}
+.note h4{margin-bottom:5px;font-size:12px;color:#92400e}
+.note ul{margin-left:20px;font-size:11px;color:#92400e}
+.project-info{background:#e0f2fe;padding:10px;margin-bottom:10px;border-radius:3px}
+.project-info input{border:1px solid #cbd5e0;padding:4px;border-radius:3px;margin:0 5px}
+.footer{text-align:center;padding:15px;color:#64748b;font-size:10px;margin-top:20px}
+.editable{background:#fef9c3;border:1px dashed #facc15 !important;cursor:pointer}
+@media print{body{background:#fff}.section{box-shadow:none;page-break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+<h1>🛢️ ADDVALUE SYSTEM CO., LTD.</h1>
+<h2>OIL & GAS SERVICE BOM TEMPLATE</h2>
+<p>Telecommunication System Integration | Version 3.0 | January 2025</p>
+</div>
+
+<!-- PROJECT INFO -->
+<div class="project-info">
+<strong>Project:</strong><input type="text" placeholder="Enter Project Name" style="width:250px">
+<strong>Client:</strong><input type="text" placeholder="Client Name" style="width:200px">
+<strong>Location:</strong>
+<select style="padding:4px;border-radius:3px;border:1px solid #cbd5e0">
+<option>Offshore Platform</option>
+<option>Onshore Facility</option>
+<option>International</option>
+</select>
+<strong>Date:</strong><input type="date" value="2025-01-01">
+</div>
+
+<!-- MANPOWER RATES -->
+<div class="section">
+<div class="section-title">📊 STANDARD MANPOWER RATES (PER PERSON/DAY)</div>
+<table class="table">
+<thead>
+<tr>
+<th width="15%">Position Code</th>
+<th width="25%">Position Title</th>
+<th width="10%">Level</th>
+<th width="12%">Offshore(12hr)</th>
+<th width="12%">Onshore(12hr)</th>
+<th width="10%">OT Rate/hr</th>
+<th width="10%">Standby/day</th>
+</tr>
+</thead>
+<tbody>
+<!-- ENGINEERING POSITIONS -->
+<tr style="background:#f0f9ff">
+<td colspan="7"><b>ENGINEERING POSITIONS</b></td>
+</tr>
+<tr>
+<td><span class="code">ENG-MID</span></td>
+<td>Telecom Engineer</td>
+<td>Mid(3-5y)</td>
+<td class="price-green">฿9,000</td>
+<td class="price-green">฿6,000</td>
+<td class="price-blue">฿750</td>
+<td class="price-blue">฿4,500</td>
+</tr>
+<tr>
+<td><span class="code">ENG-SEN</span></td>
+<td>Senior Telecom Engineer</td>
+<td>Senior(5+y)</td>
+<td class="price-green">฿18,000</td>
+<td class="price-green">฿12,000</td>
+<td class="price-blue">฿1,500</td>
+<td class="price-blue">฿9,000</td>
+</tr>
+<tr>
+<td><span class="code">ENG-LEAD</span></td>
+<td>Lead Engineer</td>
+<td>Lead(7+y)</td>
+<td class="price-red">฿24,000</td>
+<td class="price-red">฿16,000</td>
+<td class="price-blue">฿2,000</td>
+<td class="price-blue">฿12,000</td>
+</tr>
+<tr>
+<td><span class="code">ENG-SPEC</span></td>
+<td>Specialist/SME</td>
+<td>Expert(10+y)</td>
+<td class="price-red">฿30,000</td>
+<td class="price-red">฿20,000</td>
+<td class="price-blue">฿2,500</td>
+<td class="price-blue">฿15,000</td>
+</tr>
+
+<!-- TESTING POSITIONS -->
+<tr style="background:#f0f9ff">
+<td colspan="7"><b>TESTING & COMMISSIONING POSITIONS</b></td>
+</tr>
+<tr>
+<td><span class="code">TEST-ENG</span></td>
+<td>Test Engineer</td>
+<td>Mid(3-5y)</td>
+<td class="price-green">฿9,000</td>
+<td class="price-green">฿6,000</td>
+<td class="price-blue">฿750</td>
+<td class="price-blue">฿4,500</td>
+</tr>
+<tr>
+<td><span class="code">TEST-LEAD</span></td>
+<td>Test Lead/Supervisor</td>
+<td>Senior(5+y)</td>
+<td class="price-green">฿18,000</td>
+<td class="price-green">฿12,000</td>
+<td class="price-blue">฿1,500</td>
+<td class="price-blue">฿9,000</td>
+</tr>
+<tr>
+<td><span class="code">COMM-ENG</span></td>
+<td>Commissioning Engineer</td>
+<td>Senior(5+y)</td>
+<td class="price-green">฿21,000</td>
+<td class="price-green">฿14,000</td>
+<td class="price-blue">฿1,750</td>
+<td class="price-blue">฿10,500</td>
+</tr>
+
+<!-- SUPPORT POSITIONS -->
+<tr style="background:#f0f9ff">
+<td colspan="7"><b>SUPPORT POSITIONS</b></td>
+</tr>
+<tr>
+<td><span class="code">TECH-JUN</span></td>
+<td>Junior Technician</td>
+<td>Junior(1-3y)</td>
+<td class="price-green">฿6,000</td>
+<td class="price-green">฿4,000</td>
+<td class="price-blue">฿500</td>
+<td class="price-blue">฿3,000</td>
+</tr>
+<tr>
+<td><span class="code">TECH-SEN</span></td>
+<td>Senior Technician</td>
+<td>Senior(5+y)</td>
+<td class="price-green">฿12,000</td>
+<td class="price-green">฿8,000</td>
+<td class="price-blue">฿1,000</td>
+<td class="price-blue">฿6,000</td>
+</tr>
+<tr>
+<td><span class="code">DOC-ENG</span></td>
+<td>Documentation Engineer</td>
+<td>Mid(3-5y)</td>
+<td>N/A</td>
+<td class="price-green">฿5,000</td>
+<td class="price-blue">฿625</td>
+<td class="price-blue">฿2,500</td>
+</tr>
+
+<!-- MANAGEMENT -->
+<tr style="background:#f0f9ff">
+<td colspan="7"><b>MANAGEMENT POSITIONS</b></td>
+</tr>
+<tr>
+<td><span class="code">PM-SITE</span></td>
+<td>Site Project Manager</td>
+<td>PM</td>
+<td class="price-red">฿36,000</td>
+<td class="price-red">฿24,000</td>
+<td class="price-blue">฿3,000</td>
+<td class="price-blue">฿18,000</td>
+</tr>
+<tr>
+<td><span class="code">COORD</span></td>
+<td>Project Coordinator</td>
+<td>Mid(3-5y)</td>
+<td class="price-green">฿15,000</td>
+<td class="price-green">฿10,000</td>
+<td class="price-blue">฿1,250</td>
+<td class="price-blue">฿7,500</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<!-- FAT BOM TEMPLATE -->
+<div class="section">
+<div class="section-title">🔧 FAT (FACTORY ACCEPTANCE TEST) - BOM TEMPLATE</div>
+<table class="table">
+<thead>
+<tr style="background:#e8f4fd">
+<th colspan="10">FAT Package Configuration - <span style="color:#2563eb">Customize per project</span></th>
+</tr>
+<tr>
+<th width="12%">Position Code</th>
+<th width="20%">Position</th>
+<th width="8%">Qty</th>
+<th width="8%">Days</th>
+<th width="10%">Rate/day</th>
+<th width="10%">Subtotal</th>
+<th width="8%">MOB/DEM</th>
+<th width="8%">Travel</th>
+<th width="8%">Other</th>
+<th width="12%">Line Total</th>
+</tr>
+</thead>
+<tbody>
+<!-- FAT LOCAL -->
+<tr style="background:#f0f9ff">
+<td colspan="10"><b>FAT LOCAL (Bangkok/Rayong)</b></td>
+</tr>
+<tr>
+<td><span class="code">TEST-LEAD</span></td>
+<td>Test Lead</td>
+<td class="editable">1</td>
+<td class="editable">5</td>
+<td class="price-green">฿12,000</td>
+<td>฿60,000</td>
+<td>฿3,000</td>
+<td>฿6,000</td>
+<td>-</td>
+<td class="price-red">฿69,000</td>
+</tr>
+<tr>
+<td><span class="code">TEST-ENG</span></td>
+<td>Test Engineer</td>
+<td class="editable">2</td>
+<td class="editable">5</td>
+<td class="price-green">฿6,000</td>
+<td>฿60,000</td>
+<td>฿3,000</td>
+<td>฿6,000</td>
+<td>-</td>
+<td class="price-green">฿69,000</td>
+</tr>
+<tr>
+<td><span class="code">DOC-ENG</span></td>
+<td>Documentation</td>
+<td class="editable">1</td>
+<td class="editable">3</td>
+<td class="price-green">฿5,000</td>
+<td>฿15,000</td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td class="price-green">฿15,000</td>
+</tr>
+<tr>
+<td colspan="10">Additional: Equipment rental, Test tools, Reports</td>
+</tr>
+<tr class="total">
+<td colspan="9"><b>TOTAL FAT LOCAL PACKAGE</b></td>
+<td class="price-red"><b>฿153,000</b></td>
+</tr>
+
+<!-- FAT INTERNATIONAL -->
+<tr style="background:#f0f9ff">
+<td colspan="10"><b>FAT INTERNATIONAL (Vendor Factory)</b></td>
+</tr>
+<tr>
+<td><span class="code">TEST-LEAD</span></td>
+<td>Test Lead</td>
+<td class="editable">1</td>
+<td class="editable">7</td>
+<td class="price-green">USD800</td>
+<td>USD5,600</td>
+<td>USD400</td>
+<td>USD800</td>
+<td>USD700</td>
+<td class="price-red">USD7,500</td>
+</tr>
+<tr>
+<td><span class="code">TEST-ENG</span></td>
+<td>Test Engineer</td>
+<td class="editable">1</td>
+<td class="editable">7</td>
+<td class="price-green">USD450</td>
+<td>USD3,150</td>
+<td>USD225</td>
+<td>USD450</td>
+<td>USD700</td>
+<td class="price-green">USD4,525</td>
+</tr>
+<tr>
+<td colspan="10">Additional: Visa, Insurance, Per Diem (USD100/day)</td>
+</tr>
+<tr class="total">
+<td colspan="9"><b>TOTAL FAT INTERNATIONAL PACKAGE</b></td>
+<td class="price-red"><b>USD12,025</b></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<!-- SAT BOM TEMPLATE -->
+<div class="section">
+<div class="section-title">🏗️ SAT (SITE ACCEPTANCE TEST) - BOM TEMPLATE</div>
+<table class="table">
+<thead>
+<tr style="background:#e8f4fd">
+<th colspan="10">SAT Package Configuration - <span style="color:#2563eb">Customize per project</span></th>
+</tr>
+<tr>
+<th width="12%">Position Code</th>
+<th width="20%">Position</th>
+<th width="8%">Qty</th>
+<th width="8%">Days</th>
+<th width="10%">Rate/day</th>
+<th width="10%">Subtotal</th>
+<th width="8%">MOB/DEM</th>
+<th width="8%">Travel</th>
+<th width="8%">Other</th>
+<th width="12%">Line Total</th>
+</tr>
+</thead>
+<tbody>
+<!-- SAT OFFSHORE -->
+<tr style="background:#ffe4e6">
+<td colspan="10"><b>SAT OFFSHORE PLATFORM (Priority)</b></td>
+</tr>
+<tr>
+<td><span class="code">TEST-LEAD</span></td>
+<td>Test Lead</td>
+<td class="editable">1</td>
+<td class="editable">14</td>
+<td class="price-green">฿18,000</td>
+<td>฿252,000</td>
+<td>฿4,500</td>
+<td>฿9,000</td>
+<td>฿10,000</td>
+<td class="price-red">฿275,500</td>
+</tr>
+<tr>
+<td><span class="code">TEST-ENG</span></td>
+<td>Test Engineer</td>
+<td class="editable">2</td>
+<td class="editable">14</td>
+<td class="price-green">฿9,000</td>
+<td>฿252,000</td>
+<td>฿9,000</td>
+<td>฿18,000</td>
+<td>฿20,000</td>
+<td class="price-green">฿299,000</td>
+</tr>
+<tr>
+<td><span class="code">TECH-SEN</span></td>
+<td>Sr.Technician</td>
+<td class="editable">1</td>
+<td class="editable">14</td>
+<td class="price-green">฿12,000</td>
+<td>฿168,000</td>
+<td>฿3,000</td>
+<td>฿6,000</td>
+<td>฿10,000</td>
+<td class="price-green">฿187,000</td>
+</tr>
+<tr>
+<td><span class="code">DOC-ENG</span></td>
+<td>Documentation</td>
+<td>1</td>
+<td>5</td>
+<td class="price-green">฿5,000</td>
+<td colspan="5">Remote Support</td>
+<td class="price-green">฿25,000</td>
+</tr>
+<tr>
+<td colspan="10">Additional: BOSIET Training, Medical, PPE, Tools</td>
+</tr>
+<tr class="total">
+<td colspan="9"><b>TOTAL SAT OFFSHORE PACKAGE</b></td>
+<td class="price-red"><b>฿786,500</b></td>
+</tr>
+
+<!-- SAT ONSHORE -->
+<tr style="background:#f0f9ff">
+<td colspan="10"><b>SAT ONSHORE FACILITY</b></td>
+</tr>
+<tr>
+<td><span class="code">TEST-LEAD</span></td>
+<td>Test Lead</td>
+<td class="editable">1</td>
+<td class="editable">10</td>
+<td class="price-green">฿12,000</td>
+<td>฿120,000</td>
+<td>฿3,000</td>
+<td>฿6,000</td>
+<td>-</td>
+<td class="price-red">฿129,000</td>
+</tr>
+<tr>
+<td><span class="code">TEST-ENG</span></td>
+<td>Test Engineer</td>
+<td class="editable">2</td>
+<td class="editable">10</td>
+<td class="price-green">฿6,000</td>
+<td>฿120,000</td>
+<td>฿6,000</td>
+<td>฿12,000</td>
+<td>-</td>
+<td class="price-green">฿138,000</td>
+</tr>
+<tr>
+<td><span class="code">TECH-SEN</span></td>
+<td>Sr.Technician</td>
+<td class="editable">1</td>
+<td class="editable">10</td>
+<td class="price-green">฿8,000</td>
+<td>฿80,000</td>
+<td>฿2,000</td>
+<td>฿4,000</td>
+<td>-</td>
+<td class="price-green">฿86,000</td>
+</tr>
+<tr>
+<td><span class="code">DOC-ENG</span></td>
+<td>Documentation</td>
+<td>1</td>
+<td>3</td>
+<td class="price-green">฿5,000</td>
+<td colspan="5">Remote Support</td>
+<td class="price-green">฿15,000</td>
+</tr>
+<tr class="total">
+<td colspan="9"><b>TOTAL SAT ONSHORE PACKAGE</b></td>
+<td class="price-red"><b>฿368,000</b></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<!-- COMMISSIONING BOM -->
+<div class="section">
+<div class="section-title">⚡ COMMISSIONING - BOM TEMPLATE</div>
+<table class="table">
+<thead>
+<tr>
+<th width="12%">Position Code</th>
+<th width="20%">Position</th>
+<th width="8%">Qty</th>
+<th width="8%">Days</th>
+<th width="10%">Rate/day</th>
+<th width="10%">Subtotal</th>
+<th width="8%">MOB/DEM</th>
+<th width="8%">Travel</th>
+<th width="8%">Other</th>
+<th width="12%">Line Total</th>
+</tr>
+</thead>
+<tbody>
+<tr style="background:#ffe4e6">
+<td colspan="10"><b>SYSTEM COMMISSIONING - OFFSHORE</b></td>
+</tr>
+<tr>
+<td><span class="code">COMM-ENG</span></td>
+<td>Commissioning Lead</td>
+<td class="editable">1</td>
+<td class="editable">15</td>
+<td class="price-green">฿21,000</td>
+<td>฿315,000</td>
+<td>฿5,250</td>
+<td>฿10,500</td>
+<td>฿15,000</td>
+<td class="price-red">฿345,750</td>
+</tr>
+<tr>
+<td><span class="code">ENG-SEN</span></td>
+<td>Sr.Telecom Engineer</td>
+<td class="editable">2</td>
+<td class="editable">15</td>
+<td class="price-green">฿18,000</td>
+<td>฿540,000</td>
+<td>฿9,000</td>
+<td>฿18,000</td>
+<td>฿30,000</td>
+<td class="price-green">฿597,000</td>
+</tr>
+<tr>
+<td><span class="code">TECH-SEN</span></td>
+<td>Sr.Technician</td>
+<td class="editable">2</td>
+<td class="editable">15</td>
+<td class="price-green">฿12,000</td>
+<td>฿360,000</td>
+<td>฿6,000</td>
+<td>฿12,000</td>
+<td>฿30,000</td>
+<td class="price-green">฿408,000</td>
+</tr>
+<tr class="total">
+<td colspan="9"><b>TOTAL COMMISSIONING PACKAGE</b></td>
+<td class="price-red"><b>฿1,350,750</b></td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<!-- ADDITIONAL COSTS -->
+<div class="section">
+<div class="section-title">💰 ADDITIONAL COSTS & MULTIPLIERS</div>
+<table class="table">
+<thead>
+<tr>
+<th width="20%">Item</th>
+<th width="20%">Description</th>
+<th width="15%">Calculation</th>
+<th width="15%">Offshore</th>
+<th width="15%">Onshore</th>
+<th width="15%">International</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><b>MOB/DEMOB</b></td>
+<td>Mobilization/Demobilization</td>
+<td>25% of daily rate</td>
+<td class="price-green">฿2,250-7,500</td>
+<td class="price-green">฿1,500-5,000</td>
+<td class="price-green">USD225-600</td>
+</tr>
+<tr>
+<td><b>Travel Day</b></td>
+<td>Travel time charge</td>
+<td>50% of daily rate</td>
+<td class="price-green">฿4,500-15,000</td>
+<td class="price-green">฿3,000-10,000</td>
+<td class="price-green">USD225-600</td>
+</tr>
+<tr>
+<td><b>Standby</b></td>
+<td>Weather/Waiting</td>
+<td>50% of daily rate</td>
+<td class="price-green">฿4,500-15,000</td>
+<td class="price-green">฿3,000-10,000</td>
+<td class="price-green">USD225-600</td>
+</tr>
+<tr>
+<td><b>OT Weekday</b></td>
+<td>After 12 hours</td>
+<td>1.5x hourly rate</td>
+<td colspan="3" style="text-align:center">As per position rate table</td>
+</tr>
+<tr>
+<td><b>OT Weekend</b></td>
+<td>Saturday</td>
+<td>1.5x daily rate</td>
+<td colspan="3" style="text-align:center">150% of daily rate</td>
+</tr>
+<tr>
+<td><b>OT Holiday</b></td>
+<td>Sunday/Public Holiday</td>
+<td>2.0x daily rate</td>
+<td colspan="3" style="text-align:center">200% of daily rate</td>
+</tr>
+<tr>
+<td><b>Per Diem (Intl)</b></td>
+<td>Daily allowance</td>
+<td>Fixed amount</td>
+<td>-</td>
+<td>-</td>
+<td class="price-green">USD100-150</td>
+</tr>
+<tr>
+<td><b>BOSIET/HUET</b></td>
+<td>Safety training</td>
+<td>Per person</td>
+<td class="price-green">฿35,000</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td><b>Medical (Offshore)</b></td>
+<td>Fit to work certificate</td>
+<td>Per person</td>
+<td class="price-green">฿5,000</td>
+<td>-</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="note">
+<h4>📌 BOM USAGE INSTRUCTIONS</h4>
+<ul>
+<li><b>Yellow cells</b> are editable - adjust Qty and Days per project requirement</li>
+<li><b>Position codes</b> reference the standard rate table above</li>
+<li><b>Offshore priority:</b> Always quote offshore rates first for O&G clients</li>
+<li><b>Package deals:</b> Can offer 10-15% discount for bundled services (FAT+SAT+COMM)</li>
+<li><b>Long-term projects:</b> Consider monthly rates for projects >30 days</li>
+<li><b>Rate validity:</b> 30 days from quotation date</li>
+<li><b>Payment terms:</b> 30% mobilization, 70% upon completion</li>
+<li><b>Minimum charge:</b> 1 day for all positions</li>
+</ul>
+</div>
+
+<div class="footer">
+<b>ADDVALUE SYSTEM CO., LTD.</b><br>
+O&G TSI Specialist | BOM Template v3.0 | January 2025<br>
+This template is for internal use - Customize per project requirements
+</div>
+
+</div>
+</body>
+</html>

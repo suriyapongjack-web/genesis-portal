@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Addvalue HR System – Single-file (SQLite in Browser)</title>
+data:,
+<style>
+  :root{
+    --bg:#f5f7fb; --card:#ffffff; --brand:#4e7cf5; --muted:#6b7280;
+    --ok:#10b981; --warn:#f59e0b; --bad:#ef4444; --ring:#e5e7eb;
+    --grad1:#7c3aed; --grad2:#06b6d4;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);font-family:system-ui,Segoe UI,Arial,sans-serif;color:#111827}
+  header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:#fff;border-bottom:1px solid var(--ring);position:sticky;top:0;z-index:10}
+  header h1{margin:0;font-size:18px;display:flex;gap:10px;align-items:center}
+  header h1 span.logo{font-size:20px}
+  .tabs{display:flex;gap:10px}
+  .tab{padding:8px 14px;border-radius:8px;border:1px solid var(--ring);background:#f3f4f6;cursor:pointer}
+  .tab.active{background:var(--brand);border-color:var(--brand);color:#fff}
+  main{max-width:1100px;margin:16px auto;padding:0 16px 40px}
+  .panel{background:var(--card);border:1px solid var(--ring);border-radius:12px;padding:16px;margin:16px 0}
+  .grid{display:grid;gap:14px}
+  @media(min-width:760px){.grid.cols-4{grid-template-columns:repeat(4,1fr)}.grid.cols-2{grid-template-columns:1fr 1fr}}
+  .kpi{border-radius:12px;padding:16px;color:#fff;background:linear-gradient(135deg,var(--grad1),var(--grad2));min-height:110px;display:flex;flex-direction:column;justify-content:center}
+  .kpi small{opacity:.9}
+  .kpi strong{font-size:28px;margin-top:4px}
+  .btns{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0}
+  .btn{border:1px solid var(--ring);background:#fff;border-radius:8px;padding:8px 12px;cursor:pointer}
+  .btn.primary{background:#10b981;color:#fff;border-color:#10b981}
+  .btn.warn{background:#fee2e2;border-color:#fecaca;color:#b91c1c}
+  .btn.blue{background:#dbeafe;border-color:#bfdbfe;color:#1d4ed8}
+  .btn.orange{background:#ffedd5;border-color:#fed7aa;color:#c2410c}
+  .hint{color:var(--muted);font-size:13px}
+  input[type="file"],input[type="text"],input[type="number"]{padding:8px;border:1px solid var(--ring);border-radius:8px}
+  table{width:100%;border-collapse:collapse;border:1px solid var(--ring)}
+  th,td{border-top:1px solid var(--ring);padding:8px;text-align:left}
+  .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0}
+  .badge{display:inline-block;background:#eef2ff;color:#3730a3;padding:2px 8px;border-radius:999px;font-size:12px}
+  footer{margin-top:16px;color:var(--muted);font-size:12px}
+</style>
+</head>
+<body>
+<header>
+  <h1>
+    <span class="logo">🗂️</span> <span><strong>Addvalue HR System</strong><br><small class="hint">ระบบบริหารจัดการทรัพยากรบุคคล (Single‑file)</small></span>
+  </h1>
+  <nav class="tabs">
+    <button class="tab active" data-tab="tab-dashboard">Dashboard</button>
+    <button class="tab" data-tab="tab-people">พนักงาน</button>
+    <button class="tab" data-tab="tab-db">Database</button>
+  </nav>
+</header>
+
+<main>
+  <!-- DASHBOARD -->
+  <section id="tab-dashboard" class="panel">
+    <div class="grid cols-4">
+      <div class="kpi"><small>พนักงานทั้งหมด</small><strong id="kpi-emps">0</strong></div>
+      <div class="kpi"><small>เงินเดือนรวม/เดือน</small><strong id="kpi-sum">฿0</strong></div>
+      <div class="kpi"><small>เงินเดือนเฉลี่ย</small><strong id="kpi-avg">฿0</strong></div>
+      <div class="kpi"><small>แผนกทั้งหมด</small><strong id="kpi-dept">0</strong></div>
+    </div>
+
+    <div class="btns">
+      <label class="btn primary">
+        📁 Load SQL/DB File
+        <input id="fileInput" type="file" accept=".sql,.db" style="display:none">
+      </label>
+      <button class="btn orange" id="btnSaveLS">💾 บันทึก LocalStorage</button>
+      <button class="btn blue" id="btnLoadLS">📂 Load จาก Storage</button>
+      <button class="btn warn" id="btnClear">🧹 ล้างข้อมูล</button>
+    </div>
+    <p class="hint">รองรับไฟล์ <code>.sql</code> (CREATE/INSERT) หรือฐานข้อมูล <code>.db</code> (SQLite). ข้อมูลสามารถบันทึกไว้ใน LocalStorage เพื่อใช้งานครั้งถัดไปได้</p>
+    <div id="status" class="hint">ℹ️ ไม่มีข้อมูล – กรุณา Load SQL File หรือ Import ข้อมูล</div>
+  </section>
+
+  <!-- PEOPLE -->
+  <section id="tab-people" class="panel" hidden>
+    <div class="toolbar">
+      <strong>พนักงาน</strong>
+      <span id="peopleCount" class="badge">0 รายการ</span>
+      <span class="hint">• ตาราง: <code>personnel</code></span>
+    </div>
+    <div class="grid cols-2">
+      <div>
+        <table id="peopleTable">
+          <thead><tr><th>ID Card</th><th>Full Name (EN)</th><th>Full Name (TH)</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div>
+        <h3>เพิ่มพนักงาน</h3>
+        <div class="grid">
+          <input id="p-id" placeholder="ID Card (13 หลัก)">
+          <input id="p-en" placeholder="Full Name (EN)">
+          <input id="p-th" placeholder="Full Name (TH)">
+          <button class="btn primary" id="btnAddP">➕ เพิ่ม</button>
+        </div>
+        <p class="hint">บันทึกนี้เพิ่มเฉพาะตาราง <code>personnel</code></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- DATABASE -->
+  <section id="tab-db" class="panel" hidden>
+    <div class="toolbar">
+      <strong>Database</strong>
+      <button class="btn" id="btnListTables">🔎 โหลดรายชื่อตาราง</button>
+      <button class="btn" id="btnExportDB">⬇️ Export เป็นไฟล์ .db</button>
+    </div>
+    <div class="grid cols-2">
+      <div>
+        <h4>ตาราง</h4>
+        <ul id="tablesList" style="margin:0;padding-left:18px"></ul>
+      </div>
+      <div>
+        <h4>ดูข้อมูลตาราง</h4>
+        <div class="toolbar">
+          <input id="viewTableName" placeholder="เช่น personnel">
+          <button class="btn" id="btnViewTable">ดู</button>
+        </div>
+        <div style="overflow:auto;max-height:420px">
+          <table id="tableView"><thead></thead><tbody></tbody></table>
+        </div>
+      </div>
+    </div>
+    <footer>หมายเหตุ: โหมดนี้อ่าน/เพิ่มข้อมูลในเครื่องคุณเท่านั้น (ไม่ส่งขึ้นเซิร์ฟเวอร์)</footer>
+  </section>
+</main>
+
+<script>
+/** ---------------------- Utility ---------------------- */
+const $ = (sel)=> document.querySelector(sel);
+const fmtMoney = (n)=> '฿' + (n||0).toLocaleString('th-TH', {maximumFractionDigits:0});
+function setStatus(msg){ $("#status").textContent = msg; }
+
+/** Tabs */
+document.querySelectorAll('.tab').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    document.querySelectorAll('main > section').forEach(s=>s.hidden=true);
+    document.getElementById(b.dataset.tab).hidden=false;
+  });
+});
+
+/** ---------------------- Load sql.js ---------------------- */
+let SQL, db;
+(async function init(){
+  SQL = await initSqlJs({
+    locateFile: file => 'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/' + file
+  });
+  // เริ่มด้วย DB เปล่า (จนกว่าจะโหลดไฟล์หรือ storage)
+  db = new SQL.Database();
+  setStatus('พร้อมใช้งาน – โปรดโหลดไฟล์ .sql/.db หรือกด Load จาก Storage');
+})();
+
+/** โหลดไฟล์ .sql หรือ .db */
+$("#fileInput").addEventListener('change', async (e)=>{
+  const f = e.target.files[0]; if(!f) return;
+  const name = f.name.toLowerCase();
+  try{
+    if(name.endsWith('.db')){
+      const buf = new Uint8Array(await f.arrayBuffer());
+      db && db.close && db.close();
+      db = new SQL.Database(buf);
+      setStatus('โหลดไฟล์ .db สำเร็จ');
+    }else{
+      const sqlText = await f.text();
+      db.run(sqlText);
+      setStatus('นำเข้า .sql สำเร็จ');
+    }
+    await refreshAll();
+  }catch(err){
+    console.error(err);
+    setStatus('❌ โหลดไฟล์ไม่สำเร็จ: ' + err.message);
+  }finally{
+    e.target.value='';
+  }
+});
+
+/** LocalStorage helpers */
+const KEY = 'addvalue_hr_db_b64';
+function u8ToB64(u8){
+  let s=''; for(let i=0;i<u8.length;i++) s += String.fromCharCode(u8[i]);
+  return btoa(s);
+}
+function b64ToU8(b64){
+  const s = atob(b64); const u8 = new Uint8Array(s.length);
+  for(let i=0;i<s.length;i++) u8[i]=s.charCodeAt(i);
+  return u8;
+}
+
+$("#btnSaveLS").addEventListener('click', ()=>{
+  if(!db){ setStatus('❌ ยังไม่มีฐานข้อมูล'); return; }
+  const data = db.export(); localStorage.setItem(KEY, u8ToB64(data));
+  setStatus('✅ บันทึกฐานข้อมูลลง LocalStorage แล้ว');
+});
+$("#btnLoadLS").addEventListener('click', async ()=>{
+  const b64 = localStorage.getItem(KEY);
+  if(!b64){ setStatus('ℹ️ ไม่พบข้อมูลใน LocalStorage'); return; }
+  db && db.close && db.close();
+  db = new SQL.Database(b64ToU8(b64));
+  setStatus('✅ โหลดฐานข้อมูลจาก LocalStorage แล้ว');
+  await refreshAll();
+});
+$("#btnClear").addEventListener('click', ()=>{
+  if(confirm('ล้างฐานข้อมูลที่กำลังเปิด?')){ db.close(); db = new SQL.Database(); }
+  if(confirm('ต้องการล้างข้อมูลที่บันทึกใน LocalStorage ด้วยหรือไม่?')){ localStorage.removeItem(KEY); }
+  setStatus('เคลียร์ข้อมูลเรียบร้อย');
+  refreshAll();
+});
+
+/** ---------------------- Dashboard compute ---------------------- */
+function getScalar(sql, params=[]){
+  try{
+    const res = db.exec(sql, params);
+    if(res.length && res[0].values.length) return res[0].values[0][0];
+    return 0;
+  }catch(_){ return 0; }
+}
+function computeKPIs(){
+  // เผื่อกรณีตารางยังไม่ถูกสร้างจาก schema.sql
+  const tables = listTables();
+  const hasPersonnel = tables.includes('personnel');
+  const hasPayroll   = tables.includes('payroll_master');
+
+  const emp = hasPersonnel ? getScalar("SELECT COUNT(*) FROM personnel") : 0;
+  const sum = hasPayroll   ? getScalar("SELECT IFNULL(SUM(salary_monthly),0) FROM payroll_master") : 0;
+  const avg = hasPayroll   ? getScalar("SELECT IFNULL(AVG(salary_monthly),0) FROM payroll_master") : 0;
+  const dept= hasPersonnel ? getScalar("SELECT COUNT(DISTINCT department) FROM personnel") : 0;
+
+  $("#kpi-emps").textContent = (emp||0).toLocaleString('th-TH');
+  $("#kpi-sum").textContent  = fmtMoney(sum||0);
+  $("#kpi-avg").textContent  = fmtMoney(avg||0);
+  $("#kpi-dept").textContent = (dept||0).toLocaleString('th-TH');
+}
+
+/** ---------------------- People tab ---------------------- */
+async function refreshPeople(){
+  const body = $("#peopleTable tbody"); body.innerHTML='';
+  if(!listTables().includes('personnel')){ $("#peopleCount").textContent='0 รายการ'; return; }
+  const res = db.exec("SELECT id_card, full_name_en, full_name_th FROM personnel ORDER BY full_name_en LIMIT 200");
+  if(res.length){
+    const rows = res[0].values;
+    $("#peopleCount").textContent = rows.length + ' รายการ';
+    rows.forEach(r=>{
+      const tr = document.createElement('tr');
+      r.forEach((c,i)=>{
+        const td = document.createElement('td'); td.textContent = c==null?'':c; tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    });
+  }else{
+    $("#peopleCount").textContent='0 รายการ';
+  }
+}
+$("#btnAddP").addEventListener('click', ()=>{
+  const id = $("#p-id").value.trim();
+  const en = $("#p-en").value.trim();
+  const th = $("#p-th").value.trim() || null;
+  if(!(id && /^\d{13}$/.test(id))) return alert("ID Card ต้องเป็นตัวเลข 13 หลัก");
+  if(!en) return alert("Full Name (EN) ต้องไม่ว่าง");
+  try{
+    const stmt = db.prepare("INSERT INTO personnel (id_card, full_name_en, full_name_th) VALUES (?, ?, ?)");
+    stmt.run([id, en, th]); stmt.free();
+    setStatus('✅ เพิ่มพนักงานสำเร็จ');
+    $("#p-id").value = $("#p-en").value = $("#p-th").value = '';
+    refreshAll();
+  }catch(err){ alert("เพิ่มข้อมูลไม่สำเร็จ: " + err.message); }
+});
+
+/** ---------------------- Database tab ---------------------- */
+function listTables(){
+  try{
+    const res = db.exec("SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name");
+    return res.length ? res[0].values.map(v=>v[0]) : [];
+  }catch(_){ return []; }
+}
+$("#btnListTables").addEventListener('click', ()=>{
+  const list = $("#tablesList"); list.innerHTML='';
+  listTables().forEach(t=>{
+    const li = document.createElement('li'); li.textContent = t; list.appendChild(li);
+  });
+});
+$("#btnViewTable").addEventListener('click', ()=>{
+  const t = $("#viewTableName").value.trim(); if(!t) return;
+  try{
+    const res = db.exec(`SELECT * FROM ${t} LIMIT 300`);
+    const thead = $("#tableView thead"); const tbody = $("#tableView tbody");
+    thead.innerHTML = tbody.innerHTML = '';
+    if(!res.length) return;
+    const cols = res[0].columns;
+    const trh = document.createElement('tr');
+    cols.forEach(c=>{ const th=document.createElement('th'); th.textContent=c; trh.appendChild(th); });
+    thead.appendChild(trh);
+    res[0].values.forEach(row=>{
+      const tr=document.createElement('tr');
+      row.forEach(c=>{ const td=document.createElement('td'); td.textContent=c==null?'':c; tr.appendChild(td); });
+      tbody.appendChild(tr);
+    });
+  }catch(err){ alert('อ่านตารางไม่สำเร็จ: '+err.message); }
+});
+
+/** Export .db (binary) */
+$("#btnExportDB").addEventListener('click', ()=>{
+  if(!db){ alert('ยังไม่มีฐานข้อมูล'); return; }
+  const data = db.export();
+  const blob = new Blob([data], {type: 'application/octet-stream'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'addvalue_database.db';
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
+/** ---------------------- Refresh entire UI ---------------------- */
+async function refreshAll(){
+  computeKPIs();
+  refreshPeople();
+  // refresh table list if tab opened
+  if(!$("#tab-db").hidden) $("#btnListTables").click();
+}
+</script>
+
+<!-- sql.js (SQLite WASM in browser) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js" defer
+        on

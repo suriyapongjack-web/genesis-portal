@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>App Preview — Demo</title>
+  <style>
+    :root{--bg:#0f1724;--card:#0b1220;--muted:#9aa4b2;--accent:#06b6d4;--glass:rgba(255,255,255,0.04)}
+    *{box-sizing:border-box}
+    body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;margin:0;background:linear-gradient(180deg,#071023 0%, #071827 100%);color:#e6eef6}
+    .wrap{max-width:1100px;margin:36px auto;padding:20px}
+    header{display:flex;align-items:center;gap:18px}
+    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#8b5cf6);display:flex;align-items:center;justify-content:center;font-weight:700;color:#04293a}
+    h1{font-size:20px;margin:0}
+    p.lead{margin:6px 0 18px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1fr 420px;gap:20px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:12px;padding:18px;box-shadow:0 6px 30px rgba(2,6,23,0.6)}
+    .features{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px}
+    .feature{background:var(--glass);padding:12px;border-radius:10px}
+    .feature h3{margin:0;font-size:13px}
+    .hero{display:flex;gap:18px;align-items:center}
+    .hero .meta{flex:1}
+    .phone-wrap{display:flex;flex-direction:column;align-items:center}
+    .phone{width:320px;height:640px;border-radius:28px;padding:14px;background:linear-gradient(180deg,#021428 0%, #03192c 100%);box-shadow:0 20px 50px rgba(3,8,18,0.7);border:1px solid rgba(255,255,255,0.04)}
+    .screen{background:#081826;border-radius:14px;height:100%;overflow:hidden;position:relative;padding:12px;color:#dbeafe}
+    .nav{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+    .avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#60a5fa,#a78bfa);display:flex;align-items:center;justify-content:center;font-weight:700;color:#051025}
+    .title{font-size:15px}
+    .cta{margin-top:12px}
+    button.btn{background:linear-gradient(90deg,var(--accent),#8b5cf6);border:none;padding:10px 14px;border-radius:10px;color:#022;cursor:pointer;font-weight:600}
+    .list{margin-top:10px}
+    .item{display:flex;justify-content:space-between;padding:10px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));margin-bottom:8px}
+    .small{font-size:12px;color:var(--muted)}
+    footer{margin-top:16px;text-align:center;color:var(--muted);font-size:13px}
+    @media (max-width:980px){.grid{grid-template-columns:1fr;}.phone{margin-top:18px;width:100%;height:520px}}
+    .pulse{animation:pulse 3s ease-in-out infinite}
+    @keyframes pulse{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">AV</div>
+      <div>
+        <h1>App Preview — Addvalue Demo</h1>
+        <p class="lead">Single-file HTML preview for presenting the app UI. Interactive elements below simulate real behaviour.</p>
+      </div>
+    </header>
+    <div class="grid">
+      <div>
+        <div class="card hero">
+          <div class="meta">
+            <h2 style="margin:0 0 6px 0">Project Dashboard</h2>
+            <p class="small">Overview of active jobs, team status and quick actions.</p>
+            <div style="display:flex;gap:10px;margin-top:12px">
+              <div style="flex:1">
+                <div class="card" style="padding:12px">
+                  <div style="display:flex;justify-content:space-between;align-items:center">
+                    <div>
+                      <div style="font-size:20px;font-weight:700">12</div>
+                      <div class="small">Active Projects</div>
+                    </div>
+                    <div style="text-align:right">
+                      <div style="font-size:20px;font-weight:700">3</div>
+                      <div class="small">On Hold</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="width:120px;display:flex;flex-direction:column;gap:8px">
+                <button class="btn" onclick="togglePreview()">Toggle Preview</button>
+                <button class="btn" onclick="mockNotify()">Send Mock Alert</button>
+              </div>
+            </div>
+            <div class="features">
+              <div class="feature"><h3>RFQ → PO</h3><p class="small">Automated pipeline to convert RFQs into quotes & POs.</p></div>
+              <div class="feature"><h3>CWP Generator</h3><p class="small">Generate construction work packages (CWP) in one click.</p></div>
+              <div class="feature"><h3>Asset Tracker</h3><p class="small">Track O&G assets, spares and maintenance cycles.</p></div>
+              <div class="feature"><h3>AI Assistant</h3><p class="small">Context-aware assistant for docs and meeting notes.</p></div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:12px">
+          <h3 style="margin:0 0 8px 0">Recent Activity</h3>
+          <div class="list">
+            <div class="item"><div><strong>RFQ-2025-0921</strong><div class="small">New RFQ from PTTEP</div></div><div class="small">2h ago</div></div>
+            <div class="item"><div><strong>PO-2025-0904</strong><div class="small">PO Received (Yadana)</div></div><div class="small">1d ago</div></div>
+            <div class="item"><div><strong>Site SAT</strong><div class="small">CCTV - Offshore</div></div><div class="small">3d ago</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-wrap">
+        <div class="card phone pulse" id="phoneCard">
+          <div class="screen" id="screen">
+            <div class="nav">
+              <div class="avatar">AV</div>
+              <div style="flex:1">
+                <div class="title">Addvalue — Team</div>
+                <div class="small">Suriyapong Jack · Project Manager</div>
+              </div>
+              <div style="display:flex;gap:8px">
+                <div class="small">Online</div>
+                <div class="small">●</div>
+              </div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div>
+                  <div style="font-weight:700;font-size:18px">Today</div>
+                  <div class="small">3 tasks due</div>
+                </div>
+                <div class="small">Oct 22, 2025</div>
+              </div>
+              <div class="cta">
+                <button class="btn" onclick="completeTask()">Mark Task Complete</button>
+              </div>
+              <div style="margin-top:12px">
+                <div class="item"><div>Site Visit: Zawtika</div><div class="small">9:00</div></div>
+                <div class="item"><div>PM: WiMAX Link</div><div class="small">13:00</div></div>
+                <div class="item"><div>Submit RFQ</div><div class="small">17:30</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <footer>
+          Preview mode — responsive single-file HTML • Click buttons inside the preview to simulate interactions
+        </footer>
+      </div>
+    </div>
+  </div>
+  <script>
+    const phone = document.getElementById('phoneCard');
+    const screen = document.getElementById('screen');
+    function togglePreview(){
+      phone.classList.toggle('pulse');
+      phone.style.transform = phone.style.transform ? '' : 'scale(0.98)';
+    }
+    function mockNotify(){
+      const el = document.createElement('div');
+      el.className = 'item';
+      el.style.background = 'linear-gradient(90deg, rgba(6,182,212,0.06), rgba(139,92,246,0.03))';
+      el.innerHTML = '<div><strong>Alert</strong><div class="small">New site requirement added</div></div><div class="small">now</div>';
+      screen.insertBefore(el, screen.children[2]);
+      setTimeout(()=>el.style.opacity=0.85,10);
+    }
+    function completeTask(){
+      const first = screen.querySelector('.item');
+      if(first){
+        first.style.opacity = 0.5; first.style.textDecoration = 'line-through';
+        first.querySelector('.small').textContent = 'Done';
+      }
+    }
+  </script>
+</body>
+</html>

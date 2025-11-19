@@ -1,0 +1,1661 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard ผู้รับเหมา - โครงการ LAN 76 จังหวัด</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+            animation: float 20s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateX(-50px) translateY(-50px); }
+            100% { transform: translateX(50px) translateY(50px); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+        }
+
+        .project-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .info-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        /* Stats Grid */
+        .stats-section {
+            padding: 40px 30px;
+            background: #f8f9fa;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .stat-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .stat-card.total::before { background: linear-gradient(135deg, #007bff, #0056b3); }
+        .stat-card.confirmed::before { background: linear-gradient(135deg, #28a745, #20c997); }
+        .stat-card.multiple::before { background: linear-gradient(135deg, #17a2b8, #138496); }
+        .stat-card.pending::before { background: linear-gradient(135deg, #ffc107, #fd7e14); }
+
+        .stat-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.8;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .stat-trend {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            padding: 5px 10px;
+            border-radius: 15px;
+            background: #e3f2fd;
+            color: #1565c0;
+            display: inline-block;
+        }
+
+        /* Progress Section */
+        .progress-section {
+            background: white;
+            margin: 0 30px 30px;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .progress-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .progress-percentage {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #28a745;
+        }
+
+        .progress-bar-container {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            transition: width 1s ease;
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 35%, rgba(255,255,255,0.3) 50%, transparent 65%);
+            animation: shine 2s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .progress-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .progress-item-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #495057;
+        }
+
+        .progress-item-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        /* Controls */
+        .controls {
+            padding: 30px;
+            background: white;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .search-group {
+            display: flex;
+            gap: 15px;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .form-control {
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary { background: linear-gradient(135deg, #007bff, #0056b3); }
+        .btn-success { background: linear-gradient(135deg, #28a745, #20c997); }
+        .btn-warning { background: linear-gradient(135deg, #ffc107, #fd7e14); }
+        .btn-info { background: linear-gradient(135deg, #17a2b8, #138496); }
+        .btn-secondary { background: linear-gradient(135deg, #6c757d, #5a6268); }
+
+        .export-section {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-info {
+            background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+            padding: 15px;
+            border-radius: 10px;
+            color: #1565c0;
+            font-weight: 500;
+            display: none;
+            border-left: 4px solid #007bff;
+        }
+
+        /* Table */
+        .table-container {
+            padding: 30px;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            font-size: 0.95rem;
+        }
+
+        .data-table thead {
+            background: linear-gradient(135deg, #343a40, #495057);
+            color: white;
+        }
+
+        .data-table th {
+            padding: 18px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: none;
+        }
+
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .data-table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+        .data-table tbody tr:hover {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            transform: scale(1.01);
+        }
+
+        .province-name {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .region-badge {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .equipment-count {
+            background: #f8f9fa;
+            color: #495057;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 2px;
+            display: inline-block;
+        }
+
+        .contractor-status {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+            min-width: 120px;
+            display: inline-block;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .contractor-status:hover {
+            transform: scale(1.05);
+        }
+
+        .status-none {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-single {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-multiple {
+            background: #cce7ff;
+            color: #004085;
+            border: 1px solid #b8daff;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .contractor-count {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            cursor: pointer;
+            color: #6c757d;
+            padding: 10px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-btn:hover {
+            background: #f8f9fa;
+            color: #dc3545;
+            transform: rotate(90deg);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 1.1rem;
+        }
+
+        .required {
+            color: #dc3545;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 20px;
+            justify-content: flex-end;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .btn-cancel {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            color: white;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 20px 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transform: translateX(300px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 3000;
+            font-weight: 600;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .footer-section p {
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.2);
+            padding-top: 20px;
+            opacity: 0.8;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .control-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-group {
+                min-width: auto;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .export-section {
+                justify-content: center;
+            }
+
+            .modal-content {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .data-table {
+                font-size: 0.8rem;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 10px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="notification" class="notification"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1>🏢 Dashboard ผู้รับเหมาโครงการ LAN</h1>
+                <p>โครงการติดตั้งระบบเครือข่าย (LAN) 76 จังหวัด - Add Value System Company Limited</p>
+                
+                <div class="project-info">
+                    <div class="info-item">
+                        <div class="info-label">มาตรฐาน</div>
+                        <div class="info-value">TIA/EIA-568 Cat.6</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">จุดติดตั้งรวม</div>
+                        <div class="info-value">2,373 จุด</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Switch รวม</div>
+                        <div class="info-value">157 ตัว</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Rack Cabinet</div>
+                        <div class="info-value">76 ตู้</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">ระยะเวลา</div>
+                        <div class="info-value">8-11 วันทำการ/จังหวัด</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats-section">
+            <div class="stats-grid">
+                <div class="stat-card total" onclick="filterByStatus('')">
+                    <div class="stat-icon">🏛️</div>
+                    <div class="stat-number" id="totalProvinces">76</div>
+                    <div class="stat-label">จังหวัดทั้งหมด</div>
+                    <div class="stat-trend">ครอบคลุมทั่วประเทศ</div>
+                </div>
+                
+                <div class="stat-card confirmed" onclick="filterByStatus('hasContractors')">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-number" id="confirmedCount">4</div>
+                    <div class="stat-label">มีผู้รับเหมาแล้ว</div>
+                    <div class="stat-trend" id="confirmedTrend">5.3% ของทั้งหมด</div>
+                </div>
+                
+                <div class="stat-card multiple" onclick="filterByStatus('multiple')">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-number" id="multipleCount">2</div>
+                    <div class="stat-label">มีผู้รับเหมาหลายราย</div>
+                    <div class="stat-trend">การแข่งขันสูง</div>
+                </div>
+                
+                <div class="stat-card pending" onclick="filterByStatus('noContractors')">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-number" id="pendingCount">72</div>
+                    <div class="stat-label">รอผู้รับเหมา</div>
+                    <div class="stat-trend">ต้องเร่งหาผู้รับเหมา</div>
+                </div>
+                
+                <div class="stat-card total">
+                    <div class="stat-icon">🏪</div>
+                    <div class="stat-number" id="totalContractors">7</div>
+                    <div class="stat-label">ผู้รับเหมาทั้งหมด</div>
+                    <div class="stat-trend">ลงทะเบียนแล้ว</div>
+                </div>
+                
+                <div class="stat-card total">
+                    <div class="stat-icon">🔌</div>
+                    <div class="stat-number">2,373</div>
+                    <div class="stat-label">จุดติดตั้งทั้งหมด</div>
+                    <div class="stat-trend">ครอบคลุมทุกหน่วยงาน</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="progress-section">
+            <div class="progress-header">
+                <div class="progress-title">📊 ความคืบหน้าการหาผู้รับเหมา</div>
+                <div class="progress-percentage" id="progressPercentage">5.3%</div>
+            </div>
+            
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar" style="width: 5.3%"></div>
+            </div>
+            
+            <div class="progress-details">
+                <div class="progress-item">
+                    <div class="progress-item-number" id="progressConfirmed">4</div>
+                    <div class="progress-item-label">จังหวัดที่มีผู้รับเหมา</div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-item-number" id="progressRemaining">72</div>
+                    <div class="progress-item-label">จังหวัดที่ยังต้องหา</div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-item-number">76</div>
+                    <div class="progress-item-label">เป้าหมายทั้งหมด</div>
+                </div>
+                <div class="progress-item">
+                    <div class="progress-item-number" id="progressContractors">7</div>
+                    <div class="progress-item-label">ผู้รับเหมาลงทะเบียน</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <div class="control-row">
+                <div class="search-group">
+                    <input type="text" id="searchInput" class="form-control" placeholder="🔍 ค้นหาจังหวัด, บริษัท, ผู้ติดต่อ..." oninput="applyFilters()">
+                    <select id="statusFilter" class="form-control" onchange="applyFilters()">
+                        <option value="">📋 สถานะทั้งหมด</option>
+                        <option value="hasContractors">✅ มีผู้รับเหมา</option>
+                        <option value="multiple">👥 ผู้รับเหมาหลายราย</option>
+                        <option value="noContractors">⏳ ยังไม่มีผู้รับเหมา</option>
+                    </select>
+                    <select id="regionFilter" class="form-control" onchange="applyFilters()">
+                        <option value="">🗺️ ภาคทั้งหมด</option>
+                        <option value="north">ภาคเหนือ</option>
+                        <option value="northeast">ภาคอีสาน</option>
+                        <option value="central">ภาคกลาง</option>
+                        <option value="east">ภาคตะวันออก</option>
+                        <option value="west">ภาคตะวันตก</option>
+                        <option value="south">ภาคใต้</option>
+                    </select>
+                </div>
+                <div class="export-section">
+                    <button class="btn btn-primary" onclick="showAddContractorModal()">➕ เพิ่มผู้รับเหมา</button>
+                    <button class="btn btn-info" onclick="showBatchAddModal()">📋 เพิ่มหลายราย</button>
+                    <button class="btn btn-success" onclick="exportToCSV()">📊 Export CSV</button>
+                    <button class="btn btn-warning" onclick="exportToPowerBI()">⚡ Power BI</button>
+                    <button class="btn btn-secondary" onclick="generateReport()">📄 รายงาน</button>
+                </div>
+            </div>
+            <div id="filterInfo" class="filter-info"></div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-container">
+            <table class="data-table" id="provincesTable">
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">ลำดับ</th>
+                        <th style="width: 120px;">จังหวัด</th>
+                        <th style="width: 100px;">ภาค</th>
+                        <th>อีเมลทีม</th>
+                        <th style="width: 80px;">จุดติดตั้ง</th>
+                        <th style="width: 60px;">Switch</th>
+                        <th style="width: 60px;">Rack</th>
+                        <th style="width: 150px;">สถานะผู้รับเหมา</th>
+                        <th style="width: 120px;">วันที่อัพเดท</th>
+                        <th style="width: 100px;">การจัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>โครงการ LAN 76 จังหวัด</h3>
+                    <p>ระบบจัดการผู้รับเหมาติดตั้งระบบเครือข่าย<br>
+                    มาตรฐาน TIA/EIA-568 และ Cat.6 UTP Cable</p>
+                </div>
+                <div class="footer-section">
+                    <h3>ผู้ติดต่อโครงการ</h3>
+                    <p>ฝ่ายจัดซื้อ: 092-708-2329<br>
+                    Email: addvalue-procurement@addvaluesystemcompany.onmicrosoft.com</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Add Value System Co., Ltd.</h3>
+                    <p>บริษัทระบบเทคโนโลยีสารสนเทศ<br>
+                    ผู้เชี่ยวชาญด้านโครงสร้างพื้นฐาน ICT</p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>📅 วันที่อัพเดท: <span id="updateDate"></span> | 
+                   🏢 Add Value System Company Limited | 
+                   📧 addvalue-procurement@addvaluesystemcompany.onmicrosoft.com</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Single Contractor Modal -->
+    <div id="addContractorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">➕ เพิ่มผู้รับเหมาใหม่</h2>
+                <button class="close-btn" onclick="closeModal('addContractorModal')">✕</button>
+            </div>
+            
+            <form id="contractorForm">
+                <div class="form-group">
+                    <label class="form-label">จังหวัด <span class="required">*</span></label>
+                    <select id="provinceSelect" class="form-select" required>
+                        <option value="">เลือกจังหวัด</option>
+                    </select>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label class="form-label">ชื่อบริษัท/ร้าน <span class="required">*</span></label>
+                        <input type="text" id="companyName" class="form-input" required placeholder="บจก. หจก. ห้างหุ้นส่วน">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">ผู้ติดต่อ <span class="required">*</span></label>
+                        <input type="text" id="contactPerson" class="form-input" required placeholder="ชื่อ-นามสกุล">
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label class="form-label">เบอร์โทรศัพท์ <span class="required">*</span></label>
+                        <input type="tel" id="contactPhone" class="form-input" required placeholder="0XX-XXX-XXXX">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Line ID</label>
+                        <input type="text" id="lineId" class="form-input" placeholder="Line ID">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">อีเมล</label>
+                    <input type="email" id="contactEmail" class="form-input" placeholder="email@company.com">
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="form-group">
+                        <label class="form-label">ประสบการณ์ (ปี)</label>
+                        <input type="number" id="experience" class="form-input" min="0" max="50" placeholder="จำนวนปี">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">สถานะ</label>
+                        <select id="contractorStatus" class="form-select">
+                            <option value="pending">รอการพิจารณา</option>
+                            <option value="qualified">ผ่านคุณสมบัติ</option>
+                            <option value="selected">เลือกเป็นผู้รับเหมาหลัก</option>
+                            <option value="backup">สำรองรอง</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">หมายเหตุ</label>
+                    <textarea id="contractorNotes" class="form-input" rows="3" placeholder="หมายเหตุเพิ่มเติม เช่น จุดเด่น ข้อจำกัด"></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-cancel" onclick="closeModal('addContractorModal')">ยกเลิก</button>
+                    <button type="submit" class="btn btn-save">💾 บันทึก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Batch Add Modal -->
+    <div id="batchAddModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📋 เพิ่มผู้รับเหมาหลายราย</h2>
+                <button class="close-btn" onclick="closeModal('batchAddModal')">✕</button>
+            </div>
+            
+            <div>
+                <p style="margin-bottom: 20px; color: #6c757d;">
+                    อัพโหลดไฟล์ CSV หรือกรอกข้อมูลหลายรายพร้อมกัน<br>
+                    รูปแบบ CSV: จังหวัด,บริษัท,ผู้ติดต่อ,โทร,อีเมล,Line ID,ประสบการณ์,สถานะ,หมายเหตุ
+                </p>
+                
+                <div class="form-group">
+                    <label class="form-label">อัพโหลด CSV File</label>
+                    <input type="file" id="csvFile" class="form-input" accept=".csv" onchange="handleCSVUpload(event)">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">หรือกรอกข้อมูลแบบ CSV</label>
+                    <textarea id="csvData" class="form-input" rows="10" placeholder="ตัวอย่าง:
+กระบี่,บริษัท ABC จำกัด,นายสมชาย ใจดี,081-234-5678,somchai@abc.com,somchai123,5,qualified,มีประสบการณ์สูง
+ขอนแก่น,ร้านคอมพิวเตอร์ XYZ,นางสาวมาลี สวยงาม,092-345-6789,malee@xyz.com,malee456,3,pending,ราคาดี"></textarea>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-cancel" onclick="closeModal('batchAddModal')">ยกเลิก</button>
+                    <button type="button" class="btn btn-save" onclick="processBatchAdd()">📥 นำเข้าข้อมูล</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ข้อมูลจังหวัดทั้ง 76 จังหวัด พร้อมข้อมูลผู้รับเหมาตัวอย่าง
+        var provincesData = [
+            // จังหวัดที่มีผู้รับเหมาแล้ว (ตัวอย่าง)
+            {id: 1, name: "กระบี่", region: "south", email: "addvalue-krabi@outlook.co.th", points: 29, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 2, name: "กาญจนบุรี", region: "west", email: "addvalue-kanchanaburi@outlook.co.th", points: 34, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 3, name: "กาฬสินธุ์", region: "northeast", email: "addvalue-kalasin@outlook.co.th", points: 37, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 4, name: "กำแพงเพชร", region: "north", email: "addvalue-kamphaengphet@outlook.co.th", points: 11, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 5, name: "ขอนแก่น", region: "northeast", email: "addvalue-khonkaen@outlook.co.th", points: 53, switches: 3, racks: 1, lastUpdate: "2024-08-30", contractors: [
+                {id: 1, companyName: "บจก.เทคโนโลยี ขอนแก่น", contactPerson: "นายสมชาย ใจดี", contactPhone: "089-123-4567", contactEmail: "somchai@techkk.com", lineId: "somchai_tech", experience: 5, status: "qualified", submittedDate: "2024-08-28", notes: "มีประสบการณ์งาน LAN มากกว่า 5 ปี"}
+            ]},
+            {id: 6, name: "จันทบุรี", region: "east", email: "addvalue-chanthaburi@outlook.co.th", points: 29, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 7, name: "ฉะเชิงเทรา", region: "central", email: "addvalue-chachoengsao@outlook.co.th", points: 31, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 8, name: "ชลบุรี", region: "east", email: "addvalue-chonburi@outlook.co.th", points: 48, switches: 3, racks: 1, lastUpdate: "2024-08-30", contractors: [
+                {id: 1, companyName: "หจก.เน็ตเวิร์ค ชลบุรี", contactPerson: "นายวิทยา เก่งกาจ", contactPhone: "081-234-5678", contactEmail: "wittaya@netcb.com", lineId: "wittaya_net", experience: 7, status: "selected", submittedDate: "2024-08-25", notes: "ราคาแข่งขันได้ มีผลงานดี"},
+                {id: 2, companyName: "บจก.อินเทอร์เน็ต พลัส", contactPerson: "นางสาวมดี แสงทอง", contactPhone: "092-345-6789", contactEmail: "malee@inetplus.com", lineId: "malee_iplus", experience: 4, status: "qualified", submittedDate: "2024-08-27", notes: "ราคาแข่งขันได้แต่สูงกว่า"},
+                {id: 3, companyName: "ร้านคอมฯ โชคดี", contactPerson: "นายประเสริฐ ชอบงาน", contactPhone: "086-456-7890", contactEmail: "prasert@chokdee.com", lineId: "prasert_cd", experience: 2, status: "pending", submittedDate: "2024-08-29", notes: "รอการประเมิน"}
+            ]},
+            {id: 9, name: "ชัยนาท", region: "central", email: "addvalue-chainat@outlook.co.th", points: 29, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 10, name: "ชัยภูมิ", region: "northeast", email: "addvalue-chaiyaphum@outlook.co.th", points: 34, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 11, name: "ชุมพร", region: "south", email: "addvalue-chumphon@outlook.co.th", points: 29, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 12, name: "เชียงราย", region: "north", email: "addvalue-chiangrai@outlook.co.th", points: 38, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 13, name: "เชียงใหม่", region: "north", email: "addvalue-chiangmai@outlook.co.th", points: 53, switches: 3, racks: 1, lastUpdate: "2024-08-30", contractors: [
+                {id: 1, companyName: "บจก.เหนือเทค เซอร์วิส", contactPerson: "นายชำนาญ รู้เก่ง", contactPhone: "053-123-456", contactEmail: "chamnan@northtech.com", lineId: "chamnan_nt", experience: 8, status: "selected", submittedDate: "2024-08-26", notes: "เลือกเป็นผู้รับเหมาหลักแล้ว"},
+                {id: 2, companyName: "หจก.ดอยเทค", contactPerson: "นางสุดา ขยันทำ", contactPhone: "053-234-567", contactEmail: "suda@doitech.com", lineId: "suda_dt", experience: 6, status: "backup", submittedDate: "2024-08-27", notes: "เก็บไว้เป็น backup contractor"}
+            ]},
+            {id: 14, name: "ตรัง", region: "south", email: "addvalue-trang@outlook.co.th", points: 29, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 15, name: "ตราด", region: "east", email: "addvalue-trat@outlook.co.th", points: 29, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 16, name: "ตาก", region: "north", email: "addvalue-tak@outlook.co.th", points: 29, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 17, name: "นครนายก", region: "central", email: "addvalue-nakhonnayok@outlook.co.th", points: 29, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 18, name: "นครปฐม", region: "central", email: "addvalue-nakhonpathom@outlook.co.th", points: 34, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 19, name: "นครพนม", region: "northeast", email: "addvalue-nakhonphanom@outlook.co.th", points: 11, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 20, name: "นครราชสีมา", region: "northeast", email: "addvalue-nakhonratchasima@outlook.co.th", points: 43, switches: 3, racks: 1, lastUpdate: "2024-08-30", contractors: [
+                {id: 1, companyName: "บจก.โคราช เน็ตเวิร์ค", contactPerson: "นายดำรงค์ เชี่ยวชาญ", contactPhone: "044-123-456", contactEmail: "damrong@koratnet.com", lineId: "damrong_kn", experience: 10, status: "qualified", submittedDate: "2024-08-24", notes: "มีประสบการณ์สูงที่สุด"}
+            ]}
+        ];
+
+        // เติมข้อมูลจังหวัดที่เหลือ (71 จังหวัด)
+        var remainingProvinces = [
+            {name: "นครศรีธรรมราช", region: "south", points: 38},
+            {name: "นครสวรรค์", region: "north", points: 34},
+            {name: "นนทบุรี", region: "central", points: 31},
+            {name: "นราธิวาส", region: "south", points: 29},
+            {name: "น่าน", region: "north", points: 29},
+            {name: "บึงกาฬ", region: "northeast", points: 11},
+            {name: "บุรีรัมย์", region: "northeast", points: 38},
+            {name: "ปทุมธานี", region: "central", points: 34},
+            {name: "ประจวบคีรีขันธ์", region: "south", points: 29},
+            {name: "ปราจีนบุรี", region: "east", points: 29},
+            {name: "ปัตตานี", region: "south", points: 11},
+            {name: "พระนครศรีอยุธยา", region: "central", points: 34},
+            {name: "พะเยา", region: "north", points: 29},
+            {name: "พังงา", region: "south", points: 29},
+            {name: "พัทลุง", region: "south", points: 29},
+            {name: "พิจิตร", region: "north", points: 29},
+            {name: "พิษณุโลก", region: "north", points: 34},
+            {name: "เพชรบุรี", region: "central", points: 29},
+            {name: "เพชรบูรณ์", region: "north", points: 34},
+            {name: "แพร่", region: "north", points: 29},
+            {name: "ภูเก็ต", region: "south", points: 29},
+            {name: "มหาสารคาม", region: "northeast", points: 34},
+            {name: "มุกดาหาร", region: "northeast", points: 29},
+            {name: "แม่ฮ่องสอน", region: "north", points: 29},
+            {name: "ยโสธร", region: "northeast", points: 29},
+            {name: "ยะลา", region: "south", points: 29},
+            {name: "ร้อยเอ็ด", region: "northeast", points: 38},
+            {name: "ระนอง", region: "south", points: 29},
+            {name: "ระยอง", region: "east", points: 29},
+            {name: "ราชบุรี", region: "west", points: 34},
+            {name: "ลพบุรี", region: "central", points: 31},
+            {name: "ลำปาง", region: "north", points: 29},
+            {name: "ลำพูน", region: "north", points: 29},
+            {name: "เลย", region: "northeast", points: 29},
+            {name: "ศรีสะเกษ", region: "northeast", points: 38},
+            {name: "สกลนคร", region: "northeast", points: 34},
+            {name: "สงขลา", region: "south", points: 51},
+            {name: "สตูล", region: "south", points: 29},
+            {name: "สมุทรปราการ", region: "central", points: 34},
+            {name: "สมุทรสงคราม", region: "central", points: 29},
+            {name: "สมุทรสาคร", region: "central", points: 11},
+            {name: "สระแก้ว", region: "east", points: 29},
+            {name: "สระบุรี", region: "central", points: 31},
+            {name: "สิงห์บุรี", region: "central", points: 29},
+            {name: "สุโขทัย", region: "north", points: 29},
+            {name: "สุพรรณบุรี", region: "central", points: 31},
+            {name: "สุราษฎร์ธานี", region: "south", points: 34},
+            {name: "สุรินทร์", region: "northeast", points: 38},
+            {name: "หนองคาย", region: "northeast", points: 29},
+            {name: "หนองบัวลำภู", region: "northeast", points: 29},
+            {name: "อ่างทอง", region: "central", points: 29},
+            {name: "อำนาจเจริญ", region: "northeast", points: 29},
+            {name: "อุดรธานี", region: "northeast", points: 38},
+            {name: "อุตรดิตถ์", region: "north", points: 29},
+            {name: "อุทัยธานี", region: "north", points: 29},
+            {name: "อุบลราชธานี", region: "northeast", points: 39}
+        ];
+
+        // เติมข้อมูลจังหวัดที่เหลือ
+        for (var i = 0; i < remainingProvinces.length; i++) {
+            var province = remainingProvinces[i];
+            provincesData.push({
+                id: 21 + i,
+                name: province.name,
+                region: province.region,
+                email: "addvalue-" + province.name.toLowerCase() + "@outlook.co.th",
+                points: province.points,
+                switches: province.points > 40 ? 3 : 2,
+                racks: 1,
+                lastUpdate: "2024-08-30",
+                contractors: []
+            });
+        }
+
+        var filteredData = provincesData.slice();
+
+        var regionNames = {
+            "north": "ภาคเหนือ",
+            "northeast": "ภาคตะวันออกเฉียงเหนือ", 
+            "central": "ภาคกลาง",
+            "east": "ภาคตะวันออก",
+            "west": "ภาคตะวันตก",
+            "south": "ภาคใต้"
+        };
+
+        // Functions
+        function updateStats() {
+            var provincesWithContractors = 0;
+            var provincesWithMultiple = 0;
+            var totalContractors = 0;
+
+            for (var i = 0; i < provincesData.length; i++) {
+                var p = provincesData[i];
+                if (p.contractors.length > 0) {
+                    provincesWithContractors++;
+                }
+                if (p.contractors.length > 1) {
+                    provincesWithMultiple++;
+                }
+                totalContractors += p.contractors.length;
+            }
+
+            var pendingProvinces = provincesData.length - provincesWithContractors;
+
+            document.getElementById('confirmedCount').textContent = provincesWithContractors;
+            document.getElementById('multipleCount').textContent = provincesWithMultiple;
+            document.getElementById('pendingCount').textContent = pendingProvinces;
+            document.getElementById('totalContractors').textContent = totalContractors;
+
+            var progressPercent = Math.round((provincesWithContractors / provincesData.length) * 100);
+            document.getElementById('progressPercentage').textContent = progressPercent + '%';
+            document.getElementById('progressBar').style.width = progressPercent + '%';
+            document.getElementById('progressConfirmed').textContent = provincesWithContractors;
+            document.getElementById('progressRemaining').textContent = pendingProvinces;
+            document.getElementById('progressContractors').textContent = totalContractors;
+            document.getElementById('confirmedTrend').textContent = progressPercent + '% ของทั้งหมด';
+        }
+
+        function getContractorStatus(province) {
+            var count = province.contractors.length;
+            if (count === 0) {
+                return '<div class="contractor-status status-none" onclick="showAddContractorModal(' + province.id + ')">⏳ ยังไม่มีผู้รับเหมา</div>';
+            } else if (count === 1) {
+                return '<div class="contractor-status status-single"><span class="contractor-count">1</span> ราย</div>';
+            } else {
+                return '<div class="contractor-status status-multiple"><span class="contractor-count">' + count + '</span> ราย 👥</div>';
+            }
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('th-TH');
+        }
+
+        function populateTable(data) {
+            if (!data) data = filteredData;
+            
+            var tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; padding: 40px; color: #6c757d;">ไม่พบข้อมูลที่ตรงกับการค้นหา</td></tr>';
+                return;
+            }
+
+            for (var i = 0; i < data.length; i++) {
+                var province = data[i];
+                var row = tbody.insertRow();
+                var contractorStatus = getContractorStatus(province);
+                
+                row.innerHTML = 
+                    '<td style="text-align: center; font-weight: bold;">' + (i + 1) + '</td>' +
+                    '<td><div class="province-name">' + province.name + '</div></td>' +
+                    '<td><span class="region-badge">' + regionNames[province.region] + '</span></td>' +
+                    '<td style="font-size: 0.85rem; color: #6c757d;">' + province.email + '</td>' +
+                    '<td><span class="equipment-count">' + province.points + ' จุด</span></td>' +
+                    '<td><span class="equipment-count">' + province.switches + ' ตัว</span></td>' +
+                    '<td><span class="equipment-count">' + province.racks + ' ตู้</span></td>' +
+                    '<td>' + contractorStatus + '</td>' +
+                    '<td style="font-size: 0.85rem; color: #6c757d;">' + formatDate(province.lastUpdate) + '</td>' +
+                    '<td><button class="btn btn-primary" style="padding: 8px 12px; font-size: 0.8rem;" onclick="manageProvince(' + province.id + ')">จัดการ</button></td>';
+            }
+
+            updateFilterInfo(data.length);
+        }
+
+        function updateFilterInfo(count) {
+            var filterInfo = document.getElementById('filterInfo');
+            var searchTerm = document.getElementById('searchInput').value;
+            var statusFilter = document.getElementById('statusFilter').value;
+            var regionFilter = document.getElementById('regionFilter').value;
+
+            if (searchTerm || statusFilter || regionFilter || count < provincesData.length) {
+                var info = 'แสดง ' + count.toLocaleString() + ' จาก ' + provincesData.length + ' จังหวัด';
+                if (searchTerm) info += ' | ค้นหา: "' + searchTerm + '"';
+                if (statusFilter) {
+                    var statusLabels = {
+                        'hasContractors': '✅ มีผู้รับเหมา',
+                        'multiple': '👥 ผู้รับเหมาหลายราย',
+                        'noContractors': '⏳ ยังไม่มีผู้รับเหมา'
+                    };
+                    info += ' | สถานะ: ' + statusLabels[statusFilter];
+                }
+                if (regionFilter) info += ' | ภาค: ' + regionNames[regionFilter];
+                
+                filterInfo.textContent = info;
+                filterInfo.style.display = 'block';
+            } else {
+                filterInfo.style.display = 'none';
+            }
+        }
+
+        function applyFilters() {
+            var searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            var statusFilter = document.getElementById('statusFilter').value;
+            var regionFilter = document.getElementById('regionFilter').value;
+
+            filteredData = [];
+
+            for (var i = 0; i < provincesData.length; i++) {
+                var province = provincesData[i];
+                
+                var matchesSearch = province.name.toLowerCase().indexOf(searchTerm) !== -1 || 
+                                   province.email.toLowerCase().indexOf(searchTerm) !== -1;
+
+                for (var j = 0; j < province.contractors.length; j++) {
+                    var c = province.contractors[j];
+                    if (c.companyName.toLowerCase().indexOf(searchTerm) !== -1 ||
+                        c.contactPerson.toLowerCase().indexOf(searchTerm) !== -1) {
+                        matchesSearch = true;
+                        break;
+                    }
+                }
+                
+                var matchesStatus = true;
+                if (statusFilter) {
+                    if (statusFilter === 'hasContractors') {
+                        matchesStatus = province.contractors.length > 0;
+                    } else if (statusFilter === 'multiple') {
+                        matchesStatus = province.contractors.length > 1;
+                    } else if (statusFilter === 'noContractors') {
+                        matchesStatus = province.contractors.length === 0;
+                    }
+                }
+
+                var matchesRegion = !regionFilter || province.region === regionFilter;
+
+                if (matchesSearch && matchesStatus && matchesRegion) {
+                    filteredData.push(province);
+                }
+            }
+
+            populateTable(filteredData);
+        }
+
+        function filterByStatus(status) {
+            document.getElementById('statusFilter').value = status;
+            applyFilters();
+            showNotification('กรองข้อมูลตามสถานะเรียบร้อย');
+        }
+
+        function showNotification(message) {
+            var notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(function() {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Modal Functions
+        function showAddContractorModal(provinceId) {
+            populateProvinceSelect();
+            if (provinceId) {
+                document.getElementById('provinceSelect').value = provinceId;
+            }
+            document.getElementById('addContractorModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function showBatchAddModal() {
+            document.getElementById('batchAddModal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+            document.body.style.overflow = 'auto';
+            if (modalId === 'addContractorModal') {
+                document.getElementById('contractorForm').reset();
+            }
+        }
+
+        function populateProvinceSelect() {
+            var select = document.getElementById('provinceSelect');
+            select.innerHTML = '<option value="">เลือกจังหวัด</option>';
+            
+            for (var i = 0; i < provincesData.length; i++) {
+                var province = provincesData[i];
+                var option = document.createElement('option');
+                option.value = province.id;
+                option.textContent = province.name + ' (' + regionNames[province.region] + ')';
+                select.appendChild(option);
+            }
+        }
+
+        function manageProvince(provinceId) {
+            var province = provincesData.find(function(p) { return p.id === provinceId; });
+            if (province) {
+                if (province.contractors.length === 0) {
+                    showAddContractorModal(provinceId);
+                } else {
+                    var message = 'จังหวัด' + province.name + ' มีผู้รับเหมา ' + province.contractors.length + ' ราย:\n\n';
+                    for (var i = 0; i < province.contractors.length; i++) {
+                        var c = province.contractors[i];
+                        message += (i + 1) + '. ' + c.companyName + ' (' + c.contactPerson + ')\n';
+                        message += '   โทร: ' + c.contactPhone + '\n';
+                        message += '   สถานะ: ' + c.status + '\n\n';
+                    }
+                    message += 'ต้องการเพิ่มผู้รับเหมารายใหม่หรือไม่?';
+                    
+                    if (confirm(message)) {
+                        showAddContractorModal(provinceId);
+                    }
+                }
+            }
+        }
+
+        // Export Functions
+        function exportToCSV() {
+            var csvContent = '\ufeffID,จังหวัด,ภาค,อีเมลทีม,จุดติดตั้ง,Switch,Rack,จำนวนผู้รับเหมา,วันที่อัพเดท\n';
+
+            for (var i = 0; i < provincesData.length; i++) {
+                var p = provincesData[i];
+                csvContent += p.id + ',"' + p.name + '","' + regionNames[p.region] + '","' + p.email + '",' + p.points + ',' + p.switches + ',' + p.racks + ',' + p.contractors.length + ',' + p.lastUpdate + '\n';
+            }
+            
+            downloadFile(csvContent, 'provinces_contractors_full.csv', 'text/csv;charset=utf-8;');
+            showNotification('ส่งออกข้อมูล CSV สำเร็จ!');
+        }
+
+        function exportToPowerBI() {
+            var powerBIData = [];
+
+            for (var i = 0; i < provincesData.length; i++) {
+                var p = provincesData[i];
+                if (p.contractors.length === 0) {
+                    powerBIData.push({
+                        ProvinceID: p.id,
+                        ProvinceName: p.name,
+                        Region: p.region,
+                        RegionName: regionNames[p.region],
+                        TeamEmail: p.email,
+                        InstallationPoints: p.points,
+                        SwitchCount: p.switches,
+                        RackCount: p.racks,
+                        ContractorsCount: 0,
+                        HasContractors: false,
+                        HasMultipleContractors: false,
+                        LastUpdated: p.lastUpdate,
+                        CreatedDate: new Date().toISOString(),
+                        ProjectName: 'โครงการติดตั้งระบบเครือข่าย (LAN) 76 จังหวัด'
+                    });
+                } else {
+                    for (var j = 0; j < p.contractors.length; j++) {
+                        var c = p.contractors[j];
+                        powerBIData.push({
+                            ProvinceID: p.id,
+                            ProvinceName: p.name,
+                            Region: p.region,
+                            RegionName: regionNames[p.region],
+                            TeamEmail: p.email,
+                            InstallationPoints: p.points,
+                            SwitchCount: p.switches,
+                            RackCount: p.racks,
+                            ContractorsCount: p.contractors.length,
+                            HasContractors: true,
+                            HasMultipleContractors: p.contractors.length > 1,
+                            ContractorCompany: c.companyName,
+                            ContactPerson: c.contactPerson,
+                            ContactPhone: c.contactPhone,
+                            ContactEmail: c.contactEmail,
+                            ContractorStatus: c.status,
+                            Experience: c.experience,
+                            SubmittedDate: c.submittedDate,
+                            Notes: c.notes,
+                            LastUpdated: p.lastUpdate,
+                            CreatedDate: new Date().toISOString(),
+                            ProjectName: 'โครงการติดตั้งระบบเครือข่าย (LAN) 76 จังหวัด'
+                        });
+                    }
+                }
+            }
+
+            var dataStr = JSON.stringify(powerBIData, null, 2);
+            downloadFile(dataStr, 'contractors_powerbi_format.json', 'application/json');
+            showNotification('ส่งออกข้อมูล Power BI Format สำเร็จ!');
+        }
+
+        function generateReport() {
+            var provincesWithContractors = 0;
+            var totalContractors = 0;
+
+            for (var i = 0; i < provincesData.length; i++) {
+                if (provincesData[i].contractors.length > 0) {
+                    provincesWithContractors++;
+                }
+                totalContractors += provincesData[i].contractors.length;
+            }
+            
+            var reportData = {
+                metadata: {
+                    reportTitle: 'รายงานสถานะผู้รับเหมาตอบรับ - รายจังหวัด',
+                    projectName: 'โครงการติดตั้งระบบเครือข่าย (LAN) 76 จังหวัด',
+                    company: 'Add Value System Company Limited',
+                    generatedDate: new Date().toISOString()
+                },
+                summary: {
+                    totalProvinces: provincesData.length,
+                    provincesWithContractors: provincesWithContractors,
+                    totalContractors: totalContractors,
+                    progressPercentage: Math.round((provincesWithContractors / provincesData.length) * 100),
+                    totalInstallationPoints: 2373,
+                    totalSwitches: 157,
+                    totalRackCabinets: 76
+                },
+                detailedData: provincesData.map(function(p) {
+                    return {
+                        id: p.id,
+                        name: p.name,
+                        region: regionNames[p.region],
+                        email: p.email,
+                        points: p.points,
+                        switches: p.switches,
+                        racks: p.racks,
+                        contractorsCount: p.contractors.length,
+                        contractors: p.contractors,
+                        lastUpdate: p.lastUpdate
+                    };
+                })
+            };
+
+            var dataStr = JSON.stringify(reportData, null, 2);
+            downloadFile(dataStr, 'contractors_detailed_report.json', 'application/json');
+            showNotification('สร้างรายงานสำเร็จ!');
+        }
+
+        function downloadFile(content, filename, contentType) {
+            var a = document.createElement('a');
+            var file = new Blob([content], {type: contentType});
+            a.href = URL.createObjectURL(file);
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // CSV Upload Handler
+        function handleCSVUpload(event) {
+            var file = event.target.files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('csvData').value = e.target.result;
+                };
+                reader.readAsText(file, 'UTF-8');
+            }
+        }
+
+        function processBatchAdd() {
+            var csvData = document.getElementById('csvData').value.trim();
+            if (!csvData) {
+                alert('กรุณากรอกข้อมูล CSV หรือเลือกไฟล์');
+                return;
+            }
+
+            var lines = csvData.split('\n');
+            var successCount = 0;
+            var errorCount = 0;
+            var errors = [];
+
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i].trim();
+                if (!line) continue;
+
+                var fields = line.split(',');
+                if (fields.length < 4) {
+                    errors.push('บรรทัด ' + (i + 1) + ': ข้อมูลไม่ครบถ้วน');
+                    errorCount++;
+                    continue;
+                }
+
+                var provinceName = fields[0].trim();
+                var companyName = fields[1].trim();
+                var contactPerson = fields[2].trim();
+                var contactPhone = fields[3].trim();
+                var contactEmail = fields[4] ? fields[4].trim() : '';
+                var lineId = fields[5] ? fields[5].trim() : '';
+                var experience = fields[6] ? parseInt(fields[6].trim()) || 0 : 0;
+                var status = fields[7] ? fields[7].trim() : 'pending';
+                var notes = fields[8] ? fields[8].trim() : '';
+
+                // หาจังหวัด
+                var province = provincesData.find(function(p) { 
+                    return p.name === provinceName; 
+                });
+
+                if (!province) {
+                    errors.push('บรรทัด ' + (i + 1) + ': ไม่พบจังหวัด "' + provinceName + '"');
+                    errorCount++;
+                    continue;
+                }
+
+                // สร้าง contractor ใหม่
+                var maxId = 0;
+                for (var j = 0; j < provincesData.length; j++) {
+                    for (var k = 0; k < provincesData[j].contractors.length; k++) {
+                        if (provincesData[j].contractors[k].id > maxId) {
+                            maxId = provincesData[j].contractors[k].id;
+                        }
+                    }
+                }
+
+                var newContractor = {
+                    id: maxId + 1,
+                    companyName: companyName,
+                    contactPerson: contactPerson,
+                    contactPhone: contactPhone,
+                    contactEmail: contactEmail,
+                    lineId: lineId,
+                    experience: experience,
+                    status: status,
+                    submittedDate: new Date().toISOString().split('T')[0],
+                    notes: notes
+                };
+
+                province.contractors.push(newContractor);
+                province.lastUpdate = new Date().toISOString().split('T')[0];
+                successCount++;
+            }
+
+            // อัพเดท UI
+            updateStats();
+            populateTable();
+            closeModal('batchAddModal');
+            
+            // แสดงผลลัพธ์
+            var message = 'นำเข้าข้อมูลสำเร็จ: ' + successCount + ' รายการ';
+            if (errorCount > 0) {
+                message += '\nข้อผิดพลาด: ' + errorCount + ' รายการ\n\n' + errors.join('\n');
+            }
+            
+            if (errorCount > 0) {
+                alert(message);
+            } else {
+                showNotification(message);
+            }
+
+            document.getElementById('csvData').value = '';
+            document.getElementById('csvFile').value = '';
+        }
+
+        // Form submission
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();
+            populateTable();
+            
+            document.getElementById('updateDate').textContent = new Date().toLocaleDateString('th-TH', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            document.getElementById('contractorForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                var formData = {
+                    provinceId: parseInt(document.getElementById('provinceSelect').value),
+                    companyName: document.getElementById('companyName').value.trim(),
+                    contactPerson: document.getElementById('contactPerson').value.trim(),
+                    contactPhone: document.getElementById('contactPhone').value.trim(),
+                    contactEmail: document.getElementById('contactEmail').value.trim(),
+                    lineId: document.getElementById('lineId').value.trim(),
+                    experience: parseInt(document.getElementById('experience').value) || 0,
+                    status: document.getElementById('contractorStatus').value,
+                    notes: document.getElementById('contractorNotes').value.trim()
+                };
+
+                if (!formData.provinceId || !formData.companyName || !formData.contactPerson || !formData.contactPhone) {
+                    alert('กรุณากรอกข้อมูลที่จำเป็น (*) ให้ครบถ้วน');
+                    return;
+                }
+
+                var province = provincesData.find(function(p) { return p.id === formData.provinceId; });
+                if (province) {
+                    var maxId = 0;
+                    for (var i = 0; i < provincesData.length; i++) {
+                        for (var j = 0; j < provincesData[i].contractors.length; j++) {
+                            if (provincesData[i].contractors[j].id > maxId) {
+                                maxId = provincesData[i].contractors[j].id;
+                            }
+                        }
+                    }
+
+                    var newContractor = {
+                        id: maxId + 1,
+                        companyName: formData.companyName,
+                        contactPerson: formData.contactPerson,
+                        contactPhone: formData.contactPhone,
+                        contactEmail: formData.contactEmail || '',
+                        lineId: formData.lineId || '',
+                        experience: formData.experience,
+                        status: formData.status,
+                        submittedDate: new Date().toISOString().split('T')[0],
+                        notes: formData.notes || ''
+                    };
+
+                    province.contractors.push(newContractor);
+                    province.lastUpdate = new Date().toISOString().split('T')[0];
+
+                    updateStats();
+                    populateTable();
+                    
+                    closeModal('addContractorModal');
+                    
+                    showNotification('เพิ่มผู้รับเหมาสำเร็จ: ' + formData.companyName + ' ในจังหวัด' + province.name);
+                } else {
+                    alert('ไม่พบข้อมูลจังหวัดที่เลือก');
+                }
+            });
+        });
+
+        // Close modal handlers
+        document.addEventListener('click', function(e) {
+            var modals = ['addContractorModal', 'batchAddModal'];
+            for (var i = 0; i < modals.length; i++) {
+                var modal = document.getElementById(modals[i]);
+                if (e.target === modal) {
+                    closeModal(modals[i]);
+                }
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal('addContractorModal');
+                closeModal('batchAddModal');
+            }
+        });
+    </script>
+</body>
+</html>

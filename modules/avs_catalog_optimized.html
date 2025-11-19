@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AVS Service Catalog System v5.0</title>
+<style>
+/* Core Styles */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font: 12px 'Segoe UI', Arial, sans-serif; background: #f0f2f5; }
+.container { max-width: 100%; margin: 0; padding: 10px; }
+
+/* Layout */
+.header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.header h1 { font-size: 22px; margin-bottom: 3px; }
+
+.project-bar {
+    background: white;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.project-bar input, .project-bar select {
+    padding: 6px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 11px;
+}
+.project-bar label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 10px;
+}
+
+.main-content {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Service Grid */
+.service-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px;
+    margin-bottom: 15px;
+}
+.service-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+}
+.service-card:hover {
+    background: #eff6ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.service-card.selected {
+    background: #dbeafe;
+    border-color: #3b82f6;
+    border-width: 2px;
+}
+.service-icon { font-size: 24px; margin-bottom: 5px; }
+.service-name { font-size: 11px; font-weight: 600; color: #374151; }
+.service-code {
+    font-size: 9px;
+    background: #6366f1;
+    color: white;
+    padding: 2px 5px;
+    border-radius: 3px;
+    margin-top: 3px;
+    display: inline-block;
+}
+
+/* Team Table */
+.team-section { margin-bottom: 20px; }
+.team-header {
+    background: #3b82f6;
+    color: white;
+    padding: 8px;
+    font-weight: bold;
+    border-radius: 4px 4px 0 0;
+}
+.resource-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+.resource-table th {
+    background: #f9fafb;
+    padding: 6px;
+    text-align: left;
+    border: 1px solid #e5e7eb;
+}
+.resource-table td {
+    padding: 4px;
+    border: 1px solid #e5e7eb;
+}
+.resource-table input, .resource-table select {
+    width: 100%;
+    padding: 2px;
+    border: 1px solid #d1d5db;
+    border-radius: 3px;
+    font-size: 10px;
+}
+
+/* Summary */
+.summary-panel {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 2px solid #3b82f6;
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 15px;
+}
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+}
+.summary-item { text-align: center; }
+.summary-label { font-size: 10px; color: #6b7280; }
+.summary-value { font-size: 18px; font-weight: bold; color: #1e40af; }
+
+/* Buttons */
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 11px;
+    margin: 0 5px;
+}
+.btn-primary { background: #3b82f6; color: white; }
+.btn-success { background: #10b981; color: white; }
+.btn-danger { background: #ef4444; color: white; }
+
+/* Location Badges */
+.location-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-left: 5px;
+}
+.badge-offshore { background: #dbeafe; color: #1e40af; }
+.badge-onshore { background: #d1fae5; color: #065f46; }
+.badge-document { background: #fee2e2; color: #991b1b; }
+
+/* Price Adjustment */
+.price-adjust {
+    background: #fef3c7;
+    border: 2px solid #f59e0b;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 768px) {
+    .service-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); }
+    .summary-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <div>
+            <h1>🏢 ADDVALUE SYSTEM CO., LTD.</h1>
+            <p>Service Catalog & Pricing System v5.0</p>
+        </div>
+        <div style="text-align: right; font-size: 10px;">
+            <p id="datetime"></p>
+            <p>Session: #2025-001</p>
+        </div>
+    </div>
+
+    <!-- Project Information -->
+    <div class="project-bar">
+        <div>
+            <label>Project:</label>
+            <input type="text" id="projectName" placeholder="Project Name">
+        </div>
+        <div>
+            <label>Client:</label>
+            <select id="clientType">
+                <option value="">-- Select --</option>
+                <option>PTTEP</option>
+                <option>Chevron</option>
+                <option>MUBADALA</option>
+                <option>TOTAL</option>
+            </select>
+        </div>
+        <div>
+            <label>Country:</label>
+            <select id="country">
+                <option value="">-- Select --</option>
+                <option value="thailand">🇹🇭 Thailand</option>
+                <option value="myanmar">🇲🇲 Myanmar</option>
+                <option value="malaysia">🇲🇾 Malaysia</option>
+            </select>
+        </div>
+        <div>
+            <label>Field/Location:</label>
+            <select id="field">
+                <option value="">-- Select --</option>
+            </select>
+        </div>
+        <div>
+            <label>Platform/Area:</label>
+            <select id="platform">
+                <option value="">-- Select --</option>
+            </select>
+        </div>
+        <div>
+            <label>Quote:</label>
+            <input type="text" id="quoteNo" value="Q-2025-001" style="width: 100px;">
+        </div>
+    </div>
+
+    <!-- Price Adjustment -->
+    <div class="price-adjust">
+        <span style="font-weight: bold; color: #92400e;">💰 Location Adjustment:</span>
+        <label>Offshore:</label>
+        <input type="number" id="offshoreAdj" value="30" style="width: 50px;">%
+        <label>Onshore:</label>
+        <input type="number" id="onshoreAdj" value="30" style="width: 50px;">%
+        <label>Document:</label>
+        <input type="number" id="documentAdj" value="0" style="width: 50px;">%
+        <button class="btn btn-primary" onclick="App.applyAdjustment()">Apply</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Service Selection -->
+        <h3 style="margin-bottom: 10px;">Select Service:</h3>
+        <div class="service-grid" id="serviceGrid"></div>
+
+        <!-- Team Configuration -->
+        <div class="team-section">
+            <div class="team-header">👥 Team Assignment</div>
+            <table class="resource-table">
+                <thead>
+                    <tr>
+                        <th>Position</th>
+                        <th>Employee</th>
+                        <th>Qty</th>
+                        <th>Days</th>
+                        <th>Daily Rate</th>
+                        <th>OT Hours</th>
+                        <th>Subtotal</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="teamTable"></tbody>
+            </table>
+            <button class="btn btn-success" onclick="App.addTeamMember()">+ Add Member</button>
+        </div>
+
+        <!-- Cost Summary -->
+        <div class="summary-panel">
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-label">Man-Days</div>
+                    <div class="summary-value" id="totalManDays">0</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Service Cost</div>
+                    <div class="summary-value" id="serviceCost">฿0</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Management (15%)</div>
+                    <div class="summary-value" id="mgmtFee">฿0</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Grand Total</div>
+                    <div class="summary-value" id="grandTotal" style="color: #059669;">฿0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div style="margin-top: 20px;">
+            <button class="btn btn-primary" onclick="App.save()">💾 Save</button>
+            <button class="btn btn-success" onclick="App.export()">📤 Export</button>
+            <button class="btn btn-danger" onclick="App.reset()">🔄 Reset</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Data Module
+const Data = {
+    // Location Structure (Updated from location_structure_test)
+    locations: {
+        thailand: {
+            name: 'Thailand',
+            fields: {
+                'G1F': {
+                    name: 'G1 Field Complex',
+                    type: 'offshore',
+                    platforms: ['PLT-Platong', 'ERW-Erawan', 'STN-Satun', 'FNN-Funan']
+                },
+                'G2F': {
+                    name: 'G2 Field Complex',
+                    type: 'offshore',
+                    platforms: ['G2N', 'G2S', 'ART-Arthit', 'ARS-Arthit South']
+                },
+                'BLG': {
+                    name: 'Bualuang Field',
+                    type: 'offshore',
+                    platforms: ['ALP-Alpha', 'BRV-Bravo']
+                },
+                'GCM': {
+                    name: 'GCME Office',
+                    type: 'document',
+                    platforms: ['VDR-VDRL', 'DOC-Document Center']
+                },
+                'AVS': {
+                    name: 'Addvalue Office',
+                    type: 'document',
+                    platforms: ['OFC-Office', 'ENG-Engineering']
+                }
+            }
+        },
+        myanmar: {
+            name: 'Myanmar',
+            fields: {
+                'ZTK': {
+                    name: 'Zawtika Offshore',
+                    type: 'offshore',
+                    platforms: ['ZPQ-Platform']
+                },
+                'ZON': {
+                    name: 'Zawtika Onshore',
+                    type: 'onshore',
+                    platforms: ['ZOC', 'ZBV1', 'ZBV2', 'ZMS-Metering']
+                },
+                'YDN': {
+                    name: 'Yadana Field',
+                    type: 'onshore',
+                    platforms: ['PLC-Control', 'MS-Metering']
+                }
+            }
+        },
+        malaysia: {
+            name: 'Malaysia',
+            fields: {
+                'CPC': {
+                    name: 'CPOC',
+                    type: 'offshore',
+                    platforms: ['CPOC-Platform']
+                }
+            }
+        }
+    },
+
+    // Services
+    services: {
+        field: [
+            { code: 'SURVEY', name: 'Site Survey', icon: '🔍' },
+            { code: 'INSTALL', name: 'Installation', icon: '🔨' },
+            { code: 'MAINT', name: 'Maintenance', icon: '🔧' },
+            { code: 'TROUBLE', name: 'Troubleshooting', icon: '🔍' }
+        ],
+        testing: [
+            { code: 'FAT', name: 'Factory Test', icon: '🏭' },
+            { code: 'SAT', name: 'Site Test', icon: '📍' },
+            { code: 'COMM', name: 'Commissioning', icon: '✅' }
+        ],
+        document: [
+            { code: 'FEED', name: 'FEED Package', icon: '📘' },
+            { code: 'DETAIL', name: 'Detail Design', icon: '📐' },
+            { code: 'AS-BUILT', name: 'As-Built', icon: '🏗️' }
+        ]
+    },
+
+    // Employees
+    employees: [
+        { id: 1, name: 'Sakda Wongjam', position: 'Chief Engineer', rate: 2733 },
+        { id: 2, name: 'Suttirak Nunsong', position: 'Sr. Engineer', rate: 1200 },
+        { id: 3, name: 'Ratchaneekorn Mo-on', position: 'Engineer', rate: 800 },
+        { id: 4, name: 'Yuttapong Eakimphon', position: 'Technician', rate: 1233 },
+        { id: 5, name: 'Natcha Yodin', position: 'Admin', rate: 467 }
+    ],
+
+    // Client Mapping
+    clientMap: {
+        'PTTEP': ['thailand', 'myanmar', 'malaysia'],
+        'Chevron': ['thailand'],
+        'MUBADALA': ['thailand', 'myanmar'],
+        'TOTAL': ['myanmar']
+    }
+};
+
+// UI Module
+const UI = {
+    init() {
+        this.loadServices();
+        this.bindEvents();
+        this.updateDateTime();
+        setInterval(() => this.updateDateTime(), 60000);
+    },
+
+    loadServices() {
+        const grid = document.getElementById('serviceGrid');
+        let html = '';
+        
+        Object.keys(Data.services).forEach(cat => {
+            Data.services[cat].forEach(srv => {
+                html += `
+                    <div class="service-card" onclick="App.selectService('${srv.code}', this)">
+                        <div class="service-icon">${srv.icon}</div>
+                        <div class="service-name">${srv.name}</div>
+                        <div class="service-code">${srv.code}</div>
+                    </div>
+                `;
+            });
+        });
+        grid.innerHTML = html;
+    },
+
+    bindEvents() {
+        document.getElementById('clientType').addEventListener('change', e => this.updateCountries(e.target.value));
+        document.getElementById('country').addEventListener('change', e => this.updateFields(e.target.value));
+        document.getElementById('field').addEventListener('change', e => this.updatePlatforms(e.target.value));
+    },
+
+    updateCountries(client) {
+        const countrySelect = document.getElementById('country');
+        countrySelect.innerHTML = '<option value="">-- Select --</option>';
+        
+        if (Data.clientMap[client]) {
+            Data.clientMap[client].forEach(country => {
+                const option = document.createElement('option');
+                option.value = country;
+                option.textContent = Data.locations[country].name;
+                countrySelect.appendChild(option);
+            });
+        }
+    },
+
+    updateFields(country) {
+        const fieldSelect = document.getElementById('field');
+        fieldSelect.innerHTML = '<option value="">-- Select --</option>';
+        
+        if (Data.locations[country]) {
+            Object.keys(Data.locations[country].fields).forEach(fieldCode => {
+                const field = Data.locations[country].fields[fieldCode];
+                const option = document.createElement('option');
+                option.value = fieldCode;
+                option.textContent = `${field.name} (${field.type})`;
+                option.setAttribute('data-type', field.type);
+                fieldSelect.appendChild(option);
+            });
+        }
+    },
+
+    updatePlatforms(fieldCode) {
+        const country = document.getElementById('country').value;
+        const platformSelect = document.getElementById('platform');
+        platformSelect.innerHTML = '<option value="">-- Select --</option>';
+        
+        if (country && fieldCode) {
+            const field = Data.locations[country].fields[fieldCode];
+            field.platforms.forEach(platform => {
+                const option = document.createElement('option');
+                option.value = platform;
+                option.textContent = platform;
+                platformSelect.appendChild(option);
+            });
+        }
+    },
+
+    updateDateTime() {
+        document.getElementById('datetime').textContent = new Date().toLocaleString();
+    }
+};
+
+// Application Module
+const App = {
+    currentTeam: [],
+    
+    init() {
+        UI.init();
+    },
+
+    selectService(code, element) {
+        document.querySelectorAll('.service-card').forEach(card => card.classList.remove('selected'));
+        element.classList.add('selected');
+        this.loadDefaultTeam(code);
+    },
+
+    loadDefaultTeam(serviceCode) {
+        const templates = {
+            'SURVEY': [
+                { position: 'Chief Engineer', emp: 'Sakda Wongjam', qty: 1, days: 5 },
+                { position: 'Engineer', emp: 'Ratchaneekorn Mo-on', qty: 2, days: 5 }
+            ],
+            'INSTALL': [
+                { position: 'Chief Engineer', emp: 'Sakda Wongjam', qty: 1, days: 10 },
+                { position: 'Sr. Engineer', emp: 'Suttirak Nunsong', qty: 1, days: 10 },
+                { position: 'Technician', emp: 'Yuttapong Eakimphon', qty: 2, days: 10 }
+            ]
+        };
+        
+        this.currentTeam = templates[serviceCode] || [];
+        this.renderTeam();
+    },
+
+    renderTeam() {
+        const tbody = document.getElementById('teamTable');
+        tbody.innerHTML = '';
+        
+        this.currentTeam.forEach((member, idx) => {
+            const emp = Data.employees.find(e => e.name === member.emp);
+            const rate = this.getAdjustedRate(emp?.rate || 1000);
+            const subtotal = member.qty * member.days * rate;
+            
+            tbody.innerHTML += `
+                <tr>
+                    <td>${member.position}</td>
+                    <td>
+                        <select onchange="App.updateMember(${idx}, 'emp', this.value)">
+                            ${Data.employees.map(e => 
+                                `<option value="${e.name}" ${e.name === member.emp ? 'selected' : ''}>${e.name}</option>`
+                            ).join('')}
+                        </select>
+                    </td>
+                    <td><input type="number" value="${member.qty}" min="1" onchange="App.updateMember(${idx}, 'qty', this.value)"></td>
+                    <td><input type="number" value="${member.days}" min="1" onchange="App.updateMember(${idx}, 'days', this.value)"></td>
+                    <td><input type="number" value="${rate}" onchange="App.updateMember(${idx}, 'rate', this.value)"></td>
+                    <td><input type="number" value="0" placeholder="OT"></td>
+                    <td style="font-weight: bold;">฿${subtotal.toLocaleString()}</td>
+                    <td><button class="btn btn-danger" onclick="App.removeMember(${idx})">×</button></td>
+                </tr>
+            `;
+        });
+        this.calculateTotals();
+    },
+
+    getAdjustedRate(baseRate) {
+        const field = document.getElementById('field');
+        const type = field.selectedOptions[0]?.getAttribute('data-type');
+        
+        if (!type) return baseRate;
+        
+        const adjustments = {
+            'offshore': parseFloat(document.getElementById('offshoreAdj').value) || 30,
+            'onshore': parseFloat(document.getElementById('onshoreAdj').value) || 30,
+            'document': parseFloat(document.getElementById('documentAdj').value) || 0
+        };
+        
+        return Math.round(baseRate * (1 + adjustments[type] / 100));
+    },
+
+    addTeamMember() {
+        this.currentTeam.push({
+            position: 'Engineer',
+            emp: Data.employees[0].name,
+            qty: 1,
+            days: 5
+        });
+        this.renderTeam();
+    },
+
+    updateMember(idx, field, value) {
+        if (field === 'qty' || field === 'days') {
+            this.currentTeam[idx][field] = parseInt(value) || 1;
+        } else {
+            this.currentTeam[idx][field] = value;
+        }
+        this.renderTeam();
+    },
+
+    removeMember(idx) {
+        this.currentTeam.splice(idx, 1);
+        this.renderTeam();
+    },
+
+    calculateTotals() {
+        let totalManDays = 0;
+        let totalCost = 0;
+        
+        this.currentTeam.forEach(member => {
+            const emp = Data.employees.find(e => e.name === member.emp);
+            const rate = this.getAdjustedRate(emp?.rate || 1000);
+            totalManDays += member.qty * member.days;
+            totalCost += member.qty * member.days * rate;
+        });
+        
+        const mgmtFee = Math.round(totalCost * 0.15);
+        const grandTotal = totalCost + mgmtFee;
+        
+        document.getElementById('totalManDays').textContent = totalManDays;
+        document.getElementById('serviceCost').textContent = `฿${totalCost.toLocaleString()}`;
+        document.getElementById('mgmtFee').textContent = `฿${mgmtFee.toLocaleString()}`;
+        document.getElementById('grandTotal').textContent = `฿${grandTotal.toLocaleString()}`;
+    },
+
+    applyAdjustment() {
+        this.renderTeam();
+    },
+
+    save() {
+        const data = {
+            project: document.getElementById('projectName').value,
+            client: document.getElementById('clientType').value,
+            location: {
+                country: document.getElementById('country').value,
+                field: document.getElementById('field').value,
+                platform: document.getElementById('platform').value
+            },
+            team: this.currentTeam,
+            quote: document.getElementById('quoteNo').value,
+            timestamp: new Date().toISOString()
+        };
+        localStorage.setItem('avs_config', JSON.stringify(data));
+        alert('Configuration saved!');
+    },
+
+    export() {
+        const data = {
+            project: document.getElementById('projectName').value,
+            team: this.currentTeam,
+            totals: {
+                manDays: document.getElementById('totalManDays').textContent,
+                serviceCost: document.getElementById('serviceCost').textContent,
+                grandTotal: document.getElementById('grandTotal').textContent
+            }
+        };
+        
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `AVS_${document.getElementById('quoteNo').value}_${Date.now()}.json`;
+        a.click();
+    },
+
+    reset() {
+        if (confirm('Reset all data?')) {
+            this.currentTeam = [];
+            this.renderTeam();
+            document.getElementById('projectName').value = '';
+            document.getElementById('clientType').value = '';
+            document.getElementById('country').value = '';
+            document.getElementById('field').value = '';
+            document.getElementById('platform').value = '';
+        }
+    }
+};
+
+// Initialize
+document.addEventListener('DOMContentLoaded', () => App.init());
+</script>
+</body>
+</html>

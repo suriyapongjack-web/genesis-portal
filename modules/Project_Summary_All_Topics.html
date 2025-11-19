@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 สรุปหัวข้อทั้งหมดในโครงการ Addvalue-PTTEP-Mytel</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', 'Sarabun', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .project-info {
+            background: linear-gradient(135deg, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.1) 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border: 2px solid #667eea;
+        }
+        
+        .category {
+            margin: 30px 0;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .category h2 {
+            color: #667eea;
+            margin-top: 0;
+            font-size: 1.8rem;
+        }
+        
+        .file-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .file-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        .file-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        
+        .file-name {
+            font-weight: bold;
+            color: #333;
+            flex: 1;
+        }
+        
+        .file-type {
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-left: 15px;
+        }
+        
+        .file-type.xlsx {
+            background: #28a745;
+        }
+        
+        .file-type.pdf {
+            background: #dc3545;
+        }
+        
+        .file-type.html {
+            background: #ff6b6b;
+        }
+        
+        .file-type.docx {
+            background: #007bff;
+        }
+        
+        .file-type.md {
+            background: #6c757d;
+        }
+        
+        .file-description {
+            color: #666;
+            font-size: 0.9rem;
+            margin-left: 20px;
+            flex: 2;
+        }
+        
+        .summary-stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            flex: 1;
+            margin: 0 10px;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .quick-links {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .quick-links h3 {
+            color: #856404;
+            margin-top: 0;
+        }
+        
+        .link-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .link-button {
+            background: white;
+            border: 2px solid #ffc107;
+            padding: 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #856404;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .link-button:hover {
+            background: #ffc107;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+            color: #666;
+        }
+        
+        .section-index {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .index-title {
+            color: #333;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .index-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .index-item {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .index-item:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 สรุปหัวข้อทั้งหมดในโครงการ ZQP-ZWP4 Telecommunications Link</h1>
+        
+        <div class="project-info">
+            <h2 style="margin-top:0; color:#333;">ข้อมูลโครงการ</h2>
+            <p><strong>โครงการ:</strong> PTTEP Zawtika ZQP-ZWP4 Telecommunications Link</p>
+            <p><strong>หมายเลขโครงการ:</strong> PJ25080493</p>
+            <p><strong>ผู้เกี่ยวข้อง:</strong> PTTEP Myanmar • Mytel • Addvalue Systems • NextG Solution • Ceragon</p>
+            <p><strong>ระยะเวลาสัญญา:</strong> 5 ปี (Rental Service Model)</p>
+            <p><strong>สถานะ:</strong> Pre-FEED Study และ Commercial Proposal</p>
+        </div>
+        
+        <!-- สรุปสถิติ -->
+        <div class="summary-stats">
+            <div class="stat-box">
+                <div class="stat-number">50+</div>
+                <div class="stat-label">เอกสารทั้งหมด</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">12</div>
+                <div class="stat-label">หมวดหมู่หลัก</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">6</div>
+                <div class="stat-label">ประเภทไฟล์</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">ความครบถ้วน</div>
+            </div>
+        </div>
+        
+        <!-- Quick Navigation Index -->
+        <div class="section-index">
+            <div class="index-title">🔍 Quick Navigation - เลือกหมวดหมู่ที่ต้องการ:</div>
+            <div class="index-list">
+                <a href="#agreements" class="index-item">📝 Agreements & MOU</a>
+                <a href="#bom" class="index-item">📦 BOM & Equipment</a>
+                <a href="#certificates" class="index-item">📜 Certificates</a>
+                <a href="#commercial" class="index-item">💼 Commercial Proposals</a>
+                <a href="#cost" class="index-item">💰 Cost Analysis</a>
+                <a href="#instructions" class="index-item">📋 Instructions & Guides</a>
+                <a href="#prefeed" class="index-item">📊 Pre-FEED Study</a>
+                <a href="#procedures" class="index-item">📖 Procedures & Standards</a>
+                <a href="#project" class="index-item">📁 Project Documents</a>
+                <a href="#risk" class="index-item">⚠️ Risk Management</a>
+                <a href="#technical" class="index-item">🔧 Technical Specifications</a>
+                <a href="#workflow" class="index-item">🔄 Workflow & Relationships</a>
+            </div>
+        </div>
+        
+        <!-- Categories Listed Alphabetically -->
+        
+        <!-- A: Agreements & MOU -->
+        <div class="category" id="agreements">
+            <h2>📝 A. Agreements & MOU</h2>
+            <ul class="file-list">
+                <li class="file-item">
+                    <span class="file-name">Draft Service Agreement Mytel and Addvalue</span>
+                    <span class="file-description">ข้อตกลงบริการระหว่าง Mytel และ Addvalue</span>
+                    <span class="file-type pdf">PDF</span>
+                </li>
+                <li class="file-item">
+                    <span class="file-name">MOU_TelecomIntlMyanmar_Addvalue</span>
+                    <span class="file-description">บันทึกข้อตกลงความร่วมมือ</span>
+                    <span class="file-type pdf">PDF</span>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- B: BOM & Equipment Lists -->
+        <div class="category" id="bom">
+            <h2>📦 B. BOM & Equipment Lists</h2>
+            <ul class="file-list">
+                <li class="file-item">
+                    <span class="file-name">24-3018-1 AddValue_PTTEPI Zawtka ZPQ-ZWHP4_BOM</span>
+                    <span class="file-description">รายการอุปกรณ์ Ceragon และอุปกรณ์เสริม</span>
+                    <span class="file-type pdf">PDF</span>
+                </li>
+                <li class="file-item">
+                    <span class="file-name">Ceragon_IP-50CX_Datasheet_Rev_C.01</span>
+                    <span class="file-description">สเปคอุปกรณ์หลัก</span>
+                    <span class="file-type pdf">PDF</span>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- C: Certificates -->
+        <div class="category" id="certificates">
+            <h2>📜 C. Certificates</h2>
+            <ul class="file-list">
+                <li class="file-item">
+                    <span class="file-name">Certificate-Addvaluesystem.co.ltd</span>
+                    <span class="file-description">ใบรับรองบริษัท Addvalue Systems</span>
+                    <span class="file-type pdf">PDF</span>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- D: Commercial Proposals & Presentations -->
+        <div class="category" id="commercial">
+            <h2>💼 D. Commercial Proposals & Presentations</h2>
+            <ul class="file-list">
+                <li class="file-item">
+                    <span class="file-name">Commercial_Proposal_ZQP-ZWP4_Updated</span>
+                    <span class="file-description">ข้อเสนอทางการค้าฉบับล่าสุด</span>
+                    <span class="file-type html">HTML</span>
+                </li>
+                <li class="file-item">
+                    <span class="file-name">PTTEP_Zawtika_Financial_Feasibility_Mytel</span>
+                    <span class="file-description">การวิเคราะห์ความเป็นไปได้ทางการเงิน</span>
+                    <span class="file-type html">HTML</span>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- E: Cost Analysis Documents -->
+        <div class="category" id="cost">
+            <h2>💰 E. Cost Analysis Documents</h2>
+            <ul class="file-list">
+                <li class="file-item">
+                    <span class="file-name">0493_Cost_Analysis_Simple</span>
+                    <span class="file-description">การวิเคราะห์ต้นทุนเบื้องต้น</span>
+                    <span class="file-type xlsx">XLSX</span>
+                </li>
+                <li class="file-item">
+                    <span class="file-name">0493_Cost_Structure_Detail</span>
+                    <span class="file-description">รายละเอียดโครงสร้างต้นทุน</span>
+                    <span class="file-type md">MD</span>
+                </li>
+                <li class="file-item">
+                    <span class="file-name">0493_costs_complete_with_maintenance</span>
+                    <span class="file-description">ต้นทุนรวมค่าบำรุงรักษา</span>
+                    <span class="file-type">TXT</span>
+                </li>
+                <li class="file-item">
+                    <span class="file-name">0493Estimate Costs Rev.4</span>
+                    <span class="file-description">ประมาณการต้นทุน Revision 4</span>
+                    <span class="file-type xlsx">XLSX</span>
+                </li>
+                <li class="file-item">
+                    <span class="file-name">Project_0493_Cost_Structure</span>
+                    <span class="file-description">โครงสร้างต้นทุนโครงการ</span>
+                    <span class="file-type docx">DOCX</span>
+                </li>
+                <li class="file-item">
+                    <span class="file-name">Telecom_Calculator_v3_MYTEL</span>
+                    <span class="file-description">เครื่องคำนวณต้นทุน Telecom</span>
+                    <span class="file-type xlsx">XLSX</span>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- F: Instructions & Guides -->
+        <div class="category" id="instructions">
+            <h2>📋 F. Instructions & Guides</h2>
+            <ul class="file-list">
+                <li class="file-item">
+                    <span class="file-name">Addvalue_Project_Continuation_Instructions</span>
+                    <span class="file-description">คำแนะนำการดำเนินโครงการต่อ</span>
+                    <span class="file-type md">MD</span>
+                </li>
+                <li class="file-item">
+                    <span class="file-name">Relationship_Workflow_Instruction</span>
+                    <span class="file-description">คู่มือความสัมพันธ์และขั้นตอนการทำงาน</span>
+                    <span class="file-type pdf">PDF</span>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- G: Pre-FEED Study -->
+        <div class="category" id="prefeed">
+            <h2>📊 G. Pre-FEED Study</h2>
+            <ul class="file-list">
+                <li class="file-item">
+                    <span class="file-name">ZQP-ZWP4 Telecommunications Link Pre-FEED Study</span>
+                    <span class="file-description">การศึกษาความเป็นไปได้เบื้องต้น</span>
+                    <span class="file-type pdf">PDF</span>
+                </li>
+                <li class="file-item">
+                    <span class="file-name">24-3018 AddValue_Zawtika_ZPQ-ZWP4 Project_Rev3</span>
+                    <span class="file-description">เอกสารโครงการ Revision 3</span>
+                    <span class="file-type pdf">PDF</span>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- H: Procedures & Standards -->
+        <div class="category" id="procedures">
+            <h2>📖 H. Procedures & Standards</h2>
+            <ul class="file-list">
+                <li class="file-item">
+                    <span class="file-name">MM-ZTK-1A-GEN-PJM-PRC-0002 Rev C2</span>
+                    <span class="file-description">Project Numbering Procedure - ขั้นตอนการกำหนดหมายเลขโครงการ</span>
+                    <span class="file-type pdf">PDF</span>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- I: Project Management Documents -->
+        <div class="category" id="project">
+            <h2>📁 I. Project Management Documents</h2>
+            <ul class="file-list">
+                <li class="file-item">
+                    <span class="file-name">PJ25080493 PTTEPI MM MTEL Project_Contact</span>
+                    <span class="file-description">รายชื่อผู้ติดต่อโครงการ</span>
+                    <span class="file-type">DOC</span>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- J: Risk Management -->
+        <div class="category" id="risk">
+            <h2>⚠️ J. Risk Management</h2>
+            <ul class="file-list">
+                <li class="file-item">
+                    <span class="file-name">risk_management_plan</span>
+                    <span class="file-description">แผนการจัดการความเสี่ยง</span>
+                    <span class="file-type html">HTML</span>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- K: Technical Specifications -->
+        <div class="category" id="technical">
+            <h2>🔧 K. Technical Specifications</h2>
+            <ul class="file-list">
+                <li class="file-item">
+                    <span class="file-name">WP4 - ZPQ IP-50CX, 1+0, 7GHz, 28MHz</span>
+                    <span class="file-description">สเปคทางเทคนิค Link Configuration</span>
+                    <span class="file-type">DOC</span>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- L: Workflow & Relationships -->
+        <div class="category" id="workflow">
+            <h2>🔄 L. Workflow & Relationships</h2>
+            <ul class="file-list">
+                <li class="file-item">
+                    <span class="file-name">ZQP-ZWP4 Project Relationship & Workflow</span>
+                    <span class="file-description">แผนภาพความสัมพันธ์และขั้นตอนการทำงาน</span>
+                    <span class="file-type html">HTML</span>
+                </li>
+            </ul>
+        </div>
+        
+        <!-- Quick Access Links -->
+        <div class="quick-links">
+            <h3>⚡ Quick Access - ไฟล์สำคัญที่ใช้บ่อย</h3>
+            <div class="link-grid">
+                <a href="#cost" class="link-button">💰 Cost Calculator</a>
+                <a href="#prefeed" class="link-button">📊 Pre-FEED Study</a>
+                <a href="#commercial" class="link-button">💼 Commercial Proposal</a>
+                <a href="#agreements" class="link-button">📝 Service Agreement</a>
+                <a href="#bom" class="link-button">📦 BOM List</a>
+                <a href="#risk" class="link-button">⚠️ Risk Management</a>
+            </div>
+        </div>
+        
+        <!-- Summary Information -->
+        <div class="category" style="background: linear-gradient(135deg, rgba(255,216,155,0.2) 0%, rgba(25,84,123,0.2) 100%); border-left-color: #ffc107;">
+            <h2>📌 สรุปข้อมูลสำคัญ</h2>
+            <h3>ประเภทไฟล์ที่มีในโครงการ:</h3>
+            <ul>
+                <li><strong>HTML Files:</strong> Commercial Proposals, Risk Management, Workflow Diagrams, Financial Analysis</li>
+                <li><strong>DOCX Files:</strong> Project Cost Structure, Service Agreements</li>
+                <li><strong>PDF Files:</strong> Pre-FEED Study, MOU, Certificates, BOM, Technical Specs</li>
+                <li><strong>XLSX Files:</strong> Cost Estimates, Calculators, Financial Models</li>
+                <li><strong>MD Files:</strong> Instructions, Cost Structure Details</li>
+                <li><strong>TXT Files:</strong> Cost Analysis, Maintenance Details</li>
+            </ul>
+            
+            <h3>ข้อมูลการใช้งาน:</h3>
+            <ul>
+                <li>ไฟล์ทั้งหมดจัดเรียงตามลำดับอักษร A-Z ในแต่ละหมวดหมู่</li>
+                <li>หมวดหมู่จัดเรียงตามลำดับอักษรเพื่อง่ายต่อการค้นหา</li>
+                <li>ใช้ Quick Navigation ด้านบนเพื่อไปยังหมวดที่ต้องการได้เร็วขึ้น</li>
+                <li>ไฟล์สำคัญสามารถเข้าถึงได้จาก Quick Access Links</li>
+            </ul>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Project Reference:</strong> PJ25080493 | PTTEP-Mytel-Addvalue Partnership</p>
+            <p><strong>Document Created:</strong> October 2025 | <strong>Status:</strong> Active Project</p>
+            <p>© 2025 Addvalue Systems Co., Ltd. - Confidential Project Documentation</p>
+        </div>
+    </div>
+</body>
+</html>

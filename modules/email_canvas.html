@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Draft - PTTEP Microwave Project</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 30px;
+        }
+        .language-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        .toggle-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .toggle-btn:hover {
+            transform: translateY(-2px);
+        }
+        .toggle-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        .email-box {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        .subject-line {
+            background: white;
+            border: 2px solid #4299e1;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .editable {
+            background: #fffaf0;
+            border: 2px dashed #ed8936;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 10px 0;
+            min-height: 30px;
+            transition: all 0.3s;
+            white-space: pre-wrap;
+            line-height: 1.8;
+        }
+        .editable:hover {
+            background: #fff;
+            border-color: #4299e1;
+        }
+        .editable:focus {
+            outline: none;
+            background: white;
+            border: 2px solid #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+        .section-title {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 20px 0 10px 0;
+            font-weight: bold;
+        }
+        .highlight {
+            background: #fef5e7;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        .list-item {
+            background: white;
+            border-left: 3px solid #48bb78;
+            margin: 8px 0;
+            padding: 10px 15px;
+            border-radius: 5px;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .action-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .copy-btn {
+            background: #48bb78;
+            color: white;
+        }
+        .copy-btn:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+        }
+        .version {
+            display: none;
+        }
+        .version.active {
+            display: block;
+        }
+        .signature {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📧 Email Draft - PTTEP Microwave Project</h1>
+        <p class="subtitle">คลิกที่กล่องสีส้มเพื่อแก้ไขข้อความ</p>
+
+        <div class="language-toggle">
+            <button class="toggle-btn active" onclick="showVersion('english')">English Version</button>
+            <button class="toggle-btn" onclick="showVersion('thai')">ภาษาไทย</button>
+        </div>
+
+        <!-- English Version -->
+        <div id="english" class="version active">
+            <div class="email-box">
+                <div class="subject-line">
+                    Subject: <span contenteditable="true" style="color: #2d3748;">PTTEP Approval - Alternative Microwave Link Proposal (5.8 GHz & 7 GHz with 1+1) - Budget Request</span>
+                </div>
+
+                <div contenteditable="true" class="editable">Dear Khun Sith and Khun Aung,
+
+I hope this email finds you both well.</div>
+
+                <div contenteditable="true" class="editable">Following our recent meeting and discussion regarding the microwave link solution for PTTEP Myanmar's Zawtika/Yadana project, I am pleased to inform you of the positive outcome from PTTEP.</div>
+
+                <div class="section-title">✅ PTTEP Approval</div>
+                <div contenteditable="true" class="editable">PTTEP has agreed to proceed with the alternative proposal, which includes:
+• Point-to-Point (PTP) 5.8 GHz link
+• Point-to-Point (PTP) 7 GHz link
+• 1+1 redundancy configuration for enhanced reliability</div>
+
+                <div class="section-title">⚠️ Important Condition</div>
+                <div class="highlight" contenteditable="true">PTTEP's approval comes with one specific requirement - the 7 GHz equipment must have modified tags/labels to facilitate importation into PTTEP Myanmar. This modification is necessary to ensure smooth customs clearance.</div>
+
+                <div class="section-title">💰 Budget Request from ZPQ</div>
+                <div contenteditable="true" class="editable">The ICT Engineer at ZPQ has requested comprehensive budget information for this solution to present to their Management and Field Manager for final approval.</div>
+
+                <div class="list-item" contenteditable="true">1. Updated Quotation for the complete solution (5.8 GHz + 7 GHz with 1+1 configuration)</div>
+                
+                <div class="list-item" contenteditable="true">2. Cost Breakdown including:
+   - Equipment costs (with modified labeling for 7 GHz)
+   - Installation and commissioning services
+   - Training (if applicable)
+   - Warranty and support options</div>
+
+                <div class="list-item" contenteditable="true">3. Commercial Terms:
+   - Delivery timeline
+   - Payment terms
+   - Validity period of quotation</div>
+
+                <div class="section-title">📋 Next Steps</div>
+                <div contenteditable="true" class="editable">1. Please confirm your understanding of the labeling requirement for the 7 GHz equipment
+2. Provide the requested budget/quotation for Management presentation (urgent)
+3. Confirm timeline for equipment preparation with modified labels
+4. Share any documentation requirements for the import process</div>
+
+                <div contenteditable="true" class="editable">We appreciate your prompt response as ZPQ management is awaiting this information for their budget planning and approval process.</div>
+
+                <div class="signature" contenteditable="true">Best regards,
+[Your name]
+[Your position]
+ADD VALUE SYSTEM COMPANY LIMITED
+[Your contact information]</div>
+            </div>
+        </div>
+
+        <!-- Thai Version -->
+        <div id="thai" class="version">
+            <div class="email-box">
+                <div class="subject-line">
+                    Subject: <span contenteditable="true" style="color: #2d3748;">PTTEP อนุมัติข้อเสนอทางเลือก - Microwave Link (5.8 GHz & 7 GHz แบบ 1+1) - ขอใบเสนอราคา</span>
+                </div>
+
+                <div contenteditable="true" class="editable">เรียน คุณสิทธิ์ และคุณอ่อง
+
+สวัสดีครับ</div>
+
+                <div contenteditable="true" class="editable">ตามที่เราได้มีการประชุมหารือกันเกี่ยวกับโซลูชัน microwave link สำหรับโครงการ Zawtika/Yadana ของ PTTEP Myanmar นั้น ผมขอแจ้งผลการพิจารณาจากทาง PTTEP ดังนี้</div>
+
+                <div class="section-title">✅ การอนุมัติจาก PTTEP</div>
+                <div contenteditable="true" class="editable">PTTEP ได้อนุมัติให้ดำเนินการตามข้อเสนอทางเลือก (Alternative Proposal) ซึ่งประกอบด้วย:
+• ระบบ Point-to-Point (PTP) ความถี่ 5.8 GHz
+• ระบบ Point-to-Point (PTP) ความถี่ 7 GHz
+• การติดตั้งแบบ 1+1 redundancy configuration เพื่อความน่าเชื่อถือสูงสุด</div>
+
+                <div class="section-title">⚠️ เงื่อนไขสำคัญ</div>
+                <div class="highlight" contenteditable="true">การอนุมัติครั้งนี้มีเงื่อนไขเฉพาะคือ อุปกรณ์ 7 GHz จะต้องมีการปรับแก้ไข tag/label เพื่อให้สามารถนำเข้าไปยัง PTTEP Myanmar ได้อย่างราบรื่น</div>
+
+                <div class="section-title">💰 คำขอจาก ZPQ</div>
+                <div contenteditable="true" class="editable">ICT Engineer ของ ZPQ ได้ขอทราบข้อมูลงบประมาณสำหรับโซลูชันนี้ เพื่อนำเสนอต่อ Management และ Field Manager เพื่อขออนุมัติงบประมาณขั้นสุดท้าย</div>
+
+                <div class="list-item" contenteditable="true">1. ใบเสนอราคาล่าสุดสำหรับโซลูชันทั้งหมด (5.8 GHz + 7 GHz พร้อม 1+1 configuration)</div>
+
+                <div class="list-item" contenteditable="true">2. รายละเอียดค่าใช้จ่ายแยกตามหมวด:
+   - ค่าอุปกรณ์ (รวมการปรับ label สำหรับ 7 GHz)
+   - ค่าติดตั้งและ commissioning
+   - ค่าอบรม (ถ้ามี)
+   - ค่า warranty และ support</div>
+
+                <div class="list-item" contenteditable="true">3. เงื่อนไขทางการค้า:
+   - ระยะเวลาการส่งมอบ
+   - เงื่อนไขการชำระเงิน
+   - ระยะเวลาที่ใบเสนอราคามีผล</div>
+
+                <div class="section-title">📋 ขั้นตอนต่อไป</div>
+                <div contenteditable="true" class="editable">1. กรุณายืนยันความเข้าใจเกี่ยวกับข้อกำหนดการปรับ label สำหรับอุปกรณ์ 7 GHz
+2. จัดส่งใบเสนอราคา/งบประมาณที่ขอมาเพื่อนำเสนอต่อ Management (ด่วน)
+3. ยืนยันระยะเวลาในการเตรียมอุปกรณ์พร้อม label ที่ปรับแก้แล้ว
+4. แจ้งเอกสารที่จำเป็นสำหรับกระบวนการนำเข้า</div>
+
+                <div contenteditable="true" class="editable">ขอความกรุณาตอบกลับโดยเร็ว เนื่องจาก Management ของ ZPQ รอข้อมูลนี้เพื่อการวางแผนและอนุมัติงบประมาณ</div>
+
+                <div class="signature" contenteditable="true">ขอแสดงความนับถือ
+[ชื่อของคุณ]
+[ตำแหน่ง]
+บริษัท แอดวาลู ซิสเต็ม จำกัด
+[ข้อมูลติดต่อ]</div>
+            </div>
+        </div>
+
+        <div class="button-group">
+            <button class="action-btn copy-btn" onclick="copyEmail()">📋 Copy Email</button>
+        </div>
+    </div>
+
+    <script>
+        function showVersion(version) {
+            document.querySelectorAll('.version').forEach(v => {
+                v.classList.remove('active');
+            });
+            document.getElementById(version).classList.add('active');
+            
+            document.querySelectorAll('.toggle-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+        }
+
+        function copyEmail() {
+            const activeVersion = document.querySelector('.version.active');
+            const emailContent = activeVersion.querySelector('.email-box').innerText;
+            
+            navigator.clipboard.writeText(emailContent).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                const originalText = btn.innerText;
+                btn.innerText = '✅ Copied!';
+                btn.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.background = '#48bb78';
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html>

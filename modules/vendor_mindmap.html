@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Database Mind Map</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .mindmap-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .title {
+            text-align: center;
+            color: #2d3748;
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .mindmap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+        
+        .center-node {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 20px 40px;
+            border-radius: 25px;
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(79, 172, 254, 0.3);
+            margin-bottom: 20px;
+        }
+        
+        .regions-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+            width: 100%;
+        }
+        
+        .region {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            border: 3px solid;
+            min-width: 300px;
+            max-width: 400px;
+        }
+        
+        .region.north { border-color: #ff6b6b; }
+        .region.south { border-color: #4ecdc4; }
+        .region.central-east { border-color: #45b7d1; }
+        .region.central-west { border-color: #96ceb4; }
+        .region.isaan-north { border-color: #feca57; }
+        .region.isaan-south { border-color: #ff9ff3; }
+        
+        .region-header {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+            padding: 10px;
+            border-radius: 10px;
+            color: white;
+        }
+        
+        .north .region-header { background: #ff6b6b; }
+        .south .region-header { background: #4ecdc4; }
+        .central-east .region-header { background: #45b7d1; }
+        .central-west .region-header { background: #96ceb4; }
+        .isaan-north .region-header { background: #feca57; }
+        .isaan-south .region-header { background: #ff9ff3; }
+        
+        .province-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+        
+        .province {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: #f8f9fa;
+            border-left: 4px solid #e9ecef;
+            font-size: 0.9em;
+        }
+        
+        .province.has-vendor {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+        
+        .province.partial-vendor {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+        }
+        
+        .status-icon {
+            margin-right: 8px;
+            font-weight: bold;
+        }
+        
+        .has-vendor .status-icon { color: #28a745; }
+        .partial-vendor .status-icon { color: #ffc107; }
+        .province .status-icon { color: #6c757d; }
+        
+        .vendor-count {
+            margin-left: auto;
+            font-size: 0.8em;
+            background: #e9ecef;
+            padding: 2px 8px;
+            border-radius: 12px;
+            color: #495057;
+        }
+        
+        .has-vendor .vendor-count {
+            background: #28a745;
+            color: white;
+        }
+        
+        .partial-vendor .vendor-count {
+            background: #ffc107;
+            color: white;
+        }
+        
+        .region-stats {
+            text-align: center;
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            font-size: 0.9em;
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 15px;
+            border-radius: 20px;
+            background: #f8f9fa;
+            font-size: 0.9em;
+        }
+        
+        .package-deals {
+            margin-top: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            color: white;
+        }
+        
+        .package-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .packages {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .package {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .package-header {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #ffd700;
+        }
+        
+        .package-provinces {
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+        
+        .package-value {
+            font-size: 0.8em;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="mindmap-container">
+        <div class="title">🗺️ Vendor Database Mind Map - 76 จังหวัด</div>
+        
+        <div class="mindmap">
+            <div class="center-node">
+                📊 VENDOR DATABASE<br>
+                <div style="font-size: 0.7em; margin-top: 5px;">76 จังหวัด × 3 vendors = 228 records</div>
+            </div>
+            
+            <div class="regions-container">
+                <!-- ภาคเหนือ -->
+                <div class="region north">
+                    <div class="region-header">🏔️ ภาคเหนือ (13 จังหวัด)</div>
+                    <div class="province-list">
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>กำแพงเพชร</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>ตาก</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>ลำปาง</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province has-vendor">
+                            <span class="status-icon">✅</span>
+                            <span><strong>ลำพูน</strong></span>
+                            <span class="vendor-count">2/3</span>
+                        </div>
+                        <div class="province has-vendor">
+                            <span class="status-icon">✅</span>
+                            <span><strong>เชียงใหม่</strong></span>
+                            <span class="vendor-count">4/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>แม่ฮ่องสอน</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province has-vendor">
+                            <span class="status-icon">✅</span>
+                            <span><strong>เชียงราย</strong></span>
+                            <span class="vendor-count">2/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>พะเยา</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>น่าน</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>อุตรดิตถ์</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>สุโขทัย</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>พิษณุโลก</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>พิจิตร</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                    </div>
+                    <div class="region-stats">
+                        <strong>Team Leader:</strong> กิติศักดิ์ แสงเดช<br>
+                        <strong>Progress:</strong> 16/39 vendors (41%)
+                    </div>
+                </div>
+                
+                <!-- ภาคใต้ -->
+                <div class="region south">
+                    <div class="region-header">🏖️ ภาคใต้ (15 จังหวัด)</div>
+                    <div class="province-list">
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>ประจวบคีรีขันธ์</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>ชุมพร</span>
+                            <span class="vendor-count">2/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>ระนอง</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province has-vendor">
+                            <span class="status-icon">✅</span>
+                            <span><strong>สุราษฎร์ธานี</strong></span>
+                            <span class="vendor-count">3/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>พังงา</span>
+                            <span class="vendor-count">2/3</span>
+                        </div>
+                        <div class="province has-vendor">
+                            <span class="status-icon">✅</span>
+                            <span><strong>ภูเก็ต</strong></span>
+                            <span class="vendor-count">4/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>กระบี่</span>
+                            <span class="vendor-count">2/3</span>
+                        </div>
+                        <div class="province has-vendor">
+                            <span class="status-icon">✅</span>
+                            <span><strong>นครศรีธรรมราช</strong></span>
+                            <span class="vendor-count">3/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>ตรัง</span>
+                            <span class="vendor-count">2/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>พัทลุง</span>
+                            <span class="vendor-count">2/3</span>
+                        </div>
+                        <div class="province has-vendor">
+                            <span class="status-icon">✅</span>
+                            <span><strong>สตูล</strong></span>
+                            <span class="vendor-count">3/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>สงขลา</span>
+                            <span class="vendor-count">2/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>ปัตตานี</span>
+                            <span class="vendor-count">2/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>ยะลา</span>
+                            <span class="vendor-count">2/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>นราธิวาส</span>
+                            <span class="vendor-count">2/3</span>
+                        </div>
+                    </div>
+                    <div class="region-stats">
+                        <strong>Team Leader:</strong> คุณโอภาส<br>
+                        <strong>Progress:</strong> 33/45 vendors (73%)
+                    </div>
+                </div>
+                
+                <!-- ภาคกลาง+ตะวันออก -->
+                <div class="region central-east">
+                    <div class="region-header">🏭 ภาคกลาง+ตะวันออก (12 จังหวัด)</div>
+                    <div class="province-list">
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>ตราด</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>จันทบุรี</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province has-vendor">
+                            <span class="status-icon">✅</span>
+                            <span><strong>ระยอง</strong></span>
+                            <span class="vendor-count">2/3</span>
+                        </div>
+                        <div class="province has-vendor">
+                            <span class="status-icon">✅</span>
+                            <span><strong>ชลบุรี</strong></span>
+                            <span class="vendor-count">3/3</span>
+                        </div>
+                        <div class="province has-vendor">
+                            <span class="status-icon">✅</span>
+                            <span><strong>สมุทรปราการ</strong></span>
+                            <span class="vendor-count">2/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>ฉะเชิงเทรา</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>สระแก้ว</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>ปราจีนบุรี</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>นครนายก</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>อยุธยา</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province has-vendor">
+                            <span class="status-icon">✅</span>
+                            <span><strong>ปทุมธานี</strong></span>
+                            <span class="vendor-count">2/3</span>
+                        </div>
+                        <div class="province has-vendor">
+                            <span class="status-icon">✅</span>
+                            <span><strong>นนทบุรี</strong></span>
+                            <span class="vendor-count">2/3</span>
+                        </div>
+                    </div>
+                    <div class="region-stats">
+                        <strong>Team Leader:</strong> ทีมตะวันออก<br>
+                        <strong>Progress:</strong> 20/36 vendors (56%)
+                    </div>
+                </div>
+                
+                <!-- ภาคกลาง+ตะวันตก -->
+                <div class="region central-west">
+                    <div class="region-header">🌾 ภาคกลาง+ตะวันตก (11 จังหวัด)</div>
+                    <div class="province-list">
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>อุทัยธานี</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>ชัยนาท</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>สิงห์บุรี</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>อ่างทอง</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province has-vendor">
+                            <span class="status-icon">✅</span>
+                            <span><strong>นครปฐม</strong></span>
+                            <span class="vendor-count">3/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>กาญจนบุรี</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province has-vendor">
+                            <span class="status-icon">✅</span>
+                            <span><strong>ราชบุรี</strong></span>
+                            <span class="vendor-count">2/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>สมุทรสาคร</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>สมุทรสงคราม</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>เพชรบุรี</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>สุพรรณบุรี</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                    </div>
+                    <div class="region-stats">
+                        <strong>Team Leader:</strong> ทีมตะวันตก<br>
+                        <strong>Progress:</strong> 15/33 vendors (45%)
+                    </div>
+                </div>
+                
+                <!-- ภาคอีสานเหนือ -->
+                <div class="region isaan-north">
+                    <div class="region-header">🌾 ภาคอีสานเหนือ (12 จังหวัด)</div>
+                    <div class="province-list">
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>นครสวรรค์</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>เพชรบูรณ์</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>เลย</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>หนองคาย</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>บึงกาฬ</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>นครพนม</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>สกลนคร</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>อุดรธานี</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>หนองบัวลำภู</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province has-vendor">
+                            <span class="status-icon">✅</span>
+                            <span><strong>ขอนแก่น</strong></span>
+                            <span class="vendor-count">2/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>ชัยภูมิ</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province has-vendor">
+                            <span class="status-icon">✅</span>
+                            <span><strong>ลพบุรี</strong></span>
+                            <span class="vendor-count">2/3</span>
+                        </div>
+                    </div>
+                    <div class="region-stats">
+                        <strong>Team Leader:</strong> ทีมอีสาน<br>
+                        <strong>Progress:</strong> 15/36 vendors (42%)
+                    </div>
+                </div>
+                
+                <!-- ภาคอีสานใต้ -->
+                <div class="region isaan-south">
+                    <div class="region-header">🌾 ภาคอีสานใต้ (11 จังหวัด)</div>
+                    <div class="province-list">
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>นครราชสีมา</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>บุรีรัมย์</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>ศรีสะเกษ</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>อุบลราชธานี</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>อำนาจเจริญ</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>มุกดาหาร</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>ยโสธร</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>ร้อยเอ็ด</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>กาฬสินธุ์</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>มหาสารคาม</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                        <div class="province partial-vendor">
+                            <span class="status-icon">🟡</span>
+                            <span>สระบุรี</span>
+                            <span class="vendor-count">1/3</span>
+                        </div>
+                    </div>
+                    <div class="region-stats">
+                        <strong>Team Leader:</strong> ทีมอีสานใต้<br>
+                        <strong>Progress:</strong> 11/33 vendors (33%)
+                    </div>
+                </div>
+            </div>
+            
+            <div class

@@ -1,0 +1,1892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AVS Service Catalog & Pricing System</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font: 12px 'Segoe UI', Arial, sans-serif; background: #f0f2f5; }
+.container { max-width: 1600px; margin: 0 auto; padding: 10px; }
+
+/* Header */
+.header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.header h1 { font-size: 24px; margin-bottom: 5px; }
+.header-info { text-align: right; font-size: 11px; opacity: 0.9; }
+
+/* Project Bar */
+.project-bar {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.project-bar input, .project-bar select {
+    padding: 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 12px;
+}
+.project-bar label {
+    font-weight: 600;
+    color: #374151;
+}
+
+/* Service Navigation */
+.service-nav {
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.nav-tabs {
+    display: flex;
+    gap: 5px;
+}
+.nav-tab {
+    padding: 10px 20px;
+    background: #e5e7eb;
+    border: none;
+    border-radius: 4px 4px 0 0;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+.nav-tab.active {
+    background: #3b82f6;
+    color: white;
+}
+.nav-tab:hover {
+    background: #60a5fa;
+    color: white;
+}
+
+/* Main Content Grid */
+.content-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 20px;
+}
+
+/* Service Catalog Tree */
+.catalog-panel {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    max-height: 700px;
+    overflow-y: auto;
+}
+.catalog-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #1f2937;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3b82f6;
+}
+.service-group {
+    margin-bottom: 15px;
+}
+.group-header {
+    background: #f3f4f6;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.group-header:hover {
+    background: #e5e7eb;
+}
+.service-items {
+    margin-left: 20px;
+    margin-top: 5px;
+}
+.service-item {
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.service-item:hover {
+    background: #eff6ff;
+}
+.service-item.selected {
+    background: #dbeafe;
+    font-weight: 600;
+}
+.service-code {
+    font-size: 10px;
+    background: #6366f1;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+/* Work Panel */
+.work-panel {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Service Configuration */
+.config-section {
+    margin-bottom: 25px;
+}
+.config-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #1f2937;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #10b981;
+}
+.config-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+.config-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.config-item label {
+    font-weight: 600;
+    color: #4b5563;
+    font-size: 11px;
+}
+.config-item input,
+.config-item select {
+    padding: 6px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 11px;
+}
+
+/* Resource Table */
+.resource-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+.resource-table th {
+    background: #f9fafb;
+    padding: 10px;
+    text-align: left;
+    font-weight: 600;
+    border: 1px solid #e5e7eb;
+    font-size: 11px;
+}
+.resource-table td {
+    padding: 8px;
+    border: 1px solid #e5e7eb;
+    font-size: 11px;
+}
+.resource-table tr:hover {
+    background: #f9fafb;
+}
+.add-resource-btn {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+}
+.add-resource-btn:hover {
+    background: #059669;
+}
+.remove-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 10px;
+}
+
+/* Document Management */
+.doc-status {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+}
+.status-ifr { background: #fef3c7; color: #92400e; }
+.status-ifc { background: #dbeafe; color: #1e40af; }
+.status-ifa { background: #d1fae5; color: #065f46; }
+.status-afc { background: #fee2e2; color: #991b1b; }
+
+.revision-tag {
+    display: inline-block;
+    background: #e5e7eb;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    margin-left: 5px;
+}
+
+/* Summary Panel */
+.summary-panel {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 2px solid #3b82f6;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+}
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 15px;
+}
+.summary-item {
+    text-align: center;
+}
+.summary-label {
+    font-size: 11px;
+    color: #6b7280;
+    margin-bottom: 5px;
+}
+.summary-value {
+    font-size: 20px;
+    font-weight: bold;
+    color: #1e40af;
+}
+.summary-unit {
+    font-size: 11px;
+    color: #6b7280;
+}
+
+/* Buttons */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 12px;
+    transition: all 0.3s;
+}
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+.btn-primary:hover {
+    background: #2563eb;
+}
+.btn-success {
+    background: #10b981;
+    color: white;
+}
+.btn-warning {
+    background: #f59e0b;
+    color: white;
+}
+.btn-export {
+    background: #8b5cf6;
+    color: white;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Location Info Panel */
+.location-info {
+    background: #f0f9ff;
+    border: 1px solid #3b82f6;
+    border-radius: 4px;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 11px;
+    display: none;
+}
+.location-info.active {
+    display: block;
+}
+.location-info-title {
+    font-weight: 600;
+    color: #1e40af;
+    margin-bottom: 5px;
+}
+.location-info-details {
+    color: #4b5563;
+}
+
+/* Integration Status */
+.integration-status {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 8px 12px;
+    background: #10b981;
+    color: white;
+    border-radius: 4px;
+    font-size: 11px;
+    display: none;
+    z-index: 1000;
+}
+.integration-status.active {
+    display: block;
+}
+
+/* Service Recommendations */
+.service-item.recommended {
+    background-color: #fef3c7 !important;
+    border-left: 3px solid #f59e0b;
+}
+
+/* Location Type Badges */
+.location-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-left: 5px;
+}
+.badge-offshore { background: #dbeafe; color: #1e40af; }
+.badge-onshore { background: #d1fae5; color: #065f46; }
+.badge-document { background: #fee2e2; color: #991b1b; }
+
+/* Employee Status Badges */
+.status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+/* Employee Select Styling */
+.employee-select option:disabled {
+    font-weight: bold;
+    color: #6b7280;
+    background: #f3f4f6;
+}
+
+/* Resource Table Enhancement */
+.resource-table .employee-status {
+    text-align: center;
+}
+
+/* Quick View Panel */
+#employeeQuickView {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <div>
+            <h1>🏢 ADDVALUE SYSTEM CO., LTD.</h1>
+            <p>Standard Service Catalog & Pricing System v4.0</p>
+        </div>
+        <div class="header-info">
+            <p>User: Engineering Team</p>
+            <p id="datetime">Loading...</p>
+            <p>Session: #2025-001</p>
+        </div>
+    </div>
+
+    <!-- Project Information Bar -->
+    <div class="project-bar">
+        <div>
+            <label>Project:</label>
+            <input type="text" id="projectName" placeholder="Enter Project Name" style="width: 200px;">
+        </div>
+        <div>
+            <label>Client:</label>
+            <select id="clientType" onchange="updateLocations()">
+                <option value="">-- Select Client --</option>
+                <option>PTTEP</option>
+                <option>Chevron</option>
+                <option>MUBADALA</option>
+                <option>TOTAL</option>
+                <option>Other O&G</option>
+                <option>Non-O&G</option>
+            </select>
+        </div>
+        <div>
+            <label>Country:</label>
+            <select id="country" onchange="updateLocationsByCountry()">
+                <option value="">-- Select Country --</option>
+                <option value="thailand">🇹🇭 Thailand</option>
+                <option value="myanmar">🇲🇲 Myanmar</option>
+                <option value="malaysia">🇲🇾 Malaysia</option>
+            </select>
+        </div>
+        <div>
+            <label>Location:</label>
+            <select id="location">
+                <option value="">-- Select Location --</option>
+            </select>
+        </div>
+        <div>
+            <label>Quote No:</label>
+            <input type="text" id="quoteNo" value="Q-2025-001" style="width: 120px;">
+        </div>
+        <div>
+            <label>Rev:</label>
+            <select id="revision">
+                <option>Rev.0</option>
+                <option>Rev.A</option>
+                <option>Rev.B</option>
+                <option>Rev.C</option>
+            </select>
+        </div>
+    </div>
+    
+    <!-- Price Adjustment Settings -->
+    <div class="project-bar" style="background: #fef3c7; border: 1px solid #f59e0b;">
+        <div style="width: 100%; display: flex; gap: 20px; align-items: center;">
+            <div style="font-weight: bold; color: #92400e;">
+                💰 Location Price Adjustment:
+            </div>
+            <div>
+                <label style="font-size: 11px;">Offshore:</label>
+                <input type="number" id="offshoreAdjust" value="30" min="-100" max="200" style="width: 60px;">
+                <span style="font-size: 11px;">%</span>
+            </div>
+            <div>
+                <label style="font-size: 11px;">Onshore:</label>
+                <input type="number" id="onshoreAdjust" value="30" min="-100" max="200" style="width: 60px;">
+                <span style="font-size: 11px;">%</span>
+            </div>
+            <div>
+                <label style="font-size: 11px;">Document:</label>
+                <input type="number" id="documentAdjust" value="0" min="-100" max="200" style="width: 60px;">
+                <span style="font-size: 11px;">%</span>
+            </div>
+            <button onclick="applyPriceAdjustment()" style="padding: 6px 12px; background: #f59e0b; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;">
+                Apply Adjustment
+            </button>
+            <span id="adjustmentStatus" style="font-size: 11px; color: #065f46; display: none;">✓ Applied</span>
+        </div>
+    </div>
+    
+    <!-- Location Info Panel -->
+    <div class="location-info" id="locationInfo">
+        <div class="location-info-title">📍 Selected Location Details</div>
+        <div class="location-info-details" id="locationDetails">
+            No location selected
+        </div>
+    </div>
+
+    <!-- Integration Status Indicator -->
+    <div class="integration-status" id="integrationStatus">
+        ✅ Location Dashboard Connected
+    </div>
+
+    <!-- Service Navigation -->
+    <div class="service-nav">
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('field')">🔧 Field Engineering</button>
+            <button class="nav-tab" onclick="switchTab('document')">📄 Document Engineering</button>
+            <button class="nav-tab" onclick="switchTab('testing')">🧪 Testing & Commissioning</button>
+            <button class="nav-tab" onclick="switchTab('specialized')">🚀 Specialized Services</button>
+            <button class="nav-tab" onclick="switchTab('summary')">📊 Summary</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content-grid">
+        <!-- Service Catalog Tree -->
+        <div class="catalog-panel">
+            <div class="catalog-title">📚 Service Catalog</div>
+            
+            <!-- Field Engineering Services -->
+            <div class="service-group">
+                <div class="group-header" onclick="toggleGroup('field-group')">
+                    <span>▼</span> Field Engineering Services
+                </div>
+                <div class="service-items" id="field-group">
+                    <div class="service-item" onclick="selectService('SURVEY')">
+                        <span>Site Survey</span>
+                        <span class="service-code">SURVEY</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('INSTALL')">
+                        <span>Installation & Config</span>
+                        <span class="service-code">INSTALL</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('MAINT')">
+                        <span>Maintenance Service</span>
+                        <span class="service-code">MAINT</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('TROUBLE')">
+                        <span>Troubleshooting</span>
+                        <span class="service-code">TROUBLE</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('UPGRADE')">
+                        <span>System Upgrade</span>
+                        <span class="service-code">UPGRADE</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Testing Services -->
+            <div class="service-group">
+                <div class="group-header" onclick="toggleGroup('test-group')">
+                    <span>▼</span> Testing & Commissioning
+                </div>
+                <div class="service-items" id="test-group">
+                    <div class="service-item" onclick="selectService('FAT')">
+                        <span>Factory Acceptance Test</span>
+                        <span class="service-code">FAT</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('SAT')">
+                        <span>Site Acceptance Test</span>
+                        <span class="service-code">SAT</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('SIT')">
+                        <span>System Integration Test</span>
+                        <span class="service-code">SIT</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('COMM')">
+                        <span>Commissioning</span>
+                        <span class="service-code">COMM</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('LOOP')">
+                        <span>Loop Check</span>
+                        <span class="service-code">LOOP</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Document Engineering -->
+            <div class="service-group">
+                <div class="group-header" onclick="toggleGroup('doc-group')">
+                    <span>▼</span> Document Engineering
+                </div>
+                <div class="service-items" id="doc-group">
+                    <div class="service-item" onclick="selectService('PRE-FEED')">
+                        <span>Pre-FEED Package</span>
+                        <span class="service-code">PRE-FEED</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('FEED')">
+                        <span>FEED Package</span>
+                        <span class="service-code">FEED</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('DETAIL')">
+                        <span>Detail Design</span>
+                        <span class="service-code">DETAIL</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('VDRL')">
+                        <span>VDRL Documents</span>
+                        <span class="service-code">VDRL</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('AS-BUILT')">
+                        <span>As-Built Package</span>
+                        <span class="service-code">AS-BUILT</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Specialized Services -->
+            <div class="service-group">
+                <div class="group-header" onclick="toggleGroup('spec-group')">
+                    <span>▼</span> Specialized Services
+                </div>
+                <div class="service-items" id="spec-group">
+                    <div class="service-item" onclick="selectService('PM')">
+                        <span>Project Management</span>
+                        <span class="service-code">PM</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('CONSULT')">
+                        <span>Technical Consultancy</span>
+                        <span class="service-code">CONSULT</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('TRAINING')">
+                        <span>Training Services</span>
+                        <span class="service-code">TRAINING</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('AUDIT')">
+                        <span>System Audit</span>
+                        <span class="service-code">AUDIT</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Work Configuration Panel -->
+        <div class="work-panel">
+            <!-- Service Configuration -->
+            <div class="config-section">
+                <div class="config-title">⚙️ Service Configuration: <span id="selectedService">Site Survey</span></div>
+                
+                <div class="config-grid">
+                    <div class="config-item">
+                        <label>Service Type:</label>
+                        <select id="serviceType">
+                            <option>Standard Package</option>
+                            <option>Custom Configuration</option>
+                            <option>Emergency Response</option>
+                        </select>
+                    </div>
+                    <div class="config-item">
+                        <label>Duration (Days):</label>
+                        <input type="number" id="duration" value="5" min="1">
+                    </div>
+                    <div class="config-item">
+                        <label>Start Date:</label>
+                        <input type="date" id="startDate" value="2025-02-01">
+                    </div>
+                    <div class="config-item">
+                        <label>Complexity:</label>
+                        <select id="complexity">
+                            <option>Low</option>
+                            <option selected>Medium</option>
+                            <option>High</option>
+                            <option>Very High</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resource Assignment -->
+            <div class="config-section">
+                <div class="config-title">👥 Resource Assignment</div>
+                
+                <table class="resource-table">
+                    <thead>
+                        <tr>
+                            <th>Position</th>
+                            <th>Employee Name</th>
+                            <th>Level</th>
+                            <th>Qty</th>
+                            <th>Days</th>
+                            <th>Daily Rate (THB)</th>
+                            <th>Man-Hours</th>
+                            <th>Subtotal</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resourceTable">
+                        <!-- Rows will be dynamically generated -->
+                    </tbody>
+                </table>
+                <button class="add-resource-btn" onclick="addResource()">+ Add Resource</button>
+            </div>
+
+            <!-- Document Details (for Document Engineering) -->
+            <div class="config-section" id="documentSection" style="display: none;">
+                <div class="config-title">📋 Document Deliverables</div>
+                
+                <table class="resource-table">
+                    <thead>
+                        <tr>
+                            <th>Document Code</th>
+                            <th>Document Title</th>
+                            <th>Type</th>
+                            <th>Rev</th>
+                            <th>Status</th>
+                            <th>Man-Hours</th>
+                            <th>Responsible</th>
+                            <th>Progress</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>TSI-DDS-001</td>
+                            <td>System Design Specification</td>
+                            <td>Technical</td>
+                            <td><span class="revision-tag">Rev.B</span></td>
+                            <td><span class="doc-status status-ifc">IFC</span></td>
+                            <td>120</td>
+                            <td>Sr. Engineer</td>
+                            <td>75%</td>
+                        </tr>
+                        <tr>
+                            <td>TSI-PID-001</td>
+                            <td>P&ID Telecom System</td>
+                            <td>Drawing</td>
+                            <td><span class="revision-tag">Rev.A</span></td>
+                            <td><span class="doc-status status-ifr">IFR</span></td>
+                            <td>80</td>
+                            <td>CAD Designer</td>
+                            <td>50%</td>
+                        </tr>
+                        <tr>
+                            <td>TSI-BOQ-001</td>
+                            <td>Bill of Quantity</td>
+                            <td>Commercial</td>
+                            <td><span class="revision-tag">Rev.C</span></td>
+                            <td><span class="doc-status status-ifa">IFA</span></td>
+                            <td>40</td>
+                            <td>Engineer</td>
+                            <td>100%</td>
+                        </tr>
+                        <tr>
+                            <td>TSI-MTO-001</td>
+                            <td>Material Take Off</td>
+                            <td>Procurement</td>
+                            <td><span class="revision-tag">Rev.0</span></td>
+                            <td><span class="doc-status status-afc">AFC</span></td>
+                            <td>60</td>
+                            <td>Engineer</td>
+                            <td>25%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Cost Summary -->
+            <div class="summary-panel">
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <div class="summary-label">Total Man-Days</div>
+                        <div class="summary-value">30</div>
+                        <div class="summary-unit">days</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Total Man-Hours</div>
+                        <div class="summary-value">360</div>
+                        <div class="summary-unit">hours</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Service Cost</div>
+                        <div class="summary-value">฿180,000</div>
+                        <div class="summary-unit">THB</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Additional Cost</div>
+                        <div class="summary-value">฿25,000</div>
+                        <div class="summary-unit">THB</div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; padding-top: 15px; border-top: 2px solid #3b82f6;">
+                    <div style="font-size: 14px; color: #6b7280;">Total Package Price</div>
+                    <div style="font-size: 28px; font-weight: bold; color: #1e40af;">฿205,000</div>
+                    <div style="font-size: 11px; color: #6b7280;">(Exclude VAT 7%)</div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-primary">💾 Save Configuration</button>
+                <button class="btn btn-success">✓ Add to Quote</button>
+                <button class="btn btn-warning" onclick="initializeFieldEngineeringResources()">👥 Load Default Team</button>
+                <button class="btn btn-export" onclick="exportResourceAllocation()">📥 Export Team JSON</button>
+                <button class="btn" style="background: #8b5cf6; color: white;">📤 Export to Excel</button>
+                <button class="btn" style="background: #6b7280; color: white;">🔄 Reset</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Employee Database
+const employees = [
+  {
+    id: 1,
+    name: 'Natcha Yodin',
+    position: 'Admin Officer',
+    department: 'Administration',
+    salary: 14000,
+    dailyRate: 467,
+    hourlyRate: 58,
+    otRate: 87,
+    email: 'natcha@addvaluesystemcompany.onmicrosoft.com',
+    phone: '0891234567',
+    birthdate: '1995-03-15',
+    address: '59/66 Moo 1 Ban Mai Sub-distric Pakkret city Nonthaburi Province 11120',
+    status: 'available'
+  },
+  {
+    id: 2,
+    name: 'Aurnchalee Meenak',
+    position: 'CFO',
+    department: 'Management',
+    salary: 50000,
+    dailyRate: 1667,
+    hourlyRate: 208,
+    otRate: 312,
+    email: 'aurnchalee@addvaluesystem.com',
+    phone: '0812345678',
+    birthdate: '1988-07-22',
+    address: '456 ถ.พหลโยธิน แขวงสามเสนใน เขตพญาไท กรุงเทพฯ 10400',
+    status: 'available'
+  },
+  {
+    id: 3,
+    name: 'Ratchaneekorn Mo-on',
+    position: 'Telecommunication Engineer',
+    department: 'Engineering',
+    salary: 24000,
+    dailyRate: 800,
+    hourlyRate: 100,
+    otRate: 150,
+    email: 'ratchaneekom@addvaluesystem.com',
+    phone: '0823456789',
+    birthdate: '1992-11-08',
+    address: '789 ถ.รามอินทรา แขวงอนุสาวรีย์ เขตบางเขน กรุงเทพฯ 10220',
+    status: 'busy'
+  },
+  {
+    id: 4,
+    name: 'Sakda Wongjam',
+    position: 'Chief Telecommunication Engineer',
+    department: 'Engineering',
+    salary: 82000,
+    dailyRate: 2733,
+    hourlyRate: 342,
+    otRate: 513,
+    email: 'sakda@addvaluesystem.com',
+    phone: '0834567890',
+    birthdate: '1985-05-10',
+    address: '321 ถ.ลาดพร้าว แขวงจอมพล เขตจตุจักร กรุงเทพฯ 10900',
+    status: 'available'
+  },
+  {
+    id: 5,
+    name: 'Suriyapong Yoo-om-sin',
+    position: 'CEO',
+    department: 'Management',
+    salary: 120000,
+    dailyRate: 4000,
+    hourlyRate: 500,
+    otRate: 750,
+    email: 'suriyapong@addvaluesystem.com',
+    phone: '0845678901',
+    birthdate: '1980-12-25',
+    address: '654 ถ.เพชรบุรี แขวงถนนพญาไท เขตราชเทวี กรุงเทพฯ 10400',
+    status: 'available'
+  },
+  {
+    id: 6,
+    name: 'Suttirak Nunsong',
+    position: 'Senior Telecommunication Engineer',
+    department: 'Engineering',
+    salary: 36000,
+    dailyRate: 1200,
+    hourlyRate: 150,
+    otRate: 225,
+    email: 'suttirak@addvaluesystem.com',
+    phone: '0856789012',
+    birthdate: '1990-09-18',
+    address: '987 ถ.รัชดาภิเษก แขวงดินแดง เขตดินแดง กรุงเทพฯ 10400',
+    status: 'busy'
+  },
+  {
+    id: 7,
+    name: 'Wasupol Amonthat',
+    position: 'Sales Representative',
+    department: 'Sales & Marketing',
+    salary: 18000,
+    dailyRate: 600,
+    hourlyRate: 75,
+    otRate: 113,
+    email: 'wasupol@addvaluesystem.com',
+    phone: '0867890123',
+    birthdate: '1993-06-30',
+    address: '147 ถ.วิภาวดีรังสิต แขวงสนามบิน เขตดอนเมือง กรุงเทพฯ 10210',
+    status: 'available'
+  },
+  {
+    id: 8,
+    name: 'Yuttapong Eakimphon',
+    position: 'Chief Telecommunication Technician',
+    department: 'Engineering',
+    salary: 37000,
+    dailyRate: 1233,
+    hourlyRate: 154,
+    otRate: 231,
+    email: 'yuttapong@addvaluesystem.com',
+    phone: '0878901234',
+    birthdate: '1991-02-14',
+    address: '258 ถ.พระราม 4 แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110',
+    status: 'available'
+  }
+];
+
+// Position Mapping for Field Engineering Services
+const positionMapping = {
+  'Chief Telecommunication Engineer': {
+    defaultEmployee: 'Sakda Wongjam',
+    alternatives: [],
+    standardRate: 18000,
+    level: 'Chief'
+  },
+  'Senior Telecommunication Engineer': {
+    defaultEmployee: 'Suttirak Nunsong',
+    alternatives: [],
+    standardRate: 12000,
+    level: 'Senior'
+  },
+  'Telecommunication Engineer': {
+    defaultEmployee: 'Ratchaneekorn Mo-on',
+    alternatives: ['Ratchaneekom Mo-on'], // Alternative spelling
+    standardRate: 8000,
+    level: 'Mid'
+  },
+  'Chief Telecommunication Technician': {
+    defaultEmployee: 'Yuttapong Eakimphon',
+    alternatives: [],
+    standardRate: 10000,
+    level: 'Chief'
+  },
+  'Lead Engineer': {
+    defaultEmployee: null,
+    alternatives: ['Sakda Wongjam', 'Suttirak Nunsong'],
+    standardRate: 18000,
+    level: 'Senior'
+  },
+  'Sr. Engineer': {
+    defaultEmployee: null,
+    alternatives: ['Suttirak Nunsong'],
+    standardRate: 9000,
+    level: 'Senior'
+  },
+  'Engineer': {
+    defaultEmployee: null,
+    alternatives: ['Ratchaneekorn Mo-on'],
+    standardRate: 6000,
+    level: 'Mid'
+  },
+  'Technician': {
+    defaultEmployee: null,
+    alternatives: ['Yuttapong Eakimphon'],
+    standardRate: 5000,
+    level: 'Junior'
+  }
+};
+
+// Function to get employee by name
+function getEmployeeByName(name) {
+  // Handle alternative spellings
+  const nameVariations = {
+    'Ratchaneekorn Mo-on': 'Ratchaneekom Mo-on',
+    'Ratchaneekom Mo-on': 'Ratchaneekorn Mo-on'
+  };
+  
+  let searchName = name;
+  if (nameVariations[name]) {
+    // Try both variations
+    let emp = employees.find(e => e.name === name);
+    if (!emp) {
+      emp = employees.find(e => e.name === nameVariations[name]);
+    }
+    return emp;
+  }
+  
+  return employees.find(e => e.name === name);
+}
+
+// Function to get employees by position
+function getEmployeesByPosition(position) {
+  return employees.filter(e => e.position === position);
+}
+
+// Function to get available employees
+function getAvailableEmployees() {
+  return employees.filter(e => e.status === 'available');
+}
+
+// Function to auto-assign employee to position
+function autoAssignEmployee(position) {
+  const mapping = positionMapping[position];
+  if (mapping) {
+    if (mapping.defaultEmployee) {
+      const emp = getEmployeeByName(mapping.defaultEmployee);
+      if (emp && emp.status === 'available') {
+        return emp;
+      }
+    }
+    
+    // Try alternatives if default is not available
+    for (const altName of mapping.alternatives) {
+      const emp = getEmployeeByName(altName);
+      if (emp && emp.status === 'available') {
+        return emp;
+      }
+    }
+  }
+  
+  // If no mapping, try to find by position title
+  const availableByPosition = employees.filter(e => 
+    e.position.toLowerCase().includes(position.toLowerCase()) && 
+    e.status === 'available'
+  );
+  
+  if (availableByPosition.length > 0) {
+    return availableByPosition[0];
+  }
+  
+  return null;
+}
+
+// Update datetime
+function updateDateTime() {
+    const now = new Date();
+    document.getElementById('datetime').textContent = now.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+}
+setInterval(updateDateTime, 1000);
+updateDateTime();
+
+// Toggle service group
+function toggleGroup(groupId) {
+    const group = document.getElementById(groupId);
+    group.style.display = group.style.display === 'none' ? 'block' : 'none';
+}
+
+// Switch tabs
+function switchTab(tab) {
+    const tabs = document.querySelectorAll('.nav-tab');
+    tabs.forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Show/hide document section based on tab
+    const docSection = document.getElementById('documentSection');
+    if (tab === 'document') {
+        docSection.style.display = 'block';
+    } else {
+        docSection.style.display = 'none';
+    }
+}
+
+// Select service
+function selectService(serviceCode) {
+    // Update UI
+    const items = document.querySelectorAll('.service-item');
+    items.forEach(item => item.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    
+    // Update selected service display
+    document.getElementById('selectedService').textContent = event.currentTarget.querySelector('span').textContent;
+    
+    // Load service-specific configuration
+    loadServiceConfig(serviceCode);
+}
+
+// Load service configuration
+function loadServiceConfig(serviceCode) {
+    // This would load specific configurations based on service type
+    console.log('Loading configuration for:', serviceCode);
+    
+    // Show document section for document services
+    const docSection = document.getElementById('documentSection');
+    if (['PRE-FEED', 'FEED', 'DETAIL', 'VDRL', 'AS-BUILT'].includes(serviceCode)) {
+        docSection.style.display = 'block';
+    } else {
+        docSection.style.display = 'none';
+    }
+}
+
+// Add resource row with employee assignment
+function addResource() {
+    const table = document.getElementById('resourceTable');
+    const newRow = table.insertRow();
+    const rowId = 'resource-row-' + Date.now();
+    newRow.id = rowId;
+    
+    newRow.innerHTML = `
+        <td>
+            <select class="position-select" onchange="onPositionChange('${rowId}')">
+                <option value="">-- Select Position --</option>
+                <option value="Chief Telecommunication Engineer">Chief Telecom Engineer</option>
+                <option value="Senior Telecommunication Engineer">Sr. Telecom Engineer</option>
+                <option value="Telecommunication Engineer">Telecom Engineer</option>
+                <option value="Chief Telecommunication Technician">Chief Telecom Technician</option>
+                <option value="Lead Engineer">Lead Engineer</option>
+                <option value="Sr. Engineer">Sr. Engineer</option>
+                <option value="Engineer">Engineer</option>
+                <option value="Technician">Technician</option>
+            </select>
+        </td>
+        <td>
+            <select class="employee-select" style="width: 150px;" onchange="onEmployeeChange('${rowId}')">
+                <option value="">-- Select Employee --</option>
+            </select>
+        </td>
+        <td>
+            <select class="level-select">
+                <option>Chief</option>
+                <option>Senior</option>
+                <option>Mid</option>
+                <option>Junior</option>
+            </select>
+        </td>
+        <td><input type="number" value="1" min="1" style="width: 50px;" class="qty-input" onchange="calculateRowTotal('${rowId}')"></td>
+        <td><input type="number" value="1" min="1" style="width: 50px;" class="days-input" onchange="calculateRowTotal('${rowId}')"></td>
+        <td><input type="number" value="0" style="width: 90px;" class="rate-input" onchange="calculateRowTotal('${rowId}')"></td>
+        <td class="man-hours">0</td>
+        <td class="subtotal" style="font-weight: bold; color: #059669;">฿0</td>
+        <td class="employee-status">
+            <span class="status-badge" style="padding: 2px 6px; border-radius: 3px; font-size: 10px;">-</span>
+        </td>
+        <td><button class="remove-btn" onclick="this.closest('tr').remove(); calculateTotals()">Remove</button></td>
+    `;
+}
+
+// Handle position change
+function onPositionChange(rowId) {
+    const row = document.getElementById(rowId);
+    const position = row.querySelector('.position-select').value;
+    const employeeSelect = row.querySelector('.employee-select');
+    
+    // Clear current selection
+    employeeSelect.innerHTML = '<option value="">-- Select Employee --</option>';
+    
+    if (position) {
+        // Try to auto-assign employee
+        const assignedEmployee = autoAssignEmployee(position);
+        
+        // Add all available employees as options
+        const availableEmps = getAvailableEmployees();
+        const busyEmps = employees.filter(e => e.status === 'busy');
+        
+        // Add recommended employee first if exists
+        if (assignedEmployee) {
+            const option = document.createElement('option');
+            option.value = assignedEmployee.id;
+            option.textContent = `⭐ ${assignedEmployee.name} (Recommended)`;
+            option.selected = true;
+            employeeSelect.appendChild(option);
+        }
+        
+        // Add separator
+        if (assignedEmployee && availableEmps.length > 1) {
+            const separator = document.createElement('option');
+            separator.disabled = true;
+            separator.textContent = '--- Other Available ---';
+            employeeSelect.appendChild(separator);
+        }
+        
+        // Add other available employees
+        availableEmps.forEach(emp => {
+            if (!assignedEmployee || emp.id !== assignedEmployee.id) {
+                const option = document.createElement('option');
+                option.value = emp.id;
+                option.textContent = `${emp.name} (${emp.position})`;
+                employeeSelect.appendChild(option);
+            }
+        });
+        
+        // Add busy employees with warning
+        if (busyEmps.length > 0) {
+            const separator = document.createElement('option');
+            separator.disabled = true;
+            separator.textContent = '--- Busy (On Project) ---';
+            employeeSelect.appendChild(separator);
+            
+            busyEmps.forEach(emp => {
+                const option = document.createElement('option');
+                option.value = emp.id;
+                option.textContent = `${emp.name} (${emp.position}) ⚠️`;
+                option.style.color = '#ef4444';
+                employeeSelect.appendChild(option);
+            });
+        }
+        
+        // If auto-assigned, update employee details
+        if (assignedEmployee) {
+            employeeSelect.value = assignedEmployee.id;
+            onEmployeeChange(rowId);
+        }
+        
+        // Set standard rate if no employee assigned
+        if (!assignedEmployee && positionMapping[position]) {
+            row.querySelector('.rate-input').value = positionMapping[position].standardRate;
+            row.querySelector('.level-select').value = positionMapping[position].level;
+            calculateRowTotal(rowId);
+        }
+    }
+}
+
+// Handle employee change
+function onEmployeeChange(rowId) {
+    const row = document.getElementById(rowId);
+    const employeeId = row.querySelector('.employee-select').value;
+    
+    if (employeeId) {
+        const employee = employees.find(e => e.id == employeeId);
+        if (employee) {
+            // Update rate with employee's actual daily rate
+            row.querySelector('.rate-input').value = employee.dailyRate;
+            
+            // Update level based on employee position
+            if (employee.position.includes('Chief')) {
+                row.querySelector('.level-select').value = 'Chief';
+            } else if (employee.position.includes('Senior')) {
+                row.querySelector('.level-select').value = 'Senior';
+            } else if (employee.position.includes('Engineer')) {
+                row.querySelector('.level-select').value = 'Mid';
+            } else {
+                row.querySelector('.level-select').value = 'Junior';
+            }
+            
+            // Update status badge
+            const statusBadge = row.querySelector('.status-badge');
+            if (employee.status === 'available') {
+                statusBadge.textContent = 'Available';
+                statusBadge.style.background = '#d1fae5';
+                statusBadge.style.color = '#065f46';
+            } else {
+                statusBadge.textContent = 'Busy';
+                statusBadge.style.background = '#fee2e2';
+                statusBadge.style.color = '#991b1b';
+            }
+            
+            calculateRowTotal(rowId);
+        }
+    } else {
+        // Clear status if no employee selected
+        const statusBadge = row.querySelector('.status-badge');
+        statusBadge.textContent = '-';
+        statusBadge.style.background = '#e5e7eb';
+        statusBadge.style.color = '#6b7280';
+    }
+}
+
+// Calculate row total
+function calculateRowTotal(rowId) {
+    const row = document.getElementById(rowId);
+    const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+    const days = parseFloat(row.querySelector('.days-input').value) || 0;
+    const rate = parseFloat(row.querySelector('.rate-input').value) || 0;
+    
+    const manHours = qty * days * 8; // 8 hours per day
+    const subtotal = qty * days * rate;
+    
+    row.querySelector('.man-hours').textContent = manHours;
+    row.querySelector('.subtotal').textContent = `฿${subtotal.toLocaleString()}`;
+    
+    calculateTotals();
+}
+
+// Calculate totals
+function calculateTotals() {
+    let totalManDays = 0;
+    let totalManHours = 0;
+    let totalCost = 0;
+    
+    const rows = document.querySelectorAll('#resourceTable tr');
+    rows.forEach(row => {
+        const qty = parseFloat(row.querySelector('.qty-input')?.value) || 0;
+        const days = parseFloat(row.querySelector('.days-input')?.value) || 0;
+        const rate = parseFloat(row.querySelector('.rate-input')?.value) || 0;
+        
+        totalManDays += qty * days;
+        totalManHours += qty * days * 8;
+        totalCost += qty * days * rate;
+    });
+    
+    // Update summary values
+    const summaryValues = document.querySelectorAll('.summary-value');
+    if (summaryValues.length >= 3) {
+        summaryValues[0].textContent = totalManDays;
+        summaryValues[1].textContent = totalManHours;
+        summaryValues[2].textContent = `฿${totalCost.toLocaleString()}`;
+    }
+    
+    // Calculate additional costs (example: 15% overhead)
+    const additionalCost = totalCost * 0.15;
+    if (summaryValues.length >= 4) {
+        summaryValues[3].textContent = `฿${Math.round(additionalCost).toLocaleString()}`;
+    }
+    
+    // Update total package price
+    const totalPackage = totalCost + additionalCost;
+    const totalPriceElement = document.querySelector('.summary-panel div:last-child div:nth-child(2)');
+    if (totalPriceElement) {
+        totalPriceElement.textContent = `฿${Math.round(totalPackage).toLocaleString()}`;
+    }
+}
+
+// Initialize default resources for Field Engineering Service
+function initializeFieldEngineeringResources() {
+    // Clear existing rows
+    document.getElementById('resourceTable').innerHTML = '';
+    
+    // Define default team for Field Engineering
+    const defaultTeam = [
+        { position: 'Chief Telecommunication Engineer', qty: 1, days: 5 },
+        { position: 'Senior Telecommunication Engineer', qty: 1, days: 5 },
+        { position: 'Telecommunication Engineer', qty: 2, days: 5 },
+        { position: 'Chief Telecommunication Technician', qty: 1, days: 5 }
+    ];
+    
+    // Add each team member
+    defaultTeam.forEach((member, index) => {
+        setTimeout(() => {
+            addResource();
+            const rows = document.querySelectorAll('#resourceTable tr');
+            const lastRow = rows[rows.length - 1];
+            
+            // Set position
+            lastRow.querySelector('.position-select').value = member.position;
+            onPositionChange(lastRow.id);
+            
+            // Set qty and days
+            setTimeout(() => {
+                lastRow.querySelector('.qty-input').value = member.qty;
+                lastRow.querySelector('.days-input').value = member.days;
+                calculateRowTotal(lastRow.id);
+            }, 100);
+        }, index * 200);
+    });
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('AVS Service Catalog System loaded');
+    console.log('Employee Database loaded:', employees.length, 'employees');
+    initializeLocationData();
+    initializeFieldEngineeringResources();
+    
+    // Add employee quick view panel
+    addEmployeeQuickView();
+});
+
+// Location Data from Location Dashboard v4
+const locationData = {
+    thailand: {
+        name: '🇹🇭 Thailand',
+        locations: [
+            { id: 'th-g1', name: 'G1 Platform', type: 'offshore', details: 'Platong, Erawan, Satun, Funan' },
+            { id: 'th-g2', name: 'G2 Platform', type: 'offshore', details: 'G2N, G2S, Arthit' },
+            { id: 'th-bualuang', name: 'Bualuang Field', type: 'offshore', details: 'Alpha, Bravo' },
+            { id: 'th-gcme', name: 'GCME Platform', type: 'offshore', details: 'Arthit South' },
+            { id: 'th-bkk', name: 'Bangkok DCC', type: 'document', details: 'Main, VDRL, ESO, PMO' }
+        ]
+    },
+    myanmar: {
+        name: '🇲🇲 Myanmar',
+        locations: [
+            { id: 'mm-zawtika-off', name: 'ZAWTIKA Offshore', type: 'offshore', details: 'ZPQ, Z1D, Z1E' },
+            { id: 'mm-zawtika-on', name: 'ZAWTIKA Onshore', type: 'onshore', details: 'ATL' },
+            { id: 'mm-yadana', name: 'YADANA', type: 'onshore', details: 'PLC-MS' }
+        ]
+    },
+    malaysia: {
+        name: '🇲🇾 Malaysia',
+        locations: [
+            { id: 'my-jda', name: 'JDA Platform', type: 'offshore', details: 'CPOC' }
+        ]
+    }
+};
+
+// Client-Location Mapping
+const clientLocationMap = {
+    'PTTEP': ['thailand', 'myanmar', 'malaysia'],
+    'Chevron': ['thailand'],
+    'MUBADALA': ['thailand', 'myanmar'],
+    'TOTAL': ['myanmar'],
+    'Other O&G': ['thailand', 'myanmar', 'malaysia'],
+    'Non-O&G': ['thailand']
+};
+
+// Initialize location data
+function initializeLocationData() {
+    console.log('Initializing Location Data from Dashboard v4');
+    
+    // Add event listeners
+    const clientSelect = document.getElementById('clientType');
+    const countrySelect = document.getElementById('country');
+    
+    if (clientSelect) {
+        clientSelect.addEventListener('change', updateLocations);
+    }
+    
+    if (countrySelect) {
+        countrySelect.addEventListener('change', updateLocationsByCountry);
+    }
+}
+
+// Update available countries based on selected client
+function updateLocations() {
+    const client = document.getElementById('clientType').value;
+    const countrySelect = document.getElementById('country');
+    const locationSelect = document.getElementById('location');
+    
+    // Clear selections
+    countrySelect.innerHTML = '<option value="">-- Select Country --</option>';
+    locationSelect.innerHTML = '<option value="">-- Select Location --</option>';
+    
+    if (client && clientLocationMap[client]) {
+        const availableCountries = clientLocationMap[client];
+        
+        availableCountries.forEach(country => {
+            if (locationData[country]) {
+                const option = document.createElement('option');
+                option.value = country;
+                option.textContent = locationData[country].name;
+                countrySelect.appendChild(option);
+            }
+        });
+        
+        // Enable country select
+        countrySelect.disabled = false;
+    } else if (client === '') {
+        // If no client selected, show all countries
+        Object.keys(locationData).forEach(country => {
+            const option = document.createElement('option');
+            option.value = country;
+            option.textContent = locationData[country].name;
+            countrySelect.appendChild(option);
+        });
+    }
+}
+
+// Update locations based on selected country
+function updateLocationsByCountry() {
+    const country = document.getElementById('country').value;
+    const locationSelect = document.getElementById('location');
+    
+    // Clear current locations
+    locationSelect.innerHTML = '<option value="">-- Select Location --</option>';
+    
+    if (country && locationData[country]) {
+        const locations = locationData[country].locations;
+        
+        locations.forEach(loc => {
+            const option = document.createElement('option');
+            option.value = loc.id;
+            option.textContent = `${loc.name} (${loc.type.charAt(0).toUpperCase() + loc.type.slice(1)})`;
+            option.setAttribute('data-type', loc.type);
+            option.setAttribute('data-details', loc.details);
+            
+            // Add icon based on type
+            if (loc.type === 'offshore') {
+                option.textContent = '🛢️ ' + option.textContent;
+            } else if (loc.type === 'onshore') {
+                option.textContent = '🏭 ' + option.textContent;
+            } else if (loc.type === 'document') {
+                option.textContent = '📄 ' + option.textContent;
+            }
+            
+            locationSelect.appendChild(option);
+        });
+        
+        // Auto-adjust service recommendations based on location type
+        locationSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption && selectedOption.value) {
+                const locationType = selectedOption.getAttribute('data-type');
+                const details = selectedOption.getAttribute('data-details');
+                
+                // Show location info
+                showLocationInfo(selectedOption.textContent, locationType, details);
+                
+                // Recommend services
+                recommendServices(locationType);
+                
+                // Auto-adjust pricing based on location
+                adjustPricingByLocation(locationType);
+            } else {
+                hideLocationInfo();
+            }
+        });
+    }
+}
+
+// Show location information panel
+function showLocationInfo(locationName, locationType, details) {
+    const locationInfo = document.getElementById('locationInfo');
+    const locationDetails = document.getElementById('locationDetails');
+    
+    let badgeClass = '';
+    if (locationType === 'offshore') badgeClass = 'badge-offshore';
+    else if (locationType === 'onshore') badgeClass = 'badge-onshore';
+    else if (locationType === 'document') badgeClass = 'badge-document';
+    
+    locationDetails.innerHTML = `
+        <strong>${locationName}</strong>
+        <span class="location-badge ${badgeClass}">${locationType.toUpperCase()}</span>
+        <br>
+        <span style="color: #6b7280; font-size: 10px;">Facilities: ${details}</span>
+    `;
+    
+    locationInfo.classList.add('active');
+    
+    // Show integration status briefly
+    showIntegrationStatus();
+}
+
+// Hide location information panel
+function hideLocationInfo() {
+    const locationInfo = document.getElementById('locationInfo');
+    locationInfo.classList.remove('active');
+}
+
+// Show integration status notification
+function showIntegrationStatus() {
+    const status = document.getElementById('integrationStatus');
+    status.classList.add('active');
+    setTimeout(() => {
+        status.classList.remove('active');
+    }, 2000);
+}
+
+// Adjust pricing based on location type
+function adjustPricingByLocation(locationType) {
+    // Get custom adjustment percentages from inputs
+    const offshoreAdjust = parseFloat(document.getElementById('offshoreAdjust').value) || 30;
+    const onshoreAdjust = parseFloat(document.getElementById('onshoreAdjust').value) || 30;
+    const documentAdjust = parseFloat(document.getElementById('documentAdjust').value) || 0;
+    
+    const multipliers = {
+        'offshore': 1 + (offshoreAdjust / 100),  // Custom % adjustment
+        'onshore': 1 + (onshoreAdjust / 100),    // Custom % adjustment
+        'document': 1 + (documentAdjust / 100)    // Custom % adjustment (default 0%)
+    };
+    
+    const multiplier = multipliers[locationType] || 1.0;
+    
+    // Store base rates if not already stored
+    if (!window.baseRates) {
+        window.baseRates = {
+            lead: 18000,
+            senior: 9000,
+            mid: 6000
+        };
+    }
+    
+    // Update all rate inputs based on multiplier
+    document.querySelectorAll('#resourceTable input[type="number"]').forEach(input => {
+        const currentValue = parseInt(input.value);
+        // Check if this is a rate field (typical values)
+        if (currentValue >= 5000 && currentValue <= 25000) {
+            // Determine base rate
+            let baseRate = currentValue;
+            if (currentValue > 15000) baseRate = window.baseRates.lead;
+            else if (currentValue > 7000) baseRate = window.baseRates.senior;
+            else baseRate = window.baseRates.mid;
+            
+            const adjustedRate = Math.round(baseRate * multiplier);
+            input.value = adjustedRate;
+        }
+    });
+    
+    // Trigger recalculation
+    calculateTotals();
+    
+    // Show adjustment info
+    const adjustPercent = multiplier > 1 ? `+${((multiplier - 1) * 100).toFixed(0)}%` : 
+                          multiplier < 1 ? `-${((1 - multiplier) * 100).toFixed(0)}%` : 
+                          'Standard';
+    
+    console.log(`Pricing adjusted for ${locationType} location (${adjustPercent})`);
+    
+    // Update location info to show adjustment
+    const locationDetails = document.getElementById('locationDetails');
+    if (locationDetails && locationDetails.innerHTML !== 'No location selected') {
+        const currentHTML = locationDetails.innerHTML;
+        if (!currentHTML.includes('Price Adjustment:')) {
+            locationDetails.innerHTML += `<br><span style="color: #f59e0b; font-weight: bold;">💰 Price Adjustment: ${adjustPercent}</span>`;
+        } else {
+            // Update existing adjustment info
+            locationDetails.innerHTML = currentHTML.replace(/Price Adjustment:.*?<\/span>/, `Price Adjustment: ${adjustPercent}</span>`);
+        }
+    }
+}
+
+// Apply custom price adjustment
+function applyPriceAdjustment() {
+    const locationSelect = document.getElementById('location');
+    const selectedOption = locationSelect.options[locationSelect.selectedIndex];
+    
+    if (selectedOption && selectedOption.value) {
+        const locationType = selectedOption.getAttribute('data-type');
+        adjustPricingByLocation(locationType);
+        
+        // Show confirmation
+        const status = document.getElementById('adjustmentStatus');
+        status.style.display = 'inline';
+        setTimeout(() => {
+            status.style.display = 'none';
+        }, 2000);
+    } else {
+        alert('Please select a location first');
+    }
+}
+
+// Reset price adjustment to defaults
+function resetPriceAdjustment() {
+    document.getElementById('offshoreAdjust').value = 30;
+    document.getElementById('onshoreAdjust').value = 30;
+    document.getElementById('documentAdjust').value = 0;
+    
+    const locationSelect = document.getElementById('location');
+    const selectedOption = locationSelect.options[locationSelect.selectedIndex];
+    
+    if (selectedOption && selectedOption.value) {
+        const locationType = selectedOption.getAttribute('data-type');
+        adjustPricingByLocation(locationType);
+    }
+}
+
+// Recommend services based on location type
+function recommendServices(locationType) {
+    console.log('Recommending services for location type:', locationType);
+    
+    // Highlight recommended services based on location type
+    const recommendations = {
+        'offshore': ['SURVEY', 'INSTALL', 'MAINT', 'COMM', 'SAT'],
+        'onshore': ['INSTALL', 'UPGRADE', 'FAT', 'TRAINING'],
+        'document': ['PRE-FEED', 'FEED', 'DETAIL', 'VDRL', 'AS-BUILT']
+    };
+    
+    // Clear all highlights first
+    document.querySelectorAll('.service-item').forEach(item => {
+        item.style.backgroundColor = '';
+    });
+    
+    // Highlight recommended services
+    if (recommendations[locationType]) {
+        recommendations[locationType].forEach(serviceCode => {
+            document.querySelectorAll('.service-code').forEach(code => {
+                if (code.textContent === serviceCode) {
+                    code.parentElement.style.backgroundColor = '#fef3c7';
+                }
+            });
+        });
+    }
+}
+
+// Integration with Location Dashboard (if embedded in iframe)
+window.addEventListener('message', function(event) {
+    if (event.data.type === 'LOCATION_SELECTED') {
+        console.log('Location selected from dashboard:', event.data.data);
+        
+        // Parse location ID to set country and location
+        const locationId = event.data.data.id;
+        if (locationId) {
+            const parts = locationId.split('-');
+            const countryMap = { 'th': 'thailand', 'mm': 'myanmar', 'my': 'malaysia' };
+            const country = countryMap[parts[0]];
+            
+            if (country) {
+                document.getElementById('country').value = country;
+                updateLocationsByCountry();
+                
+                // Set the specific location after a short delay
+                setTimeout(() => {
+                    document.getElementById('location').value = locationId;
+                }, 100);
+            }
+        }
+    }
+});
+
+// Send system status to parent window (if in iframe)
+function sendSystemStatus() {
+    if (window.parent !== window) {
+        window.parent.postMessage({
+            type: 'AVS_CATALOG_STATUS',
+            module: 'service-catalog',
+            version: '4.0',
+            ready: true,
+            timestamp: new Date().toISOString()
+        }, '*');
+    }
+}
+
+// Call on load
+setTimeout(sendSystemStatus, 1000);
+
+// Add employee quick view panel
+function addEmployeeQuickView() {
+    // Create floating employee panel
+    const panel = document.createElement('div');
+    panel.id = 'employeeQuickView';
+    panel.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 300px;
+        max-height: 400px;
+        background: white;
+        border: 2px solid #3b82f6;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        display: none;
+        overflow-y: auto;
+        z-index: 1000;
+    `;
+    
+    panel.innerHTML = `
+        <div style="font-weight: bold; color: #1f2937; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+            👥 Employee Quick View
+            <button onclick="document.getElementById('employeeQuickView').style.display='none'" style="background: #ef4444; color: white; border: none; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;">✕</button>
+        </div>
+        <div id="employeeDetails"></div>
+    `;
+    
+    document.body.appendChild(panel);
+    
+    // Add toggle button in header
+    const header = document.querySelector('.header-info');
+    if (header) {
+        const toggleBtn = document.createElement('button');
+        toggleBtn.innerHTML = '👥 Team Info';
+        toggleBtn.style.cssText = `
+            margin-top: 5px;
+            padding: 4px 8px;
+            background: #60a5fa;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+        `;
+        toggleBtn.onclick = toggleEmployeePanel;
+        header.appendChild(toggleBtn);
+    }
+}
+
+// Toggle employee panel
+function toggleEmployeePanel() {
+    const panel = document.getElementById('employeeQuickView');
+    const details = document.getElementById('employeeDetails');
+    
+    if (panel.style.display === 'none' || !panel.style.display) {
+        // Generate employee list
+        let html = '<div style="font-size: 11px;">';
+        
+        // Available employees
+        html += '<div style="margin-bottom: 10px;"><strong style="color: #10b981;">Available Employees:</strong>';
+        const available = employees.filter(e => e.status === 'available');
+        available.forEach(emp => {
+            html += `
+                <div style="padding: 5px; margin: 3px 0; background: #f0f9ff; border-radius: 4px;">
+                    <strong>${emp.name}</strong><br>
+                    ${emp.position}<br>
+                    Daily: ฿${emp.dailyRate.toLocaleString()} | Hour: ฿${emp.hourlyRate}
+                </div>
+            `;
+        });
+        html += '</div>';
+        
+        // Busy employees
+        html += '<div><strong style="color: #f59e0b;">Busy Employees:</strong>';
+        const busy = employees.filter(e => e.status === 'busy');
+        busy.forEach(emp => {
+            html += `
+                <div style="padding: 5px; margin: 3px 0; background: #fef3c7; border-radius: 4px;">
+                    <strong>${emp.name}</strong><br>
+                    ${emp.position}<br>
+                    Daily: ฿${emp.dailyRate.toLocaleString()} | Hour: ฿${emp.hourlyRate}
+                </div>
+            `;
+        });
+        html += '</div></div>';
+        
+        details.innerHTML = html;
+        panel.style.display = 'block';
+    } else {
+        panel.style.display = 'none';
+    }
+}
+
+// Export resource allocation to JSON
+function exportResourceAllocation() {
+    const rows = document.querySelectorAll('#resourceTable tr');
+    const allocation = [];
+    
+    rows.forEach(row => {
+        const position = row.querySelector('.position-select')?.value;
+        const employeeId = row.querySelector('.employee-select')?.value;
+        const employee = employees.find(e => e.id == employeeId);
+        const qty = row.querySelector('.qty-input')?.value;
+        const days = row.querySelector('.days-input')?.value;
+        const rate = row.querySelector('.rate-input')?.value;
+        
+        if (position && employee) {
+            allocation.push({
+                position: position,
+                employee: employee.name,
+                employeeId: employee.id,
+                email: employee.email,
+                quantity: qty,
+                days: days,
+                dailyRate: rate,
+                totalCost: qty * days * rate,
+                status: employee.status
+            });
+        }
+    });
+    
+    const exportData = {
+        project: document.getElementById('projectName').value,
+        client: document.getElementById('clientType').value,
+        location: document.getElementById('location').options[document.getElementById('location').selectedIndex]?.text,
+        quoteNo: document.getElementById('quoteNo').value,
+        revision: document.getElementById('revision').value,
+        resourceAllocation: allocation,
+        exportDate: new Date().toISOString()
+    };
+    
+    // Create download link
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    
+    const exportFileDefaultName = `resource_allocation_${exportData.quoteNo}_${new Date().getTime()}.json`;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+}
+</script>
+</body>
+</html>
