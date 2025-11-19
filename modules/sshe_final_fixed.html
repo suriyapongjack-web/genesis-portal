@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Addvalue SSHE Management System</title>
+<style>
+* {margin:0;padding:0;box-sizing:border-box}
+body {font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f5f7fa;color:#2d3748}
+.container {max-width:1400px;margin:0 auto;padding:20px}
+.header {background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:35px;border-radius:12px;margin-bottom:30px;box-shadow:0 10px 30px rgba(0,0,0,0.15)}
+.header h1 {font-size:2.2rem;margin-bottom:8px}
+.header p {opacity:0.95;font-size:1.1rem}
+.datetime {background:rgba(255,255,255,0.2);padding:8px 16px;border-radius:6px;display:inline-block;margin-top:10px;font-weight:500}
+.tabs {display:flex;gap:2px;background:white;padding:4px;border-radius:10px;margin-bottom:25px;box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+.tab {flex:1;padding:14px 20px;border:none;background:transparent;border-radius:8px;cursor:pointer;font-weight:600;transition:all 0.3s;color:#4a5568}
+.tab:hover {background:#f7fafc}
+.tab.active {background:#667eea;color:white}
+.content {background:white;padding:30px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.08)}
+.hidden {display:none !important}
+.notification {position:fixed;top:20px;right:20px;padding:15px 20px;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:9999;animation:slideIn 0.3s}
+.notification.success {background:#48bb78;color:white}
+.notification.error {background:#f56565;color:white}
+.notification.info {background:#4299e1;color:white}
+@keyframes slideIn {from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.stats-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-bottom:30px}
+.stat-card {background:white;padding:24px;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,0.08);border-left:4px solid #667eea}
+.stat-value {font-size:2.5rem;font-weight:700;color:#2d3748;margin-bottom:5px}
+.stat-label {color:#718096;font-size:0.95rem;text-transform:uppercase;letter-spacing:0.5px}
+.btn {padding:12px 24px;border:none;border-radius:8px;cursor:pointer;font-weight:600;transition:all 0.3s;text-transform:uppercase;font-size:0.9rem;letter-spacing:0.5px;display:inline-flex;align-items:center;gap:8px}
+.btn-primary {background:#667eea;color:white}
+.btn-primary:hover {background:#5a67d8;transform:translateY(-1px);box-shadow:0 4px 12px rgba(102,126,234,0.4)}
+.btn-success {background:#48bb78;color:white}
+.btn-success:hover {background:#38a169}
+.btn-danger {background:#f56565;color:white}
+.btn-danger:hover {background:#e53e3e}
+.btn-info {background:#4299e1;color:white}
+.btn-info:hover {background:#3182ce}
+.btn-warning {background:#ed8936;color:white}
+.btn-warning:hover {background:#dd6b20}
+.toolbar {display:flex;gap:10px;flex-wrap:wrap;margin-bottom:25px;align-items:center}
+.search-box {flex:1;min-width:300px;padding:12px 20px;border:2px solid #e2e8f0;border-radius:8px;font-size:16px;transition:all 0.3s}
+.search-box:focus {outline:none;border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,0.1)}
+.form-row {display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+.form-group {margin-bottom:20px}
+.form-group label {display:block;margin-bottom:6px;font-weight:600;color:#4a5568;font-size:0.95rem}
+.form-group input, .form-group select {width:100%;padding:10px 14px;border:2px solid #e2e8f0;border-radius:8px;font-size:15px;transition:all 0.3s}
+.form-group input:focus, .form-group select:focus {outline:none;border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,0.1)}
+.personnel-grid {display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:20px}
+.person-card {background:white;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.08);transition:all 0.3s}
+.person-card:hover {transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,0.12)}
+.person-header {background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:20px}
+.person-name {font-size:1.3rem;font-weight:700;margin-bottom:5px}
+.person-id {opacity:0.95;font-size:0.9rem}
+.person-body {padding:20px}
+.cert-list {display:flex;flex-direction:column;gap:10px}
+.cert-item {display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f7fafc;border-radius:8px;border-left:3px solid #667eea}
+.cert-badge {padding:5px 12px;border-radius:20px;font-size:0.85rem;font-weight:600;text-transform:uppercase}
+.valid {background:#c6f6d5;color:#22543d}
+.expiring {background:#feebc8;color:#7c2d12}
+.expired {background:#fed7d7;color:#742a2a}
+.na {background:#edf2f7;color:#718096}
+.modal {display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;animation:fadeIn 0.2s}
+.modal-content {background:white;max-width:900px;margin:40px auto;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,0.3);max-height:90vh;overflow:hidden;display:flex;flex-direction:column}
+.modal-header {padding:25px 30px;border-bottom:2px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;background:#f7fafc}
+.modal-header h2 {color:#2d3748;font-size:1.5rem}
+.modal-body {padding:30px;overflow-y:auto;flex:1}
+.close {font-size:32px;cursor:pointer;color:#a0aec0;transition:color 0.3s;line-height:1}
+.close:hover {color:#e53e3e}
+.action-buttons {display:flex;gap:10px;margin-top:15px}
+.checkbox-grid {display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.checkbox-item {display:flex;align-items:center;gap:10px;padding:10px 14px;background:white;border-radius:8px;cursor:pointer;transition:all 0.2s;border:2px solid transparent}
+.checkbox-item:hover {border-color:#667eea;background:#f7fafc}
+.checkbox-item input {width:20px;height:20px;cursor:pointer}
+.checkbox-item label {cursor:pointer;flex:1;font-weight:500}
+.project-card {background:white;padding:20px;border-radius:10px;border-left:4px solid #667eea;margin-bottom:15px}
+.project-header {display:flex;justify-content:space-between;align-items:start}
+.project-info h4 {color:#2d3748;margin-bottom:8px;font-size:1.2rem}
+.project-info p {color:#4a5568;margin-bottom:5px}
+.project-info p strong {color:#2d3748}
+.project-actions {display:flex;gap:10px}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+<h1>🛡️ Addvalue SSHE Management System</h1>
+<p>Safety, Security, Health & Environment - Personnel Certification Management</p>
+<div class="datetime" id="currentDateTime"></div>
+</div>
+
+<div class="tabs">
+<button class="tab active" onclick="showTab('dashboard')">📊 Dashboard</button>
+<button class="tab" onclick="showTab('personnel')">👥 Personnel</button>
+<button class="tab" onclick="showTab('projects')">📋 Projects & PO</button>
+<button class="tab" onclick="showTab('reports')">📑 Reports</button>
+<button class="tab" onclick="showTab('settings')">⚙️ Settings</button>
+</div>
+
+<div id="dashboard" class="content">
+<div class="stats-grid">
+<div class="stat-card">
+<div class="stat-value" id="totalPersonnel">5</div>
+<div class="stat-label">Total Personnel</div>
+</div>
+<div class="stat-card" style="border-color:#48bb78">
+<div class="stat-value" id="validCerts">0</div>
+<div class="stat-label">Valid Documents</div>
+</div>
+<div class="stat-card" style="border-color:#ed8936">
+<div class="stat-value" id="expiringCerts">0</div>
+<div class="stat-label">Expiring Soon</div>
+</div>
+<div class="stat-card" style="border-color:#f56565">
+<div class="stat-value" id="expiredCerts">0</div>
+<div class="stat-label">Expired</div>
+</div>
+</div>
+<div id="warningList"></div>
+</div>
+
+<div id="personnel" class="content hidden">
+<div class="toolbar">
+<input type="text" class="search-box" placeholder="🔍 Search by name or ID..." onkeyup="searchPersonnel()">
+<button class="btn btn-primary" onclick="showAddModal()">➕ Add Personnel</button>
+<button class="btn btn-info" onclick="importData()">📥 Import</button>
+<button class="btn btn-warning" onclick="exportData()">📤 Export</button>
+</div>
+<div class="personnel-grid" id="personnelGrid"></div>
+</div>
+
+<div id="projects" class="content hidden">
+<div class="toolbar">
+<button class="btn btn-primary" onclick="showPOModal()">➕ Create PO/Project</button>
+<button class="btn btn-success" onclick="generateAllPOReports()">📄 Generate All PO Documents</button>
+</div>
+<h3 style="margin:20px 0">Active Projects</h3>
+<div id="projectsList"></div>
+</div>
+
+<div id="reports" class="content hidden">
+<p>Reports section - Select from Projects tab to generate specific reports</p>
+</div>
+
+<div id="settings" class="content hidden">
+<h2>System Settings</h2>
+<div class="form-group">
+<label>Company Name</label>
+<input type="text" id="companyName" value="Addvalue Co., Ltd.">
+</div>
+<div class="form-group">
+<label>Default Expiry Warning (Days)</label>
+<input type="number" id="warningDays" value="30">
+</div>
+<button class="btn btn-success" onclick="saveSettings()">Save Settings</button>
+</div>
+
+</div>
+
+<div id="addModal" class="modal">
+<div class="modal-content">
+<div class="modal-header">
+<h2>Personnel Information</h2>
+<span class="close" onclick="closeModal('addModal')">&times;</span>
+</div>
+<div class="modal-body">
+<div class="form-row">
+<div class="form-group">
+<label>Full Name *</label>
+<input type="text" id="addName">
+</div>
+<div class="form-group">
+<label>National ID *</label>
+<input type="text" id="addNationalId">
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>National ID Issue Date</label>
+<input type="text" id="addNationalIdIssue" placeholder="DD Mon YYYY">
+</div>
+<div class="form-group">
+<label>National ID Expiry Date</label>
+<input type="text" id="addNationalIdExpiry" placeholder="DD Mon YYYY">
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>Passport Number</label>
+<input type="text" id="addPassport">
+</div>
+<div class="form-group">
+<label>Passport Issue Date</label>
+<input type="text" id="addPassportIssue" placeholder="DD Mon YYYY">
+</div>
+</div>
+<div class="form-group">
+<label>Passport Expiry Date</label>
+<input type="text" id="addPassportExpiry" placeholder="DD Mon YYYY">
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>BOSIET/FOET Certificate Number</label>
+<input type="text" id="addBosiet">
+</div>
+<div class="form-group">
+<label>BOSIET Issue Date</label>
+<input type="text" id="addBosietIssue" placeholder="DD Mon YYYY">
+</div>
+</div>
+<div class="form-group">
+<label>BOSIET Expiry Date</label>
+<input type="text" id="addBosietExpiry" placeholder="DD Mon YYYY">
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>WAH Certificate Number</label>
+<input type="text" id="addWah">
+</div>
+<div class="form-group">
+<label>WAH Issue Date</label>
+<input type="text" id="addWahIssue" placeholder="DD Mon YYYY">
+</div>
+</div>
+<div class="form-group">
+<label>WAH Expiry Date</label>
+<input type="text" id="addWahExpiry" placeholder="DD Mon YYYY">
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>Medical Hospital/Clinic</label>
+<input type="text" id="addMedical">
+</div>
+<div class="form-group">
+<label>Medical Exam Date</label>
+<input type="text" id="addMedicalExam" placeholder="DD Mon YYYY">
+</div>
+</div>
+<div class="form-group">
+<label>Medical Expiry Date</label>
+<input type="text" id="addMedicalExpiry" placeholder="DD Mon YYYY">
+</div>
+<button class="btn btn-success" onclick="savePersonnel()">Save Personnel</button>
+</div>
+</div>
+</div>
+
+<div id="poModal" class="modal">
+<div class="modal-content">
+<div class="modal-header">
+<h2>Create PO/Project</h2>
+<span class="close" onclick="closeModal('poModal')">&times;</span>
+</div>
+<div class="modal-body">
+<div class="form-row">
+<div class="form-group">
+<label>PO Number *</label>
+<input type="text" id="poNumber" placeholder="e.g., 3450068036">
+</div>
+<div class="form-group">
+<label>Client Name *</label>
+<input type="text" id="clientName" placeholder="e.g., PTTEPI MYANMAR">
+</div>
+</div>
+<div class="form-row">
+<div class="form-group">
+<label>Project Name</label>
+<input type="text" id="projectName" placeholder="e.g., PJ2502-0452 PTTEPI MY ATL [PM CCTV]">
+</div>
+<div class="form-group">
+<label>Start Date</label>
+<input type="text" id="startDate" placeholder="DD Mon YYYY">
+</div>
+</div>
+<div class="form-group">
+<label>Select Personnel for this PO</label>
+<div class="checkbox-grid" id="poPersonnelList"></div>
+</div>
+<button class="btn btn-success" onclick="savePO()">Create PO</button>
+</div>
+</div>
+</div>
+
+<script>
+let personnelData = {
+"1 9098 02393 61 4": {
+name: "Suttirak Nunsong",
+national_id_issue: "05 Sep 2018",
+national_id_expiry: "20 Oct 2028",
+passport_no: "AC4335274",
+passport_issue: "03 Jan 2023",
+passport_expiry: "02 Jan 2028",
+bosiet_no: "OPITOEN2UrD8s (BOSIET+EBS 5700) Learner: L02083248",
+bosiet_issue: "15 May 2024",
+bosiet_expiry: "14 May 2028",
+wah_no: "FR-2023-27854 SAFESIRI Operator",
+wah_issue: "20 Oct 2023",
+wah_expiry: "19 Oct 2025",
+medical: "Vibhavadi Hospital PAD: Dr. Kanda Kumuang (52491)",
+medical_exam: "25 Oct 2025",
+medical_expiry: "25 Oct 2027"
+},
+"3 1005 03048 91 1": {
+name: "Yuttapong Eakimphon",
+national_id_issue: "14 Nov 2022",
+national_id_expiry: "22 Apr 2031",
+passport_no: "AC3883473",
+passport_issue: "22 Aug 2022",
+passport_expiry: "21 Aug 2027",
+bosiet_no: "OPITO1C1vta103C MOG Industry FOET+EBS Learner: L01423124",
+bosiet_issue: "09 Oct 2024",
+bosiet_expiry: "16 Nov 2028",
+wah_no: "202416701 Perfect Safety",
+wah_issue: "05 Oct 2024",
+wah_expiry: "05 Oct 2027",
+medical: "Bangkok Hospital PAD: Dr. Piyapat Pandee (24901)",
+medical_exam: "25 Oct 2025",
+medical_expiry: "25 Oct 2027"
+},
+"5 1005 00047 64 2": {
+name: "Suriyapong Yoo-om-sin",
+national_id_issue: "14 Apr 2022",
+national_id_expiry: "14 Apr 2027",
+passport_no: "AC3883510",
+passport_issue: "22 Aug 2022",
+passport_expiry: "21 Aug 2027",
+bosiet_no: "NONE",
+bosiet_issue: "-",
+bosiet_expiry: "-",
+wah_no: "NONE",
+wah_issue: "-",
+wah_expiry: "-",
+medical: "NONE",
+medical_exam: "-",
+medical_expiry: "-"
+},
+"3 7703 00480 42 1": {
+name: "Sakda Wongiam",
+national_id_issue: "14 Nov 2022",
+national_id_expiry: "21 Jan 2032",
+passport_no: "AC3887124",
+passport_issue: "UNKNOWN",
+passport_expiry: "UNKNOWN",
+bosiet_no: "6374585811124733945 RelyOn Nutec FOET+EBS",
+bosiet_issue: "11 Nov 2024",
+bosiet_expiry: "16 Nov 2028",
+wah_no: "FR-65-14837 SAFESIRI Tower Climber",
+wah_issue: "25 Aug 2022",
+wah_expiry: "24 Aug 2024",
+medical: "NONE",
+medical_exam: "-",
+medical_expiry: "-"
+},
+"1 1195 01064 97 0": {
+name: "Ratchaneekorn Mo-on",
+national_id_issue: "12 Nov 2024",
+national_id_expiry: "22 Jan 2030",
+passport_no: "AC7243956",
+passport_issue: "21 Jan 2025",
+passport_expiry: "20 Jan 2030",
+bosiet_no: "NONE",
+bosiet_issue: "-",
+bosiet_expiry: "-",
+wah_no: "NONE",
+wah_issue: "-",
+wah_expiry: "-",
+medical: "NONE",
+medical_exam: "-",
+medical_expiry: "-"
+}
+};
+
+let projectsData = {};
+let settings = {
+companyName: "Addvalue Co., Ltd.",
+warningDays: 30
+};
+
+function showNotification(message, type = 'info') {
+const notification = document.createElement('div');
+notification.className = `notification ${type}`;
+notification.textContent = message;
+document.body.appendChild(notification);
+setTimeout(() => notification.remove(), 3000);
+}
+
+function updateDateTime() {
+const now = new Date();
+const options = {weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit'};
+document.getElementById('currentDateTime').textContent = now.toLocaleDateString('en-US', options);
+}
+
+function saveToLocalStorage() {
+localStorage.setItem('sshePersonnel', JSON.stringify(personnelData));
+localStorage.setItem('ssheProjects', JSON.stringify(projectsData));
+localStorage.setItem('ssheSettings', JSON.stringify(settings));
+}
+
+function loadFromLocalStorage() {
+try {
+const savedPersonnel = localStorage.getItem('sshePersonnel');
+const savedProjects = localStorage.getItem('ssheProjects');
+const savedSettings = localStorage.getItem('ssheSettings');
+if (savedPersonnel) personnelData = JSON.parse(savedPersonnel);
+if (savedProjects) projectsData = JSON.parse(savedProjects);
+if (savedSettings) settings = JSON.parse(savedSettings);
+} catch(e) {
+console.log('Loading defaults');
+}
+}
+
+function getDaysUntilExpiry(dateStr) {
+if (!dateStr || dateStr === '-' || dateStr === 'NONE' || dateStr === 'UNKNOWN') return null;
+try {
+const months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+const parts = dateStr.split(' ');
+if (parts.length !== 3) return null;
+const date = new Date(parseInt(parts[2]), months[parts[1]], parseInt(parts[0]));
+const today = new Date();
+today.setHours(0,0,0,0);
+date.setHours(0,0,0,0);
+return Math.floor((date - today) / (1000 * 60 * 60 * 24));
+} catch(e) {
+return null;
+}
+}
+
+function getCertStatus(dateStr) {
+const days = getDaysUntilExpiry(dateStr);
+if (days === null) return 'na';
+if (days < 0) return 'expired';
+if (days <= settings.warningDays) return 'expiring';
+return 'valid';
+}
+
+function showTab(tabName) {
+document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+document.querySelectorAll('.content').forEach(content => content.classList.add('hidden'));
+event.target.classList.add('active');
+document.getElementById(tabName).classList.remove('hidden');
+if (tabName === 'dashboard') updateDashboard();
+else if (tabName === 'personnel') renderPersonnel();
+else if (tabName === 'projects') renderProjects();
+}
+
+function updateDashboard() {
+let valid = 0, expiring = 0, expired = 0;
+const warnings = [];
+Object.entries(personnelData).forEach(([id, person]) => {
+['national_id_expiry','passport_expiry','bosiet_expiry','wah_expiry','medical_expiry'].forEach(field => {
+const days = getDaysUntilExpiry(person[field]);
+if (days !== null) {
+const status = getCertStatus(person[field]);
+if (status === 'valid') valid++;
+else if (status === 'expiring') {
+expiring++;
+warnings.push({name: person.name, doc: field.replace('_expiry','').toUpperCase(), days});
+} else if (status === 'expired') {
+expired++;
+warnings.push({name: person.name, doc: field.replace('_expiry','').toUpperCase(), days});
+}
+}
+});
+});
+document.getElementById('validCerts').textContent = valid;
+document.getElementById('expiringCerts').textContent = expiring;
+document.getElementById('expiredCerts').textContent = expired;
+warnings.sort((a,b) => a.days - b.days);
+const warningHtml = warnings.slice(0,10).map(w => 
+`<div style="padding:10px;margin:5px 0;background:#fff5f5;border-left:4px solid #e53e3e;border-radius:4px">
+⚠️ ${w.name} - ${w.doc}: ${w.days < 0 ? `Expired ${Math.abs(w.days)} days ago` : `${w.days} days remaining`}
+</div>`
+).join('');
+document.getElementById('warningList').innerHTML = warnings.length > 0 ? 
+`<h3 style="margin:20px 0;color:#e53e3e">⚠️ Attention Required</h3>${warningHtml}` : '';
+}
+
+function renderPersonnel() {
+const grid = document.getElementById('personnelGrid');
+grid.innerHTML = '';
+Object.entries(personnelData).forEach(([id, person]) => {
+const card = document.createElement('div');
+card.className = 'person-card';
+card.innerHTML = `
+<div class="person-header">
+<div class="person-name">${person.name}</div>
+<div class="person-id">ID: ${id}</div>
+</div>
+<div class="person-body">
+<div class="cert-list">
+${person.passport_no !== 'NONE' ? `
+<div class="cert-item">
+<span>📘 Passport: ${person.passport_no}</span>
+<span class="cert-badge ${getCertStatus(person.passport_expiry)}">${person.passport_expiry}</span>
+</div>` : ''}
+${person.bosiet_no !== 'NONE' && person.bosiet_no !== '-' ? `
+<div class="cert-item">
+<span>🔶 BOSIET/FOET</span>
+<span class="cert-badge ${getCertStatus(person.bosiet_expiry)}">${person.bosiet_expiry}</span>
+</div>` : ''}
+${person.wah_no !== 'NONE' && person.wah_no !== '-' ? `
+<div class="cert-item">
+<span>🏗️ WAH Certificate</span>
+<span class="cert-badge ${getCertStatus(person.wah_expiry)}">${person.wah_expiry}</span>
+</div>` : ''}
+${person.medical !== 'NONE' && person.medical !== '-' ? `
+<div class="cert-item">
+<span>🏥 Medical</span>
+<span class="cert-badge ${getCertStatus(person.medical_expiry)}">${person.medical_expiry}</span>
+</div>` : ''}
+</div>
+<div class="action-buttons">
+<button class="btn btn-primary" onclick="editPerson('${id}')">Edit</button>
+<button class="btn btn-danger" onclick="deletePerson('${id}')">Delete</button>
+</div>
+</div>`;
+grid.appendChild(card);
+});
+}
+
+function renderProjects() {
+const list = document.getElementById('projectsList');
+if (Object.keys(projectsData).length === 0) {
+list.innerHTML = '<p style="color:#718096">No active projects. Create a new PO/Project to get started.</p>';
+return;
+}
+let html = '';
+Object.entries(projectsData).forEach(([poNumber, project]) => {
+const assignedPersonnel = project.personnel || [];
+html += `
+<div class="project-card">
+<div class="project-header">
+<div class="project-info">
+<h4>${poNumber}</h4>
+<p><strong>Client:</strong> ${project.clientName}</p>
+<p><strong>Project:</strong> ${project.projectName || 'N/A'}</p>
+<p><strong>Personnel:</strong> ${assignedPersonnel.length} assigned</p>
+${assignedPersonnel.length > 0 ? `<p style="font-size:0.9rem;color:#718096">
+${assignedPersonnel.map(id => personnelData[id]?.name || 'Unknown').join(', ')}
+</p>` : ''}
+</div>
+<div class="project-actions">
+<button class="btn btn-info" onclick="viewPODetails('${poNumber}')">VIEW</button>
+<button class="btn btn-success" onclick="generatePOReport('${poNumber}')">REPORT</button>
+</div>
+</div>
+</div>`;
+});
+list.innerHTML = html;
+}
+
+function showAddModal() {
+document.getElementById('addModal').style.display = 'block';
+}
+
+function showPOModal() {
+const list = document.getElementById('poPersonnelList');
+list.innerHTML = '';
+Object.entries(personnelData).forEach(([id, person]) => {
+const div = document.createElement('div');
+div.className = 'checkbox-item';
+div.innerHTML = `
+<input type="checkbox" id="po_person_${id.replace(/\s/g,'_')}" value="${id}">
+<label for="po_person_${id.replace(/\s/g,'_')}">${person.name}</label>`;
+list.appendChild(div);
+});
+document.getElementById('poModal').style.display = 'block';
+}
+
+function closeModal(modalId) {
+document.getElementById(modalId).style.display = 'none';
+}
+
+function savePersonnel() {
+const nationalId = document.getElementById('addNationalId').value;
+const name = document.getElementById('addName').value;
+if (!nationalId || !name) {
+showNotification('Please fill in Name and National ID', 'error');
+return;
+}
+personnelData[nationalId] = {
+name: name,
+national_id_issue: document.getElementById('addNationalIdIssue').value || '-',
+national_id_expiry: document.getElementById('addNationalIdExpiry').value || '-',
+passport_no: document.getElementById('addPassport').value || 'NONE',
+passport_issue: document.getElementById('addPassportIssue').value || '-',
+passport_expiry: document.getElementById('addPassportExpiry').value || '-',
+bosiet_no: document.getElementById('addBosiet').value || 'NONE',
+bosiet_issue: document.getElementById('addBosietIssue').value || '-',
+bosiet_expiry: document.getElementById('addBosietExpiry').value || '-',
+wah_no: document.getElementById('addWah').value || 'NONE',
+wah_issue: document.getElementById('addWahIssue').value || '-',
+wah_expiry: document.getElementById('addWahExpiry').value || '-',
+medical: document.getElementById('addMedical').value || 'NONE',
+medical_exam: document.getElementById('addMedicalExam').value || '-',
+medical_expiry: document.getElementById('addMedicalExpiry').value || '-'
+};
+saveToLocalStorage();
+renderPersonnel();
+updateDashboard();
+closeModal('addModal');
+clearPersonnelForm();
+showNotification('Personnel saved successfully', 'success');
+}
+
+function clearPersonnelForm() {
+['addNationalId','addName','addNationalIdIssue','addNationalIdExpiry','addPassport',
+'addPassportIssue','addPassportExpiry','addBosiet','addBosietIssue','addBosietExpiry',
+'addWah','addWahIssue','addWahExpiry','addMedical','addMedicalExam','addMedicalExpiry'
+].forEach(id => document.getElementById(id).value = '');
+}
+
+function savePO() {
+const poNumber = document.getElementById('poNumber').value;
+const clientName = document.getElementById('clientName').value;
+if (!poNumber || !clientName) {
+showNotification('Please fill in PO Number and Client Name', 'error');
+return;
+}
+const selectedPersonnel = [];
+document.querySelectorAll('#poPersonnelList input:checked').forEach(cb => {
+selectedPersonnel.push(cb.value);
+});
+projectsData[poNumber] = {
+clientName: clientName,
+projectName: document.getElementById('projectName').value || '',
+startDate: document.getElementById('startDate').value || '',
+personnel: selectedPersonnel,
+createdDate: new Date().toISOString()
+};
+saveToLocalStorage();
+renderProjects();
+closeModal('poModal');
+document.getElementById('poNumber').value = '';
+document.getElementById('clientName').value = '';
+document.getElementById('projectName').value = '';
+document.getElementById('startDate').value = '';
+showNotification(`PO ${poNumber} created with ${selectedPersonnel.length} personnel`, 'success');
+}
+
+function editPerson(id) {
+const person = personnelData[id];
+document.getElementById('addNationalId').value = id;
+document.getElementById('addName').value = person.name;
+document.getElementById('addNationalIdIssue').value = person.national_id_issue !== '-' ? person.national_id_issue : '';
+document.getElementById('addNationalIdExpiry').value = person.national_id_expiry !== '-' ? person.national_id_expiry : '';
+document.getElementById('addPassport').value = person.passport_no !== 'NONE' ? person.passport_no : '';
+document.getElementById('addPassportIssue').value = person.passport_issue !== '-' ? person.passport_issue : '';
+document.getElementById('addPassportExpiry').value = person.passport_expiry !== '-' ? person.passport_expiry : '';
+document.getElementById('addBosiet').value = person.bosiet_no !== 'NONE' ? person.bosiet_no : '';
+document.getElementById('addBosietIssue').value = person.bosiet_issue !== '-' ? person.bosiet_issue : '';
+document.getElementById('addBosietExpiry').value = person.bosiet_expiry !== '-' ? person.bosiet_expiry : '';
+document.getElementById('addWah').value = person.wah_no !== 'NONE' ? person.wah_no : '';
+document.getElementById('addWahIssue').value = person.wah_issue !== '-' ? person.wah_issue : '';
+document.getElementById('addWahExpiry').value = person.wah_expiry !== '-' ? person.wah_expiry : '';
+document.getElementById('addMedical').value = person.medical !== 'NONE' ? person.medical : '';
+document.getElementById('addMedicalExam').value = person.medical_exam !== '-' ? person.medical_exam : '';
+document.getElementById('addMedicalExpiry').value = person.medical_expiry !== '-' ? person.medical_expiry : '';
+showAddModal();
+}
+
+function deletePerson(id) {
+if (confirm(`Delete ${personnelData[id].name}?`)) {
+delete personnelData[id];
+saveToLocalStorage();
+renderPersonnel();
+updateDashboard();
+showNotification('Personnel deleted successfully', 'info');
+}
+}
+
+function searchPersonnel() {
+const search = event.target.value.toLowerCase();
+const cards = document.querySelectorAll('.person-card');
+cards.forEach(card => {
+const text = card.textContent.toLowerCase();
+card.style.display = text.includes(search) ? 'block' : 'none';
+});
+}
+
+function viewPODetails(poNumber) {
+const project = projectsData[poNumber];
+const personnelList = project.personnel.map(id => personnelData[id]?.name || 'Unknown').join('\n• ');
+showNotification(`PO: ${poNumber}\nClient: ${project.clientName}\n\nAssigned Personnel:\n• ${personnelList}`, 'info');
+}
+
+function generatePOReport(poNumber) {
+const project = projectsData[poNumber];
+if (!project) return;
+let html = `<h2>PO Report: ${poNumber}</h2>
+<p><strong>Client:</strong> ${project.clientName}</p>
+<p><strong>Project:</strong> ${project.projectName || 'N/A'}</p>
+<p><strong>Generated:</strong> ${new Date().toLocaleString()}</p>
+<table style="width:100%;border-collapse:collapse;margin-top:20px">
+<thead><tr style="background:#667eea;color:white">
+<th style="padding:10px">Name</th>
+<th style="padding:10px">National ID</th>
+<th style="padding:10px">Passport</th>
+<th style="padding:10px">BOSIET</th>
+<th style="padding:10px">WAH</th>
+<th style="padding:10px">Medical</th>
+<th style="padding:10px">Status</th>
+</tr></thead><tbody>`;
+if (project.personnel) {
+project.personnel.forEach(id => {
+const person = personnelData[id];
+if (person) {
+let overallStatus = 'valid';
+const statuses = [
+getCertStatus(person.passport_expiry),
+getCertStatus(person.bosiet_expiry),
+getCertStatus(person.wah_expiry),
+getCertStatus(person.medical_expiry)
+];
+if (statuses.includes('expired')) overallStatus = 'expired';
+else if (statuses.includes('expiring')) overallStatus = 'expiring';
+html += `<tr style="border:1px solid #ddd">
+<td style="padding:8px">${person.name}</td>
+<td style="padding:8px">${id}</td>
+<td style="padding:8px" class="${getCertStatus(person.passport_expiry)}">${person.passport_expiry}</td>
+<td style="padding:8px" class="${getCertStatus(person.bosiet_expiry)}">${person.bosiet_expiry}</td>
+<td style="padding:8px" class="${getCertStatus(person.wah_expiry)}">${person.wah_expiry}</td>
+<td style="padding:8px" class="${getCertStatus(person.medical_expiry)}">${person.medical_expiry}</td>
+<td style="padding:8px" class="${overallStatus}">${overallStatus.toUpperCase()}</td>
+</tr>`;
+}
+});
+}
+html += '</tbody></table>';
+const win = window.open('','_blank');
+win.document.write(`<html><head><title>PO Report - ${poNumber}</title>
+<style>
+body{font-family:Arial;padding:20px}
+table{width:100%;border-collapse:collapse}
+th{background:#667eea;color:white;padding:10px}
+td{border:1px solid #ddd;padding:8px}
+.expired{background:#fed7d7}
+.expiring{background:#feebc8}
+.valid{background:#c6f6d5}
+.na{background:#edf2f7}
+</style></head><body>${html}</body></html>`);
+win.document.close();
+}
+
+function exportData() {
+const exportObj = {
+personnel: personnelData,
+projects: projectsData,
+settings: settings,
+exportDate: new Date().toISOString()
+};
+const dataStr = JSON.stringify(exportObj, null, 2);
+const blob = new Blob([dataStr], {type:'application/json'});
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = `sshe_export_${new Date().toISOString().split('T')[0]}.json`;
+a.click();
+showNotification('Data exported successfully', 'success');
+}
+
+function importData() {
+const input = document.createElement('input');
+input.type = 'file';
+input.accept = '.json';
+input.onchange = e => {
+const file = e.target.files[0];
+const reader = new FileReader();
+reader.onload = event => {
+try {
+const data = JSON.parse(event.target.result);
+if (data.personnel) personnelData = data.personnel;
+if (data.projects) projectsData = data.projects;
+if (data.settings) settings = data.settings;
+saveToLocalStorage();
+renderPersonnel();
+updateDashboard();
+showNotification('Data imported successfully', 'success');
+} catch(error) {
+showNotification('Invalid file format', 'error');
+}
+};
+reader.readAsText(file);
+};
+input.click();
+}
+
+function saveSettings() {
+settings.companyName = document.getElementById('companyName').value;
+settings.warningDays = parseInt(document.getElementById('warningDays').value);
+saveToLocalStorage();
+showNotification('Settings saved', 'success');
+updateDashboard();
+}
+
+function generateAllPOReports() {
+if (Object.keys(projectsData).length === 0) {
+showNotification('No projects to generate reports for', 'error');
+return;
+}
+Object.keys(projectsData).forEach(poNumber => {
+generatePOReport(poNumber);
+});
+}
+
+window.onclick = e => {
+if (e.target.className === 'modal') e.target.style.display = 'none';
+};
+
+loadFromLocalStorage();
+updateDateTime();
+setInterval(updateDateTime, 60000);
+updateDashboard();
+</script>
+</body>
+</html>

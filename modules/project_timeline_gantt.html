@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZPQ-ZWP4 Project Timeline - Gantt Chart</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        
+        .project-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .info-item {
+            text-align: center;
+        }
+        
+        .info-item .label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .info-item .value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-top: 5px;
+        }
+        
+        .gantt-wrapper {
+            padding: 30px;
+            overflow-x: auto;
+        }
+        
+        .gantt-chart {
+            display: grid;
+            grid-template-columns: 250px repeat(30, 40px);
+            gap: 1px;
+            background: #e0e0e0;
+            border: 1px solid #e0e0e0;
+            min-width: 100%;
+        }
+        
+        .gantt-header {
+            display: contents;
+        }
+        
+        .task-label-header {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            position: sticky;
+            left: 0;
+            z-index: 10;
+        }
+        
+        .month-header {
+            background: #667eea;
+            color: white;
+            padding: 10px 5px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+        }
+        
+        .task-row {
+            display: contents;
+        }
+        
+        .task-label {
+            background: white;
+            padding: 12px 15px;
+            font-size: 14px;
+            border-right: 2px solid #e0e0e0;
+            position: sticky;
+            left: 0;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+        }
+        
+        .task-label.phase {
+            background: #f8f9fa;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .task-label.milestone {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .timeline-cell {
+            background: white;
+            position: relative;
+            min-height: 40px;
+        }
+        
+        .timeline-cell.weekend {
+            background: #f5f5f5;
+        }
+        
+        .task-bar {
+            position: absolute;
+            height: 24px;
+            top: 8px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            font-size: 11px;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .task-bar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 3;
+        }
+        
+        .task-bar.planning {
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+        }
+        
+        .task-bar.procurement {
+            background: linear-gradient(90deg, #2196F3, #1976D2);
+        }
+        
+        .task-bar.logistics {
+            background: linear-gradient(90deg, #FF9800, #F57C00);
+        }
+        
+        .task-bar.installation {
+            background: linear-gradient(90deg, #9C27B0, #7B1FA2);
+        }
+        
+        .task-bar.operation {
+            background: linear-gradient(90deg, #00BCD4, #0097A7);
+        }
+        
+        .milestone-marker {
+            width: 20px;
+            height: 20px;
+            background: #FFD700;
+            border: 2px solid #FFA000;
+            transform: rotate(45deg);
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+        
+        .legend {
+            display: flex;
+            gap: 30px;
+            padding: 20px 30px;
+            background: #f8f9fa;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legend-color {
+            width: 30px;
+            height: 20px;
+            border-radius: 4px;
+        }
+        
+        .progress-section {
+            padding: 30px;
+            background: white;
+        }
+        
+        .progress-bar {
+            background: #e0e0e0;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            transition: width 2s ease;
+        }
+        
+        .critical-path {
+            border: 2px solid #FF5722 !important;
+        }
+        
+        .tooltip {
+            position: absolute;
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 100;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .gantt-wrapper {
+                overflow: visible;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>ZPQ-ZWP4 Telecommunications Link Project</h1>
+            <p>Project Timeline & Gantt Chart</p>
+        </div>
+        
+        <div class="project-info">
+            <div class="info-item">
+                <div class="label">Start Date</div>
+                <div class="value">Oct 1, 2025</div>
+            </div>
+            <div class="info-item">
+                <div class="label">End Date</div>
+                <div class="value">Apr 30, 2026</div>
+            </div>
+            <div class="info-item">
+                <div class="label">Duration</div>
+                <div class="value">30 Weeks</div>
+            </div>
+            <div class="info-item">
+                <div class="label">Project Manager</div>
+                <div class="value">Suriyapong Y.</div>
+            </div>
+            <div class="info-item">
+                <div class="label">Budget</div>
+                <div class="value">$167,456</div>
+            </div>
+            <div class="info-item">
+                <div class="label">Status</div>
+                <div class="value" style="color: #4CAF50;">Planning</div>
+            </div>
+        </div>
+        
+        <div class="gantt-wrapper">
+            <div class="gantt-chart" id="ganttChart">
+                <!-- Header Row -->
+                <div class="gantt-header">
+                    <div class="task-label-header">Tasks / Phases</div>
+                    <!-- Week headers will be generated by JavaScript -->
+                </div>
+                
+                <!-- Task rows will be generated by JavaScript -->
+            </div>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(90deg, #4CAF50, #45a049);"></div>
+                <span>Planning & Design</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(90deg, #2196F3, #1976D2);"></div>
+                <span>Procurement</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(90deg, #FF9800, #F57C00);"></div>
+                <span>Logistics</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(90deg, #9C27B0, #7B1FA2);"></div>
+                <span>Installation</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(90deg, #00BCD4, #0097A7);"></div>
+                <span>Operation</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #FFD700; width: 20px; height: 20px; transform: rotate(45deg);"></div>
+                <span>Milestone</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: white; border: 2px solid #FF5722;"></div>
+                <span>Critical Path</span>
+            </div>
+        </div>
+        
+        <div class="progress-section">
+            <h2>Overall Project Progress</h2>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar">0%</div>
+            </div>
+            <p>Project Status: <strong>Awaiting Contract Signature</strong></p>
+        </div>
+    </div>
+    
+    <div class="tooltip" id="tooltip"></div>
+    
+    <script>
+        // Project data
+        const projectData = {
+            startDate: new Date('2025-10-01'),
+            weeks: 30,
+            tasks: [
+                // Phase 1: Planning & Contract
+                {
+                    name: 'PHASE 1: CONTRACT & PLANNING',
+                    type: 'phase',
+                    tasks: [
+                        {
+                            name: 'Contract Negotiation with Mytel',
+                            start: 0,
+                            duration: 1,
+                            type: 'planning',
+                            details: 'Finalize commercial terms and service agreement',
+                            critical: true
+                        },
+                        {
+                            name: 'PTTEP Approval Process',
+                            start: 1,
+                            duration: 2,
+                            type: 'planning',
+                            details: 'Internal approval and budget allocation',
+                            critical: true
+                        },
+                        {
+                            name: 'Contract Signature',
+                            start: 3,
+                            duration: 0,
+                            type: 'milestone',
+                            details: 'Milestone: Contract signed by all parties'
+                        },
+                        {
+                            name: 'Detailed Engineering Design',
+                            start: 3,
+                            duration: 2,
+                            type: 'planning',
+                            details: 'Technical specifications and installation planning'
+                        },
+                        {
+                            name: 'Site Survey',
+                            start: 4,
+                            duration: 1,
+                            type: 'planning',
+                            details: 'Physical inspection of ZPQ and ZWP4 platforms'
+                        },
+                        {
+                            name: 'Regulatory Submissions',
+                            start: 3,
+                            duration: 3,
+                            type: 'planning',
+                            details: 'PTD license applications and permits'
+                        }
+                    ]
+                },
+                // Phase 2: Procurement
+                {
+                    name: 'PHASE 2: PROCUREMENT',
+                    type: 'phase',
+                    tasks: [
+                        {
+                            name: 'Equipment Order Placement',
+                            start: 5,
+                            duration: 1,
+                            type: 'procurement',
+                            details: 'PO to Ceragon for IP-50CX systems',
+                            critical: true
+                        },
+                        {
+                            name: 'Manufacturing (Ceragon)',
+                            start: 6,
+                            duration: 12,
+                            type: 'procurement',
+                            details: 'Equipment production in Norway facility',
+                            critical: true
+                        },
+                        {
+                            name: 'Factory Acceptance Test',
+                            start: 18,
+                            duration: 1,
+                            type: 'procurement',
+                            details: 'FAT at Bergen, Norway'
+                        },
+                        {
+                            name: 'Accessories & Tools Procurement',
+                            start: 6,
+                            duration: 4,
+                            type: 'procurement',
+                            details: 'Installation tools and consumables'
+                        },
+                        {
+                            name: 'Insurance & Bonds',
+                            start: 5,
+                            duration: 2,
+                            type: 'procurement',
+                            details: 'Project insurance and performance bonds'
+                        }
+                    ]
+                },
+                // Phase 3: Logistics
+                {
+                    name: 'PHASE 3: LOGISTICS & IMPORT',
+                    type: 'phase',
+                    tasks: [
+                        {
+                            name: 'International Shipping',
+                            start: 19,
+                            duration: 3,
+                            type: 'logistics',
+                            details: 'Sea freight from Norway to Bangkok',
+                            critical: true
+                        },
+                        {
+                            name: 'Customs Clearance Thailand',
+                            start: 22,
+                            duration: 1,
+                            type: 'logistics',
+                            details: 'Import clearance in Bangkok'
+                        },
+                        {
+                            name: 'Transport to Myanmar',
+                            start: 23,
+                            duration: 1,
+                            type: 'logistics',
+                            details: 'Road transport Bangkok to Yangon',
+                            critical: true
+                        },
+                        {
+                            name: 'Myanmar Import Clearance',
+                            start: 24,
+                            duration: 1,
+                            type: 'logistics',
+                            details: 'PTD and customs clearance'
+                        },
+                        {
+                            name: 'Offshore Logistics',
+                            start: 25,
+                            duration: 1,
+                            type: 'logistics',
+                            details: 'Supply boat to platforms'
+                        }
+                    ]
+                },
+                // Phase 4: Installation
+                {
+                    name: 'PHASE 4: INSTALLATION & COMMISSIONING',
+                    type: 'phase',
+                    tasks: [
+                        {
+                            name: 'Site Preparation',
+                            start: 24,
+                            duration: 1,
+                            type: 'installation',
+                            details: 'Platform infrastructure preparation'
+                        },
+                        {
+                            name: 'Equipment Installation ZPQ',
+                            start: 26,
+                            duration: 1,
+                            type: 'installation',
+                            details: 'Radio and antenna installation at ZPQ',
+                            critical: true
+                        },
+                        {
+                            name: 'Equipment Installation ZWP4',
+                            start: 26,
+                            duration: 1,
+                            type: 'installation',
+                            details: 'ATEX equipment installation at ZWP4',
+                            critical: true
+                        },
+                        {
+                            name: 'Link Alignment & Testing',
+                            start: 27,
+                            duration: 1,
+                            type: 'installation',
+                            details: 'RF alignment and performance testing',
+                            critical: true
+                        },
+                        {
+                            name: 'System Integration',
+                            start: 28,
+                            duration: 1,
+                            type: 'installation',
+                            details: 'Integration with existing networks'
+                        },
+                        {
+                            name: 'Performance Validation',
+                            start: 28,
+                            duration: 1,
+                            type: 'installation',
+                            details: 'SLA compliance testing'
+                        },
+                        {
+                            name: 'Training & Handover',
+                            start: 29,
+                            duration: 1,
+                            type: 'installation',
+                            details: 'Operations team training'
+                        },
+                        {
+                            name: 'Service Go-Live',
+                            start: 30,
+                            duration: 0,
+                            type: 'milestone',
+                            details: 'Milestone: Commercial service starts'
+                        }
+                    ]
+                },
+                // Phase 5: Operations
+                {
+                    name: 'PHASE 5: OPERATIONS (5 Years)',
+                    type: 'phase',
+                    tasks: [
+                        {
+                            name: '24/7 NOC Monitoring',
+                            start: 30,
+                            duration: 260,
+                            type: 'operation',
+                            details: 'Continuous service monitoring'
+                        },
+                        {
+                            name: 'Preventive Maintenance',
+                            start: 30,
+                            duration: 260,
+                            type: 'operation',
+                            details: 'Quarterly maintenance visits'
+                        },
+                        {
+                            name: 'Technology Refresh',
+                            start: 156,
+                            duration: 0,
+                            type: 'milestone',
+                            details: 'Milestone: Year 3 technology upgrade'
+                        }
+                    ]
+                }
+            ]
+        };
+        
+        // Generate Gantt chart
+        function generateGanttChart() {
+            const chart = document.getElementById('ganttChart');
+            const header = chart.querySelector('.gantt-header');
+            
+            // Generate week headers
+            const months = ['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr'];
+            const weekDistribution = [4, 4, 5, 4, 4, 4, 5]; // Weeks per month
+            
+            let weekCounter = 1;
+            for (let m = 0; m < months.length && weekCounter <= 30; m++) {
+                for (let w = 0; w < weekDistribution[m] && weekCounter <= 30; w++) {
+                    const weekHeader = document.createElement('div');
+                    weekHeader.className = 'month-header';
+                    weekHeader.textContent = `${months[m]} W${w + 1}`;
+                    header.appendChild(weekHeader);
+                    weekCounter++;
+                }
+            }
+            
+            // Generate task rows
+            projectData.tasks.forEach(phase => {
+                // Phase header
+                const phaseRow = document.createElement('div');
+                phaseRow.className = 'task-row';
+                
+                const phaseLabel = document.createElement('div');
+                phaseLabel.className = 'task-label phase';
+                phaseLabel.textContent = phase.name;
+                phaseRow.appendChild(phaseLabel);
+                
+                // Empty cells for phase row
+                for (let i = 0; i < 30; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'timeline-cell';
+                    if ((i + 1) % 7 === 0 || (i + 1) % 7 === 6) {
+                        cell.classList.add('weekend');
+                    }
+                    phaseRow.appendChild(cell);
+                }
+                
+                chart.appendChild(phaseRow);
+                
+                // Individual tasks
+                phase.tasks.forEach(task => {
+                    const taskRow = document.createElement('div');
+                    taskRow.className = 'task-row';
+                    
+                    const taskLabel = document.createElement('div');
+                    taskLabel.className = task.type === 'milestone' ? 'task-label milestone' : 'task-label';
+                    taskLabel.textContent = '  • ' + task.name;
+                    if (task.critical) {
+                        taskLabel.classList.add('critical-path');
+                    }
+                    taskRow.appendChild(taskLabel);
+                    
+                    // Timeline cells
+                    for (let i = 0; i < 30; i++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'timeline-cell';
+                        if ((i + 1) % 7 === 0 || (i + 1) % 7 === 6) {
+                            cell.classList.add('weekend');
+                        }
+                        
+                        // Add task bar or milestone
+                        if (task.type === 'milestone' && i === task.start) {
+                            const milestone = document.createElement('div');
+                            milestone.className = 'milestone-marker';
+                            milestone.title = task.details;
+                            cell.appendChild(milestone);
+                        } else if (task.duration > 0 && i === task.start) {
+                            const taskBar = document.createElement('div');
+                            taskBar.className = `task-bar ${task.type}`;
+                            if (task.critical) {
+                                taskBar.classList.add('critical-path');
+                            }
+                            taskBar.style.width = `${Math.min(task.duration * 40, (30 - task.start) * 40)}px`;
+                            taskBar.textContent = task.duration > 2 ? task.name : '';
+                            taskBar.title = task.details;
+                            
+                            // Add hover effect
+                            taskBar.addEventListener('mouseenter', (e) => {
+                                const tooltip = document.getElementById('tooltip');
+                                tooltip.innerHTML = `
+                                    <strong>${task.name}</strong><br>
+                                    Duration: ${task.duration} week(s)<br>
+                                    ${task.details}
+                                    ${task.critical ? '<br><em>Critical Path</em>' : ''}
+                                `;
+                                tooltip.style.opacity = '1';
+                            });
+                            
+                            taskBar.addEventListener('mouseleave', () => {
+                                const tooltip = document.getElementById('tooltip');
+                                tooltip.style.opacity = '0';
+                            });
+                            
+                            taskBar.addEventListener('mousemove', (e) => {
+                                const tooltip = document.getElementById('tooltip');
+                                tooltip.style.left = e.pageX + 10 + 'px';
+                                tooltip.style.top = e.pageY - 30 + 'px';
+                            });
+                            
+                            cell.appendChild(taskBar);
+                        }
+                        
+                        taskRow.appendChild(cell);
+                    }
+                    
+                    chart.appendChild(taskRow);
+                });
+            });
+        }
+        
+        // Animate progress bar
+        function animateProgress() {
+            setTimeout(() => {
+                const progressBar = document.getElementById('progressBar');
+                progressBar.style.width = '5%';
+                progressBar.textContent = '5%';
+            }, 500);
+        }
+        
+        // Initialize
+        generateGanttChart();
+        animateProgress();
+        
+        // Print functionality
+        window.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'p') {
+                window.print();
+            }
+        });
+    </script>
+</body>
+</html>

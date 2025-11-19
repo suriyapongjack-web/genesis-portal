@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced USD Pricing Calculator - AWP45 Telecom Project</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            font-size: 14px;
+            background: #f5f6fa;
+            padding: 20px;
+            color: #2c3e50;
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            position: relative;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .project-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .info-label {
+            font-size: 11px;
+            opacity: 0.8;
+            margin-bottom: 3px;
+        }
+        .info-value {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .status-badge {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            color: #667eea;
+            background: white;
+            border-bottom: 2px solid #667eea;
+            margin-bottom: -2px;
+        }
+        .content {
+            padding: 25px;
+        }
+        .control-panel {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        .control-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .control-item label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .control-item input, .control-item select {
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        .control-item input:focus, .control-item select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        .margin-controls {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        .margin-toggle {
+            display: flex;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .margin-toggle button {
+            padding: 8px 16px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s;
+        }
+        .margin-toggle button.active {
+            background: #667eea;
+            color: white;
+        }
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 25px 0;
+        }
+        .summary-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            padding: 20px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        .summary-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.2);
+        }
+        .card-title {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .card-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2c3e50;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+        .card-value small {
+            font-size: 14px;
+            color: #6c757d;
+            font-weight: normal;
+        }
+        .card-subtitle {
+            font-size: 13px;
+            color: #667eea;
+            margin-top: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 13px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 10px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .section-header {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .section-header td {
+            padding: 10px;
+            border: none;
+        }
+        .editable {
+            background: #e7f1ff;
+            cursor: pointer;
+            font-weight: 600;
+            position: relative;
+        }
+        .editable:hover {
+            background: #cfe2ff;
+        }
+        input.inline-edit {
+            width: 100%;
+            border: 2px solid #667eea;
+            padding: 4px 6px;
+            text-align: right;
+            font-size: 12px;
+            background: white;
+        }
+        .text-right { text-align: right !important; }
+        .text-center { text-align: center !important; }
+        .subtotal-row {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+        .total-row {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            font-weight: bold;
+        }
+        .grand-total-row {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .grand-total-row td {
+            padding: 12px;
+            border: none;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        .info-panel {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 25px 0;
+        }
+        .info-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .info-section h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-key {
+            font-size: 12px;
+            color: #6c757d;
+        }
+        .info-val {
+            font-size: 12px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .margin-indicator {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .margin-good {
+            background: #d4edda;
+            color: #155724;
+        }
+        .margin-ok {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .margin-bad {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        @media (max-width: 1366px) {
+            body { font-size: 13px; }
+            .card-value { font-size: 22px; }
+        }
+        @media (max-width: 768px) {
+            .control-grid, .summary-cards, .info-panel {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Add Item Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+        
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+            animation: slideIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .close-btn {
+            font-size: 28px;
+            cursor: pointer;
+            color: #6c757d;
+            background: none;
+            border: none;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+        
+        .close-btn:hover {
+            background: #f8f9fa;
+            color: #495057;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+        
+        .btn-add-item {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .btn-add-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(17,153,142,0.3);
+        }
+        
+        .btn-delete {
+            background: linear-gradient(135deg, #eb3349, #f45c43);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        
+        .btn-delete:hover {
+            transform: scale(1.05);
+        }
+        
+        .btn.btn-secondary {
+            background: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .btn.btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .btn.btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+        
+        .btn.btn-success {
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+        
+        .btn.btn-primary:hover, .btn.btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            min-width: 250px;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            z-index: 2000;
+            animation: slideInRight 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .notification.success {
+            border-left: 4px solid #38ef7d;
+        }
+        
+        .notification.error {
+            border-left: 4px solid #f45c43;
+        }
+        
+        .notification.info {
+            border-left: 4px solid #667eea;
+        }
+        
+        .notification-icon {
+            font-size: 20px;
+        }
+        
+        .notification-message {
+            flex: 1;
+            font-size: 14px;
+            color: #2c3e50;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+                transform: translateX(400px);
+            }
+        }
+        
+        .save-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 1500;
+        }
+        
+        .save-indicator.show {
+            display: block;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        /* Individual markup input */
+        .markup-input {
+            width: 60px;
+            padding: 2px 5px;
+            border: 1px solid #667eea;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 12px;
+            background: white;
+        }
+        
+        .markup-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(102,126,234,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Advanced USD Pricing Calculator with Margin Management</h1>
+            <div class="project-info">
+                <div class="info-item">
+                    <span class="info-label">Project</span>
+                    <span class="info-value">AWP45 Telecom for Topside Relocation</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Customer</span>
+                    <span class="info-value">PTTEP</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Reference</span>
+                    <span class="info-value">RFX-25-19314</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Valid Until</span>
+                    <span class="info-value">4 months from bid closing</span>
+                </div>
+            </div>
+            <div class="status-badge">Draft (needs validation)</div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('pricing')">💰 Pricing Calculator</button>
+            <button class="tab" onclick="showTab('margins')">📈 Markup Analysis</button>
+        </div>
+
+        <div class="content" id="pricing-tab">
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <h3 style="margin-bottom: 20px; color: #2c3e50;">⚙️ Pricing Configuration</h3>
+                <div class="control-grid">
+                    <div class="control-item">
+                        <label>Exchange Rate (THB/USD)</label>
+                        <input type="number" id="exchangeRate" value="31.5" step="0.01" onchange="recalculateAll()">
+                    </div>
+                    <div class="control-item">
+                        <label>DISPLAY MODE</label>
+                        <select id="currencyMode" onchange="toggleCurrency()">
+                            <option value="BOTH">THB + USD</option>
+                            <option value="THB">THB Only</option>
+                            <option value="USD">USD Only</option>
+                        </select>
+                    </div>
+                    <div class="control-item">
+                        <label>Target Markup (%)</label>
+                        <input type="number" id="targetMargin" value="25" step="0.1" oninput="applyMargin()">
+                    </div>
+                    <div class="control-item">
+                        <label>Actions</label>
+                        <div style="display: flex; gap: 10px; flex-direction: column;">
+                            <button class="btn-add-item" onclick="showAddItemModal()">+ Add New Item</button>
+                            <div style="display: flex; gap: 10px;">
+                                <button class="btn btn-primary" onclick="saveData()">💾 Save</button>
+                                <button class="btn btn-success" onclick="exportToExcel()">📊 Export Excel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <div class="card-title">Total Cost (Est.)</div>
+                    <div class="card-value">
+                        <span class="usd-col">$<span id="totalCostUSD">0</span>
+                        <small>USD</small></span>
+                    </div>
+                    <div class="card-subtitle thb-col">฿<span id="totalCostTHB">0</span> THB</div>
+                </div>
+                <div class="summary-card">
+                    <div class="card-title">Selling Price (excl. VAT)</div>
+                    <div class="card-value">
+                        <span class="usd-col">$<span id="totalSellingUSD">0</span>
+                        <small>USD</small></span>
+                    </div>
+                    <div class="card-subtitle thb-col">฿<span id="totalSellingTHB">0</span> THB</div>
+                </div>
+                <div class="summary-card">
+                    <div class="card-title">Total Markup</div>
+                    <div class="card-value">
+                        <span class="usd-col">$<span id="totalProfitUSD">0</span>
+                        <small>USD</small></span>
+                    </div>
+                    <div class="card-subtitle"><span id="marginPercent">0</span>% Markup</div>
+                </div>
+                <div class="summary-card">
+                    <div class="card-title">Grand Total</div>
+                    <div class="card-value">
+                        <span class="usd-col">$<span id="grandTotalUSD">0</span>
+                        <small>USD</small></span>
+                    </div>
+                    <div class="card-subtitle thb-col">฿<span id="grandTotalTHB">0</span> THB</div>
+                </div>
+            </div>
+
+            <!-- Pricing Table -->
+            <table>
+                <thead>
+                    <tr>
+                        <th width="3%" class="text-center">#</th>
+                        <th width="12%">Part Number</th>
+                        <th width="18%">Description</th>
+                        <th width="4%" class="text-center">Qty</th>
+                        <th width="10%" class="text-right thb-col">Cost/Unit (THB)</th>
+                        <th width="10%" class="text-right thb-col">Total Cost (THB)</th>
+                        <th width="7%" class="text-center">Markup %</th>
+                        <th width="10%" class="text-right thb-col">Sell/Unit (THB)</th>
+                        <th width="10%" class="text-right usd-col">Sell/Unit (USD)</th>
+                        <th width="14%" class="text-right usd-col">Total (USD)</th>
+                    </tr>
+                </thead>
+                <tbody id="pricingTable">
+                    <!-- Content will be generated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="content" id="margins-tab" style="display: none;">
+            <div class="info-panel">
+                <div class="info-section">
+                    <h3>💵 สรุปการเงิน (THB)</h3>
+                    <div class="info-row">
+                        <span class="info-key">Amount (excl. tax)</span>
+                        <span class="info-val" id="amountExclTax">$0.00</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-key">Tax Amount</span>
+                        <span class="info-val" id="taxAmount">$0.00</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-key">Amount (inc. tax)</span>
+                        <span class="info-val" id="amountInclTax">$0.00</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-key">Currency Rate</span>
+                        <span class="info-val" id="currencyRate">0.0279 USD = 1 THB</span>
+                    </div>
+                </div>
+                <div class="info-section">
+                    <h3>📊 วิเคราะห์กำไร Markup (THB)</h3>
+                    <div class="info-row">
+                        <span class="info-key">Selling Price</span>
+                        <span class="info-val" id="marginSelling">$0.00</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-key">Cost Price</span>
+                        <span class="info-val" id="marginCost">$0.00</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-key">Gross Margin</span>
+                        <span class="info-val" id="grossMargin">$0.00</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-key">Markup %</span>
+                        <span class="info-val" id="marginPercentage">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    
+    <!-- Add Item Modal -->
+    <div id="addItemModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New Equipment Item</h3>
+                <button class="close-btn" onclick="hideAddItemModal()">&times;</button>
+            </div>
+            <form id="addItemForm" onsubmit="addNewItem(event)">
+                <div class="form-group">
+                    <label for="itemName">Description *</label>
+                    <input type="text" id="itemName" required placeholder="Enter item description">
+                </div>
+                
+                <div class="form-group">
+                    <label for="itemPartNumber">Part Number *</label>
+                    <input type="text" id="itemPartNumber" required placeholder="Enter part number">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="itemQty">Quantity *</label>
+                        <input type="number" id="itemQty" required min="1" value="1">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemCost">Cost/Unit (THB) *</label>
+                        <input type="number" id="itemCost" required min="0" step="0.01" placeholder="0.00">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="itemPrice">Sell Price/Unit (USD) - Optional</label>
+                    <input type="number" id="itemPrice" min="0" step="0.01" placeholder="Leave blank to auto-calculate">
+                </div>
+                
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" onclick="hideAddItemModal()">Cancel</button>
+                    <button type="submit" class="btn-add-item">Add Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Equipment data with costs and prices
+        const equipmentData = {
+            base: [
+                { name: 'Dual-Band, Low-Profile Transit Antenna 6ft', partNumber: 'Redline_APD-DB-02-6ft-01', qty: 1, costTHB: 147709, price: 4689.81 },
+                { name: 'Auteldac 6 Zone 1 VoIP (SIP) Hazardous Area Phone', partNumber: 'Gai-Tronics_212-02-6008-410', qty: 1, costTHB: 130000, price: 4126.98 },
+                { name: 'Ex eb Junction Box Telephone Terminal Box, Zone 1, Zone 2', partNumber: 'BARTEC_07-56B2-0411', qty: 1, costTHB: 22000, price: 698.41 },
+                { name: 'CAT6A S/FTP 4P23/7AWG TCWB SHF1 GREY Armour', partNumber: 'TECNIKABEL_CAT6A_S_FTP_4P23_7AWG_Armour', qty: 100, costTHB: 464, price: 14.73 },
+                { name: 'Brass w/nickel Cable Gland complete with locknut, earth tag and black nylon washer', partNumber: 'Hawke_PN_501_453_UNIV_A_M20', qty: 1, costTHB: 1020, price: 32.38 },
+                { name: 'Brass w/Nickel Cable Gland c/w locknut and black nylon washer', partNumber: 'Hawke_P_N_ICG653_UNIV_B_M25', qty: 1, costTHB: 3224, price: 102.35 },
+                { name: 'Ex Cable Gland M20 Os with complete Barrier Kit', partNumber: 'Hawke_501_453_Os', qty: 1, costTHB: 2065, price: 65.56 }
+            ],
+            remote: [
+            ]
+        };
+
+        function initializeTable() {
+            const tbody = document.getElementById('pricingTable');
+            tbody.innerHTML = '';
+            
+            // Base Station Section (Main Equipment)
+            const baseHeader = tbody.insertRow();
+            baseHeader.className = 'section-header';
+            baseHeader.innerHTML = '<td colspan="10"><strong>🔧 Telecom Equipment for AWP45</strong></td>';
+            
+            equipmentData.base.forEach((item, index) => {
+                createItemRow(tbody, item, 'base', index);
+            });
+            
+            const baseSubtotal = tbody.insertRow();
+            baseSubtotal.className = 'subtotal-row';
+            baseSubtotal.innerHTML = `
+                <td colspan="5"><strong>Subtotal - Equipment</strong></td>
+                <td class="text-right thb-col" id="baseCostTotalTHB">0.00</td>
+                <td></td>
+                <td class="thb-col"></td>
+                <td class="usd-col"></td>
+                <td class="text-right usd-col" id="baseSellingTotal">$0.00</td>
+            `;
+            
+            // Only show remote section if there are remote items
+            if (equipmentData.remote && equipmentData.remote.length > 0) {
+                // Remote Terminals Section
+                const remoteHeader = tbody.insertRow();
+                remoteHeader.className = 'section-header';
+                remoteHeader.innerHTML = '<td colspan="10"><strong>📡 Remote Terminals</strong></td>';
+                
+                equipmentData.remote.forEach((item, index) => {
+                    createItemRow(tbody, item, 'remote', index);
+                });
+                
+                const remoteSubtotal = tbody.insertRow();
+                remoteSubtotal.className = 'subtotal-row';
+                remoteSubtotal.innerHTML = `
+                    <td colspan="5"><strong>Subtotal - Remote Terminals</strong></td>
+                    <td class="text-right thb-col" id="remoteCostTotalTHB">0.00</td>
+                    <td></td>
+                    <td class="thb-col"></td>
+                    <td class="usd-col"></td>
+                    <td class="text-right usd-col" id="remoteSellingTotal">$0.00</td>
+                `;
+            }
+            
+            // Grand Total Rows
+            const subtotalRow = tbody.insertRow();
+            subtotalRow.className = 'total-row';
+            subtotalRow.innerHTML = `
+                <td colspan="5"><strong>SUBTOTAL</strong></td>
+                <td class="text-right thb-col" id="subtotalCostTHB">0.00</td>
+                <td></td>
+                <td class="thb-col"></td>
+                <td class="usd-col"></td>
+                <td class="text-right usd-col" id="subtotalSelling">$0.00</td>
+            `;
+            
+            const grandTotalRow = tbody.insertRow();
+            grandTotalRow.className = 'grand-total-row';
+            grandTotalRow.innerHTML = `
+                <td colspan="5"><strong>GRAND TOTAL</strong></td>
+                <td class="text-right thb-col" id="grandTotalCostTHB">0.00</td>
+                <td></td>
+                <td class="thb-col"></td>
+                <td class="usd-col"></td>
+                <td class="text-right usd-col" id="grandTotalSelling">$0.00</td>
+            `;
+            
+            recalculateAll();
+        }
+
+        function createItemRow(tbody, item, type, index) {
+            const row = tbody.insertRow();
+            row.className = 'item-row';
+            row.id = `row_${type}_${index}`;
+            const rowId = `${type}_${index}`;
+            const rowNum = type === 'base' ? index + 1 : index + 1;
+            
+            // Store individual markup for each item
+            if (!item.hasOwnProperty('markup')) {
+                item.markup = 0; // Initialize markup if not exists
+            }
+            
+            row.innerHTML = `
+                <td class="text-center">${rowNum}</td>
+                <td><span style="font-size: 11px; color: #6c757d;">${item.partNumber}</span></td>
+                <td>${item.name}</td>
+                <td class="text-center">${item.qty}</td>
+                <td class="text-right editable thb-col" onclick="editCell(this, 'cost', '${rowId}')">
+                    <span id="cost_${rowId}">${item.costTHB.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0})}</span>
+                </td>
+                <td class="text-right thb-col" id="totalCostTHB_${rowId}">0.00</td>
+                <td class="text-center">
+                    <input type="number" class="markup-input" id="markup_${rowId}" value="${item.markup}" 
+                           onchange="updateItemMarkup('${type}', ${index}, this.value)" 
+                           step="0.1" min="-100" max="500">%
+                </td>
+                <td class="text-right thb-col" id="sellTHB_${rowId}">0.00</td>
+                <td class="text-right editable usd-col" onclick="editCell(this, 'price', '${rowId}')">
+                    <span id="price_${rowId}">${item.price.toFixed(2)}</span>
+                </td>
+                <td class="text-right usd-col">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <span id="totalPrice_${rowId}" style="flex: 1; text-align: right;">$0.00</span>
+                        <button class="btn-delete" onclick="deleteItem('${type}', ${index})" style="margin-left: 10px;" title="Delete item">×</button>
+                    </div>
+                </td>
+            `;
+        }
+
+        function editCell(cell, type, rowId) {
+            const span = cell.querySelector('span');
+            const currentValue = parseFloat(span.textContent.replace(/,/g, '')) || 0; // Remove commas before parsing
+            
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.className = 'inline-edit';
+            input.value = currentValue;
+            input.step = '0.01';
+            
+            input.onblur = function() {
+                const newValue = parseFloat(input.value) || 0;
+                if (type === 'cost') {
+                    // Cost is in THB, format without decimals
+                    span.textContent = newValue.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+                } else {
+                    // Price is in USD, format with 2 decimals
+                    span.textContent = newValue.toFixed(2);
+                }
+                cell.appendChild(span);
+                input.remove();
+                recalculateAll();
+            };
+            
+            input.onkeypress = function(e) {
+                if (e.key === 'Enter') {
+                    input.blur();
+                }
+            };
+            
+            span.remove();
+            cell.appendChild(input);
+            input.focus();
+            input.select();
+        }
+
+        function recalculateAll() {
+            const exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 31.5;
+            const vatRate = 0; // VAT always 0
+            
+            // IMPORTANT: Markup calculations must use same currency on both sides
+            // Formula: Markup = (PriceTHB - CostTHB) / CostTHB * 100
+            // Or:      Markup = (PriceUSD - CostUSD) / CostUSD * 100
+            
+            let baseCostTotal = 0;
+            let baseSellingTotal = 0;
+            let remoteCostTotal = 0;
+            let remoteSellingTotal = 0;
+            
+            // Calculate base station items
+            equipmentData.base.forEach((item, index) => {
+                const rowId = `base_${index}`;
+                const costTHB = parseFloat(document.getElementById(`cost_${rowId}`).textContent.replace(/,/g, '')) || 0; // Remove commas
+                const sellUSD = parseFloat(document.getElementById(`price_${rowId}`).textContent) || 0;
+                
+                // Get individual markup from the item data
+                const individualMarkup = item.markup || 0;
+                
+                // Convert to same currency for calculations
+                const costUSD = costTHB / exchangeRate;
+                const sellTHB = sellUSD * exchangeRate;
+                
+                // Calculate actual markup percentage - MUST use same currency units
+                // Using THB: Markup = (SellTHB - CostTHB) / CostTHB * 100
+                const actualMarkup = costTHB > 0 ? Math.round(((sellTHB - costTHB) / costTHB * 100) * 10) / 10 : 0;
+                
+                // Update the markup input value to show actual markup
+                const markupInput = document.getElementById(`markup_${rowId}`);
+                if (markupInput && Math.abs(actualMarkup - individualMarkup) > 0.1) {
+                    markupInput.value = actualMarkup.toFixed(1);
+                    item.markup = actualMarkup; // Update item's markup value
+                }
+                
+                const totalCostTHB = costTHB * item.qty;
+                const totalCostUSD = costUSD * item.qty;
+                const totalPriceUSD = sellUSD * item.qty;
+                
+                document.getElementById(`totalCostTHB_${rowId}`).textContent = totalCostTHB.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+                // Display THB selling price without decimals to match cost format
+                document.getElementById(`sellTHB_${rowId}`).textContent = Math.round(sellTHB).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+                document.getElementById(`totalPrice_${rowId}`).textContent = '$' + totalPriceUSD.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                
+                baseCostTotal += totalCostUSD;
+                baseSellingTotal += totalPriceUSD;
+            });
+            
+            // Calculate remote items (same logic as base items)
+            equipmentData.remote.forEach((item, index) => {
+                const rowId = `remote_${index}`;
+                const costTHB = parseFloat(document.getElementById(`cost_${rowId}`).textContent.replace(/,/g, '')) || 0; // Remove commas
+                const sellUSD = parseFloat(document.getElementById(`price_${rowId}`).textContent) || 0;
+                
+                // Get individual markup from the item data
+                const individualMarkup = item.markup || 0;
+                
+                // Convert to same currency for calculations
+                const costUSD = costTHB / exchangeRate;
+                const sellTHB = sellUSD * exchangeRate;
+                
+                // Calculate actual markup percentage - MUST use same currency units
+                // Using THB: Markup = (SellTHB - CostTHB) / CostTHB * 100
+                const actualMarkup = costTHB > 0 ? Math.round(((sellTHB - costTHB) / costTHB * 100) * 10) / 10 : 0;
+                
+                // Update the markup input value to show actual markup
+                const markupInput = document.getElementById(`markup_${rowId}`);
+                if (markupInput && Math.abs(actualMarkup - individualMarkup) > 0.1) {
+                    markupInput.value = actualMarkup.toFixed(1);
+                    item.markup = actualMarkup; // Update item's markup value
+                }
+                
+                const totalCostTHB = costTHB * item.qty;
+                const totalCostUSD = costUSD * item.qty;
+                const totalPriceUSD = sellUSD * item.qty;
+                
+                document.getElementById(`totalCostTHB_${rowId}`).textContent = totalCostTHB.toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+                // Display THB selling price without decimals to match cost format
+                document.getElementById(`sellTHB_${rowId}`).textContent = Math.round(sellTHB).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+                document.getElementById(`totalPrice_${rowId}`).textContent = '$' + totalPriceUSD.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                
+                remoteCostTotal += totalCostUSD;
+                remoteSellingTotal += totalPriceUSD;
+            });
+            
+            // Update subtotals
+            const baseCostElement = document.getElementById('baseCostTotalTHB');
+            if (baseCostElement) {
+                baseCostElement.textContent = (baseCostTotal * exchangeRate).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+            }
+            const baseSellingElement = document.getElementById('baseSellingTotal');
+            if (baseSellingElement) {
+                baseSellingElement.textContent = '$' + baseSellingTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            }
+            
+            // Only update remote elements if they exist (remote section may not be created if no remote items)
+            const remoteCostElement = document.getElementById('remoteCostTotalTHB');
+            if (remoteCostElement) {
+                remoteCostElement.textContent = (remoteCostTotal * exchangeRate).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+            }
+            const remoteSellingElement = document.getElementById('remoteSellingTotal');
+            if (remoteSellingElement) {
+                remoteSellingElement.textContent = '$' + remoteSellingTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            }
+            
+            // Calculate totals
+            const totalCost = baseCostTotal + remoteCostTotal;
+            const totalSelling = baseSellingTotal + remoteSellingTotal;
+            const totalMarkup = totalSelling - totalCost;
+            // Calculate markup percentage using consistent USD values
+            // Markup = (SellingUSD - CostUSD) / CostUSD * 100
+            const markupPercent = totalCost > 0 ? Math.round((totalMarkup / totalCost * 100) * 10) / 10 : 0;
+            const grandTotal = totalSelling; // No VAT
+            
+            // Update grand totals
+            document.getElementById('subtotalCostTHB').textContent = (totalCost * exchangeRate).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+            document.getElementById('subtotalSelling').textContent = '$' + totalSelling.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('grandTotalCostTHB').textContent = (totalCost * exchangeRate).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+            document.getElementById('grandTotalSelling').textContent = '$' + grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            
+            // Update summary cards - fix negative zero display
+            document.getElementById('totalCostUSD').textContent = totalCost.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('totalCostTHB').textContent = (totalCost * exchangeRate).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+            document.getElementById('totalSellingUSD').textContent = totalSelling.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('totalSellingTHB').textContent = (totalSelling * exchangeRate).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+            // Fix negative zero in markup display
+            const displayMarkup = Math.abs(totalMarkup) < 0.01 ? 0 : totalMarkup;
+            document.getElementById('totalProfitUSD').textContent = displayMarkup.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('marginPercent').textContent = Math.abs(markupPercent) < 0.1 ? '0.0' : markupPercent.toFixed(1);
+            document.getElementById('grandTotalUSD').textContent = grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('grandTotalTHB').textContent = (grandTotal * exchangeRate).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+            
+            // Update margin analysis tab
+            document.getElementById('amountExclTax').textContent = '$' + totalSelling.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('taxAmount').textContent = '$0.00';
+            document.getElementById('amountInclTax').textContent = '$' + grandTotal.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            document.getElementById('marginSelling').textContent = (totalSelling * exchangeRate).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0}) + ' THB';
+            document.getElementById('marginCost').textContent = (totalCost * exchangeRate).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0}) + ' THB';
+            document.getElementById('grossMargin').textContent = (totalMarkup * exchangeRate).toLocaleString('en-US', {minimumFractionDigits: 0, maximumFractionDigits: 0}) + ' THB';
+            document.getElementById('marginPercentage').textContent = markupPercent.toFixed(1) + '%';
+            
+            // Update currency rate display
+            const usdToThb = 1 / exchangeRate;
+            document.getElementById('currencyRate').textContent = usdToThb.toFixed(4) + ' USD = 1 THB';
+        }
+
+        function applyMargin() {
+            const markupValue = parseFloat(document.getElementById('targetMargin').value) || 0;
+            const exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 31.5;
+            
+            // Apply markup to all items
+            // Calculate in THB first (same currency), then convert to USD
+            // Formula: SellTHB = CostTHB * (1 + Markup%)
+            [...equipmentData.base, ...equipmentData.remote].forEach((item, globalIndex) => {
+                const type = globalIndex < equipmentData.base.length ? 'base' : 'remote';
+                const index = type === 'base' ? globalIndex : globalIndex - equipmentData.base.length;
+                const rowId = `${type}_${index}`;
+                
+                const costElement = document.getElementById(`cost_${rowId}`);
+                const priceElement = document.getElementById(`price_${rowId}`);
+                
+                if (costElement && priceElement) {
+                    const costTHB = parseFloat(costElement.textContent.replace(/,/g, '')) || 0; // Remove commas
+                    
+                    // Calculate selling price in THB using markup percentage
+                    // Markup = (Sell - Cost) / Cost * 100
+                    // Therefore: Sell = Cost * (1 + Markup/100)
+                    const sellTHB = costTHB * (1 + markupValue / 100);
+                    
+                    // Convert THB selling price to USD for display
+                    const sellUSD = sellTHB / exchangeRate;
+                    
+                    priceElement.textContent = sellUSD.toFixed(2);
+                }
+            });
+            
+            recalculateAll();
+        }
+
+        function showTab(tabName) {
+            // Hide all tabs
+            document.getElementById('pricing-tab').style.display = 'none';
+            document.getElementById('margins-tab').style.display = 'none';
+            
+            // Show selected tab
+            document.getElementById(`${tabName}-tab`).style.display = 'block';
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        function toggleCurrency() {
+            const mode = document.getElementById('currencyMode').value;
+            const exchangeDiv = document.querySelector('.control-item:has(#exchangeRate)');
+            const usdCols = document.querySelectorAll('.usd-col');
+            const thbCols = document.querySelectorAll('.thb-col');
+            
+            if (mode === 'THB') {
+                exchangeDiv.style.display = 'none';
+                usdCols.forEach(col => col.style.display = 'none');
+            } else if (mode === 'USD') {
+                exchangeDiv.style.display = 'block';
+                thbCols.forEach(col => col.style.display = 'none');
+            } else {
+                exchangeDiv.style.display = 'block';
+                usdCols.forEach(col => col.style.display = '');
+                thbCols.forEach(col => col.style.display = '');
+            }
+            recalculateAll();
+        }
+
+        // Initialize on load
+        initializeTable();
+        document.getElementById('targetMargin').value = 0; // Start with 0% markup
+        applyMargin(); // Apply the markup to set correct prices
+        
+        // Modal Functions
+        function showAddItemModal() {
+            document.getElementById('addItemModal').classList.add('show');
+        }
+        
+        function hideAddItemModal() {
+            document.getElementById('addItemModal').classList.remove('show');
+            document.getElementById('addItemForm').reset();
+        }
+        
+        // Add New Item Function
+        function addNewItem(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('itemName').value;
+            const partNumber = document.getElementById('itemPartNumber').value;
+            const qty = parseInt(document.getElementById('itemQty').value) || 1;
+            const costTHB = parseFloat(document.getElementById('itemCost').value) || 0;
+            const priceUSD = parseFloat(document.getElementById('itemPrice').value) || 0;
+            
+            // Calculate price if not provided
+            const exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 31.5;
+            const targetMargin = parseFloat(document.getElementById('targetMargin').value) || 0;
+            
+            let price = priceUSD;
+            if (price === 0) {
+                // Auto-calculate price based on target margin
+                const costUSD = costTHB / exchangeRate;
+                price = costUSD * (1 + targetMargin / 100);
+            }
+            
+            // Add new item to equipment data
+            const newItem = {
+                name: name,
+                partNumber: partNumber,
+                qty: qty,
+                costTHB: costTHB,
+                price: price
+            };
+            
+            equipmentData.base.push(newItem);
+            
+            // Refresh table
+            initializeTable();
+            recalculateAll();
+            
+            // Close modal
+            hideAddItemModal();
+        }
+        
+        // Delete Item Function
+        function deleteItem(type, index) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                if (type === 'base') {
+                    equipmentData.base.splice(index, 1);
+                } else {
+                    equipmentData.remote.splice(index, 1);
+                }
+                
+                // Refresh table
+                initializeTable();
+                recalculateAll();
+            }
+        }
+        
+        // Update individual item markup
+        function updateItemMarkup(type, index, markupValue) {
+            const markup = parseFloat(markupValue) || 0;
+            const exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 31.5;
+            const rowId = `${type}_${index}`;
+            
+            // Get the item
+            const item = type === 'base' ? equipmentData.base[index] : equipmentData.remote[index];
+            if (!item) return;
+            
+            // Update the item's markup value
+            item.markup = markup;
+            
+            // Get current cost
+            const costElement = document.getElementById(`cost_${rowId}`);
+            const priceElement = document.getElementById(`price_${rowId}`);
+            
+            if (costElement && priceElement) {
+                const costTHB = parseFloat(costElement.textContent.replace(/,/g, '')) || 0;
+                
+                // Calculate new selling price based on markup
+                const sellTHB = costTHB * (1 + markup / 100);
+                const sellUSD = sellTHB / exchangeRate;
+                
+                // Update the price
+                priceElement.textContent = sellUSD.toFixed(2);
+                item.price = sellUSD;
+            }
+            
+            // Recalculate everything
+            recalculateAll();
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('addItemModal');
+            if (event.target == modal) {
+                hideAddItemModal();
+            }
+        }
+    </script>
+</body>
+</html>

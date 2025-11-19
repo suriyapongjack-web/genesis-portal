@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Addvalue – Reference Project Suite</title>
+  <link rel="stylesheet" href="./assets/css/main.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>Addvalue Reference Project</h1>
+        <p>PTTEP Portfolio • HR Experience • TOR Checker</p>
+      </div>
+      <nav class="nav">
+        <button data-route="dashboard" class="nav-btn">Dashboard</button>
+        <button data-route="portfolio" class="nav-btn">PO Data</button>
+        <button data-route="fxrate" class="nav-btn">FX Rate</button>
+        <button data-route="hr" class="nav-btn">HR Experience</button>
+        <button data-route="tor" class="nav-btn">TOR Checker</button>
+        <button data-route="import" class="nav-btn">Import</button>
+        <button data-route="export" class="nav-btn">Export</button>
+      </nav>
+    </header>
+    <main id="view"></main>
+  </div>
+  <div id="loading" class="loading"><div class="spinner"></div></div>
+  <script type="module" src="./app.main.js"></script>
+</body>
+</html>

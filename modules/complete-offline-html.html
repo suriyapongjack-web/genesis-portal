@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Addvalue HR System - Offline</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    
+    <!-- Babel Standalone -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Lucide React Icons -->
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pulse-green {
+            animation: pulseGreen 2s infinite;
+        }
+        @keyframes pulseGreen {
+            0%, 100% { background-color: #10b981; }
+            50% { background-color: #059669; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+        const { Users, DollarSign, Building, Clock, Download, Search, Filter, UserPlus, Edit, Trash2, Save, Upload, Database, Plus, X, AlertCircle, CheckCircle } = lucideReact;
+
+        const AddvalueHRSystem = () => {
+            // ข้อมูลเริ่มต้น - พนักงาน 8 คน (ข้อมูลจริง)
+            const initialData = {
+                employees: [
+                    {
+                        id: 1,
+                        name: "ณัชชา ยอดอินทร์",
+                        login: "natcha.yodoin",
+                        email: "natcha@hotmail.com",
+                        phone: "081-234-5670",
+                        address: "123/45 ถ.ประชาสงเคราะห์ แขวงลาดยาว เขตจตุจักร กรุงเทพฯ 10900",
+                        dateOfBirth: "1990-05-15",
+                        jobPosition: "เจ้าหน้าที่ธุรการโรงงานการบิน",
+                        department: "Administration",
+                        employmentDate: "2013-01-01",
+                        hoursPerWeek: 48,
+                        salary: 14000,
+                        type: "Full-time",
+                        status: "Active"
+                    },
+                    {
+                        id: 2,
+                        name: "Aurnchalee Meenaḳ",
+                        login: "aurnchalee.meenak",
+                        email: "aurnchalee@addvaluesystem.com",
+                        phone: "082-345-6781",
+                        address: "456/78 ถ.สุขุมวิท แขวงคลองตัน เขตคลองเตย กรุงเทพฯ 10110",
+                        dateOfBirth: "1985-03-20",
+                        jobPosition: "Account Manager",
+                        department: "Management",
+                        employmentDate: "2000-06-15",
+                        hoursPerWeek: 40,
+                        salary: 50000,
+                        type: "Full-time",
+                        status: "Active"
+                    },
+                    {
+                        id: 3,
+                        name: "Ratchaneekom Mo-on",
+                        login: "ratchaneekom.moon",
+                        email: "ratchaneekom@addvaluesystem.com",
+                        phone: "083-456-7892",
+                        address: "789/12 ถ.พระราม 4 แขวงคลองตัน เขตคลองเตย กรุงเทพฯ 10110",
+                        dateOfBirth: "1988-07-10",
+                        jobPosition: "Telecommunication Technician",
+                        department: "Technical",
+                        employmentDate: "2015-03-01",
+                        hoursPerWeek: 40,
+                        salary: 24000,
+                        type: "Full-time",
+                        status: "Active"
+                    },
+                    {
+                        id: 4,
+                        name: "Sakda Wongjam",
+                        login: "sakda.wongjam",
+                        email: "sakda@addvaluesystem.com",
+                        phone: "084-567-8903",
+                        address: "321/65 ถ.รัชดาภิเษก แขวงหัวหมาก เขตบางกะปิ กรุงเทพฯ 10240",
+                        dateOfBirth: "1982-11-25",
+                        jobPosition: "Chief Engineer",
+                        department: "Engineering",
+                        employmentDate: "2005-08-20",
+                        hoursPerWeek: 40,
+                        salary: 82000,
+                        type: "Full-time",
+                        status: "Active"
+                    },
+                    {
+                        id: 5,
+                        name: "Suriyapong Yoo-om-sin",
+                        login: "suriyapong.yoosin",
+                        email: "suriyapong@addvaluesystem.com",
+                        phone: "085-678-9014",
+                        address: "654/32 ถ.สาทร แขวงสีลม เขตบางรัก กรุงเทพฯ 10500",
+                        dateOfBirth: "1978-01-12",
+                        jobPosition: "Manager",
+                        department: "Management",
+                        employmentDate: "2001-02-01",
+                        hoursPerWeek: 40,
+                        salary: 120000,
+                        type: "Full-time",
+                        status: "Active"
+                    },
+                    {
+                        id: 6,
+                        name: "Suttirak Nunsong",
+                        login: "suttirak.nunsong",
+                        email: "suttirak@addvaluesystem.com",
+                        phone: "086-789-0125",
+                        address: "987/21 ถ.ลาดพร้าว แขวงจอมพล เขตจตุจักร กรุงเทพฯ 10900",
+                        dateOfBirth: "1987-09-08",
+                        jobPosition: "Telecommunication Engineer",
+                        department: "Engineering",
+                        employmentDate: "2010-12-15",
+                        hoursPerWeek: 40,
+                        salary: 33000,
+                        type: "Full-time",
+                        status: "Active"
+                    },
+                    {
+                        id: 7,
+                        name: "Wasupol Amonthat",
+                        login: "wasupol.amonthat",
+                        email: "wasupol@addvaluesystem.com",
+                        phone: "087-890-1236",
+                        address: "147/89 ถ.เพชรบุรี แขวงมักกะสัน เขตราชเทวี กรุงเทพฯ 10400",
+                        dateOfBirth: "1989-12-03",
+                        jobPosition: "Sales Manager",
+                        department: "Sales & Marketing",
+                        employmentDate: "2018-05-10",
+                        hoursPerWeek: 40,
+                        salary: 18000,
+                        type: "Full-time",
+                        status: "Active"
+                    },
+                    {
+                        id: 8,
+                        name: "Yuttapong Eakimphon",
+                        login: "yuttapong.eakimphon",
+                        email: "yuttapong@addvaluesystem.com",
+                        phone: "088-901-2347",
+                        address: "258/74 ถ.อโศก แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110",
+                        dateOfBirth: "1983-04-18",
+                        jobPosition: "Chief Technical",
+                        department: "Technical",
+                        employmentDate: "2001-11-01",
+                        hoursPerWeek: 40,
+                        salary: 37000,
+                        type: "Full-time",
+                        status: "Active"
+                    }
+                ],
+                salaryHistory: [
+                    {
+                        id: 1,
+                        employeeId: 2,
+                        oldSalary: 45000,
+                        newSalary: 50000,
+                        reason: "ปรับขึ้นประจำปี ตามผลงาน",
+                        effectiveDate: "2023-01-01",
+                        approvedBy: "Suriyapong Yoo-om-sin",
+                        createdAt: "2023-01-01"
+                    },
+                    {
+                        id: 2,
+                        employeeId: 4,
+                        oldSalary: 78000,
+                        newSalary: 82000,
+                        reason: "ปรับขึ้นตามผลงานดีเยี่ยม และประสบการณ์",
+                        effectiveDate: "2023-08-15",
+                        approvedBy: "Suriyapong Yoo-om-sin",
+                        createdAt: "2023-08-15"
+                    },
+                    {
+                        id: 3,
+                        employeeId: 5,
+                        oldSalary: 115000,
+                        newSalary: 120000,
+                        reason: "ปรับขึ้นประจำปี ตำแหน่งผู้บริหาร",
+                        effectiveDate: "2024-01-10",
+                        approvedBy: "Board of Directors",
+                        createdAt: "2024-01-10"
+                    },
+                    {
+                        id: 4,
+                        employeeId: 8,
+                        oldSalary: 32000,
+                        newSalary: 37000,
+                        reason: "โปรโมชั่นเป็น Chief Technical",
+                        effectiveDate: "2021-01-01",
+                        approvedBy: "Suriyapong Yoo-om-sin",
+                        createdAt: "2021-01-01"
+                    }
+                ],
+                notes: [
+                    {
+                        id: 1,
+                        employeeId: 5,
+                        content: "ผู้บริหารที่มีประสบการณ์สูง นำทีมได้ดีเยี่ยม",
+                        createdBy: "HR Manager",
+                        type: "Performance",
+                        createdAt: "2024-08-15"
+                    },
+                    {
+                        id: 2,
+                        employeeId: 4,
+                        content: "มีความเชี่ยวชาญทางเทคนิคสูง รับผิดชับโปรเจคใหญ่ได้ดี",
+                        createdBy: "Suriyapong Yoo-om-sin",
+                        type: "Achievement",
+                        createdAt: "2024-07-20"
+                    },
+                    {
+                        id: 3,
+                        employeeId: 2,
+                        content: "ดูแลลูกค้าได้ดีเยี่ยม มีความสัมพันธ์ที่ดีกับลูกค้า",
+                        createdBy: "Suriyapong Yoo-om-sin",
+                        type: "Performance",
+                        createdAt: "2024-06-10"
+                    },
+                    {
+                        id: 4,
+                        employeeId: 1,
+                        content: "พนักงานที่มีความตั้งใจทำงาน งานธุรการแม่นยำ",
+                        createdBy: "Aurnchalee Meenaḳ",
+                        type: "General",
+                        createdAt: "2024-05-05"
+                    }
+                ],
+                lastUpdated: new Date().toISOString()
+            };
+
+            // State management
+            const [data, setData] = useState(initialData);
+            const [searchTerm, setSearchTerm] = useState('');
+            const [departmentFilter, setDepartmentFilter] = useState('');
+            const [currentView, setCurrentView] = useState('dashboard');
+            const [selectedEmployee, setSelectedEmployee] = useState(null);
+            const [showEditModal, setShowEditModal] = useState(false);
+            const [showAddModal, setShowAddModal] = useState(false);
+            const [lastSaved, setLastSaved] = useState(null);
+            const [saveStatus, setSaveStatus] = useState('saved');
+            const [notification, setNotification] = useState(null);
+
+            // Load data from localStorage on component mount
+            useEffect(() => {
+                const savedData = localStorage.getItem('addvalue_hr_data');
+                if (savedData) {
+                    try {
+                        const parsedData = JSON.parse(savedData);
+                        setData(parsedData);
+                        setLastSaved(new Date(parsedData.lastUpdated));
+                    } catch (error) {
+                        console.error('Error loading saved data:', error);
+                        showNotification('เกิดข้อผิดพลาดในการโหลดข้อมูล', 'error');
+                    }
+                }
+            }, []);
+
+            // Save data to localStorage
+            const saveData = () => {
+                try {
+                    const updatedData = {
+                        ...data,
+                        lastUpdated: new Date().toISOString()
+                    };
+                    localStorage.setItem('addvalue_hr_data', JSON.stringify(updatedData));
+                    setData(updatedData);
+                    setLastSaved(new Date());
+                    setSaveStatus('saved');
+                    showNotification('บันทึกข้อมูลสำเร็จ', 'success');
+                } catch (error) {
+                    console.error('Error saving data:', error);
+                    showNotification('เกิดข้อผิดพลาดในการบันทึก', 'error');
+                }
+            };
+
+            // Auto-save every 30 seconds
+            useEffect(() => {
+                const interval = setInterval(() => {
+                    if (saveStatus === 'modified') {
+                        saveData();
+                    }
+                }, 30000);
+                return () => clearInterval(interval);
+            }, [data, saveStatus]);
+
+            // Mark data as modified
+            const markModified = () => {
+                setSaveStatus('modified');
+            };
+
+            // Show notification
+            const showNotification = (message, type = 'info') => {
+                setNotification({ message, type });
+                setTimeout(() => setNotification(null), 3000);
+            };
+
+            // Calculate statistics
+            const stats = useMemo(() => {
+                const activeEmployees = data.employees.filter(emp => emp.status === 'Active');
+                const totalEmployees = activeEmployees.length;
+                const totalSalary = activeEmployees.reduce((sum, emp) => sum + emp.salary, 0);
+                const avgSalary = totalEmployees > 0 ? totalSalary / totalEmployees : 0;
+                const departments = [...new Set(activeEmployees.map(emp => emp.department))];
+                
+                return {
+                    totalEmployees,
+                    totalSalary,
+                    avgSalary,
+                    departmentCount: departments.length
+                };
+            }, [data.employees]);
+
+            // Filter employees
+            const filteredEmployees = useMemo(() => {
+                return data.employees.filter(emp => {
+                    const matchesSearch = emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                         emp.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                         emp.jobPosition.toLowerCase().includes(searchTerm.toLowerCase());
+                    const matchesDepartment = !departmentFilter || emp.department === departmentFilter;
+                    const isActive = emp.status === 'Active';
+                    return matchesSearch && matchesDepartment && isActive;
+                });
+            }, [data.employees, searchTerm, departmentFilter]);
+
+            // Export functions
+            const exportToJSON = () => {
+                try {
+                    const exportData = {
+                        ...data,
+                        exportedAt: new Date().toISOString(),
+                        version: "1.0"
+                    };
+                    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `addvalue_hr_backup_${new Date().toISOString().split('T')[0]}.json`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                    showNotification('Export JSON สำเร็จ', 'success');
+                } catch (error) {
+                    showNotification('เกิดข้อผิดพลาดในการ Export', 'error');
+                }
+            };
+
+            const exportToCSV = () => {
+                try {
+                    const headers = ['ID', 'ชื่อ', 'อีเมล', 'ตำแหน่ง', 'แผนก', 'เงินเดือน', 'วันที่เริ่มงาน', 'สถานะ'];
+                    const csvData = [
+                        headers.join(','),
+                        ...filteredEmployees.map(emp => [
+                            emp.id,
+                            `"${emp.name}"`,
+                            emp.email,
+                            `"${emp.jobPosition}"`,
+                            `"${emp.department}"`,
+                            emp.salary,
+                            emp.employmentDate,
+                            emp.status
+                        ].join(','))
+                    ].join('\n');
+
+                    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `addvalue_hr_employees_${new Date().toISOString().split('T')[0]}.csv`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    showNotification('Export CSV สำเร็จ', 'success');
+                } catch (error) {
+                    showNotification('เกิดข้อผิดพลาดในการ Export CSV', 'error');
+                }
+            };
+
+            const importFromJSON = (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        try {
+                            const importedData = JSON.parse(e.target.result);
+                            setData(importedData);
+                            markModified();
+                            showNotification('นำเข้าข้อมูลสำเร็จ', 'success');
+                        } catch (error) {
+                            showNotification('ไฟล์ไม่ถูกต้อง กรุณาตรวจสอบไฟล์ JSON', 'error');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+                event.target.value = '';
+            };
+
+            const formatCurrency = (amount) => {
+                return new Intl.NumberFormat('th-TH', {
+                    style: 'currency',
+                    currency: 'THB',
+                    minimumFractionDigits: 0
+                }).format(amount);
+            };
+
+            const addEmployee = (newEmployee) => {
+                const maxId = Math.max(...data.employees.map(emp => emp.id), 0);
+                const employeeWithId = {
+                    ...newEmployee,
+                    id: maxId + 1,
+                    status: 'Active'
+                };
+                
+                setData(prev => ({
+                    ...prev,
+                    employees: [...prev.employees, employeeWithId]
+                }));
+                setShowAddModal(false);
+                markModified();
+                showNotification('เพิ่มพนักงานสำเร็จ', 'success');
+            };
+
+            const updateEmployee = (updatedEmployee) => {
+                setData(prev => ({
+                    ...prev,
+                    employees: prev.employees.map(emp => 
+                        emp.id === updatedEmployee.id ? updatedEmployee : emp
+                    )
+                }));
+                setShowEditModal(false);
+                setSelectedEmployee(null);
+                markModified();
+                showNotification('แก้ไขข้อมูลสำเร็จ', 'success');
+            };
+
+            const deleteEmployee = (employeeId) => {
+                if (confirm('ต้องการลบพนักงานนี้ใช่หรือไม่?')) {
+                    setData(prev => ({
+                        ...prev,
+                        employees: prev.employees.map(emp => 
+                            emp.id === employeeId ? { ...emp, status: 'Inactive' } : emp
+                        )
+                    }));
+                    markModified();
+                    showNotification('ลบพนักงานสำเร็จ', 'success');
+                }
+            };
+
+            // Notification Component
+            const Notification = ({ notification }) => {
+                if (!notification) return null;
+
+                const bgColor = notification.type === 'success' ? 'bg-green-500' : 
+                               notification.type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+                const Icon = notification.type === 'success' ? CheckCircle : AlertCircle;
+
+                return (
+                    <div className={`fixed top-4 right-4 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 fade-in z-50`}>
+                        <Icon className="h-5 w-5" />
+                        <span>{notification.message}</span>
+                    </div>
+                );
+            };
+
+            // Offline Status Indicator
+            const OfflineIndicator = () => (
+                <div className="flex items-center space-x-2 text-sm">
+                    <div className="w-2 h-2 rounded-full bg-green-500 pulse-green"></div>
+                    <span className="text-green-600 font-medium">Offline Mode</span>
+                    {lastSaved && (
+                        <span className="text-gray-500">
+                            • บันทึกล่าสุด: {lastSaved.toLocaleTimeString('th-TH')}
+                        </span>
+                    )}
+                    {saveStatus === 'modified' && (
+                        <span className="text-orange-500">• มีการแก้ไข</span>
+                    )}
+                </div>
+            );
+
+            // Employee Form Modal
+            const EmployeeModal = ({ isOpen, onClose, employee, onSave, title }) => {
+                const [formData, setFormData] = useState(employee || {
+                    name: '',
+                    email: '',
+                    phone: '',
+                    address: '',
+                    dateOfBirth: '',
+                    jobPosition: '',
+                    department: 'Management',
+                    employmentDate: new Date().toISOString().split('T')[0],
+                    hoursPerWeek: 40,
+                    salary: 0,
+                    type: 'Full-time'
+                });
+
+                if (!isOpen) return null;
+
+                const handleSubmit = (e) => {
+                    e.preventDefault();
+                    onSave({
+                        ...formData,
+                        salary: Number(formData.salary),
+                        hoursPerWeek: Number(formData.hoursPerWeek)
+                    });
+                };
+
+                return (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-90vh overflow-y-auto">
+                            <div className="flex justify-between items-center mb-4">
+                                <h2 className="text-xl font-bold">{title}</h2>
+                                <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+                                    <X className="h-6 w-6" />
+                                </button>
+                            </div>
+                            
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">ชื่อ-นามสกุล</label>
+                                        <input
+                                            type="text"
+                                            value={formData.name}
+                                            onChange={(e) => setFormData({...formData, name: e.target.value})}
+                                            className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                                            required
+                                        />
+                                    </div>
+                                    
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">อีเมล</label>
+                                        <input
+                                            type="email"
+                                            value={formData.email}
+                                            onChange={(e) => setFormData({...formData, email: e.target.value})}
+                                            className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                                            required
+                                        />
+                                    </div>
+                                    
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">เบอร์โทร</label>
+                                        <input
+                                            type="tel"
+                                            value={formData.phone}
+                                            onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                                            className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                                        />
+                                    </div>
+                                    
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">วันเกิด</label>
+                                        <input
+                                            type="date"
+                                            value={formData.dateOfBirth}
+                                            onChange={(e) => setFormData({...formData, dateOfBirth: e.target.value})}
+                                            className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                                        />
+                                    </div>
+                                    
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">ตำแหน่งงาน</label>
+                                        <input
+                                            type="text"
+                                            value={formData.jobPosition}
+                                            onChange={(e) => setFormData({...formData, jobPosition: e.target.value})}
+                                            className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                                            required
+                                        />
+                                    </div>
+                                    
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">แผนก</label>
+                                        <select
+                                            value={formData.department}
+                                            onChange={(e) => setFormData({...formData, department: e.target.value})}
+                                            className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                                            required
+                                        >
+                                            <option value="Management">Management</option>
+                                            <option value="Engineering">Engineering</option>
+                                            <option value="Technical">Technical</option>
+                                            <option value="Sales & Marketing">Sales & Marketing</option>
+                                            <option value="Administration">Administration</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">วันที่เริ่มงาน</label>
+                                        <input
+                                            type="date"
+                                            value={formData.employmentDate}
+                                            onChange={(e) => setFormData({...formData, employmentDate: e.target.value})}
+                                            className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                                            required
+                                        />
+                                    </div>
+                                    
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">เงินเดือน (บาท)</label>
+                                        <input
+                                            type="number"
+                                            value={formData.salary}
+                                            onChange={(e) => setFormData({...formData, salary: e.target.value})}
+                                            className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                                            required
+                                            min="0"
+                                        />
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">ที่อยู่</label>
+                                    <textarea
+                                        value={formData.address}
+                                        onChange={(e) => setFormData({...formData, address: e.target.value})}
+                                        className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                                        rows="3"
+                                    />
+                                </div>
+                                
+                                <div className="flex justify-end space-x-3">
+                                    <button
+                                        type="button"
+                                        onClick={onClose}
+                                        className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50"
+                                    >
+                                        ยกเลิก
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                                    >
+                                        บันทึก
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                );
+            };
+
+            if (currentView === 'dashboard') {
+                return (
+                    <div className="min-h-screen bg-gray-50">
+                        <Notification notification={notification} />
+                        
+                        {/* Header */}
+                        <div className="bg-white shadow-sm border-b">
+                            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                                <div className="flex justify-between items-center py-4">
+                                    <div>
+                                        <h1 className="text-2xl font-bold text-gray-900">Addvalue HR System</h1>
+                                        <div className="flex items-center space-x-4">
+                                            <p className="text-sm text-gray-600">Management System (Offline)</p>
+                                            <OfflineIndicator />
+                                        </div>
+                                    </div>
+                                    <div className="flex space-x-3">
+                                        <button
+                                            onClick={() => setCurrentView('employees')}
+                                            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                                        >
+                                            จัดการพนักงาน
+                                        </button>
+                                        <button
+                                            onClick={saveData}
+                                            className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                                        >
+                                            <Save className="h-4 w-4" />
+                                            <span>บันทึก</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                            {/* Stats Cards */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                                <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 fade-in">
+                                    <div className="flex items-center">
+                                        <div className="p-2 bg-blue-100 rounded-lg">
+                                            <Users className="h-6 w-6 text-blue-600" />
+                                        </div>
+                                        <div className="ml-4">
+                                            <p className="text-sm text-gray-600">พนักงานทั้งหมด</p>
+                                            <p className="text-2xl font-bold text-gray-900">{stats.totalEmployees}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 fade-in">
+                                    <div className="flex items-center">
+                                        <div className="p-2 bg-green-100 rounded-lg">
+                                            <DollarSign className="h-6 w-6 text-green-600" />
+                                        </div>
+                                        <div className="ml-4">
+                                            <p className="text-sm text-gray-600">เงินเดือนเฉลี่ย</p>
+                                            <p className="text-2xl font-bold text-gray-900">{formatCurrency(stats.avgSalary)}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 fade-in">
+                                    <div className="flex items-center">
+                                        <div className="p-2 bg-purple-100 rounded-lg">
+                                            <Building className="h-6 w-6 text-purple-600" />
+                                        </div>
+                                        <div className="ml-4">
+                                            <p className="text-sm text-gray-600">จำนวนแผนก</p>
+                                            <p className="text-2xl font-bold text-gray-900">{stats.departmentCount}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 fade-in">
+                                    <div className="flex items-center">
+                                        <div className="p-2 bg-orange-100 rounded-lg">
+                                            <Database className="h-6 w-6 text-orange-600" />
+                                        </div>
+                                        <div className="ml-4">
+                                            <p className="text-sm text-gray-600">โหมดการทำงาน</p>
+                                            <p className="text-lg font-bold text-green-600">Offline Ready</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Export/Import Section */}
+                            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8 fade-in">
+                                <h2 className="text-xl font-semibold text-gray-900 mb-4">การจัดการข้อมูล (Offline)</h2>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <button
+                                        onClick={exportToJSON}
+                                        className="flex items-center justify-center space-x-2 bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+                                    >
+                                        <Download className="h-4 w-4" />
+                                        <span>Export JSON Backup</span>
+                                    </button>
+                                    
+                                    <button
+                                        onClick={exportToCSV}
+                                        className="flex items-center justify-center space-x-2 bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition-colors"
+                                    >
+                                        <Download className="h-4 w-4" />
+                                        <span>Export CSV</span>
+                                    </button>
+                                    
+                                    <label className="flex items-center justify-center space-x-2 bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition-colors cursor-pointer">
+                                        <Upload className="h-4 w-4" />
+                                        <span>Import JSON</span>
+                                        <input
+                                            type="file"
+                                            accept=".json"
+                                            onChange={importFromJSON}
+                                            className="hidden"
+                                        />
+                                    </label>
+                                </div>
+                                <p className="text-sm text-gray-500 mt-2">
+                                    💡 ข้อมูลจะถูกบันทึกในเครื่องคุณ สามารถใช้งานได้แม้ไม่มีอินเทอร์เน็ต
+                                </p>
+                            </div>
+
+                            {/* Recent Employees */}
+                            <div className="bg-white rounded-xl shadow-sm border border-gray-100 fade-in">
+                                <div className="p-6">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h2 className="text-xl font-semibold text-gray-900">พนักงานล่าสุด</h2>
+                                        <button
+                                            onClick={() => setCurrentView('employees')}
+                                            className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                                        >
+                                            ดูทั้งหมด →
+                                        </button>
+                                    </div>
+                                    <div className="space-y-3">
+                                        {data.employees.filter(emp => emp.status === 'Active').slice(0, 5).map((emp) => (
+                                            <div key={emp.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                                <div className="flex items-center space-x-3">
+                                                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                                        <span className="text-xs font-medium text-blue-600">
+                                                            {emp.name.charAt(0)}
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <p className="font-medium text-gray-900">{emp.name}</p>
+                                                        <p className="text-sm text-gray-600">{emp.jobPosition}</p>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="font-medium text-gray-900">{formatCurrency(emp.salary)}</p>
+                                                    <p className="text-sm text-gray-600">{emp.department}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            // Employee Management View
+            return (
+                <div className="min-h-screen bg-gray-50">
+                    <Notification notification={notification} />
+                    
+                    {/* Modals */}
+                    <EmployeeModal
+                        isOpen={showAddModal}
+                        onClose={() => setShowAddModal(false)}
+                        onSave={addEmployee}
+                        title="เพิ่มพนักงานใหม่"
+                    />
+                    
+                    <EmployeeModal
+                        isOpen={showEditModal}
+                        onClose={() => {
+                            setShowEditModal(false);
+                            setSelectedEmployee(null);
+                        }}
+                        employee={selectedEmployee}
+                        onSave={updateEmployee}
+                        title="แก้ไขข้อมูลพนักงาน"
+                    />
+
+                    {/* Header */}
+                    <div className="bg-white shadow-sm border-b">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div className="flex justify-between items-center py-4">
+                                <div>
+                                    <button
+                                        onClick={() => setCurrentView('dashboard')}
+                                        className="text-blue-600 hover:text-blue-700 text-sm mb-1"
+                                    >
+                                        ← กลับสู่หน้าหลัก
+                                    </button>
+                                    <h1 className="text-2xl font-bold text-gray-900">จัดการพนักงาน (Offline)</h1>
+                                    <div className="flex items-center space-x-4">
+                                        <p className="text-sm text-gray-600">จำนวน {filteredEmployees.length} คน</p>
+                                        <OfflineIndicator />
+                                    </div>
+                                </div>
+                                <div className="flex space-x-3">
+                                    <button
+                                        onClick={() => setShowAddModal(true)}
+                                        className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                                    >
+                                        <UserPlus className="h-4 w-4" />
+                                        <span>เพิ่มพนักงาน</span>
+                                    </button>
+                                    
+                                    <button
+                                        onClick={exportToCSV}
+                                        className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                                    >
+                                        <Download className="h-4 w-4" />
+                                        <span>Export CSV</span>
+                                    </button>
+
+                                    <button
+                                        onClick={saveData}
+                                        className="flex items-center space-x-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors"
+                                    >
+                                        <Save className="h-4 w-4" />
+                                        <span>บันทึก</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                        {/* Filters */}
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8 fade-in">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                    <input
+                                        type="text"
+                                        placeholder="ค้นหาพนักงาน..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                </div>
+                                
+                                <div className="relative">
+                                    <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                    <select
+                                        value={departmentFilter}
+                                        onChange={(e) => setDepartmentFilter(e.target.value)}
+                                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    >
+                                        <option value="">ทุกแผนก</option>
+                                        <option value="Management">Management</option>
+                                        <option value="Engineering">Engineering</option>
+                                        <option value="Technical">Technical</option>
+                                        <option value="Sales & Marketing">Sales & Marketing</option>
+                                        <option value="Administration">Administration</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Employee Table */}
+                        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden fade-in">
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead className="bg-gray-50">
+                                        <tr>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                พนักงาน
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                ตำแหน่ง
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                แผนก
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                เงินเดือน
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                วันที่เริ่มงาน
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                                การจัดการ
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-gray-200">
+                                        {filteredEmployees.map((employee) => (
+                                            <tr key={employee.id} className="hover:bg-gray-50">
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="flex items-center">
+                                                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                                            <span className="text-sm font-medium text-blue-600">
+                                                                {employee.name.charAt(0)}
+                                                            </span>
+                                                        </div>
+                                                        <div className="ml-4">
+                                                            <div className="text-sm font-medium text-gray-900">{employee.name}</div>
+                                                            <div className="text-sm text-gray-500">{employee.email}</div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-sm text-gray-900">{employee.jobPosition}</div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                                        {employee.department}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-sm font-medium text-gray-900">
+                                                        {formatCurrency(employee.salary)}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                    {new Date(employee.employmentDate).toLocaleDateString('th-TH')}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                    <div className="flex space-x-2">
+                                                        <button
+                                                            onClick={() => {
+                                                                setSelectedEmployee(employee);
+                                                                setShowEditModal(true);
+                                                            }}
+                                                            className="text-indigo-600 hover:text-indigo-900 p-1 rounded"
+                                                            title="แก้ไข"
+                                                        >
+                                                            <Edit className="h-4 w-4" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => deleteEmployee(employee.id)}
+                                                            className="text-red-600 hover:text-red-900 p-1 rounded"
+                                                            title="ลบ"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Render the application
+        ReactDOM.render(<AddvalueHRSystem />, document.getElementById('root'));
+    </script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Markup Calculation Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 8px; }
+        h1 { color: #333; }
+        .formula { background: #e8f4f8; padding: 15px; margin: 20px 0; border-radius: 5px; font-family: monospace; }
+        .test { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .correct { background: #d4edda; }
+        .incorrect { background: #f8d7da; }
+        input { padding: 8px; margin: 5px; width: 100px; }
+        button { padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        .result { font-weight: bold; margin-top: 10px; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Markup Calculation Verification</h1>
+        
+        <div class="formula">
+            <h3>Correct Markup Formula:</h3>
+            <p><strong>Markup% = (Selling Price - Cost) / Cost × 100</strong></p>
+            <p>✅ Both prices must be in the SAME currency!</p>
+            <p>• THB: Markup = (SellTHB - CostTHB) / CostTHB × 100</p>
+            <p>• USD: Markup = (SellUSD - CostUSD) / CostUSD × 100</p>
+        </div>
+        
+        <div class="test">
+            <h3>Test Calculator</h3>
+            <label>Cost (THB): <input type="number" id="costTHB" value="100000" onchange="calculate()"></label><br>
+            <label>Exchange Rate (THB/USD): <input type="number" id="rate" value="31.5" step="0.1" onchange="calculate()"></label><br>
+            <label>Markup %: <input type="number" id="markup" value="25" step="0.1" onchange="calculate()"></label><br>
+            <button onclick="calculate()">Calculate</button>
+            
+            <div class="result" id="result"></div>
+        </div>
+        
+        <div class="test correct">
+            <h3>✅ Example: 25% Markup</h3>
+            <p>Cost: 100,000 THB (= $3,174.60 USD @ 31.5 THB/USD)</p>
+            <p>25% Markup Calculation:</p>
+            <p>• Sell THB = 100,000 × (1 + 0.25) = 125,000 THB</p>
+            <p>• Sell USD = 125,000 ÷ 31.5 = $3,968.25 USD</p>
+            <p>• Verify THB: (125,000 - 100,000) / 100,000 × 100 = 25% ✓</p>
+            <p>• Verify USD: (3,968.25 - 3,174.60) / 3,174.60 × 100 = 25% ✓</p>
+        </div>
+        
+        <div class="test incorrect">
+            <h3>❌ Common Mistake: Mixed Currencies</h3>
+            <p>Cost: 100,000 THB</p>
+            <p>Sell: $3,968.25 USD</p>
+            <p>Wrong calculation: (3,968.25 - 100,000) / 100,000 × 100 = -96.03%</p>
+            <p>This is meaningless because you're mixing THB and USD!</p>
+        </div>
+    </div>
+    
+    <script>
+        function calculate() {
+            const costTHB = parseFloat(document.getElementById('costTHB').value) || 0;
+            const rate = parseFloat(document.getElementById('rate').value) || 31.5;
+            const markupPercent = parseFloat(document.getElementById('markup').value) || 0;
+            
+            // Convert cost to USD
+            const costUSD = costTHB / rate;
+            
+            // Calculate selling prices
+            const sellTHB = costTHB * (1 + markupPercent / 100);
+            const sellUSD = sellTHB / rate;
+            
+            // Verify markup in both currencies
+            const markupTHB = costTHB > 0 ? (sellTHB - costTHB) / costTHB * 100 : 0;
+            const markupUSD = costUSD > 0 ? (sellUSD - costUSD) / costUSD * 100 : 0;
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <h4>Results:</h4>
+                <p>Cost: ${costTHB.toLocaleString()} THB = $${costUSD.toFixed(2)} USD</p>
+                <p>Sell: ${sellTHB.toLocaleString()} THB = $${sellUSD.toFixed(2)} USD</p>
+                <p class="${Math.abs(markupTHB - markupPercent) < 0.1 ? 'success' : 'error'}">
+                    Markup (THB): ${markupTHB.toFixed(1)}% ${Math.abs(markupTHB - markupPercent) < 0.1 ? '✓' : '✗'}
+                </p>
+                <p class="${Math.abs(markupUSD - markupPercent) < 0.1 ? 'success' : 'error'}">
+                    Markup (USD): ${markupUSD.toFixed(1)}% ${Math.abs(markupUSD - markupPercent) < 0.1 ? '✓' : '✗'}
+                </p>
+                <p><strong>Both markups should equal ${markupPercent}% when using same currency!</strong></p>
+            `;
+        }
+        
+        // Calculate on load
+        calculate();
+    </script>
+</body>
+</html>

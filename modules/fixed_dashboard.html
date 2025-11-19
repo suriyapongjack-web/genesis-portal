@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard ใบตอบรับผู้รับเหมา - โครงการ LAN 76 จังหวัด</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            border-left: 5px solid #007bff;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .stat-card.pending {
+            border-left-color: #ffc107;
+        }
+
+        .stat-card.confirmed {
+            border-left-color: #28a745;
+        }
+
+        .stat-card.multiple {
+            border-left-color: #17a2b8;
+        }
+
+        .stat-card h3 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            font-weight: 700;
+        }
+
+        .stat-card p {
+            font-size: 1.1rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .controls {
+            padding: 30px;
+            background: white;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .search-group {
+            display: flex;
+            gap: 15px;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .form-control {
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        }
+
+        .btn-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+        }
+
+        .export-section {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .table-container {
+            padding: 30px;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            font-size: 0.95rem;
+        }
+
+        .data-table thead {
+            background: linear-gradient(135deg, #343a40 0%, #495057 100%);
+            color: white;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .data-table th {
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table tbody tr {
+            transition: background-color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .contractor-count {
+            background: #f3e5f5;
+            color: #7b1fa2;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .contractor-count:hover {
+            background: #e1bee7;
+            transform: scale(1.05);
+        }
+
+        .contractor-count.multiple {
+            background: #e8f5e8;
+            color: #2e7d32;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .equipment-count {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin: 2px;
+            display: inline-block;
+        }
+
+        .progress-container {
+            background: white;
+            margin: 20px 30px;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 25px;
+            overflow: hidden;
+            margin-top: 15px;
+            position: relative;
+        }
+
+        .progress-fill {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            height: 100%;
+            transition: width 1s ease;
+            position: relative;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            color: #6c757d;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateX(300px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .filter-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 10px;
+            color: #1565c0;
+            font-weight: 500;
+            display: none;
+        }
+
+        .badge-multiple {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .control-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-group {
+                min-width: auto;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .export-section {
+                justify-content: center;
+            }
+
+            .data-table {
+                font-size: 0.8rem;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="notification" class="notification"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🏢 Dashboard ผู้รับเหมาประจำจังหวัด</h1>
+            <p>โครงการติดตั้งระบบเครือข่าย (LAN) 76 จังหวัด - Add Value System Company Limited</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card" onclick="filterByStatus('')">
+                <h3 id="totalProvinces">76</h3>
+                <p>📍 จำนวนจังหวัดทั้งหมด</p>
+            </div>
+            <div class="stat-card confirmed" onclick="filterByStatus('hasContractors')">
+                <h3 id="confirmedCount">4</h3>
+                <p>✅ มีผู้ตอบรับแล้ว</p>
+            </div>
+            <div class="stat-card multiple" onclick="filterByStatus('multiple')">
+                <h3 id="multipleCount">2</h3>
+                <p>👥 มีผู้รับเหมาหลายราย</p>
+            </div>
+            <div class="stat-card pending" onclick="filterByStatus('noContractors')">
+                <h3 id="pendingCount">72</h3>
+                <p>⏳ ยังไม่มีผู้ตอบรับ</p>
+            </div>
+            <div class="stat-card" onclick="filterByStatus('')">
+                <h3 id="totalContractors">7</h3>
+                <p>🏪 ผู้รับเหมาทั้งหมด</p>
+            </div>
+            <div class="stat-card" onclick="filterByStatus('')">
+                <h3 id="totalPoints">2,373</h3>
+                <p>🔌 จุดติดตั้งทั้งหมด</p>
+            </div>
+        </div>
+
+        <div class="progress-container">
+            <h3>📊 ความคืบหน้าการตอบรับผู้รับเหมา</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 5.3%">
+                    <div class="progress-text" id="progressText">5.3%</div>
+                </div>
+            </div>
+            <p style="margin-top: 10px; color: #6c757d; text-align: center;">
+                <span id="progressPercent">5.3</span>% ของจังหวัดทั้งหมดมีผู้รับเหมาตอบรับแล้ว 
+                (<span id="confirmedCountText">4</span> จาก 76 จังหวัด)
+            </p>
+        </div>
+
+        <div class="controls">
+            <div class="control-row">
+                <div class="search-group">
+                    <input type="text" id="searchInput" class="form-control" placeholder="🔍 ค้นหาจังหวัด, บริษัท, ผู้ติดต่อ..." oninput="applyFilters()">
+                    <select id="statusFilter" class="form-control" onchange="applyFilters()">
+                        <option value="">📋 สถานะทั้งหมด</option>
+                        <option value="hasContractors">✅ มีผู้ตอบรับ</option>
+                        <option value="multiple">👥 ผู้รับเหมาหลายราย</option>
+                        <option value="noContractors">⏳ ยังไม่มีผู้ตอบรับ</option>
+                    </select>
+                    <select id="regionFilter" class="form-control" onchange="applyFilters()">
+                        <option value="">🗺️ ภาคทั้งหมด</option>
+                        <option value="north">ภาคเหนือ</option>
+                        <option value="northeast">ภาคตะวันออกเฉียงเหนือ</option>
+                        <option value="central">ภาคกลาง</option>
+                        <option value="east">ภาคตะวันออก</option>
+                        <option value="west">ภาคตะวันตก</option>
+                        <option value="south">ภาคใต้</option>
+                    </select>
+                </div>
+                <div class="export-section">
+                    <button class="btn btn-primary" onclick="exportToJSON()">📁 Export JSON</button>
+                    <button class="btn btn-success" onclick="exportToCSV()">📊 Export CSV</button>
+                    <button class="btn btn-warning" onclick="exportToPowerBI()">⚡ Power BI Format</button>
+                    <button class="btn btn-info" onclick="generateReport()">📋 สร้างรายงาน</button>
+                </div>
+            </div>
+            <div id="filterInfo" class="filter-info"></div>
+        </div>
+
+        <div class="table-container">
+            <table class="data-table" id="provincesTable">
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">ลำดับ</th>
+                        <th style="width: 120px;">จังหวัด</th>
+                        <th style="width: 100px;">ภาค</th>
+                        <th>อีเมลทีม</th>
+                        <th style="width: 80px;">จุดติดตั้ง</th>
+                        <th style="width: 80px;">Switch</th>
+                        <th style="width: 80px;">Rack</th>
+                        <th style="width: 150px;">ผู้รับเหมาตอบรับ</th>
+                        <th style="width: 120px;">วันที่อัพเดท</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p>📅 วันที่อัพเดท: <span id="updateDate"></span> | 
+               🏢 Add Value System Company Limited | 
+               📧 addvalue-procurement@addvaluesystemcompany.onmicrosoft.com</p>
+        </div>
+    </div>
+
+    <script>
+        // ข้อมูลจังหวัดทั้ง 76 จังหวัด
+        var provincesData = [
+            {id: 1, name: "กระบี่", region: "south", email: "addvalue-krabi@outlook.co.th", points: 29, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 2, name: "กาญจนบุรี", region: "west", email: "addvalue-kanchanaburi@outlook.co.th", points: 34, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 3, name: "กาฬสินธุ์", region: "northeast", email: "addvalue-kalasin@outlook.co.th", points: 37, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 4, name: "กำแพงเพชร", region: "north", email: "addvalue-kamphaengphet@outlook.co.th", points: 11, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 5, name: "ขอนแก่น", region: "northeast", email: "addvalue-khonkaen@outlook.co.th", points: 53, switches: 3, racks: 1, lastUpdate: "2024-08-30", contractors: [
+                {id: 1, companyName: "บจก.เทคโนโลยี ขอนแก่น", contactPerson: "นายสมชาย ใจดี", contactPhone: "089-123-4567", contactEmail: "somchai@techkk.com", lineId: "somchai_tech", experience: 5, status: "qualified", submittedDate: "2024-08-28", notes: "มีประสบการณ์งาน LAN มากกว่า 5 ปี"}
+            ]},
+            {id: 6, name: "จันทบุรี", region: "east", email: "addvalue-chanthaburi@outlook.co.th", points: 29, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 7, name: "ฉะเชิงเทรา", region: "central", email: "addvalue-chachoengsao@outlook.co.th", points: 31, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 8, name: "ชลบุรี", region: "east", email: "addvalue-chonburi@outlook.co.th", points: 48, switches: 3, racks: 1, lastUpdate: "2024-08-30", contractors: [
+                {id: 1, companyName: "หจก.เน็ตเวิร์ค ชลบุรี", contactPerson: "นายวิทยา เก่งกาจ", contactPhone: "081-234-5678", contactEmail: "wittaya@netcb.com", lineId: "wittaya_net", experience: 7, status: "selected", submittedDate: "2024-08-25", notes: "ราคาแข่งขันได้ มีผลงานดี"},
+                {id: 2, companyName: "บจก.อินเทอร์เน็ต พลัส", contactPerson: "นางสาวมณี แสงทอง", contactPhone: "092-345-6789", contactEmail: "manee@inetplus.com", lineId: "manee_iplus", experience: 4, status: "qualified", submittedDate: "2024-08-27", notes: "ราคาแข่งขันได้แต่สูงกว่า"},
+                {id: 3, companyName: "ร้านคอมฯ โชคดี", contactPerson: "นายประเสริฐ ชอบงาน", contactPhone: "086-456-7890", contactEmail: "prasert@chokdee.com", lineId: "prasert_cd", experience: 2, status: "pending", submittedDate: "2024-08-29", notes: "รอการประเมิน"}
+            ]},
+            {id: 9, name: "ชัยนาท", region: "central", email: "addvalue-chainat@outlook.co.th", points: 29, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 10, name: "ชัยภูมิ", region: "northeast", email: "addvalue-chaiyaphum@outlook.co.th", points: 34, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 11, name: "ชุมพร", region: "south", email: "addvalue-chumphon@outlook.co.th", points: 29, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 12, name: "เชียงราย", region: "north", email: "addvalue-chiangrai@outlook.co.th", points: 38, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 13, name: "เชียงใหม่", region: "north", email: "addvalue-chiangmai@outlook.co.th", points: 53, switches: 3, racks: 1, lastUpdate: "2024-08-30", contractors: [
+                {id: 1, companyName: "บจก.เหนือเทค เซอร์วิส", contactPerson: "นายชำนาญ รู้เก่ง", contactPhone: "053-123-456", contactEmail: "chamnan@northtech.com", lineId: "chamnan_nt", experience: 8, status: "selected", submittedDate: "2024-08-26", notes: "เลือกเป็นผู้รับเหมาหลักแล้ว"},
+                {id: 2, companyName: "หจก.ดอยเทค", contactPerson: "นางสุดา ขยันทำ", contactPhone: "053-234-567", contactEmail: "suda@doitech.com", lineId: "suda_dt", experience: 6, status: "backup", submittedDate: "2024-08-27", notes: "เก็บไว้เป็น backup contractor"}
+            ]},
+            {id: 14, name: "ตรัง", region: "south", email: "addvalue-trang@outlook.co.th", points: 29, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 15, name: "ตราด", region: "east", email: "addvalue-trat@outlook.co.th", points: 29, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 16, name: "ตาก", region: "north", email: "addvalue-tak@outlook.co.th", points: 29, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 17, name: "นครนายก", region: "central", email: "addvalue-nakhonnayok@outlook.co.th", points: 29, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 18, name: "นครปฐม", region: "central", email: "addvalue-nakhonpathom@outlook.co.th", points: 34, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 19, name: "นครพนม", region: "northeast", email: "addvalue-nakhonphanom@outlook.co.th", points: 11, switches: 2, racks: 1, lastUpdate: "2024-08-30", contractors: []},
+            {id: 20, name: "นครราชสีมา", region: "northeast", email: "addvalue-nakhonratchasima@outlook.co.th", points: 43, switches: 3, racks: 1, lastUpdate: "2024-08-30", contractors: [
+                {id: 1, companyName: "บจก.โคราช เน็ตเวิร์ค", contactPerson: "นายดำรงค์ เชี่ยวชาญ", contactPhone: "044-123-456", contactEmail: "damrong@koratnet.com", lineId: "damrong_kn", experience: 10, status: "qualified", submittedDate: "2024-08-24", notes: "มีประสบการณ์สูงที่สุด"}
+            ]}
+        ];
+
+        // เติมข้อมูลจังหวัดที่เหลือ
+        var remainingProvinces = [
+            {name: "นครศรีธรรมราช", region: "south", points: 38},
+            {name: "นครสวรรค์", region: "north", points: 34},
+            {name: "นนทบุรี", region: "central", points: 31},
+            {name: "นราธิวาส", region: "south", points: 29},
+            {name: "น่าน", region: "north", points: 29},
+            {name: "บึงกาฬ", region: "northeast", points: 11},
+            {name: "บุรีรัมย์", region: "northeast", points: 38},
+            {name: "ปทุมธานี", region: "central", points: 34},
+            {name: "ประจวบคีรีขันธ์", region: "south", points: 29},
+            {name: "ปราจีนบุรี", region: "east", points: 29},
+            {name: "ปัตตานี", region: "south", points: 11},
+            {name: "พระนครศรีอยุธยา", region: "central", points: 34},
+            {name: "พะเยา", region: "north", points: 29},
+            {name: "พังงา", region: "south", points: 29},
+            {name: "พัทลุง", region: "south", points: 29},
+            {name: "พิจิตร", region: "north", points: 29},
+            {name: "พิษณุโลก", region: "north", points: 34},
+            {name: "เพชรบุรี", region: "central", points: 29},
+            {name: "เพชรบูรณ์", region: "north", points: 34},
+            {name: "แพร่", region: "north", points: 29},
+            {name: "ภูเก็ต", region: "south", points: 29},
+            {name: "มหาสารคาม", region: "northeast", points: 34},
+            {name: "มุกดาหาร", region: "northeast", points: 29},
+            {name: "แม่ฮ่องสอน", region: "north", points: 29},
+            {name: "ยโสธร", region: "northeast", points: 29},
+            {name: "ยะลา", region: "south", points: 29},
+            {name: "ร้อยเอ็ด", region: "northeast", points: 38},
+            {name: "ระนอง", region: "south", points: 29},
+            {name: "ระยอง", region: "east", points: 29},
+            {name: "ราชบุรี", region: "west", points: 34},
+            {name: "ลพบุรี", region: "central", points: 31},
+            {name: "ลำปาง", region: "north", points: 29},
+            {name: "ลำพูน", region: "north", points: 29},
+            {name: "เลย", region: "northeast", points: 29},
+            {name: "ศรีสะเกษ", region: "northeast", points: 38},
+            {name: "สกลนคร", region: "northeast", points: 34},
+            {name: "สงขลา", region: "south", points: 51},
+            {name: "สตูล", region: "south", points: 29},
+            {name: "สมุทรปราการ", region: "central", points: 34},
+            {name: "สมุทรสงคราม", region: "central", points: 29},
+            {name: "สมุทรสาคร", region: "central", points: 11},
+            {name: "สระแก้ว", region: "east", points: 29},
+            {name: "สระบุรี", region: "central", points: 31},
+            {name: "สิงห์บุรี", region: "central", points: 29},
+            {name: "สุโขทัย", region: "north", points: 29},
+            {name: "สุพรรณบุรี", region: "central", points: 31},
+            {name: "สุราษฎร์ธานี", region: "south", points: 34},
+            {name: "สุรินทร์", region: "northeast", points: 38},
+            {name: "หนองคาย", region: "northeast", points: 29},
+            {name: "หนองบัวลำภู", region: "northeast", points: 29},
+            {name: "อ่างทอง", region: "central", points: 29},
+            {name: "อำนาจเจริญ", region: "northeast", points: 29},
+            {name: "อุดรธานี", region: "northeast", points: 38},
+            {name: "อุตรดิตถ์", region: "north", points: 29},
+            {name: "อุทัยธานี", region: "north", points: 29},
+            {name: "อุบลราชธานี", region: "northeast", points: 39}
+        ];
+
+        // เติมข้อมูลที่เหลือ
+        for (var i = 0; i < remainingProvinces.length; i++) {
+            var province = remainingProvinces[i];
+            provincesData.push({
+                id: 21 + i,
+                name: province.name,
+                region: province.region,
+                email: "addvalue-" + province.name.toLowerCase() + "@outlook.co.th",
+                points: province.points,
+                switches: province.points > 40 ? 3 : 2,
+                racks: 1,
+                lastUpdate: "2024-08-30",
+                contractors: []
+            });
+        }
+
+        var filteredData = provincesData.slice();
+
+        var regionNames = {
+            "north": "ภาคเหนือ",
+            "northeast": "ภาคตะวันออกเฉียงเหนือ", 
+            "central": "ภาคกลาง",
+            "east": "ภาคตะวันออก",
+            "west": "ภาคตะวันตก",
+            "south": "ภาคใต้"
+        };
+
+        function updateStats() {
+            var provincesWithContractors = 0;
+            var provincesWithMultiple = 0;
+            var totalContractors = 0;
+            var totalPoints = 0;
+
+            for (var i = 0; i < provincesData.length; i++) {
+                var p = provincesData[i];
+                if (p.contractors.length > 0) {
+                    provincesWithContractors++;
+                }
+                if (p.contractors.length > 1) {
+                    provincesWithMultiple++;
+                }
+                totalContractors += p.contractors.length;
+                totalPoints += p.points;
+            }
+
+            var pendingProvinces = provincesData.length - provincesWithContractors;
+
+            document.getElementById('confirmedCount').textContent = provincesWithContractors;
+            document.getElementById('multipleCount').textContent = provincesWithMultiple;
+            document.getElementById('pendingCount').textContent = pendingProvinces;
+            document.getElementById('totalContractors').textContent = totalContractors;
+            document.getElementById('totalPoints').textContent = totalPoints.toLocaleString();
+
+            var progressPercent = Math.round((provincesWithContractors / provincesData.length) * 100);
+            document.getElementById('progressPercent').textContent = progressPercent;
+            document.getElementById('confirmedCountText').textContent = provincesWithContractors;
+            document.getElementById('progressFill').style.width = progressPercent + '%';
+            document.getElementById('progressText').textContent = progressPercent + '%';
+        }
+
+        function getContractorDisplay(province) {
+            var count = province.contractors.length;
+            if (count === 0) {
+                return '<span class="contractor-count">⏳ ยังไม่มีผู้ตอบรับ</span>';
+            } else if (count === 1) {
+                return '<span class="contractor-count">✅ ' + count + ' ราย</span>';
+            } else {
+                return '<span class="contractor-count multiple">👥 ' + count + ' ราย<span class="badge-multiple">Multiple!</span></span>';
+            }
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('th-TH');
+        }
+
+        function populateTable(data) {
+            if (!data) data = filteredData;
+            
+            var tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: #6c757d;">ไม่พบข้อมูลที่ตรงกับการค้นหา</td></tr>';
+                return;
+            }
+
+            for (var i = 0; i < data.length; i++) {
+                var province = data[i];
+                var row = tbody.insertRow();
+                var contractorDisplay = getContractorDisplay(province);
+                
+                row.innerHTML = 
+                    '<td style="text-align: center; font-weight: bold;">' + (i + 1) + '</td>' +
+                    '<td style="font-weight: bold; color: #2c3e50;">' + province.name + '</td>' +
+                    '<td><span style="background: #e3f2fd; color: #1565c0; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;">' + regionNames[province.region] + '</span></td>' +
+                    '<td style="font-size: 0.85rem; color: #6c757d;">' + province.email + '</td>' +
+                    '<td><span class="equipment-count">' + province.points + ' จุด</span></td>' +
+                    '<td><span class="equipment-count">' + province.switches + ' ตัว</span></td>' +
+                    '<td><span class="equipment-count">' + province.racks + ' ตู้</span></td>' +
+                    '<td>' + contractorDisplay + '</td>' +
+                    '<td style="font-size: 0.8rem; color: #6c757d;">' + formatDate(province.lastUpdate) + '</td>';
+            }
+
+            updateFilterInfo(data.length);
+        }
+
+        function updateFilterInfo(count) {
+            var filterInfo = document.getElementById('filterInfo');
+            var searchTerm = document.getElementById('searchInput').value;
+            var statusFilter = document.getElementById('statusFilter').value;
+            var regionFilter = document.getElementById('regionFilter').value;
+
+            if (searchTerm || statusFilter || regionFilter || count < provincesData.length) {
+                var info = 'แสดง ' + count.toLocaleString() + ' จาก ' + provincesData.length + ' จังหวัด';
+                if (searchTerm) info += ' | ค้นหา: "' + searchTerm + '"';
+                if (statusFilter) {
+                    var statusLabels = {
+                        'hasContractors': '✅ มีผู้ตอบรับ',
+                        'multiple': '👥 ผู้รับเหมาหลายราย',
+                        'noContractors': '⏳ ยังไม่มีผู้ตอบรับ'
+                    };
+                    info += ' | สถานะ: ' + statusLabels[statusFilter];
+                }
+                if (regionFilter) info += ' | ภาค: ' + regionNames[regionFilter];
+                
+                filterInfo.textContent = info;
+                filterInfo.style.display = 'block';
+            } else {
+                filterInfo.style.display = 'none';
+            }
+        }
+
+        function applyFilters() {
+            var searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            var statusFilter = document.getElementById('statusFilter').value;
+            var regionFilter = document.getElementById('regionFilter').value;
+
+            filteredData = [];
+
+            for (var i = 0; i < provincesData.length; i++) {
+                var province = provincesData[i];
+                
+                var matchesSearch = province.name.toLowerCase().indexOf(searchTerm) !== -1 || 
+                                   province.email.toLowerCase().indexOf(searchTerm) !== -1;
+
+                for (var j = 0; j < province.contractors.length; j++) {
+                    var c = province.contractors[j];
+                    if (c.companyName.toLowerCase().indexOf(searchTerm) !== -1 ||
+                        c.contactPerson.toLowerCase().indexOf(searchTerm) !== -1) {
+                        matchesSearch = true;
+                        break;
+                    }
+                }
+                
+                var matchesStatus = true;
+                if (statusFilter) {
+                    if (statusFilter === 'hasContractors') {
+                        matchesStatus = province.contractors.length > 0;
+                    } else if (statusFilter === 'multiple') {
+                        matchesStatus = province.contractors.length > 1;
+                    } else if (statusFilter === 'noContractors') {
+                        matchesStatus = province.contractors.length === 0;
+                    }
+                }
+
+                var matchesRegion = !regionFilter || province.region === regionFilter;
+
+                if (matchesSearch && matchesStatus && matchesRegion) {
+                    filteredData.push(province);
+                }
+            }
+
+            populateTable(filteredData);
+        }
+
+        function filterByStatus(status) {
+            document.getElementById('statusFilter').value = status;
+            applyFilters();
+            showNotification('กรองข้อมูลตามสถานะเรียบร้อย');
+        }
+
+        function showNotification(message) {
+            var notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(function() {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function downloadFile(content, filename, contentType) {
+            var a = document.createElement('a');
+            var file = new Blob([content], {type: contentType});
+            a.href = URL.createObjectURL(file);
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function exportToJSON() {
+            var dataStr = JSON.stringify(provincesData, null, 2);
+            downloadFile(dataStr, 'provinces_contractors_full.json', 'application/json');
+            showNotification('ส่งออกข้อมูล JSON สำเร็จ!');
+        }
+
+        function exportToCSV() {
+            var csvContent = '\ufeffID,จังหวัด,ภาค,อีเมลทีม,จุดติดตั้ง,Switch,Rack,จำนวนผู้รับเหมา,วันที่อัพเดท\n';
+
+            for (var i = 0; i < provincesData.length; i++) {
+                var p = provincesData[i];
+                csvContent += p.id + ',"' + p.name + '","' + regionNames[p.region] + '","' + p.email + '",' + p.points + ',' + p.switches + ',' + p.racks + ',' + p.contractors.length + ',' + p.lastUpdate + '\n';
+            }
+            
+            downloadFile(csvContent, 'provinces_contractors_full.csv', 'text/csv;charset=utf-8;');
+            showNotification('ส่งออกข้อมูล CSV สำเร็จ!');
+        }
+
+        function exportToPowerBI() {
+            var powerBIData = [];
+
+            for (var i = 0; i < provincesData.length; i++) {
+                var p = provincesData[i];
+                if (p.contractors.length === 0) {
+                    powerBIData.push({
+                        ProvinceID: p.id,
+                        ProvinceName: p.name,
+                        Region: p.region,
+                        RegionName: regionNames[p.region],
+                        TeamEmail: p.email,
+                        InstallationPoints: p.points,
+                        SwitchCount: p.switches,
+                        RackCount: p.racks,
+                        ContractorsCount: 0,
+                        HasContractors: false,
+                        HasMultipleContractors: false,
+                        LastUpdated: p.lastUpdate,
+                        CreatedDate: new Date().toISOString(),
+                        ProjectName: 'โครงการติดตั้งระบบเครือข่าย (LAN) 76 จังหวัด'
+                    });
+                } else {
+                    for (var j = 0; j < p.contractors.length; j++) {
+                        var c = p.contractors[j];
+                        powerBIData.push({
+                            ProvinceID: p.id,
+                            ProvinceName: p.name,
+                            Region: p.region,
+                            RegionName: regionNames[p.region],
+                            TeamEmail: p.email,
+                            InstallationPoints: p.points,
+                            SwitchCount: p.switches,
+                            RackCount: p.racks,
+                            ContractorsCount: p.contractors.length,
+                            HasContractors: true,
+                            HasMultipleContractors: p.contractors.length > 1,
+                            ContractorCompany: c.companyName,
+                            ContactPerson: c.contactPerson,
+                            ContactPhone: c.contactPhone,
+                            ContactEmail: c.contactEmail,
+                            ContractorStatus: c.status,
+                            Experience: c.experience,
+                            SubmittedDate: c.submittedDate,
+                            Notes: c.notes,
+                            LastUpdated: p.lastUpdate,
+                            CreatedDate: new Date().toISOString(),
+                            ProjectName: 'โครงการติดตั้งระบบเครือข่าย (LAN) 76 จังหวัด'
+                        });
+                    }
+                }
+            }
+
+            var dataStr = JSON.stringify(powerBIData, null, 2);
+            downloadFile(dataStr, 'contractors_powerbi_format.json', 'application/json');
+            showNotification('ส่งออกข้อมูล Power BI Format สำเร็จ!');
+        }
+
+        function generateReport() {
+            var provincesWithContractors = 0;
+            var totalContractors = 0;
+
+            for (var i = 0; i < provincesData.length; i++) {
+                if (provincesData[i].contractors.length > 0) {
+                    provincesWithContractors++;
+                }
+                totalContractors += provincesData[i].contractors.length;
+            }
+            
+            var reportData = {
+                metadata: {
+                    reportTitle: 'รายงานสถานะผู้รับเหมาตอบรับ - รายจังหวัด',
+                    projectName: 'โครงการติดตั้งระบบเครือข่าย (LAN) 76 จังหวัด',
+                    company: 'Add Value System Company Limited',
+                    generatedDate: new Date().toISOString()
+                },
+                summary: {
+                    totalProvinces: provincesData.length,
+                    provincesWithContractors: provincesWithContractors,
+                    totalContractors: totalContractors,
+                    progressPercentage: Math.round((provincesWithContractors / provincesData.length) * 100)
+                },
+                detailedData: provincesData.map(function(p) {
+                    return {
+                        id: p.id,
+                        name: p.name,
+                        region: regionNames[p.region],
+                        email: p.email,
+                        points: p.points,
+                        switches: p.switches,
+                        racks: p.racks,
+                        contractorsCount: p.contractors.length,
+                        lastUpdate: p.lastUpdate
+                    };
+                })
+            };
+
+            var dataStr = JSON.stringify(reportData, null, 2);
+            downloadFile(dataStr, 'contractors_detailed_report.json', 'application/json');
+            showNotification('สร้างรายงานสำเร็จ!');
+        }
+
+        // เริ่มต้นระบบ
+        window.onload = function() {
+            updateStats();
+            populateTable();
+            
+            document.getElementById('updateDate').textContent = new Date().toLocaleDateString('th-TH', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            setTimeout(function() {
+                showNotification('Dashboard พร้อมใช้งาน - สามารถค้นหา กรอง และ Export ข้อมูลได้!');
+            }, 1000);
+        };
+    </script>
+</body>
+</html>

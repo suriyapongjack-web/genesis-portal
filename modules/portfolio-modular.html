@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio Management System</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+<style>
+:root{--primary:#2563eb;--secondary:#64748b;--success:#10b981;--danger:#ef4444;--warning:#f59e0b;--dark:#1e293b}
+body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:#f1f5f9}
+.main-container{max-width:1400px;margin:0 auto;padding:20px}
+.module-header{background:linear-gradient(135deg,var(--primary),#1e40af);color:white;padding:25px;border-radius:12px 12px 0 0;margin-bottom:0}
+.nav-tabs{background:white;padding:0;border:none;box-shadow:0 2px 4px rgba(0,0,0,0.05)}
+.nav-tabs .nav-link{color:var(--secondary);border:none;padding:15px 30px;font-weight:500;position:relative}
+.nav-tabs .nav-link.active{color:var(--primary)}
+.nav-tabs .nav-link.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--primary)}
+.filter-bar{background:white;border-radius:10px;padding:15px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.filter-grid{display:flex;gap:10px;align-items:end}
+.filter-item{flex:1}
+.filter-item label{font-size:0.8rem;color:#64748b;font-weight:500;text-transform:uppercase;margin-bottom:5px}
+.filter-item input,.filter-item select{width:100%;padding:8px 12px;border:1px solid #e2e8f0;border-radius:6px;font-size:0.9rem}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:15px;margin-bottom:20px}
+.stat-card{background:white;border-radius:10px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.08);border-left:4px solid var(--primary)}
+.stat-value{font-size:1.75rem;font-weight:700;color:var(--dark)}
+.stat-label{font-size:0.875rem;color:var(--secondary);margin-top:5px}
+.data-table-container{background:white;border-radius:10px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.btn-icon{padding:6px 12px;border:1px solid #e2e8f0;background:white;border-radius:6px;font-size:0.875rem}
+.table thead th{background:#f8fafc;font-weight:600;font-size:0.8rem;color:var(--secondary);text-transform:uppercase;padding:12px}
+.client-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:#e0f2fe;color:#0369a1;border-radius:6px;font-weight:500;font-size:0.8rem}
+.project-tag{display:inline-block;padding:4px 10px;background:linear-gradient(135deg,#dbeafe,#bfdbfe);color:#1e40af;border-radius:6px;font-size:0.8rem;font-weight:500}
+.description-title{font-weight:600;color:var(--dark);font-size:0.9rem}
+.description-subtitle{font-size:0.75rem;color:var(--secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.status-badge{padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:500}
+.status-badge.active{background:#dcfce7;color:#166534}
+.status-badge.completed{background:#dbeafe;color:#1e40af}
+.status-badge.pending{background:#fef3c7;color:#92400e}
+.amount-display{font-weight:600;color:var(--dark)}
+.year-badge{display:inline-block;padding:2px 8px;background:#f3f4f6;color:#6b7280;border-radius:4px;font-size:0.75rem}
+.chart-container{background:white;border-radius:10px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.08);min-height:350px}
+@media(max-width:768px){.filter-grid{flex-direction:column}.stats-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="main-container">
+  <div class="module-header">
+    <h1 class="h3 mb-0">Portfolio Management System</h1>
+    <small>Modular Business Dashboard</small>
+  </div>
+
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" data-bs-toggle="tab" href="#dashboard">Dashboard</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#analytics">Analytics</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#reports">Reports</a>
+    </li>
+  </ul>
+
+  <div class="tab-content mt-4">
+    <!-- Dashboard Tab -->
+    <div class="tab-pane fade show active" id="dashboard">
+      <div class="filter-bar">
+        <div class="filter-grid">
+          <div class="filter-item">
+            <label>PO Number</label>
+            <input type="text" id="searchPO" placeholder="Search PO">
+          </div>
+          <div class="filter-item">
+            <label>Client</label>
+            <select id="searchClient">
+              <option value="">All Clients</option>
+              <option value="PTTEP">PTTEP</option>
+              <option value="Thai Oil">Thai Oil</option>
+              <option value="PTTGC">PTTGC</option>
+              <option value="SCG">SCG</option>
+              <option value="IRPC">IRPC</option>
+              <option value="Bangchak">Bangchak</option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <label>Project</label>
+            <select id="filterProject">
+              <option value="">All Projects</option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <label>Year</label>
+            <select id="filterYear">
+              <option value="">All Years</option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <button class="btn btn-primary w-100" onclick="app.search()">
+              <i class="bi bi-search"></i> Search
+            </button>
+          </div>
+          <div class="filter-item">
+            <button class="btn btn-secondary w-100" onclick="app.clear()">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="totalPO">0</div>
+          <div class="stat-label">Total Documents</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="totalAmount">฿0</div>
+          <div class="stat-label">Total Value</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="totalProjects">0</div>
+          <div class="stat-label">Projects</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="avgAmount">฿0</div>
+          <div class="stat-label">Average Value</div>
+        </div>
+      </div>
+
+      <div class="data-table-container">
+        <div class="table-header">
+          <h6 class="mb-0">Portfolio Documents</h6>
+          <div>
+            <button class="btn-icon" onclick="app.add()">
+              <i class="bi bi-plus"></i> Add
+            </button>
+            <button class="btn-icon" onclick="app.export()">
+              <i class="bi bi-download"></i> Export
+            </button>
+          </div>
+        </div>
+        <table class="table" id="dataTable">
+          <thead>
+            <tr>
+              <th>PO Number</th>
+              <th>Date/Year</th>
+              <th>Client</th>
+              <th>Project</th>
+              <th>Title</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Analytics Tab -->
+    <div class="tab-pane fade" id="analytics">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <div class="chart-container">
+            <canvas id="projectChart"></canvas>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="chart-container">
+            <canvas id="monthlyChart"></canvas>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="chart-container">
+            <canvas id="trendChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reports Tab -->
+    <div class="tab-pane fade" id="reports">
+      <div class="data-table-container">
+        <div class="btn-group mb-3">
+          <button class="btn btn-outline-primary" onclick="app.report('summary')">Summary</button>
+          <button class="btn btn-outline-primary" onclick="app.report('detail')">Detail</button>
+          <button class="btn btn-outline-primary" onclick="app.report('print')">Print</button>
+        </div>
+        <div id="reportContainer"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Edit Document</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label>PO Number</label>
+          <input type="text" class="form-control" id="edit_po">
+        </div>
+        <div class="mb-3">
+          <label>Date</label>
+          <input type="date" class="form-control" id="edit_date">
+        </div>
+        <div class="mb-3">
+          <label>Client</label>
+          <select class="form-control" id="edit_client">
+            <option>PTT Exploration and Production</option>
+            <option>Thai Oil Public Company</option>
+            <option>PTTGC</option>
+            <option>SCG Chemicals</option>
+            <option>IRPC</option>
+            <option>Bangchak Corporation</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label>Project</label>
+          <input type="text" class="form-control" id="edit_project">
+        </div>
+        <div class="mb-3">
+          <label>Description</label>
+          <textarea class="form-control" id="edit_desc" rows="2"></textarea>
+        </div>
+        <div class="mb-3">
+          <label>Amount</label>
+          <input type="number" class="form-control" id="edit_amount">
+        </div>
+        <div class="mb-3">
+          <label>Status</label>
+          <select class="form-control" id="edit_status">
+            <option>active</option>
+            <option>completed</option>
+            <option>pending</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" onclick="app.save()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+// Modular Application
+const app = {
+  data: [
+    {po:'OB130278',date:'2008-09-05',client:'PTT Exploration and Production',abbr:'PTTEP',project:'Bangkok Project',desc:'Network infrastructure upgrade',title:'Network Infrastructure',amount:1070000,status:'completed'},
+    {po:'OB126282',date:'2008-08-28',client:'PTT Exploration and Production',abbr:'PTTEP',project:'Bangkok Project',desc:'Wireless broadband access',title:'Wireless Access',amount:110000,status:'completed'},
+    {po:'OB133728',date:'2009-03-19',client:'PTT Exploration and Production',abbr:'PTTEP',project:'Bangkok Project',desc:'Antenna systems installation',title:'Antenna Systems',amount:458000,status:'completed'},
+    {po:'OA119706',date:'2010-04-06',client:'PTT Exploration and Production',abbr:'PTTEP',project:'Arthit Project',desc:'Base station deployment',title:'Base Station',amount:510000,status:'active'},
+    {po:'OA120001',date:'2024-01-15',client:'Thai Oil Public Company',abbr:'Thai Oil',project:'Rayong Project',desc:'Control system upgrade',title:'Control System',amount:750000,status:'active'},
+    {po:'OA120002',date:'2024-02-20',client:'PTTGC',abbr:'PTTGC',project:'Polymer Project',desc:'Laboratory equipment',title:'Lab Equipment',amount:320000,status:'active'},
+    {po:'OA120003',date:'2024-03-10',client:'SCG Chemicals',abbr:'SCG',project:'Expansion Project',desc:'Plant automation system',title:'Plant Automation',amount:890000,status:'pending'},
+    {po:'OA120004',date:'2024-04-05',client:'IRPC',abbr:'IRPC',project:'Refinery Upgrade',desc:'Safety system implementation',title:'Safety Systems',amount:455000,status:'active'},
+    {po:'OA120005',date:'2024-05-12',client:'Bangchak Corporation',abbr:'Bangchak',project:'Solar Farm Project',desc:'Solar monitoring system',title:'Solar Monitoring',amount:1250000,status:'active'}
+  ],
+  filtered: [],
+  editIdx: -1,
+  dt: null,
+  
+  init() {
+    this.filtered = [...this.data];
+    this.load();
+    this.populateFilters();
+    this.render();
+    this.initCharts();
+  },
+  
+  load() {
+    const saved = localStorage.getItem('portfolio');
+    if(saved) {
+      try {
+        this.data = JSON.parse(saved);
+        this.filtered = [...this.data];
+      } catch(e) {}
+    }
+  },
+  
+  save() {
+    const d = {
+      po: $('#edit_po').val(),
+      date: $('#edit_date').val(),
+      client: $('#edit_client').val(),
+      abbr: this.getAbbr($('#edit_client').val()),
+      project: $('#edit_project').val(),
+      desc: $('#edit_desc').val(),
+      title: this.getTitle($('#edit_desc').val()),
+      amount: parseFloat($('#edit_amount').val()),
+      status: $('#edit_status').val()
+    };
+    
+    if(this.editIdx === -1) {
+      this.data.push(d);
+    } else {
+      this.data[this.editIdx] = d;
+    }
+    
+    localStorage.setItem('portfolio', JSON.stringify(this.data));
+    this.filtered = [...this.data];
+    this.render();
+    bootstrap.Modal.getInstance($('#editModal')[0]).hide();
+  },
+  
+  populateFilters() {
+    const projects = [...new Set(this.data.map(d => d.project))];
+    $('#filterProject').html('<option value="">All Projects</option>' + 
+      projects.map(p => `<option value="${p}">${p}</option>`).join(''));
+    
+    const years = [...new Set(this.data.map(d => d.date.substring(0,4)))].sort().reverse();
+    $('#filterYear').html('<option value="">All Years</option>' +
+      years.map(y => `<option value="${y}">${y}</option>`).join(''));
+  },
+  
+  search() {
+    const po = $('#searchPO').val().toLowerCase();
+    const client = $('#searchClient').val();
+    const project = $('#filterProject').val();
+    const year = $('#filterYear').val();
+    
+    this.filtered = this.data.filter(item => {
+      const matchPO = !po || item.po.toLowerCase().includes(po);
+      const matchClient = !client || item.abbr === client;
+      const matchProject = !project || item.project === project;
+      const matchYear = !year || item.date.startsWith(year);
+      return matchPO && matchClient && matchProject && matchYear;
+    });
+    
+    this.render();
+  },
+  
+  clear() {
+    $('#searchPO').val('');
+    $('#searchClient').val('');
+    $('#filterProject').val('');
+    $('#filterYear').val('');
+    this.filtered = [...this.data];
+    this.render();
+  },
+  
+  render() {
+    // Stats
+    const total = this.filtered.length;
+    const amount = this.filtered.reduce((s,d) => s + d.amount, 0);
+    const projects = new Set(this.filtered.map(d => d.project)).size;
+    const avg = total ? amount/total : 0;
+    
+    $('#totalPO').text(total);
+    $('#totalAmount').text('฿' + amount.toLocaleString('th-TH', {maximumFractionDigits:0}));
+    $('#totalProjects').text(projects);
+    $('#avgAmount').text('฿' + avg.toLocaleString('th-TH', {maximumFractionDigits:0}));
+    
+    // Table
+    const tbody = this.filtered.map((item,idx) => `
+      <tr>
+        <td><strong>${item.po}</strong></td>
+        <td>
+          ${new Date(item.date).toLocaleDateString('en-US')}
+          <span class="year-badge ms-1">${item.date.substring(0,4)}</span>
+        </td>
+        <td><span class="client-badge">${item.abbr}</span></td>
+        <td><span class="project-tag">${item.project}</span></td>
+        <td>
+          <div class="description-title">${item.title}</div>
+          <div class="description-subtitle" title="${item.desc}">${item.desc}</div>
+        </td>
+        <td class="text-end amount-display">฿${item.amount.toLocaleString()}</td>
+        <td><span class="status-badge ${item.status}">${item.status}</span></td>
+        <td>
+          <button class="btn btn-sm btn-outline-primary" onclick="app.edit(${idx})">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button class="btn btn-sm btn-outline-danger" onclick="app.del(${idx})">
+            <i class="bi bi-trash"></i>
+          </button>
+        </td>
+      </tr>
+    `).join('');
+    
+    $('#tableBody').html(tbody);
+    
+    if(this.dt) this.dt.destroy();
+    this.dt = $('#dataTable').DataTable({
+      pageLength: 10,
+      searching: false,
+      info: false,
+      lengthChange: false
+    });
+    
+    if(this.charts) this.updateCharts();
+  },
+  
+  initCharts() {
+    this.charts = true;
+    
+    // Project Chart
+    const ctx1 = document.getElementById('projectChart');
+    if(ctx1) {
+      const data = {};
+      this.data.forEach(d => {
+        data[d.project] = (data[d.project] || 0) + d.amount;
+      });
+      
+      this.projectChart = new Chart(ctx1, {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(data),
+          datasets: [{
+            data: Object.values(data),
+            backgroundColor: ['#2563eb','#10b981','#f59e0b','#ef4444','#8b5cf6']
+          }]
+        },
+        options: {responsive:true, maintainAspectRatio:false}
+      });
+    }
+    
+    // Monthly Chart
+    const ctx2 = document.getElementById('monthlyChart');
+    if(ctx2) {
+      const data = {};
+      this.data.forEach(d => {
+        const month = d.date.substring(0,7);
+        data[month] = (data[month] || 0) + d.amount;
+      });
+      
+      this.monthlyChart = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(data).sort(),
+          datasets: [{
+            label: 'Amount',
+            data: Object.keys(data).sort().map(k => data[k]),
+            backgroundColor: '#2563eb'
+          }]
+        },
+        options: {responsive:true, maintainAspectRatio:false}
+      });
+    }
+    
+    // Trend Chart
+    const ctx3 = document.getElementById('trendChart');
+    if(ctx3) {
+      const sorted = [...this.data].sort((a,b) => a.date.localeCompare(b.date));
+      this.trendChart = new Chart(ctx3, {
+        type: 'line',
+        data: {
+          labels: sorted.map(d => d.po),
+          datasets: [{
+            label: 'Value',
+            data: sorted.map(d => d.amount),
+            borderColor: '#10b981',
+            tension: 0.4
+          }]
+        },
+        options: {responsive:true, maintainAspectRatio:false}
+      });
+    }
+  },
+  
+  updateCharts() {
+    if(this.projectChart) {
+      const data = {};
+      this.filtered.forEach(d => {
+        data[d.project] = (data[d.project] || 0) + d.amount;
+      });
+      this.projectChart.data.labels = Object.keys(data);
+      this.projectChart.data.datasets[0].data = Object.values(data);
+      this.projectChart.update();
+    }
+  },
+  
+  add() {
+    this.editIdx = -1;
+    $('#edit_po').val('OA' + (120005 + this.data.length));
+    $('#edit_date').val(new Date().toISOString().split('T')[0]);
+    $('#edit_client').val('');
+    $('#edit_project').val('');
+    $('#edit_desc').val('');
+    $('#edit_amount').val('');
+    $('#edit_status').val('active');
+    new bootstrap.Modal($('#editModal')[0]).show();
+  },
+  
+  edit(idx) {
+    this.editIdx = idx;
+    const d = this.filtered[idx];
+    $('#edit_po').val(d.po);
+    $('#edit_date').val(d.date);
+    $('#edit_client').val(d.client);
+    $('#edit_project').val(d.project);
+    $('#edit_desc').val(d.desc);
+    $('#edit_amount').val(d.amount);
+    $('#edit_status').val(d.status);
+    new bootstrap.Modal($('#editModal')[0]).show();
+  },
+  
+  del(idx) {
+    if(confirm('Delete?')) {
+      const po = this.filtered[idx].po;
+      this.data = this.data.filter(d => d.po !== po);
+      this.filtered = [...this.data];
+      localStorage.setItem('portfolio', JSON.stringify(this.data));
+      this.render();
+    }
+  },
+  
+  getAbbr(client) {
+    const map = {
+      'PTT Exploration and Production': 'PTTEP',
+      'Thai Oil Public Company': 'Thai Oil',
+      'PTTGC': 'PTTGC',
+      'SCG Chemicals': 'SCG',
+      'IRPC': 'IRPC',
+      'Bangchak Corporation': 'Bangchak'
+    };
+    return map[client] || client;
+  },
+  
+  getTitle(desc) {
+    const keywords = ['network','wireless','antenna','control','lab','plant','safety','solar','monitoring'];
+    const d = desc.toLowerCase();
+    for(let k of keywords) {
+      if(d.includes(k)) {
+        return k.charAt(0).toUpperCase() + k.slice(1) + 
+               (d.includes('system') ? ' System' : d.includes('upgrade') ? ' Upgrade' : '');
+      }
+    }
+    return 'Project';
+  },
+  
+  export() {
+    let csv = 'PO,Date,Client,Project,Title,Amount,Status\n';
+    this.filtered.forEach(d => {
+      csv += `"${d.po}","${d.date}","${d.client}","${d.project}","${d.title}",${d.amount},"${d.status}"\n`;
+    });
+    const blob = new Blob([csv], {type:'text/csv'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'portfolio.csv';
+    a.click();
+  },
+  
+  report(type) {
+    const container = $('#reportContainer');
+    if(type === 'summary') {
+      const total = this.filtered.reduce((s,d) => s + d.amount, 0);
+      container.html(`
+        <div class="card">
+          <div class="card-body">
+            <h5>Summary Report</h5>
+            <p>Total: ฿${total.toLocaleString()}</p>
+            <p>Documents: ${this.filtered.length}</p>
+            <p>Projects: ${new Set(this.filtered.map(d => d.project)).size}</p>
+          </div>
+        </div>
+      `);
+    } else if(type === 'detail') {
+      container.html(`
+        <table class="table table-sm">
+          ${this.filtered.map(d => `
+            <tr><td colspan="2" class="bg-light"><strong>${d.po}</strong></td></tr>
+            <tr><td>Date:</td><td>${d.date}</td></tr>
+            <tr><td>Client:</td><td>${d.client}</td></tr>
+            <tr><td>Project:</td><td>${d.project}</td></tr>
+            <tr><td>Amount:</td><td>฿${d.amount.toLocaleString()}</td></tr>
+          `).join('')}
+        </table>
+      `);
+    } else if(type === 'print') {
+      window.print();
+    }
+  }
+};
+
+$(document).ready(() => app.init());
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PJ2509-0498 SAM GCME AWP36 - Project Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 30px;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+        }
+        
+        .header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .status-badge {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: #00d084;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 208, 132, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 208, 132, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 208, 132, 0); }
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 20px;
+        }
+        
+        .icon-blue { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+        .icon-green { background: linear-gradient(135deg, #00d084, #00a66c); color: white; }
+        .icon-orange { background: linear-gradient(135deg, #ff6b6b, #ff5252); color: white; }
+        .icon-purple { background: linear-gradient(135deg, #9b59b6, #8e44ad); color: white; }
+        
+        .card-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .info-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        .info-value {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .progress-container {
+            margin-top: 15px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #ecf0f1;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00d084, #00a66c);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+        
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .team-member {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+        
+        .team-member:hover {
+            background: #e9ecef;
+        }
+        
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-weight: bold;
+        }
+        
+        .member-info {
+            flex: 1;
+        }
+        
+        .member-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.95em;
+        }
+        
+        .member-role {
+            color: #7f8c8d;
+            font-size: 0.85em;
+        }
+        
+        .full-width-card {
+            grid-column: 1 / -1;
+        }
+        
+        .scope-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .scope-item {
+            padding: 15px;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .scope-item:hover {
+            transform: scale(1.05);
+        }
+        
+        .scope-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .scope-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .scope-description {
+            font-size: 0.85em;
+            color: #7f8c8d;
+        }
+        
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .timeline-date {
+            min-width: 100px;
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        .timeline-marker {
+            width: 12px;
+            height: 12px;
+            background: #667eea;
+            border-radius: 50%;
+            margin: 0 20px;
+            position: relative;
+        }
+        
+        .timeline-marker::after {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 5px;
+            width: 2px;
+            height: 40px;
+            background: #e9ecef;
+        }
+        
+        .timeline-item:last-child .timeline-marker::after {
+            display: none;
+        }
+        
+        .timeline-content {
+            flex: 1;
+        }
+        
+        .timeline-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-description {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        
+        .org-chart {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        .org-level {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+            position: relative;
+        }
+        
+        .org-box {
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 15px 25px;
+            margin: 0 10px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .org-box.primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .org-connector {
+            width: 2px;
+            height: 30px;
+            background: #667eea;
+            margin: 0 auto;
+        }
+        
+        .task-list {
+            margin-top: 15px;
+        }
+        
+        .task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .task-info {
+            flex: 1;
+        }
+        
+        .task-id {
+            font-weight: 600;
+            color: #667eea;
+            font-size: 0.9em;
+        }
+        
+        .task-name {
+            color: #2c3e50;
+            margin-top: 3px;
+        }
+        
+        .task-status {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-progress {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .status-complete {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .metric-box {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            border-radius: 10px;
+        }
+        
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .metric-label {
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>PJ2509-0498 SAM GCME AWP36</h1>
+            <div class="subtitle">Provision of Pre-FEED and Detail Engineering for South Arthit Mobile Accommodation at AWP36</div>
+            <div class="status-badge">ACTIVE</div>
+        </div>
+        
+        <div class="content">
+            <!-- Key Metrics -->
+            <div class="grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon icon-blue">📊</div>
+                        <div class="card-title">Project Overview</div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-row">
+                            <span class="info-label">Project ID</span>
+                            <span class="info-value">PJ2509-0498</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Duration</span>
+                            <span class="info-value">160 Days</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Start Date</span>
+                            <span class="info-value">09/23/2025</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">End Date</span>
+                            <span class="info-value">02/28/2026</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Budget</span>
+                            <span class="info-value">4 ฿</span>
+                        </div>
+                    </div>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div style="text-align: center; margin-top: 5px; color: #7f8c8d; font-size: 0.9em;">
+                            Overall Progress: 0%
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon icon-green">🛢️</div>
+                        <div class="card-title">Client Information</div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-row">
+                            <span class="info-label">End User</span>
+                            <span class="info-value">PTTEP ED</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Main Contractor</span>
+                            <span class="info-value">GCME</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Telecom SI</span>
+                            <span class="info-value">Samart Comtech</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Telecom Contractor</span>
+                            <span class="info-value">Addvalue System</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Project Number</span>
+                            <span class="info-value">SD-20-25607</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon icon-orange">📡</div>
+                        <div class="card-title">Technical Details</div>
+                    </div>
+                    <div class="info-grid">
+                        <div class="info-row">
+                            <span class="info-label">Project Type</span>
+                            <span class="info-value">Pre-FEED & Detail Engineering</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Location</span>
+                            <span class="info-value">AWP36 Platform</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Field</span>
+                            <span class="info-value">South Arthit</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Service Type</span>
+                            <span class="info-value">Mobile Accommodation</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">PTTEP Job Type</span>
+                            <span class="info-value">FEED ENG</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Organization Structure -->
+            <div class="card full-width-card">
+                <div class="card-header">
+                    <div class="card-icon icon-purple">🏢</div>
+                    <div class="card-title">Organization Structure</div>
+                </div>
+                <div class="org-chart">
+                    <div class="org-level">
+                        <div class="org-box primary">
+                            <div style="font-weight: bold;">PTTEP</div>
+                            <div style="font-size: 0.9em; margin-top: 5px;">End User / Oil & Gas Operator</div>
+                        </div>
+                    </div>
+                    <div class="org-connector"></div>
+                    <div class="org-level">
+                        <div class="org-box" style="background: linear-gradient(135deg, #00d084, #00a66c); color: white;">
+                            <div style="font-weight: bold;">GC Maintenance and Engineering (GCME)</div>
+                            <div style="font-size: 0.9em; margin-top: 5px;">Main Contractor</div>
+                            <div style="font-size: 0.85em; margin-top: 3px;">Project SD-20-25607</div>
+                        </div>
+                    </div>
+                    <div class="org-connector"></div>
+                    <div class="org-level">
+                        <div class="org-box">
+                            <div style="font-weight: bold;">Samart Comtech</div>
+                            <div style="font-size: 0.9em; color: #7f8c8d; margin-top: 5px;">Telecom System Integrator</div>
+                            <div style="font-size: 0.85em; color: #95a5a6; margin-top: 3px;">Telecommunication Engineering Design Service</div>
+                        </div>
+                    </div>
+                    <div class="org-connector"></div>
+                    <div class="org-level">
+                        <div class="org-box">
+                            <div style="font-weight: bold;">Addvalue System Company Limited</div>
+                            <div style="font-size: 0.9em; color: #7f8c8d; margin-top: 5px;">Telecom Contractor</div>
+                            <div style="font-size: 0.85em; color: #95a5a6; margin-top: 3px;">Telecom Engineering & Implementation</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Roles & Responsibilities -->
+            <div class="card full-width-card">
+                <div class="card-header">
+                    <div class="card-icon icon-blue">📝</div>
+                    <div class="card-title">Roles & Responsibilities</div>
+                </div>
+                <div class="grid" style="margin-top: 20px;">
+                    <div class="card" style="background: #f0f8ff; box-shadow: none;">
+                        <div style="font-weight: bold; color: #1e3c72; margin-bottom: 10px;">🔍 PTTEP Energy Development</div>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 5px 0;">• Owner / Oil & Gas operator</li>
+                            <li style="padding: 5px 0;">• End user of South Arthit Mobile Accommodation</li>
+                            <li style="padding: 5px 0;">• Define technical requirements & specifications</li>
+                            <li style="padding: 5px 0;">• Provide site access to AWP36 platform</li>
+                            <li style="padding: 5px 0;">• Review and approve deliverables</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="background: #f0fff4; box-shadow: none;">
+                        <div style="font-weight: bold; color: #00a66c; margin-bottom: 10px;">🏢 GCME</div>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 5px 0;">• Main contractor (Project SD-20-25607)</li>
+                            <li style="padding: 5px 0;">• Pre-FEED and Detail Engineering for AMA</li>
+                            <li style="padding: 5px 0;">• Overall project management</li>
+                            <li style="padding: 5px 0;">• Contract administration</li>
+                            <li style="padding: 5px 0;">• Interface with PTTEP ED</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="background: #fff5f5; box-shadow: none;">
+                        <div style="font-weight: bold; color: #667eea; margin-bottom: 10px;">📡 Samart Comtech (Telecom SI)</div>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 5px 0;">• Telecommunication system integrator</li>
+                            <li style="padding: 5px 0;">• Telecom design philosophy & architecture</li>
+                            <li style="padding: 5px 0;">• Network and transmission design</li>
+                            <li style="padding: 5px 0;">• Radio coverage studies</li>
+                            <li style="padding: 5px 0;">• System integration management</li>
+                        </ul>
+                    </div>
+                    <div class="card" style="background: #fef5ff; box-shadow: none;">
+                        <div style="font-weight: bold; color: #764ba2; margin-bottom: 10px;">⚙️ Addvalue System (Telecom Contractor)</div>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 5px 0;">• Telecommunication engineering services</li>
+                            <li style="padding: 5px 0;">• Telecom basis of design & philosophy</li>
+                            <li style="padding: 5px 0;">• Equipment specifications & datasheets</li>
+                            <li style="padding: 5px 0;">• Telecom drawings & cable routing</li>
+                            <li style="padding: 5px 0;">• Material Take-Off (MTO)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Telecommunication System Requirements -->
+            <div class="card full-width-card">
+                <div class="card-header">
+                    <div class="card-icon icon-orange">📡</div>
+                    <div class="card-title">Telecommunication System Requirements (Doc: D25607-H2-CRQ-0003)</div>
+                </div>
+                <div class="scope-grid">
+                    <div class="scope-item">
+                        <div class="scope-icon">📶</div>
+                        <div class="scope-title">Wireless Link to APP</div>
+                        <div class="scope-description">40km distance, 50Mbps minimum bandwidth</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">🔊</div>
+                        <div class="scope-title">PAGA System</div>
+                        <div class="scope-description">Control Panel, Crane Operator, Remote Control (AQP CCR+ENCO)</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">📡</div>
+                        <div class="scope-title">WiFi Access Points</div>
+                        <div class="scope-description">Outdoor coverage for 40 POBs accommodation</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">📹</div>
+                        <div class="scope-title">CCTV System</div>
+                        <div class="scope-description">Outdoor, Anti-Corrosion with NVR 90 days recording</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">☎️</div>
+                        <div class="scope-title">IP Telephone</div>
+                        <div class="scope-description">Office, Galley and Outdoor locations</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">🌐</div>
+                        <div class="scope-title">Network Infrastructure</div>
+                        <div class="scope-description">Network switches and cabling system</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">📻</div>
+                        <div class="scope-title">DMR Tier III Radio</div>
+                        <div class="scope-description">Digital trunked radio with antenna system</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">⚓</div>
+                        <div class="scope-title">Marine Radio</div>
+                        <div class="scope-description">VHF Marine Base Radio with antenna system</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">🎛️</div>
+                        <div class="scope-title">RoIP Gateway</div>
+                        <div class="scope-description">Radio over IP with radio console</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">🚢</div>
+                        <div class="scope-title">AIS System</div>
+                        <div class="scope-description">Virtual Buoy Base Transceiver with 10 virtual</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">🖥️</div>
+                        <div class="scope-title">PC Workstation</div>
+                        <div class="scope-description">For AIS monitoring and control</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">🔋</div>
+                        <div class="scope-title">UPS System</div>
+                        <div class="scope-description">30 minutes backup power</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">📡</div>
+                        <div class="scope-title">Satellite Systems</div>
+                        <div class="scope-description">Satellite Phone (12 months) + Satellite TV</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">🆘</div>
+                        <div class="scope-title">Emergency Systems</div>
+                        <div class="scope-description">EPIRB & GMDSS Marine Radio (Handheld)</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">🗼</div>
+                        <div class="scope-title">Telecom Tower</div>
+                        <div class="scope-description">Optional tower for antenna mounting</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Scope of Work -->
+            <div class="card full-width-card">
+                <div class="card-header">
+                    <div class="card-icon icon-green">🔧</div>
+                    <div class="card-title">Scope of Work - Telecom Engineering Services (Per RFQ D25607-H2-CRQ-0003)</div>
+                </div>
+                <div class="scope-grid">
+                    <div class="scope-item">
+                        <div class="scope-icon">📋</div>
+                        <div class="scope-title">Telecom Basis of Design</div>
+                        <div class="scope-description">Design philosophy, interface tie-in philosophy, cybersecurity design</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">🔀</div>
+                        <div class="scope-title">System Block Diagrams</div>
+                        <div class="scope-description">Overall block diagram & system block diagram drawings</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">📍</div>
+                        <div class="scope-title">Equipment Layout</div>
+                        <div class="scope-description">Telecommunication equipment layout drawings</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">🔌</div>
+                        <div class="scope-title">Cable Routing</div>
+                        <div class="scope-description">Cable routing drawings & cable schedule</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">📡</div>
+                        <div class="scope-title">Radio Aerial Layout</div>
+                        <div class="scope-description">Radio antenna layout & mounting structure support</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">📊</div>
+                        <div class="scope-title">Transmission Study</div>
+                        <div class="scope-description">Wireless connectivity study (WiMAX/Digital Microwave)</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">📻</div>
+                        <div class="scope-title">Radio Coverage Study</div>
+                        <div class="scope-description">DMR, VHF Marine Radio & AIS coverage analysis</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">📝</div>
+                        <div class="scope-title">Equipment Specifications</div>
+                        <div class="scope-description">Specifications & datasheets for all telecom equipment</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">🌐</div>
+                        <div class="scope-title">Network Design</div>
+                        <div class="scope-description">Network equipment specifications & IP telephone system</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">📹</div>
+                        <div class="scope-title">CCTV System Design</div>
+                        <div class="scope-description">CCTV specifications & anti-corrosion requirements</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">🔊</div>
+                        <div class="scope-title">PAGA System Design</div>
+                        <div class="scope-description">Public Address General Alarm specifications</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">📦</div>
+                        <div class="scope-title">Material Take-Off</div>
+                        <div class="scope-description">Telecommunication MTO & cable schedule</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">💰</div>
+                        <div class="scope-title">Cost Estimation</div>
+                        <div class="scope-description">Cost estimation report (+/-30% Pre-FEED, +/-10% Detail)</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">📚</div>
+                        <div class="scope-title">Technical Documentation</div>
+                        <div class="scope-description">All engineering deliverables in native format</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">🚛</div>
+                        <div class="scope-title">Entertainment System</div>
+                        <div class="scope-description">Satellite TV & entertainment specifications</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Team Members -->
+            <div class="card full-width-card">
+                <div class="card-header">
+                    <div class="card-icon icon-blue">👥</div>
+                    <div class="card-title">Project Team</div>
+                </div>
+                <div class="team-grid">
+                    <div class="team-member">
+                        <div class="member-avatar">WK</div>
+                        <div class="member-info">
+                            <div class="member-name">Wachira Kanusattayanond</div>
+                            <div class="member-role">Project Leader - SAMTEL</div>
+                        </div>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-avatar">PP</div>
+                        <div class="member-info">
+                            <div class="member-name">Pitthaya Prasertsincharoen</div>
+                            <div class="member-role">Project Leader - ID Industrial Engineering</div>
+                        </div>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-avatar">PS</div>
+                        <div class="member-info">
+                            <div class="member-name">Pramote S.</div>
+                            <div class="member-role">Project Leader - GCME</div>
+                        </div>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-avatar">BT</div>
+                        <div class="member-info">
+                            <div class="member-name">Bobby Tay</div>
+                            <div class="member-role">Project Leader - INDUSTRONIC</div>
+                        </div>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-avatar">KT</div>
+                        <div class="member-info">
+                            <div class="member-name">Kunakorn Tummurat (Mai)</div>
+                            <div class="member-role">Project Leader - SAMTEL</div>
+                        </div>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-avatar">EB</div>
+                        <div class="member-info">
+                            <div class="member-name">Ekchanya Boonchaleeaw</div>
+                            <div class="member-role">Contributor - Addvalue</div>
+                        </div>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-avatar">AM</div>
+                        <div class="member-info">
+                            <div class="member-name">Aunchalee Meenak</div>
+                            <div class="member-role">Contributor - Addvalue</div>
+                        </div>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-avatar">RM</div>
+                        <div class="member-info">
+                            <div class="member-name">Ratchaneekorn Mo-on</div>
+                            <div class="member-role">Contributor - Addvalue</div>
+                        </div>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-avatar">SN</div>
+                        <div class="member-info">
+                            <div class="member-name">Suttirak Nunsong</div>
+                            <div class="member-role">Contributor - Addvalue</div>
+                        </div>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-avatar">SW</div>
+                        <div class="member-info">
+                            <div class="member-name">Sakda Wonglam</div>
+                            <div class="member-role">Contributor - Addvalue</div>
+                        </div>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-avatar">SY</div>
+                        <div class="member-info">
+                            <div class="member-name">Suriyapong Yoo-om-sin</div>
+                            <div class="member-role">Project Leader - Addvalue</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Current Tasks -->
+            <div class="card full-width-card">
+                <div class="card-header">
+                    <div class="card-icon icon-orange">📋</div>
+                    <div class="card-title">Current Tasks</div>
+                </div>
+                <div class="task-list">
+                    <div class="task-item">
+                        <div class="task-info">
+                            <div class="task-id">TK2509-4413</div>
+                            <div class="task-name">Submission Commercial Proposal - Provision of Pre-FEED and Detail Engineering at AWP36</div>
+                        </div>
+                        <div class="task-status status-pending">0% Complete</div>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-info">
+                            <div class="task-id">TK2509-4401</div>
+                            <div class="task-name">Internal Meeting: General Planning</div>
+                        </div>
+                        <div class="task-status status-pending">0% Complete</div>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-info">
+                            <div class="task-id">TK2509-4410</div>
+                            <div class="task-name">Internal Meeting: General Coordination</div>
+                        </div>
+                        <div class="task-status status-pending">0% Complete</div>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-info">
+                            <div class="task-id">TK2509-4412</div>
+                            <div class="task-name">Internal Meeting: Scope of Work Review</div>
+                        </div>
+                        <div class="task-status status-pending">0% Complete</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Key Performance Indicators -->
+            <div class="grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon icon-green">📈</div>
+                        <div class="card-title">Service KPIs</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-value">&gt;99.9%</div>
+                        <div class="metric-label">System Availability Target</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon icon-blue">⏱️</div>
+                        <div class="card-title">Response Time</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-value">4-24 hrs</div>
+                        <div class="metric-label">MTTR (Mean Time To Repair)</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon icon-purple">📅</div>
+                        <div class="card-title">Maintenance Schedule</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-value">Quarterly</div>
+                        <div class="metric-label">Preventive Maintenance</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Project Timeline -->
+            <div class="card full-width-card">
+                <div class="card-header">
+                    <div class="card-icon icon-orange">📅</div>
+                    <div class="card-title">Project Timeline</div>
+                </div>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-date">09/17/2025</div>
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Commercial Proposal</div>
+                            <div class="timeline-description">Submission of Pre-FEED and Detail Engineering proposal</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">09/23/2025</div>
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Project Start</div>
+                            <div class="timeline-description">Official project kickoff and mobilization</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">09/24/2025</div>
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Internal Meetings</div>
+                            <div class="timeline-description">General planning and scope review meetings</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">Q4 2025</div>
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Engineering Phase</div>
+                            <div class="timeline-description">Pre-FEED and detail engineering execution</div>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">02/28/2026</div>
+                        <div class="timeline-marker"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Project Completion</div>
+                            <div class="timeline-description">Final deliverables and documentation handover</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Service Categories -->
+            <div class="card full-width-card">
+                <div class="card-header">
+                    <div class="card-icon icon-purple">🏷️</div>
+                    <div class="card-title">Service Categories</div>
+                </div>
+                <div class="scope-grid">
+                    <div class="scope-item">
+                        <div class="scope-icon">⚙️</div>
+                        <div class="scope-title">Engineering</div>
+                        <div class="scope-description">Addvalue Service CAT >> Engineering >> Service</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">🛢️</div>
+                        <div class="scope-title">Oil and Gas</div>
+                        <div class="scope-description">Industry Sector - PTTEP</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">🏗️</div>
+                        <div class="scope-title">PTTEP Job Type</div>
+                        <div class="scope-description">FEED ENG - PRE FEED</div>
+                    </div>
+                    <div class="scope-item">
+                        <div class="scope-icon">📍</div>
+                        <div class="scope-title">Location</div>
+                        <div class="scope-description">AWP36 Platform - South Arthit Field</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Add animation to progress bars
+        window.addEventListener('load', function() {
+            const progressFills = document.querySelectorAll('.progress-fill');
+            progressFills.forEach(fill => {
+                const targetWidth = fill.style.width;
+                fill.style.width = '0%';
+                setTimeout(() => {
+                    fill.style.width = targetWidth;
+                }, 500);
+            });
+        });
+        
+        // Add hover effects
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PTTEP Portfolio - Modular SQL System (Complete)</title>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        #app {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            color: #2c5364;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            color: #64748b;
+            font-size: 0.95rem;
+        }
+        
+        .navigation {
+            background: white;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .nav-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(44, 83, 100, 0.05);
+        }
+        
+        .nav-btn.active {
+            color: #2c5364;
+            background: rgba(44, 83, 100, 0.1);
+            border-bottom: 3px solid #2c5364;
+        }
+        
+        .content {
+            background: white;
+            padding: 30px;
+            border-radius: 0 0 10px 10px;
+            min-height: 500px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #fff, #f8fafc);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-left: 4px solid #2c5364;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2c5364;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 5px;
+            text-transform: uppercase;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .data-table th {
+            background: #f8fafc;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.85rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .data-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 0.9rem;
+        }
+        
+        .data-table tr:hover {
+            background: #f8fafc;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary {
+            background: #2c5364;
+            color: white;
+        }
+        
+        .export-btn {
+            background: #10b981;
+            color: white;
+        }
+        
+        .toolbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge.delivered {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .badge.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge.amendment {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .import-section,
+        .export-section {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .import-card,
+        .export-card {
+            background: #f8fafc;
+            padding: 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .export-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .result-message {
+            margin-top: 20px;
+        }
+        
+        .success {
+            background: #dcfce7;
+            color: #166534;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 15px;
+            border-radius: 6px;
+        }
+        
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .loading-overlay.hidden {
+            display: none;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #2c5364;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="loading-overlay" id="app-loading">
+            <div class="spinner"></div>
+        </div>
+    </div>
+
+    <script>
+    // ==========================================
+    // MODULE 1: App Configuration
+    // ==========================================
+    const AppConfig = {
+        app: {
+            name: 'PTTEP Portfolio Management',
+            version: '3.0.0',
+            company: 'Addvalue Innovation Co., Ltd.'
+        },
+        database: {
+            type: 'localStorage',
+            cache: { enabled: true, ttl: 300000 }
+        },
+        ui: {
+            itemsPerPage: 20,
+            exchangeRate: 35
+        }
+    };
+
+    // ==========================================
+    // MODULE 2: Database Connector
+    // ==========================================
+    const DBConnector = (() => {
+        let connection = null;
+        
+        async function connect() {
+            connection = {
+                storage: window.localStorage,
+                execute: executeQuery
+            };
+            return true;
+        }
+        
+        async function executeQuery(operation, params = {}) {
+            const { table = 'purchase_orders', data, id } = params;
+            const stored = JSON.parse(connection.storage.getItem(table) || '[]');
+            
+            switch (operation) {
+                case 'SELECT':
+                    return stored;
+                case 'INSERT':
+                    const newItem = { ...data, id: stored.length + 1, created_at: new Date().toISOString() };
+                    stored.push(newItem);
+                    connection.storage.setItem(table, JSON.stringify(stored));
+                    return { success: true, id: newItem.id };
+                case 'UPDATE':
+                    const index = stored.findIndex(item => item.id === id);
+                    if (index !== -1) {
+                        stored[index] = { ...stored[index], ...data, updated_at: new Date().toISOString() };
+                        connection.storage.setItem(table, JSON.stringify(stored));
+                    }
+                    return { success: true };
+                case 'DELETE':
+                    const filtered = stored.filter(item => item.id !== id);
+                    connection.storage.setItem(table, JSON.stringify(filtered));
+                    return { success: true };
+                default:
+                    return stored;
+            }
+        }
+        
+        return { connect, execute: executeQuery };
+    })();
+
+    // ==========================================
+    // MODULE 3: Data Service
+    // ==========================================
+    const DataService = (() => {
+        async function getPurchaseOrders(filters = {}) {
+            let data = await DBConnector.execute('SELECT', { table: 'purchase_orders' });
+            
+            // Apply filters
+            if (filters.client) {
+                data = data.filter(item => item.client === filters.client);
+            }
+            if (filters.year) {
+                data = data.filter(item => item.date && item.date.startsWith(filters.year));
+            }
+            if (filters.status) {
+                data = data.filter(item => item.status === filters.status);
+            }
+            
+            return data;
+        }
+        
+        async function getStatistics() {
+            const data = await getPurchaseOrders();
+            
+            return {
+                total_orders: data.length,
+                total_thb: data.reduce((sum, item) => sum + (item.value_thb || 0), 0),
+                total_usd: data.reduce((sum, item) => sum + (item.value_usd || 0), 0),
+                unique_clients: new Set(data.map(item => item.client)).size
+            };
+        }
+        
+        async function addPurchaseOrder(record) {
+            return await DBConnector.execute('INSERT', { table: 'purchase_orders', data: record });
+        }
+        
+        return { getPurchaseOrders, getStatistics, addPurchaseOrder };
+    })();
+
+    // ==========================================
+    // MODULE 4: Export Service
+    // ==========================================
+    const ExportService = (() => {
+        function exportToSQL(data) {
+            let sql = `-- PTTEP Portfolio Export\\n-- Generated: ${new Date().toISOString()}\\n\\n`;
+            sql += `INSERT INTO purchase_orders (item, po_number, po_date, client, project, title, value_thb, value_usd, status) VALUES\\n`;
+            
+            const values = data.map((row, idx) => {
+                const vals = [
+                    row.item,
+                    `'${row.po || row.po_number}'`,
+                    `'${row.date || row.po_date}'`,
+                    `'${(row.client || '').replace(/'/g, "''")}'`,
+                    `'${(row.project || '').replace(/'/g, "''")}'`,
+                    `'${(row.title || '').replace(/'/g, "''")}'`,
+                    row.value_thb || 0,
+                    row.value_usd || 0,
+                    `'${row.status || 'pending'}'`
+                ].join(', ');
+                
+                const suffix = idx < data.length - 1 ? ',' : ';';
+                return `(${vals})${suffix}`;
+            });
+            
+            return sql + values.join('\\n');
+        }
+        
+        function exportToCSV(data) {
+            const headers = ['item', 'po_number', 'date', 'client', 'project', 'title', 'value_thb', 'value_usd', 'status'];
+            const csv = [headers.join(',')];
+            
+            data.forEach(row => {
+                const values = headers.map(h => {
+                    const val = row[h] || row[h.replace('_', '')] || '';
+                    return typeof val === 'string' && val.includes(',') ? `"${val}"` : val;
+                });
+                csv.push(values.join(','));
+            });
+            
+            return '\\uFEFF' + csv.join('\\n');
+        }
+        
+        function exportToJSON(data) {
+            return JSON.stringify({
+                metadata: {
+                    exported_at: new Date().toISOString(),
+                    total_records: data.length
+                },
+                data: data
+            }, null, 2);
+        }
+        
+        function downloadFile(content, filename, mimeType = 'text/plain') {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            link.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        async function exportData(format = 'csv') {
+            const data = await DataService.getPurchaseOrders();
+            const timestamp = new Date().toISOString().split('T')[0];
+            
+            let content, filename, mimeType;
+            
+            switch (format) {
+                case 'sql':
+                    content = exportToSQL(data);
+                    filename = `pttep_${timestamp}.sql`;
+                    mimeType = 'application/sql';
+                    break;
+                case 'json':
+                    content = exportToJSON(data);
+                    filename = `pttep_${timestamp}.json`;
+                    mimeType = 'application/json';
+                    break;
+                default:
+                    content = exportToCSV(data);
+                    filename = `pttep_${timestamp}.csv`;
+                    mimeType = 'text/csv';
+            }
+            
+            downloadFile(content, filename, mimeType);
+            
+            return { success: true, records: data.length, filename };
+        }
+        
+        return { exportData };
+    })();
+
+    // ==========================================
+    // MODULE 5: Import Service
+    // ==========================================
+    const ImportService = (() => {
+        async function importFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = async (e) => {
+                    const content = e.target.result;
+                    const extension = file.name.split('.').pop().toLowerCase();
+                    
+                    try {
+                        let data;
+                        if (extension === 'json') {
+                            const parsed = JSON.parse(content);
+                            data = parsed.data || parsed;
+                        } else if (extension === 'csv') {
+                            data = parseCSV(content);
+                        } else {
+                            throw new Error('Unsupported file type');
+                        }
+                        
+                        // Import each record
+                        for (const record of data) {
+                            await DataService.addPurchaseOrder(record);
+                        }
+                        
+                        resolve({ success: true, imported: data.length });
+                    } catch (error) {
+                        resolve({ success: false, error: error.message });
+                    }
+                };
+                
+                reader.readAsText(file);
+            });
+        }
+        
+        function parseCSV(content) {
+            const lines = content.split('\\n').filter(line => line.trim());
+            const headers = lines[0].split(',').map(h => h.trim());
+            
+            return lines.slice(1).map(line => {
+                const values = line.split(',');
+                const record = {};
+                headers.forEach((h, i) => {
+                    record[h] = values[i]?.trim();
+                });
+                return record;
+            });
+        }
+        
+        return { importFile };
+    })();
+
+    // ==========================================
+    // MODULE 6: Main Application
+    // ==========================================
+    const AppMain = (() => {
+        let state = {
+            currentTab: 'dashboard',
+            data: [],
+            stats: {}
+        };
+        
+        // Sample data
+        const sampleData = [
+            {
+                item: 31, po: '4700028986', date: '2023-05-25',
+                client: 'Carigali-PTTEPI Operating Company Sdn Bhd (CPOC)',
+                project: 'MOD-19/010',
+                title: 'PROVISION OF MANPOWER AND EQUIPMENT SUPPLY',
+                original_currency: 'USD', value_original: 13571.43,
+                value_thb: 475000, value_usd: 13571.43,
+                status: 'delivered'
+            },
+            {
+                item: 30, po: '3450044753', date: '2023-05-03',
+                client: 'PTTEP Energy Development Company Limited',
+                project: '1602 PTTEP ED BG2 – G2/61',
+                title: 'Provision of Site Survey ATEX CCTV at G2N',
+                original_currency: 'THB', value_original: 384000,
+                value_thb: 384000, value_usd: 10971.43,
+                status: 'delivered'
+            },
+            {
+                item: 29, po: '3500058102', date: '2019-12-11',
+                client: 'PTT Exploration and Production Public Co., Ltd.',
+                project: '1201 PTTEP Arthit',
+                title: '5GHz LTE-U Connectorized ANT',
+                original_currency: 'THB', value_original: 198316.2,
+                value_thb: 198316.2, value_usd: 5666.18,
+                status: 'delivered'
+            }
+        ];
+        
+        async function init() {
+            console.log('Initializing Modular SQL System...');
+            
+            // Connect database
+            await DBConnector.connect();
+            
+            // Initialize sample data if empty
+            const stored = localStorage.getItem('purchase_orders');
+            if (!stored) {
+                localStorage.setItem('purchase_orders', JSON.stringify(sampleData));
+            }
+            
+            // Load data
+            await loadData();
+            
+            // Setup UI
+            setupUI();
+            
+            // Render initial view
+            renderDashboard();
+            
+            hideLoading();
+        }
+        
+        async function loadData() {
+            state.data = await DataService.getPurchaseOrders();
+            state.stats = await DataService.getStatistics();
+        }
+        
+        function setupUI() {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                <div class="header">
+                    <h1>PTTEP Portfolio Management System</h1>
+                    <p>Modular SQL Architecture - Import/Export Enabled</p>
+                </div>
+                
+                <nav class="navigation">
+                    <button class="nav-btn active" data-tab="dashboard">Dashboard</button>
+                    <button class="nav-btn" data-tab="data">Data Management</button>
+                    <button class="nav-btn" data-tab="import">Import</button>
+                    <button class="nav-btn" data-tab="export">Export</button>
+                </nav>
+                
+                <main class="content" id="content"></main>
+                
+                <div id="loading-overlay" class="loading-overlay hidden">
+                    <div class="spinner"></div>
+                </div>
+            `;
+            
+            // Event listeners
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => switchTab(e.target.dataset.tab));
+            });
+        }
+        
+        function switchTab(tab) {
+            state.currentTab = tab;
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tab);
+            });
+            
+            switch(tab) {
+                case 'dashboard': renderDashboard(); break;
+                case 'data': renderDataManagement(); break;
+                case 'import': renderImport(); break;
+                case 'export': renderExport(); break;
+            }
+        }
+        
+        async function renderDashboard() {
+            await loadData();
+            
+            document.getElementById('content').innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">${state.stats.total_orders || 0}</div>
+                        <div class="stat-label">Total Orders</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">฿${((state.stats.total_thb || 0) / 1000000).toFixed(2)}M</div>
+                        <div class="stat-label">Total THB</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">$${((state.stats.total_usd || 0) / 1000).toFixed(0)}K</div>
+                        <div class="stat-label">Total USD</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${state.stats.unique_clients || 0}</div>
+                        <div class="stat-label">Clients</div>
+                    </div>
+                </div>
+                
+                <h3 style="margin-top: 30px;">Recent Orders</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>PO Number</th>
+                            <th>Client</th>
+                            <th>Project</th>
+                            <th>Value</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${state.data.slice(0, 5).map(item => `
+                            <tr>
+                                <td style="color: #2c5364; font-weight: 600;">${item.po}</td>
+                                <td>${item.client.substring(0, 40)}...</td>
+                                <td>${item.project}</td>
+                                <td>฿${(item.value_thb || 0).toLocaleString()}</td>
+                                <td><span class="badge ${item.status}">${item.status}</span></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        async function renderDataManagement() {
+            await loadData();
+            
+            document.getElementById('content').innerHTML = `
+                <div class="toolbar">
+                    <button class="btn export-btn" onclick="AppMain.export('csv')">Export CSV</button>
+                    <button class="btn export-btn" onclick="AppMain.export('sql')">Export SQL</button>
+                    <button class="btn export-btn" onclick="AppMain.export('json')">Export JSON</button>
+                </div>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>PO Number</th>
+                            <th>Date</th>
+                            <th>Client</th>
+                            <th>Title</th>
+                            <th>THB</th>
+                            <th>USD</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${state.data.map(item => `
+                            <tr>
+                                <td>${item.item}</td>
+                                <td style="color: #2c5364; font-weight: 600;">${item.po}</td>
+                                <td>${item.date}</td>
+                                <td>${item.client.substring(0, 30)}...</td>
+                                <td>${item.title.substring(0, 40)}...</td>
+                                <td>฿${(item.value_thb || 0).toLocaleString()}</td>
+                                <td>$${(item.value_usd || 0).toLocaleString()}</td>
+                                <td><span class="badge ${item.status}">${item.status}</span></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+        
+        function renderImport() {
+            document.getElementById('content').innerHTML = `
+                <div class="import-section">
+                    <h2>Import Data</h2>
+                    <div class="import-card">
+                        <h3>Select File to Import</h3>
+                        <p>Supported formats: CSV, JSON</p>
+                        <input type="file" id="import-file" accept=".csv,.json" style="display:none" onchange="AppMain.import(this)">
+                        <button class="btn btn-primary" onclick="document.getElementById('import-file').click()">Choose File</button>
+                        <div id="import-result"></div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderExport() {
+            document.getElementById('content').innerHTML = `
+                <div class="export-section">
+                    <h2>Export Data</h2>
+                    <div class="export-options">
+                        <div class="export-card">
+                            <h3>SQL Format</h3>
+                            <button class="btn export-btn" onclick="AppMain.export('sql')">Export SQL</button>
+                        </div>
+                        <div class="export-card">
+                            <h3>CSV Format</h3>
+                            <button class="btn export-btn" onclick="AppMain.export('csv')">Export CSV</button>
+                        </div>
+                        <div class="export-card">
+                            <h3>JSON Format</h3>
+                            <button class="btn export-btn" onclick="AppMain.export('json')">Export JSON</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        async function handleExport(format) {
+            const result = await ExportService.exportData(format);
+            if (result.success) {
+                alert(`Exported ${result.records} records to ${result.filename}`);
+            }
+        }
+        
+        async function handleImport(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const result = await ImportService.importFile(file);
+            const resultDiv = document.getElementById('import-result');
+            
+            if (result.success) {
+                resultDiv.innerHTML = `<div class="success">✅ Imported ${result.imported} records</div>`;
+                await loadData();
+            } else {
+                resultDiv.innerHTML = `<div class="error">❌ Import failed: ${result.error}</div>`;
+            }
+        }
+        
+        function hideLoading() {
+            const loading = document.getElementById('app-loading');
+            if (loading) loading.classList.add('hidden');
+        }
+        
+        return {
+            init,
+            export: handleExport,
+            import: handleImport
+        };
+    })();
+
+    // Start application
+    document.addEventListener('DOMContentLoaded', () => {
+        AppMain.init();
+    });
+    </script>
+</body>
+</html>

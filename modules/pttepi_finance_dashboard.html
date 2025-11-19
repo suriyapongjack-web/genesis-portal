@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PTTEPI ZQP-ZWP4 Financial Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+        
+        .nav-tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #495057;
+            transition: all 0.3s;
+        }
+        
+        .nav-tab.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .nav-tab:hover {
+            background: #5a6fd8;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 30px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .summary-card h3 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        
+        .summary-card .amount {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .summary-card .change {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .section h3 {
+            color: #1e3c72;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .cost-item:last-child {
+            border-bottom: none;
+        }
+        
+        .cost-label {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .cost-input {
+            padding: 8px 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            font-size: 1em;
+            width: 120px;
+            text-align: right;
+            background: white;
+        }
+        
+        .cost-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .cost-total {
+            background: #1e3c72;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .cost-total .total-amount {
+            font-size: 2em;
+            font-weight: bold;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+        }
+        
+        .scenario-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .scenario-btn {
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .scenario-btn.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .scenario-btn:hover {
+            background: #5a6fd8;
+            color: white;
+            border-color: #5a6fd8;
+        }
+        
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .comparison-table th {
+            background: #1e3c72;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        .comparison-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .comparison-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .export-btn {
+            background: #28a745;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            margin: 10px 5px;
+            transition: all 0.3s;
+        }
+        
+        .export-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        
+        .risk-indicator {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+        
+        .risk-low {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .risk-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .risk-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .full-width {
+            grid-column: 1 / -1;
+        }
+        
+        .milestone-timeline {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .milestone {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+        
+        .milestone-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #667eea;
+            margin-right: 15px;
+        }
+        
+        .milestone-dot.completed {
+            background: #28a745;
+        }
+        
+        .milestone-content {
+            flex: 1;
+        }
+        
+        .milestone-title {
+            font-weight: 600;
+            color: #1e3c72;
+        }
+        
+        .milestone-cost {
+            color: #495057;
+            margin-left: auto;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>💰 PTTEPI ZQP-ZWP4 Financial Dashboard</h1>
+            <p>Comprehensive Cost Analysis & Budget Management System</p>
+        </div>
+        
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('overview')">📊 Overview</button>
+            <button class="nav-tab" onclick="switchTab('detailed')">🔍 Detailed Costs</button>
+            <button class="nav-tab" onclick="switchTab('scenarios')">📈 Scenarios</button>
+            <button class="nav-tab" onclick="switchTab('timeline')">📅 Timeline & Cash Flow</button>
+            <button class="nav-tab" onclick="switchTab('analysis')">📋 Analysis</button>
+        </div>
+
+        <!-- Overview Tab -->
+        <div id="overview" class="tab-content active">
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <h3>Total Project Cost</h3>
+                    <div class="amount" id="total-cost">$30,267</div>
+                    <div class="change">Add Value Quote</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Equipment Costs</h3>
+                    <div class="amount" id="equipment-total">$22,515</div>
+                    <div class="change">74% of total</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Service Costs</h3>
+                    <div class="amount" id="service-total">$7,752</div>
+                    <div class="change">26% of total</div>
+                </div>
+                <div class="summary-card">
+                    <h3>5-Year OpEx (Est.)</h3>
+                    <div class="amount" id="opex-total">$180,000</div>
+                    <div class="change">Rental model</div>
+                </div>
+            </div>
+            
+            <div class="content-grid">
+                <div class="section">
+                    <h3>Cost Breakdown by Category</h3>
+                    <div class="chart-container">
+                        <canvas id="costPieChart"></canvas>
+                    </div>
+                </div>
+                <div class="section">
+                    <h3>CapEx vs OpEx Comparison</h3>
+                    <div class="chart-container">
+                        <canvas id="capexOpexChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Costs Tab -->
+        <div id="detailed" class="tab-content">
+            <div class="content-grid">
+                <div class="section">
+                    <h3>🔧 Equipment Costs (Add Value System)</h3>
+                    <div class="cost-item">
+                        <span class="cost-label">Microwave Radios (IP-50CX)</span>
+                        <input type="number" class="cost-input" value="18500" onchange="updateCosts()">
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">IP/MPLS Routers</span>
+                        <input type="number" class="cost-input" value="2200" onchange="updateCosts()">
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Antennas & Accessories</span>
+                        <input type="number" class="cost-input" value="1200" onchange="updateCosts()">
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">ATEX Certification</span>
+                        <input type="number" class="cost-input" value="615" onchange="updateCosts()">
+                    </div>
+                    <div class="cost-total">
+                        <div>Equipment Subtotal</div>
+                        <div class="total-amount" id="equipment-subtotal">$22,515</div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>🛠️ Service Costs (Add Value System)</h3>
+                    <div class="cost-item">
+                        <span class="cost-label">Site Survey & Design</span>
+                        <input type="number" class="cost-input" value="2500" onchange="updateCosts()">
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">FAT/SAT (Bangkok)</span>
+                        <input type="number" class="cost-input" value="1800" onchange="updateCosts()">
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Training (2 days)</span>
+                        <input type="number" class="cost-input" value="1200" onchange="updateCosts()">
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Technical Support (1 year)</span>
+                        <input type="number" class="cost-input" value="1500" onchange="updateCosts()">
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Project Management</span>
+                        <input type="number" class="cost-input" value="752" onchange="updateCosts()">
+                    </div>
+                    <div class="cost-total">
+                        <div>Service Subtotal</div>
+                        <div class="total-amount" id="service-subtotal">$7,752</div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>🏗️ PTTEP/Mytel Scope (Not in Quote)</h3>
+                    <div class="cost-item">
+                        <span class="cost-label">Tower & Structural Works</span>
+                        <input type="number" class="cost-input" value="15000" onchange="updateCosts()">
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Civil Works & Foundations</span>
+                        <input type="number" class="cost-input" value="8000" onchange="updateCosts()">
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Installation & Commissioning</span>
+                        <input type="number" class="cost-input" value="5000" onchange="updateCosts()">
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Licensing & Permits</span>
+                        <input type="number" class="cost-input" value="3000" onchange="updateCosts()">
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Logistics & Transportation</span>
+                        <input type="number" class="cost-input" value="2000" onchange="updateCosts()">
+                    </div>
+                    <div class="cost-total">
+                        <div>PTTEP/Mytel Subtotal</div>
+                        <div class="total-amount" id="pttep-subtotal">$33,000</div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>💼 Additional Costs & Contingency</h3>
+                    <div class="cost-item">
+                        <span class="cost-label">Import Duties & Taxes (10%)</span>
+                        <input type="number" class="cost-input" value="3027" onchange="updateCosts()">
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Insurance & Risk Coverage</span>
+                        <input type="number" class="cost-input" value="1500" onchange="updateCosts()">
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Project Contingency (10%)</span>
+                        <input type="number" class="cost-input" value="6579" onchange="updateCosts()">
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Spare Equipment (30%)</span>
+                        <input type="number" class="cost-input" value="6755" onchange="updateCosts()">
+                    </div>
+                    <div class="cost-total">
+                        <div>Additional Costs</div>
+                        <div class="total-amount" id="additional-subtotal">$17,861</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section full-width">
+                <h3>💰 Total Project Investment Summary</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Amount (USD)</th>
+                            <th>Percentage</th>
+                            <th>Responsibility</th>
+                            <th>Risk Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Add Value Equipment</td>
+                            <td id="table-equipment">$22,515</td>
+                            <td id="table-equipment-pct">31%</td>
+                            <td>Add Value System</td>
+                            <td><span class="risk-indicator risk-low">Low</span></td>
+                        </tr>
+                        <tr>
+                            <td>Add Value Services</td>
+                            <td id="table-service">$7,752</td>
+                            <td id="table-service-pct">11%</td>
+                            <td>Add Value System</td>
+                            <td><span class="risk-indicator risk-low">Low</span></td>
+                        </tr>
+                        <tr>
+                            <td>PTTEP/Mytel Infrastructure</td>
+                            <td id="table-pttep">$33,000</td>
+                            <td id="table-pttep-pct">45%</td>
+                            <td>PTTEP/Mytel</td>
+                            <td><span class="risk-indicator risk-medium">Medium</span></td>
+                        </tr>
+                        <tr>
+                            <td>Additional Costs</td>
+                            <td id="table-additional">$17,861</td>
+                            <td id="table-additional-pct">24%</td>
+                            <td>Various</td>
+                            <td><span class="risk-indicator risk-high">High</span></td>
+                        </tr>
+                        <tr style="background: #1e3c72; color: white; font-weight: bold;">
+                            <td>TOTAL PROJECT COST</td>
+                            <td id="table-total">$81,128</td>
+                            <td>100%</td>
+                            <td>All Parties</td>
+                            <td><span class="risk-indicator risk-medium">Medium</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section full-width">
+                <button class="export-btn" onclick="exportData('csv')">📊 Export to CSV</button>
+                <button class="export-btn" onclick="exportData('excel')">📈 Export to Excel</button>
+                <button class="export-btn" onclick="printReport()">🖨️ Print Report</button>
+                <button class="export-btn" onclick="saveConfiguration()">💾 Save Configuration</button>
+            </div>
+        </div>
+
+        <!-- Scenarios Tab -->
+        <div id="scenarios" class="tab-content">
+            <div class="scenario-selector">
+                <button class="scenario-btn active" onclick="selectScenario('purchase')">💰 Purchase Model</button>
+                <button class="scenario-btn" onclick="selectScenario('rental')">🏠 5-Year Rental</button>
+                <button class="scenario-btn" onclick="selectScenario('hybrid')">⚖️ Hybrid Model</button>
+            </div>
+
+            <div class="content-grid">
+                <div class="section">
+                    <h3>Scenario Comparison</h3>
+                    <div class="chart-container">
+                        <canvas id="scenarioChart"></canvas>
+                    </div>
+                </div>
+                <div class="section">
+                    <h3>5-Year Cash Flow</h3>
+                    <div class="chart-container">
+                        <canvas id="cashFlowChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section full-width">
+                <h3>Detailed Scenario Analysis</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Factor</th>
+                            <th>Purchase Model</th>
+                            <th>5-Year Rental</th>
+                            <th>Hybrid Model</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Initial Investment</td>
+                            <td>$81,128</td>
+                            <td>$0</td>
+                            <td>$40,000</td>
+                        </tr>
+                        <tr>
+                            <td>Monthly Costs</td>
+                            <td>$2,000</td>
+                            <td>$3,500</td>
+                            <td>$2,500</td>
+                        </tr>
+                        <tr>
+                            <td>5-Year Total</td>
+                            <td>$201,128</td>
+                            <td>$210,000</td>
+                            <td>$190,000</td>
+                        </tr>
+                        <tr>
+                            <td>Technology Risk</td>
+                            <td><span class="risk-indicator risk-high">High</span></td>
+                            <td><span class="risk-indicator risk-low">Low</span></td>
+                            <td><span class="risk-indicator risk-medium">Medium</span></td>
+                        </tr>
+                        <tr>
+                            <td>Maintenance Responsibility</td>
+                            <td>PTTEP</td>
+                            <td>Service Provider</td>
+                            <td>Shared</td>
+                        </tr>
+                        <tr>
+                            <td>Performance Guarantee</td>
+                            <td>None</td>
+                            <td>99.95% SLA</td>
+                            <td>99.9% SLA</td>
+                        </tr>
+                        <tr>
+                            <td>Flexibility</td>
+                            <td>Low</td>
+                            <td>High</td>
+                            <td>Medium</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Timeline & Cash Flow Tab -->
+        <div id="timeline" class="tab-content">
+            <div class="content-grid">
+                <div class="section">
+                    <h3>Project Timeline & Costs</h3>
+                    <div class="milestone-timeline">
+                        <div class="milestone">
+                            <div class="milestone-dot completed"></div>
+                            <div class="milestone-content">
+                                <div class="milestone-title">MOU Execution</div>
+                                <div>July 2025 - Completed</div>
+                            </div>
+                            <div class="milestone-cost">$0</div>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-dot completed"></div>
+                            <div class="milestone-content">
+                                <div class="milestone-title">Pre-FEED Study</div>
+                                <div>August 2025 - Completed</div>
+                            </div>
+                            <div class="milestone-cost">$2,500</div>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-dot"></div>
+                            <div class="milestone-content">
+                                <div class="milestone-title">Technical Review & Approval</div>
+                                <div>September 2025 - Current</div>
+                            </div>
+                            <div class="milestone-cost">$0</div>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-dot"></div>
+                            <div class="milestone-content">
+                                <div class="milestone-title">Commercial Agreement</div>
+                                <div>Q4 2025 - Planned</div>
+                            </div>
+                            <div class="milestone-cost">$7,000</div>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-dot"></div>
+                            <div class="milestone-content">
+                                <div class="milestone-title">Equipment Order & Manufacturing</div>
+                                <div>16 weeks from order</div>
+                            </div>
+                            <div class="milestone-cost">$30,267</div>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-dot"></div>
+                            <div class="milestone-content">
+                                <div class="milestone-title">FAT (Bangkok)</div>
+                                <div>2 days testing</div>
+                            </div>
+                            <div class="milestone-cost">$1,800</div>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-dot"></div>
+                            <div class="milestone-content">
+                                <div class="milestone-title">Installation & Commissioning</div>
+                                <div>4-6 weeks offshore</div>
+                            </div>
+                            <div class="milestone-cost">$15,000</div>
+                        </div>
+                        <div class="milestone">
+                            <div class="milestone-dot"></div>
+                            <div class="milestone-content">
+                                <div class="milestone-title">SAT & Acceptance</div>
+                                <div>Final testing & go-live</div>
+                            </div>
+                            <div class="milestone-cost">$2,000</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h3>Cash Flow Analysis</h3>
+                    <div class="chart-container">
+                        <canvas id="timelineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analysis Tab -->
+        <div id="analysis" class="tab-content">
+            <div class="content-grid">
+                <div class="section">
+                    <h3>ROI Analysis</h3>
+                    <div class="cost-item">
+                        <span class="cost-label">Current Downtime Cost/Month</span>
+                        <input type="number" class="cost-input" value="8000" onchange="updateROI()">
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Expected Downtime Reduction</span>
+                        <input type="number" class="cost-input" value="85" onchange="updateROI()">
+                        <span style="margin-left: 10px;">%</span>
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Monthly Savings</span>
+                        <span id="monthly-savings" style="font-weight: bold; color: #28a745;">$6,800</span>
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Payback Period</span>
+                        <span id="payback-period" style="font-weight: bold; color: #1e3c72;">11.9 months</span>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Risk Assessment</h3>
+                    <div class="cost-item">
+                        <span class="cost-label">Technical Risk</span>
+                        <span class="risk-indicator risk-low">Low - Proven technology</span>
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Commercial Risk</span>
+                        <span class="risk-indicator risk-medium">Medium - 5-year commitment</span>
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Installation Risk</span>
+                        <span class="risk-indicator risk-medium">Medium - Offshore environment</span>
+                    </div>
+                    <div class="cost-item">
+                        <span class="cost-label">Performance Risk</span>
+                        <span class="risk-indicator risk-low">Low - SLA guarantee</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section full-width">
+                <h3>Key Performance Indicators (KPIs)</h3>
+                <div class="summary-cards">
+                    <div class="summary-card">
+                        <h3>Cost Per Mbps</h3>
+                        <div class="amount">$180</div>
+                        <div class="change">5-year average</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Cost Per 9 Uptime</h3>
+                        <div class="amount">$42,000</div>
+                        <div class="change">99.95% guarantee</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Monthly OpEx</h3>
+                        <div class="amount">$3,500</div>
+                        <div class="change">Rental model</div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Break-even Point</h3>
+                        <div class="amount">12</div>
+                        <div class="change">months</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let costData = {
+            equipment: {
+                microwaveRadios: 18500,
+                routers: 2200,
+                antennas: 1200,
+                atex: 615
+            },
+            service: {
+                survey: 2500,
+                fatSat: 1800,
+                training: 1200,
+                support: 1500,
+                management: 752
+            },
+            pttep: {
+                tower: 15000,
+                civil: 8000,
+                installation: 5000,
+                licensing: 3000,
+                logistics: 2000
+            },
+            additional: {
+                duties: 3027,
+                insurance: 1500,
+                contingency: 6579,
+                spares: 6755
+            }
+        };
+
+        // Chart instances
+        let charts = {};
+
+        // Initialize dashboard
+        function initDashboard() {
+            updateCosts();
+            initCharts();
+            updateROI();
+        }
+
+        // Switch tabs
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            // Refresh charts when switching tabs
+            setTimeout(() => {
+                Object.values(charts).forEach(chart => {
+                    if (chart) chart.resize();
+                });
+            }, 100);
+        }
+
+        // Update all costs
+        function updateCosts() {
+            // Get values from inputs
+            const inputs = document.querySelectorAll('.cost-input');
+            const values = Array.from(inputs).map(input => parseFloat(input.value) || 0);
+
+            // Update cost data
+            let index = 0;
+            costData.equipment.microwaveRadios = values[index++];
+            costData.equipment.routers = values[index++];
+            costData.equipment.antennas = values[index++];
+            costData.equipment.atex = values[index++];
+            
+            costData.service.survey = values[index++];
+            costData.service.fatSat = values[index++];
+            costData.service.training = values[index++];
+            costData.service.support = values[index++];
+            costData.service.management = values[index++];
+            
+            costData.pttep.tower = values[index++];
+            costData.pttep.civil = values[index++];
+            costData.pttep.installation = values[index++];
+            costData.pttep.licensing = values[index++];
+            costData.pttep.logistics = values[index++];
+            
+            costData.additional.duties = values[index++];
+            costData.additional.insurance = values[index++];
+            costData.additional.contingency = values[index++];
+            costData.additional.spares = values[index++];
+
+            // Calculate totals
+            const equipmentTotal = Object.values(costData.equipment).reduce((a, b) => a + b, 0);
+            const serviceTotal = Object.values(costData.service).reduce((a, b) => a + b, 0);
+            const pttepTotal = Object.values(costData.pttep).reduce((a, b) => a + b, 0);
+            const additionalTotal = Object.values(costData.additional).reduce((a, b) => a + b, 0);
+            const grandTotal = equipmentTotal + serviceTotal + pttepTotal + additionalTotal;
+
+            // Update display
+            document.getElementById('equipment-subtotal').textContent = `$${equipmentTotal.toLocaleString()}`;
+            document.getElementById('service-subtotal').textContent = `$${serviceTotal.toLocaleString()}`;
+            document.getElementById('pttep-subtotal').textContent = `$${pttepTotal.toLocaleString()}`;
+            document.getElementById('additional-subtotal').textContent = `$${additionalTotal.toLocaleString()}`;
+
+            // Update summary cards
+            document.getElementById('total-cost').textContent = `$${(equipmentTotal + serviceTotal).toLocaleString()}`;
+            document.getElementById('equipment-total').textContent = `$${equipmentTotal.toLocaleString()}`;
+            document.getElementById('service-total').textContent = `$${serviceTotal.toLocaleString()}`;
+
+            // Update table
+            document.getElementById('table-equipment').textContent = `$${equipmentTotal.toLocaleString()}`;
+            document.getElementById('table-service').textContent = `$${serviceTotal.toLocaleString()}`;
+            document.getElementById('table-pttep').textContent = `$${pttepTotal.toLocaleString()}`;
+            document.getElementById('table-additional').textContent = `$${additionalTotal.toLocaleString()}`;
+            document.getElementById('table-total').textContent = `$${grandTotal.toLocaleString()}`;
+
+            // Update percentages
+            document.getElementById('table-equipment-pct').textContent = `${Math.round(equipmentTotal/grandTotal*100)}%`;
+            document.getElementById('table-service-pct').textContent = `${Math.round(serviceTotal/grandTotal*100)}%`;
+            document.getElementById('table-pttep-pct').textContent = `${Math.round(pttepTotal/grandTotal*100)}%`;
+            document.getElementById('table-additional-pct').textContent = `${Math.round(additionalTotal/grandTotal*100)}%`;
+
+            // Update charts
+            updateCharts();
+        }
+
+        // Initialize charts
+        function initCharts() {
+            // Cost Pie Chart
+            const costPieCtx = document.getElementById('costPieChart').getContext('2d');
+            charts.costPie = new Chart(costPieCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Equipment', 'Services', 'PTTEP/Mytel', 'Additional'],
+                    datasets: [{
+                        data: [22515, 7752, 33000, 17861],
+                        backgroundColor: ['#667eea', '#764ba2', '#f093fb', '#f5576c'],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // CapEx vs OpEx Chart
+            const capexOpexCtx = document.getElementById('capexOpexChart').getContext('2d');
+            charts.capexOpex = new Chart(capexOpexCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
+                    datasets: [{
+                        label: 'Purchase Model',
+                        data: [81128, 24000, 24000, 24000, 24000],
+                        backgroundColor: '#667eea'
+                    }, {
+                        label: 'Rental Model',
+                        data: [42000, 42000, 42000, 42000, 42000],
+                        backgroundColor: '#764ba2'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Scenario Chart
+            const scenarioCtx = document.getElementById('scenarioChart').getContext('2d');
+            charts.scenario = new Chart(scenarioCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Year 0', 'Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
+                    datasets: [{
+                        label: 'Purchase Model',
+                        data: [81128, 105128, 129128, 153128, 177128, 201128],
+                        borderColor: '#667eea',
+                        fill: false
+                    }, {
+                        label: 'Rental Model',
+                        data: [0, 42000, 84000, 126000, 168000, 210000],
+                        borderColor: '#764ba2',
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // Cash Flow Chart
+            const cashFlowCtx = document.getElementById('cashFlowChart').getContext('2d');
+            charts.cashFlow = new Chart(cashFlowCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                    datasets: [{
+                        label: 'Cash Outflow',
+                        data: [7000, 30267, 15000, 2000],
+                        backgroundColor: '#f5576c'
+                    }, {
+                        label: 'Cash Inflow (Savings)',
+                        data: [0, 0, 20400, 20400],
+                        backgroundColor: '#4ecdc4'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // Timeline Chart
+            const timelineCtx = document.getElementById('timelineChart').getContext('2d');
+            charts.timeline = new Chart(timelineCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'],
+                    datasets: [{
+                        label: 'Cumulative Investment',
+                        data: [0, 2500, 2500, 9500, 39767, 41567, 56567, 58567],
+                        borderColor: '#667eea',
+                        fill: true,
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        // Update charts
+        function updateCharts() {
+            const equipmentTotal = Object.values(costData.equipment).reduce((a, b) => a + b, 0);
+            const serviceTotal = Object.values(costData.service).reduce((a, b) => a + b, 0);
+            const pttepTotal = Object.values(costData.pttep).reduce((a, b) => a + b, 0);
+            const additionalTotal = Object.values(costData.additional).reduce((a, b) => a + b, 0);
+
+            if (charts.costPie) {
+                charts.costPie.data.datasets[0].data = [equipmentTotal, serviceTotal, pttepTotal, additionalTotal];
+                charts.costPie.update();
+            }
+        }
+
+        // Update ROI calculation
+        function updateROI() {
+            const downtimeCost = parseFloat(document.querySelector('input[onchange="updateROI()"]').value) || 8000;
+            const reduction = parseFloat(document.querySelectorAll('input[onchange="updateROI()"]')[1].value) || 85;
+            
+            const monthlySavings = downtimeCost * (reduction / 100);
+            const totalInvestment = 81128; // Total project cost
+            const paybackPeriod = totalInvestment / monthlySavings;
+
+            document.getElementById('monthly-savings').textContent = `$${monthlySavings.toLocaleString()}`;
+            document.getElementById('payback-period').textContent = `${paybackPeriod.toFixed(1)} months`;
+        }
+
+        // Select scenario
+        function selectScenario(scenario) {
+            document.querySelectorAll('.scenario-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Update scenario data based on selection
+            // This would update the scenario chart with different data
+        }
+
+        // Export functions
+        function exportData(format) {
+            alert(`Exporting data to ${format.toUpperCase()} format...`);
+        }
+
+        function printReport() {
+            window.print();
+        }
+
+        function saveConfiguration() {
+            const config = JSON.stringify(costData);
+            localStorage.setItem('pttepi_cost_config', config);
+            alert('Configuration saved successfully!');
+        }
+
+        // Initialize dashboard on load
+        document.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
+</body>
+</html>

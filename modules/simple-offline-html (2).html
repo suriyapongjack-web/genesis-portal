@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Addvalue HR System - Offline</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #667eea;
+        }
+        
+        .stat-card h3 {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-card .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .controls {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .controls h2 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+            transform: translateY(-1px);
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .employee-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .employee-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .employee-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .employee-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .employee-position {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .employee-department {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .employee-salary {
+            font-size: 20px;
+            font-weight: bold;
+            color: #28a745;
+        }
+        
+        .employee-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 10px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #28a745;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            z-index: 1001;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .notification.success {
+            background: #28a745;
+        }
+        
+        .notification.error {
+            background: #dc3545;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 22px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .employee-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🏢 Addvalue HR System</h1>
+            <p>ระบบจัดการพนักงานแบบ Offline 
+                <span class="status-indicator">
+                    <span class="status-dot"></span>
+                    ใช้งานได้โดยไม่ต้องอินเทอร์เน็ต
+                </span>
+            </p>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>👥 พนักงานทั้งหมด</h3>
+                <div class="value" id="totalEmployees">8</div>
+            </div>
+            <div class="stat-card">
+                <h3>💰 เงินเดือนเฉลี่ย</h3>
+                <div class="value" id="avgSalary">47,250 ฿</div>
+            </div>
+            <div class="stat-card">
+                <h3>🏢 จำนวนแผนก</h3>
+                <div class="value" id="totalDepartments">5</div>
+            </div>
+            <div class="stat-card">
+                <h3>💾 สถานะข้อมูล</h3>
+                <div class="value" id="lastSaved" style="color: #28a745;">บันทึกแล้ว</div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <h2>🔧 การจัดการข้อมูล</h2>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="addEmployee()">
+                    ➕ เพิ่มพนักงาน
+                </button>
+                <button class="btn btn-success" onclick="exportToJSON()">
+                    💾 Export JSON
+                </button>
+                <button class="btn btn-success" onclick="exportToCSV()">
+                    📊 Export CSV
+                </button>
+                <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importFromJSON(event)">
+                <button class="btn btn-warning" onclick="document.getElementById('importFile').click()">
+                    📥 Import JSON
+                </button>
+            </div>
+        </div>
+
+        <!-- Search -->
+        <input type="text" class="search-box" id="searchBox" placeholder="🔍 ค้นหาพนักงาน... (ชื่อ, อีเมล, ตำแหน่ง)" onkeyup="filterEmployees()">
+
+        <!-- Employee Grid -->
+        <div class="employee-grid" id="employeeGrid">
+            <!-- จะถูกสร้างด้วย JavaScript -->
+        </div>
+    </div>
+
+    <!-- Add/Edit Employee Modal -->
+    <div id="employeeModal" class="modal">
+        <div class="modal-content">
+            <h2 id="modalTitle">เพิ่มพนักงานใหม่</h2>
+            <form id="employeeForm">
+                <div class="form-group">
+                    <label>ชื่อ-นามสกุล *</label>
+                    <input type="text" id="employeeName" required>
+                </div>
+                <div class="form-group">
+                    <label>อีเมล *</label>
+                    <input type="email" id="employeeEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>เบอร์โทร</label>
+                    <input type="tel" id="employeePhone">
+                </div>
+                <div class="form-group">
+                    <label>ตำแหน่งงาน *</label>
+                    <input type="text" id="employeePosition" required>
+                </div>
+                <div class="form-group">
+                    <label>แผนก *</label>
+                    <select id="employeeDepartment" required>
+                        <option value="Management">Management</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Technical">Technical</option>
+                        <option value="Sales & Marketing">Sales & Marketing</option>
+                        <option value="Administration">Administration</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>เงินเดือน (บาท) *</label>
+                    <input type="number" id="employeeSalary" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label>วันที่เริ่มงาน *</label>
+                    <input type="date" id="employeeStartDate" required>
+                </div>
+                <div class="form-group">
+                    <label>ที่อยู่</label>
+                    <textarea id="employeeAddress" rows="3"></textarea>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">💾 บันทึก</button>
+                    <button type="button" class="btn btn-danger" onclick="closeModal()">❌ ยกเลิก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ข้อมูลพนักงาน 8 คน (ข้อมูลจริง)
+        let employees = [
+            {
+                id: 1,
+                name: "ณัชชา ยอดอินทร์",
+                email: "natcha@hotmail.com",
+                phone: "081-234-5670",
+                address: "123/45 ถ.ประชาสงเคราะห์ แขวงลาดยาว เขตจตุจักร กรุงเทพฯ 10900",
+                dateOfBirth: "1990-05-15",
+                jobPosition: "เจ้าหน้าที่ธุรการโรงงานการบิน",
+                department: "Administration",
+                employmentDate: "2013-01-01",
+                salary: 14000,
+                status: "Active"
+            },
+            {
+                id: 2,
+                name: "Aurnchalee Meenaḳ",
+                email: "aurnchalee@addvaluesystem.com",
+                phone: "082-345-6781",
+                address: "456/78 ถ.สุขุมวิท แขวงคลองตัน เขตคลองเตย กรุงเทพฯ 10110",
+                dateOfBirth: "1985-03-20",
+                jobPosition: "Account Manager",
+                department: "Management",
+                employmentDate: "2000-06-15",
+                salary: 50000,
+                status: "Active"
+            },
+            {
+                id: 3,
+                name: "Ratchaneekom Mo-on",
+                email: "ratchaneekom@addvaluesystem.com",
+                phone: "083-456-7892",
+                address: "789/12 ถ.พระราม 4 แขวงคลองตัน เขตคลองเตย กรุงเทพฯ 10110",
+                dateOfBirth: "1988-07-10",
+                jobPosition: "Telecommunication Technician",
+                department: "Technical",
+                employmentDate: "2015-03-01",
+                salary: 24000,
+                status: "Active"
+            },
+            {
+                id: 4,
+                name: "Sakda Wongjam",
+                email: "sakda@addvaluesystem.com",
+                phone: "084-567-8903",
+                address: "321/65 ถ.รัชดาภิเษก แขวงหัวหมาก เขตบางกะปิ กรุงเทพฯ 10240",
+                dateOfBirth: "1982-11-25",
+                jobPosition: "Chief Engineer",
+                department: "Engineering",
+                employmentDate: "2005-08-20",
+                salary: 82000,
+                status: "Active"
+            },
+            {
+                id: 5,
+                name: "Suriyapong Yoo-om-sin",
+                email: "suriyapong@addvaluesystem.com",
+                phone: "085-678-9014",
+                address: "654/32 ถ.สาทร แขวงสีลม เขตบางรัก กรุงเทพฯ 10500",
+                dateOfBirth: "1978-01-12",
+                jobPosition: "Manager",
+                department: "Management",
+                employmentDate: "2001-02-01",
+                salary: 120000,
+                status: "Active"
+            },
+            {
+                id: 6,
+                name: "Suttirak Nunsong",
+                email: "suttirak@addvaluesystem.com",
+                phone: "086-789-0125",
+                address: "987/21 ถ.ลาดพร้าว แขวงจอมพล เขตจตุจักร กรุงเทพฯ 10900",
+                dateOfBirth: "1987-09-08",
+                jobPosition: "Telecommunication Engineer",
+                department: "Engineering",
+                employmentDate: "2010-12-15",
+                salary: 33000,
+                status: "Active"
+            },
+            {
+                id: 7,
+                name: "Wasupol Amonthat",
+                email: "wasupol@addvaluesystem.com",
+                phone: "087-890-1236",
+                address: "147/89 ถ.เพชรบุรี แขวงมักกะสัน เขตราชเทวี กรุงเทพฯ 10400",
+                dateOfBirth: "1989-12-03",
+                jobPosition: "Sales Manager",
+                department: "Sales & Marketing",
+                employmentDate: "2018-05-10",
+                salary: 18000,
+                status: "Active"
+            },
+            {
+                id: 8,
+                name: "Yuttapong Eakimphon",
+                email: "yuttapong@addvaluesystem.com",
+                phone: "088-901-2347",
+                address: "258/74 ถ.อโศก แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110",
+                dateOfBirth: "1983-04-18",
+                jobPosition: "Chief Technical",
+                department: "Technical",
+                employmentDate: "2001-11-01",
+                salary: 37000,
+                status: "Active"
+            }
+        ];
+
+        let currentEditId = null;
+
+        // โหลดข้อมูลจาก localStorage เมื่อเริ่มต้น
+        function loadData() {
+            const savedData = localStorage.getItem('addvalue_hr_employees');
+            if (savedData) {
+                try {
+                    employees = JSON.parse(savedData);
+                    showNotification('โหลดข้อมูลจาก localStorage สำเร็จ', 'success');
+                } catch (error) {
+                    console.error('Error loading data:', error);
+                    showNotification('เกิดข้อผิดพลาดในการโหลดข้อมูล', 'error');
+                }
+            }
+            renderEmployees();
+            updateStats();
+        }
+
+        // บันทึกข้อมูลลง localStorage
+        function saveData() {
+            try {
+                localStorage.setItem('addvalue_hr_employees', JSON.stringify(employees));
+                localStorage.setItem('addvalue_hr_lastSaved', new Date().toISOString());
+                updateLastSavedTime();
+                showNotification('บันทึกข้อมูลสำเร็จ', 'success');
+            } catch (error) {
+                console.error('Error saving data:', error);
+                showNotification('เกิดข้อผิดพลาดในการบันทึก', 'error');
+            }
+        }
+
+        // แสดงการแจ้งเตือน
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // อัปเดตสถิติ
+        function updateStats() {
+            const activeEmployees = employees.filter(emp => emp.status === 'Active');
+            const totalEmployees = activeEmployees.length;
+            const totalSalary = activeEmployees.reduce((sum, emp) => sum + emp.salary, 0);
+            const avgSalary = totalEmployees > 0 ? Math.round(totalSalary / totalEmployees) : 0;
+            const departments = [...new Set(activeEmployees.map(emp => emp.department))];
+
+            document.getElementById('totalEmployees').textContent = totalEmployees;
+            document.getElementById('avgSalary').textContent = avgSalary.toLocaleString('th-TH') + ' ฿';
+            document.getElementById('totalDepartments').textContent = departments.length;
+        }
+
+        // อัปเดตเวลาบันทึกล่าสุด
+        function updateLastSavedTime() {
+            const lastSaved = localStorage.getItem('addvalue_hr_lastSaved');
+            if (lastSaved) {
+                const date = new Date(lastSaved);
+                document.getElementById('lastSaved').textContent = date.toLocaleTimeString('th-TH');
+            }
+        }
+
+        // แสดงรายการพนักงาน
+        function renderEmployees(employeeList = null) {
+            const employeesToShow = employeeList || employees.filter(emp => emp.status === 'Active');
+            const grid = document.getElementById('employeeGrid');
+            
+            if (employeesToShow.length === 0) {
+                grid.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;"><h3>ไม่พบพนักงาน</h3><p>ลองค้นหาด้วยคำอื่น หรือเพิ่มพนักงานใหม่</p></div>';
+                return;
+            }
+
+            grid.innerHTML = employeesToShow.map(emp => `
+                <div class="employee-card">
+                    <div class="employee-name">${emp.name}</div>
+                    <div class="employee-position">${emp.jobPosition}</div>
+                    <div class="employee-department">${emp.department}</div>
+                    <div class="employee-salary">${emp.salary.toLocaleString('th-TH')} ฿</div>
+                    <div style="margin-top: 10px; font-size: 12px; color: #666;">
+                        📧 ${emp.email}<br>
+                        📞 ${emp.phone || 'ไม่ระบุ'}<br>
+                        📅 เริ่มงาน: ${new Date(emp.employmentDate).toLocaleDateString('th-TH')}
+                    </div>
+                    <div class="employee-actions">
+                        <button class="btn btn-primary btn-small" onclick="editEmployee(${emp.id})">
+                            ✏️ แก้ไข
+                        </button>
+                        <button class="btn btn-danger btn-small" onclick="deleteEmployee(${emp.id})">
+                            🗑️ ลบ
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ค้นหาและกรองพนักงาน
+        function filterEmployees() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            const filtered = employees.filter(emp => 
+                emp.status === 'Active' && (
+                    emp.name.toLowerCase().includes(searchTerm) ||
+                    emp.email.toLowerCase().includes(searchTerm) ||
+                    emp.jobPosition.toLowerCase().includes(searchTerm) ||
+                    emp.department.toLowerCase().includes(searchTerm)
+                )
+            );
+            renderEmployees(filtered);
+        }
+
+        // เพิ่มพนักงานใหม่
+        function addEmployee() {
+            currentEditId = null;
+            document.getElementById('modalTitle').textContent = 'เพิ่มพนักงานใหม่';
+            document.getElementById('employeeForm').reset();
+            document.getElementById('employeeStartDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('employeeModal').style.display = 'block';
+        }
+
+        // แก้ไขพนักงาน
+        function editEmployee(id) {
+            const employee = employees.find(emp => emp.id === id);
+            if (!employee) return;
+
+            currentEditId = id;
+            document.getElementById('modalTitle').textContent = 'แก้ไขข้อมูลพนักงาน';
+            document.getElementById('employeeName').value = employee.name;
+            document.getElementById('employeeEmail').value = employee.email;
+            document.getElementById('employeePhone').value = employee.phone || '';
+            document.getElementById('employeePosition').value = employee.jobPosition;
+            document.getElementById('employeeDepartment').value = employee.department;
+            document.getElementById('employeeSalary').value = employee.salary;
+            document.getElementById('employeeStartDate').value = employee.employmentDate;
+            document.getElementById('employeeAddress').value = employee.address || '';
+            document.getElementById('employeeModal').style.display = 'block';
+        }
+
+        // ลบพนักงาน
+        function deleteEmployee(id) {
+            const employee = employees.find(emp => emp.id === id);
+            if (!employee) return;
+
+            if (confirm(`ต้องการลบพนักงาน "${employee.name}" ใช่หรือไม่?`)) {
+                const index = employees.findIndex(emp => emp.id === id);
+                employees[index].status = 'Inactive';
+                saveData();
+                renderEmployees();
+                updateStats();
+                showNotification('ลบพนักงานสำเร็จ', 'success');
+            }
+        }
+
+        // ปิด Modal
+        function closeModal() {
+            document.getElementById('employeeModal').style.display = 'none';
+            currentEditId = null;
+        }
+
+        // Export เป็น JSON
+        function exportToJSON() {
+            const data = {
+                employees: employees,
+                exportedAt: new Date().toISOString(),
+                version: "1.0"
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `addvalue_hr_backup_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Export JSON สำเร็จ', 'success');
+        }
+
+        // Export เป็น CSV
+        function exportToCSV() {
+            const activeEmployees = employees.filter(emp => emp.status === 'Active');
+            const headers = ['ID', 'ชื่อ', 'อีเมล', 'ตำแหน่ง', 'แผนก', 'เงินเดือน', 'วันที่เริ่มงาน'];
+            const csvData = [
+                headers.join(','),
+                ...activeEmployees.map(emp => [
+                    emp.id,
+                    `"${emp.name}"`,
+                    emp.email,
+                    `"${emp.jobPosition}"`,
+                    `"${emp.department}"`,
+                    emp.salary,
+                    emp.employmentDate
+                ].join(','))
+            ].join('\n');
+
+            const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `addvalue_hr_employees_${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Export CSV สำเร็จ', 'success');
+        }
+
+        // Import จาก JSON
+        function importFromJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.employees && Array.isArray(data.employees)) {
+                        employees = data.employees;
+                        saveData();
+                        renderEmployees();
+                        updateStats();
+                        showNotification('Import ข้อมูลสำเร็จ', 'success');
+                    } else {
+                        showNotification('ไฟล์ JSON ไม่ถูกต้อง', 'error');
+                    }
+                } catch (error) {
+                    console.error('Import error:', error);
+                    showNotification('เกิดข้อผิดพลาดในการ Import', 'error');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        // จัดการ Form
+        document.getElementById('employeeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('employeeName').value,
+                email: document.getElementById('employeeEmail').value,
+                phone: document.getElementById('employeePhone').value,
+                jobPosition: document.getElementById('employeePosition').value,
+                department: document.getElementById('employeeDepartment').value,
+                salary: parseInt(document.getElementById('employeeSalary').value),
+                employmentDate: document.getElementById('employeeStartDate').value,
+                address: document.getElementById('employeeAddress').value
+            };
+
+            if (currentEditId) {
+                // แก้ไขพนักงาน
+                const index = employees.findIndex(emp => emp.id === currentEditId);
+                employees[index] = { ...employees[index], ...formData };
+                showNotification('แก้ไขข้อมูลสำเร็จ', 'success');
+            } else {
+                // เพิ่มพนักงานใหม่
+                const newId = Math.max(...employees.map(emp => emp.id), 0) + 1;
+                const newEmployee = {
+                    id: newId,
+                    ...formData,
+                    status: 'Active'
+                };
+                employees.push(newEmployee);
+                showNotification('เพิ่มพนักงานสำเร็จ', 'success');
+            }
+
+            saveData();
+            renderEmployees();
+            updateStats();
+            closeModal();
+        });
+
+        // ปิด Modal เมื่อคลิกนอก Modal
+        window.onclick = function(event) {
+            const modal = document.getElementById('employeeModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Auto-save ทุก 30 วินาที
+        setInterval(function() {
+            saveData();
+        }, 30000);
+
+        // เริ่มต้นโปรแกรม
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+            updateLastSavedTime();
+            showEmployeeView(); // แสดงหน้าพนักงานเป็นหน้าแรก
+            
+            // แสดงข้อความต้อนรับ
+            setTimeout(function() {
+                showNotification('ยินดีต้อนรับสู่ระบบ Addvalue HR (Offline) - พร้อมคำนวณค่าจ้าง', 'success');
+            }, 500);
+        });
+    </script>
+</body>
+</html>

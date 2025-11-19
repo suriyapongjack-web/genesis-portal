@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio Management System - PTTEP</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+<style>
+:root{--primary:#2563eb;--secondary:#64748b;--success:#10b981;--danger:#ef4444;--warning:#f59e0b;--dark:#1e293b}
+body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:#f1f5f9}
+.main-container{max-width:1400px;margin:0 auto;padding:20px}
+.module-header{background:linear-gradient(135deg,var(--primary),#1e40af);color:white;padding:25px;border-radius:12px 12px 0 0;margin-bottom:0}
+.nav-tabs{background:white;padding:0;border:none;box-shadow:0 2px 4px rgba(0,0,0,0.05)}
+.nav-tabs .nav-link{color:var(--secondary);border:none;padding:15px 30px;font-weight:500;position:relative}
+.nav-tabs .nav-link.active{color:var(--primary)}
+.nav-tabs .nav-link.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--primary)}
+.filter-bar{background:white;border-radius:10px;padding:15px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.filter-grid{display:flex;gap:10px;align-items:end}
+.filter-item{flex:1}
+.filter-item label{font-size:0.8rem;color:#64748b;font-weight:500;text-transform:uppercase;margin-bottom:5px}
+.filter-item input,.filter-item select{width:100%;padding:8px 12px;border:1px solid #e2e8f0;border-radius:6px;font-size:0.9rem}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:15px;margin-bottom:20px}
+.stat-card{background:white;border-radius:10px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.08);border-left:4px solid var(--primary)}
+.stat-value{font-size:1.75rem;font-weight:700;color:var(--dark)}
+.stat-label{font-size:0.875rem;color:var(--secondary);margin-top:5px}
+.data-table-container{background:white;border-radius:10px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.btn-icon{padding:6px 12px;border:1px solid #e2e8f0;background:white;border-radius:6px;font-size:0.875rem;cursor:pointer}
+.btn-icon:hover{background:#f8f9fa}
+.table thead th{background:#f8fafc;font-weight:600;font-size:0.8rem;color:var(--secondary);text-transform:uppercase;padding:12px}
+.client-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;background:#e0f2fe;color:#0369a1;border-radius:6px;font-weight:500;font-size:0.8rem}
+.project-tag{display:inline-block;padding:4px 10px;background:linear-gradient(135deg,#dbeafe,#bfdbfe);color:#1e40af;border-radius:6px;font-size:0.8rem;font-weight:500}
+.description-title{font-weight:600;color:var(--dark);font-size:0.9rem}
+.description-subtitle{font-size:0.75rem;color:var(--secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.status-badge{padding:4px 12px;border-radius:20px;font-size:0.75rem;font-weight:500}
+.status-badge.active{background:#dcfce7;color:#166534}
+.status-badge.completed{background:#dbeafe;color:#1e40af}
+.status-badge.pending{background:#fef3c7;color:#92400e}
+.amount-display{font-weight:600;color:var(--dark)}
+.year-badge{display:inline-block;padding:2px 8px;background:#f3f4f6;color:#6b7280;border-radius:4px;font-size:0.75rem}
+.chart-container{background:white;border-radius:10px;padding:20px;box-shadow:0 1px 3px rgba(0,0,0,0.08);min-height:350px}
+.pagination{display:flex;justify-content:center;gap:5px;margin-top:15px}
+.pagination button{padding:5px 10px;border:1px solid #e2e8f0;background:white;border-radius:4px;cursor:pointer}
+.pagination button.active{background:var(--primary);color:white}
+.pagination button:disabled{opacity:0.5;cursor:not-allowed}
+.field-badge{background:#f3e8ff;color:#6b21a8;padding:3px 8px;border-radius:4px;font-size:0.75rem;font-weight:500;margin-left:5px}
+@media(max-width:768px){.filter-grid{flex-direction:column}.stats-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="main-container">
+  <div class="module-header">
+    <h1 class="h3 mb-0">Portfolio Management System</h1>
+    <small>PTT Exploration and Production Projects</small>
+  </div>
+
+  <ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item">
+      <a class="nav-link active" data-bs-toggle="tab" href="#dashboard">Dashboard</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#analytics">Analytics</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#reports">Reports</a>
+    </li>
+  </ul>
+
+  <div class="tab-content mt-4">
+    <!-- Dashboard Tab -->
+    <div class="tab-pane fade show active" id="dashboard">
+      <div class="filter-bar">
+        <div class="filter-grid">
+          <div class="filter-item">
+            <label>PO Number</label>
+            <input type="text" id="searchPO" placeholder="Search PO">
+          </div>
+          <div class="filter-item">
+            <label>Field/Location</label>
+            <select id="filterField">
+              <option value="">All Fields</option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <label>Service Type</label>
+            <select id="filterService">
+              <option value="">All Services</option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <label>Year</label>
+            <select id="filterYear">
+              <option value="">All Years</option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <button class="btn btn-primary w-100" onclick="app.search()">
+              <i class="bi bi-search"></i> Search
+            </button>
+          </div>
+          <div class="filter-item">
+            <button class="btn btn-secondary w-100" onclick="app.clear()">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="totalPO">0</div>
+          <div class="stat-label">Total Documents</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="totalAmount">฿0</div>
+          <div class="stat-label">Total Value</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="totalFields">0</div>
+          <div class="stat-label">Fields/Locations</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="avgAmount">฿0</div>
+          <div class="stat-label">Average Value</div>
+        </div>
+      </div>
+
+      <div class="data-table-container">
+        <div class="table-header">
+          <h6 class="mb-0">PTTEP Portfolio Documents</h6>
+          <div>
+            <button class="btn-icon" onclick="app.add()">
+              <i class="bi bi-plus"></i> Add
+            </button>
+            <button class="btn-icon" onclick="app.export()">
+              <i class="bi bi-download"></i> Export
+            </button>
+          </div>
+        </div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>PO Number</th>
+              <th>Date/Year</th>
+              <th>Client</th>
+              <th>Field/Location</th>
+              <th>Service/Title</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+
+    <!-- Analytics Tab -->
+    <div class="tab-pane fade" id="analytics">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <div class="chart-container">
+            <h6>Field Distribution</h6>
+            <canvas id="fieldChart"></canvas>
+          </div>
+        </div>
+        <div class="col-md-6 mb-3">
+          <div class="chart-container">
+            <h6>Service Type Distribution</h6>
+            <canvas id="serviceChart"></canvas>
+          </div>
+        </div>
+        <div class="col-12">
+          <div class="chart-container">
+            <h6>Portfolio Value Trend</h6>
+            <canvas id="trendChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reports Tab -->
+    <div class="tab-pane fade" id="reports">
+      <div class="data-table-container">
+        <div class="btn-group mb-3">
+          <button class="btn btn-outline-primary" onclick="app.report('summary')">Summary</button>
+          <button class="btn btn-outline-primary" onclick="app.report('detail')">Detail</button>
+          <button class="btn btn-outline-primary" onclick="app.report('print')">Print</button>
+        </div>
+        <div id="reportContainer"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="editModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Edit Document</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">PO Number</label>
+          <input type="text" class="form-control" id="edit_po">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Date</label>
+          <input type="date" class="form-control" id="edit_date">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Field/Location</label>
+          <select class="form-control" id="edit_field">
+            <option value="Bangkok">Bangkok Office</option>
+            <option value="Arthit">Arthit Field</option>
+            <option value="Bongkot">Bongkot Field</option>
+            <option value="S1">S1 Field</option>
+            <option value="Zawtika">Zawtika Field (Myanmar)</option>
+            <option value="GCME">GCME Field (Arthit South)</option>
+            <option value="Alpha/Bravo">Bualuang Field (Alpha/Bravo)</option>
+            <option value="ZPQ/Z1D/Z1E">Zawtika Field (ZPQ/Z1D/Z1E)</option>
+            <option value="Songkhla">Songkhla Office</option>
+            <option value="Surat">Surat Office</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Service Type</label>
+          <select class="form-control" id="edit_service">
+            <option value="Network Infrastructure">Network Infrastructure</option>
+            <option value="Wireless Communication">Wireless Communication</option>
+            <option value="Base Station">Base Station</option>
+            <option value="IT Services">IT Services</option>
+            <option value="Maintenance">Maintenance</option>
+            <option value="Training">Training</option>
+            <option value="Consulting">Consulting</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Description</label>
+          <textarea class="form-control" id="edit_desc" rows="2"></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Amount</label>
+          <input type="number" class="form-control" id="edit_amount">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Status</label>
+          <select class="form-control" id="edit_status">
+            <option>active</option>
+            <option>completed</option>
+            <option>pending</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-primary" onclick="app.save()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// PTTEP Real Data from Database
+const app = {
+  // Based on actual PTTEP data from images
+  data: [
+    {po:'OB130278',date:'2008-09-05',client:'PTT Exploration and Production',field:'Bangkok',service:'Network Infrastructure',desc:'Network infrastructure upgrade',title:'Network Infrastructure',amount:1070000,status:'completed'},
+    {po:'OB126282',date:'2008-08-28',client:'PTT Exploration and Production',field:'Bangkok',service:'Wireless Communication',desc:'Wireless broadband access',title:'Wireless Access',amount:110000,status:'completed'},
+    {po:'OB133728',date:'2009-03-19',client:'PTT Exploration and Production',field:'Bangkok',service:'Wireless Communication',desc:'Complete wireless solution with antenna',title:'Antenna Systems',amount:458000,status:'completed'},
+    {po:'OA119706',date:'2010-04-06',client:'PTT Exploration and Production',field:'Arthit',service:'Base Station',desc:'Base station deployment with training',title:'Base Station',amount:510000,status:'active'},
+    // Additional realistic PTTEP data
+    {po:'OA120001',date:'2023-01-15',client:'PTT Exploration and Production',field:'Bongkot',service:'Network Infrastructure',desc:'Offshore platform network upgrade',title:'Platform Network',amount:1250000,status:'completed'},
+    {po:'OA120002',date:'2023-03-20',client:'PTT Exploration and Production',field:'S1',service:'IT Services',desc:'SCADA system implementation',title:'SCADA System',amount:2100000,status:'completed'},
+    {po:'OA120003',date:'2023-05-10',client:'PTT Exploration and Production',field:'Zawtika',service:'Wireless Communication',desc:'Myanmar offshore communication system',title:'Offshore Communication',amount:1850000,status:'active'},
+    {po:'OA120004',date:'2023-07-15',client:'PTT Exploration and Production',field:'GCME',service:'Network Infrastructure',desc:'Arthit South field network',title:'Field Network',amount:980000,status:'active'},
+    {po:'OA120005',date:'2023-09-22',client:'PTT Exploration and Production',field:'Alpha/Bravo',service:'Base Station',desc:'Bualuang field base station',title:'Bualuang Base Station',amount:750000,status:'active'},
+    {po:'OA120006',date:'2023-11-08',client:'PTT Exploration and Production',field:'ZPQ/Z1D/Z1E',service:'Maintenance',desc:'Zawtika field maintenance contract',title:'Field Maintenance',amount:450000,status:'active'},
+    {po:'OA120007',date:'2024-01-10',client:'PTT Exploration and Production',field:'Songkhla',service:'IT Services',desc:'Office IT infrastructure upgrade',title:'IT Infrastructure',amount:320000,status:'active'},
+    {po:'OA120008',date:'2024-02-15',client:'PTT Exploration and Production',field:'Surat',service:'Training',desc:'Technical training for operators',title:'Operator Training',amount:180000,status:'completed'},
+    {po:'OA120009',date:'2024-03-20',client:'PTT Exploration and Production',field:'Arthit',service:'Maintenance',desc:'Annual maintenance contract',title:'Annual Maintenance',amount:890000,status:'active'},
+    {po:'OA120010',date:'2024-04-05',client:'PTT Exploration and Production',field:'Bongkot',service:'Consulting',desc:'Digital transformation consulting',title:'Digital Consulting',amount:550000,status:'pending'}
+  ],
+  
+  filtered: [],
+  editIdx: -1,
+  currentPage: 1,
+  perPage: 10,
+  
+  init() {
+    this.filtered = [...this.data];
+    this.load();
+    this.populateFilters();
+    this.render();
+    this.initCharts();
+  },
+  
+  load() {
+    const saved = localStorage.getItem('pttep_portfolio');
+    if(saved) {
+      try {
+        this.data = JSON.parse(saved);
+        this.filtered = [...this.data];
+      } catch(e) {}
+    }
+  },
+  
+  save() {
+    const d = {
+      po: document.getElementById('edit_po').value,
+      date: document.getElementById('edit_date').value,
+      client: 'PTT Exploration and Production',
+      field: document.getElementById('edit_field').value,
+      service: document.getElementById('edit_service').value,
+      desc: document.getElementById('edit_desc').value,
+      title: document.getElementById('edit_service').value,
+      amount: parseFloat(document.getElementById('edit_amount').value),
+      status: document.getElementById('edit_status').value
+    };
+    
+    if(this.editIdx === -1) {
+      this.data.push(d);
+    } else {
+      const originalIdx = this.data.findIndex(item => item.po === this.filtered[this.editIdx].po);
+      this.data[originalIdx] = d;
+    }
+    
+    localStorage.setItem('pttep_portfolio', JSON.stringify(this.data));
+    this.filtered = [...this.data];
+    this.populateFilters();
+    this.render();
+    bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+  },
+  
+  populateFilters() {
+    // Fields
+    const fields = [...new Set(this.data.map(d => d.field))];
+    const fieldSelect = document.getElementById('filterField');
+    fieldSelect.innerHTML = '<option value="">All Fields</option>' + 
+      fields.map(f => `<option value="${f}">${f}</option>`).join('');
+    
+    // Services
+    const services = [...new Set(this.data.map(d => d.service))];
+    const serviceSelect = document.getElementById('filterService');
+    serviceSelect.innerHTML = '<option value="">All Services</option>' + 
+      services.map(s => `<option value="${s}">${s}</option>`).join('');
+    
+    // Years
+    const years = [...new Set(this.data.map(d => d.date.substring(0,4)))].sort().reverse();
+    const yearSelect = document.getElementById('filterYear');
+    yearSelect.innerHTML = '<option value="">All Years</option>' +
+      years.map(y => `<option value="${y}">${y}</option>`).join('');
+  },
+  
+  search() {
+    const po = document.getElementById('searchPO').value.toLowerCase();
+    const field = document.getElementById('filterField').value;
+    const service = document.getElementById('filterService').value;
+    const year = document.getElementById('filterYear').value;
+    
+    this.filtered = this.data.filter(item => {
+      const matchPO = !po || item.po.toLowerCase().includes(po);
+      const matchField = !field || item.field === field;
+      const matchService = !service || item.service === service;
+      const matchYear = !year || item.date.startsWith(year);
+      return matchPO && matchField && matchService && matchYear;
+    });
+    
+    this.currentPage = 1;
+    this.render();
+  },
+  
+  clear() {
+    document.getElementById('searchPO').value = '';
+    document.getElementById('filterField').value = '';
+    document.getElementById('filterService').value = '';
+    document.getElementById('filterYear').value = '';
+    this.filtered = [...this.data];
+    this.currentPage = 1;
+    this.render();
+  },
+  
+  render() {
+    // Stats
+    const total = this.filtered.length;
+    const amount = this.filtered.reduce((s,d) => s + d.amount, 0);
+    const fields = new Set(this.filtered.map(d => d.field)).size;
+    const avg = total ? amount/total : 0;
+    
+    document.getElementById('totalPO').textContent = total;
+    document.getElementById('totalAmount').textContent = '฿' + amount.toLocaleString('th-TH', {maximumFractionDigits:0});
+    document.getElementById('totalFields').textContent = fields;
+    document.getElementById('avgAmount').textContent = '฿' + avg.toLocaleString('th-TH', {maximumFractionDigits:0});
+    
+    // Table with pagination
+    const start = (this.currentPage - 1) * this.perPage;
+    const end = start + this.perPage;
+    const pageData = this.filtered.slice(start, end);
+    
+    const tbody = pageData.map((item,idx) => `
+      <tr>
+        <td><strong>${item.po}</strong></td>
+        <td>
+          ${new Date(item.date).toLocaleDateString('en-US', {month:'numeric',day:'numeric',year:'numeric'})}
+          <span class="year-badge ms-1">${item.date.substring(0,4)}</span>
+        </td>
+        <td><span class="client-badge">PTTEP</span></td>
+        <td>
+          <span class="project-tag">${item.field}</span>
+          ${item.field.includes('/') || item.field.includes('(') ? '<span class="field-badge">Offshore</span>' : ''}
+        </td>
+        <td>
+          <div class="description-title">${item.title}</div>
+          <div class="description-subtitle" title="${item.desc}">${item.desc}</div>
+        </td>
+        <td class="text-end amount-display">฿${item.amount.toLocaleString()}</td>
+        <td><span class="status-badge ${item.status}">${item.status}</span></td>
+        <td>
+          <button class="btn btn-sm btn-outline-primary" onclick="app.edit(${start + idx})">
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button class="btn btn-sm btn-outline-danger" onclick="app.del(${start + idx})">
+            <i class="bi bi-trash"></i>
+          </button>
+        </td>
+      </tr>
+    `).join('');
+    
+    document.getElementById('tableBody').innerHTML = tbody;
+    
+    // Pagination
+    const totalPages = Math.ceil(total / this.perPage);
+    let pagination = '';
+    
+    if(totalPages > 1) {
+      pagination += `<button onclick="app.page(${this.currentPage-1})" ${this.currentPage === 1 ? 'disabled' : ''}>‹</button>`;
+      
+      for(let i = 1; i <= totalPages; i++) {
+        if(i === 1 || i === totalPages || (i >= this.currentPage - 2 && i <= this.currentPage + 2)) {
+          pagination += `<button onclick="app.page(${i})" class="${i === this.currentPage ? 'active' : ''}">${i}</button>`;
+        } else if(i === this.currentPage - 3 || i === this.currentPage + 3) {
+          pagination += `<button disabled>...</button>`;
+        }
+      }
+      
+      pagination += `<button onclick="app.page(${this.currentPage+1})" ${this.currentPage === totalPages ? 'disabled' : ''}>›</button>`;
+    }
+    
+    document.getElementById('pagination').innerHTML = pagination;
+    
+    if(this.charts) this.updateCharts();
+  },
+  
+  page(n) {
+    const totalPages = Math.ceil(this.filtered.length / this.perPage);
+    if(n >= 1 && n <= totalPages) {
+      this.currentPage = n;
+      this.render();
+    }
+  },
+  
+  initCharts() {
+    this.charts = true;
+    
+    // Field Chart
+    const ctx1 = document.getElementById('fieldChart');
+    if(ctx1) {
+      const data = {};
+      this.data.forEach(d => {
+        data[d.field] = (data[d.field] || 0) + 1;
+      });
+      
+      this.fieldChart = new Chart(ctx1, {
+        type: 'doughnut',
+        data: {
+          labels: Object.keys(data),
+          datasets: [{
+            data: Object.values(data),
+            backgroundColor: ['#2563eb','#10b981','#f59e0b','#ef4444','#8b5cf6','#06b6d4','#ec4899','#14b8a6','#f97316','#6366f1']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {position: 'bottom', labels: {boxWidth: 12, font: {size: 11}}}
+          }
+        }
+      });
+    }
+    
+    // Service Chart
+    const ctx2 = document.getElementById('serviceChart');
+    if(ctx2) {
+      const data = {};
+      this.data.forEach(d => {
+        data[d.service] = (data[d.service] || 0) + d.amount;
+      });
+      
+      this.serviceChart = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(data),
+          datasets: [{
+            label: 'Value (THB)',
+            data: Object.values(data),
+            backgroundColor: '#2563eb'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: 'y',
+          scales: {
+            x: {
+              ticks: {
+                callback: function(value) {
+                  return '฿' + (value/1000000).toFixed(1) + 'M';
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+    
+    // Trend Chart
+    const ctx3 = document.getElementById('trendChart');
+    if(ctx3) {
+      const sorted = [...this.data].sort((a,b) => a.date.localeCompare(b.date));
+      let cumulative = 0;
+      
+      this.trendChart = new Chart(ctx3, {
+        type: 'line',
+        data: {
+          labels: sorted.map(d => d.po),
+          datasets: [{
+            label: 'Cumulative Value (THB)',
+            data: sorted.map(d => {
+              cumulative += d.amount;
+              return cumulative;
+            }),
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              ticks: {
+                callback: function(value) {
+                  return '฿' + (value/1000000).toFixed(1) + 'M';
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+  },
+  
+  updateCharts() {
+    if(this.fieldChart) {
+      const data = {};
+      this.filtered.forEach(d => {
+        data[d.field] = (data[d.field] || 0) + 1;
+      });
+      this.fieldChart.data.labels = Object.keys(data);
+      this.fieldChart.data.datasets[0].data = Object.values(data);
+      this.fieldChart.update();
+    }
+    
+    if(this.serviceChart) {
+      const data = {};
+      this.filtered.forEach(d => {
+        data[d.service] = (data[d.service] || 0) + d.amount;
+      });
+      this.serviceChart.data.labels = Object.keys(data);
+      this.serviceChart.data.datasets[0].data = Object.values(data);
+      this.serviceChart.update();
+    }
+  },
+  
+  add() {
+    this.editIdx = -1;
+    document.getElementById('edit_po').value = 'OA' + (120010 + this.data.length);
+    document.getElementById('edit_date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('edit_field').value = 'Bangkok';
+    document.getElementById('edit_service').value = 'Network Infrastructure';
+    document.getElementById('edit_desc').value = '';
+    document.getElementById('edit_amount').value = '';
+    document.getElementById('edit_status').value = 'active';
+    new bootstrap.Modal(document.getElementById('editModal')).show();
+  },
+  
+  edit(idx) {
+    this.editIdx = idx;
+    const d = this.filtered[idx];
+    document.getElementById('edit_po').value = d.po;
+    document.getElementById('edit_date').value = d.date;
+    document.getElementById('edit_field').value = d.field;
+    document.getElementById('edit_service').value = d.service;
+    document.getElementById('edit_desc').value = d.desc;
+    document.getElementById('edit_amount').value = d.amount;
+    document.getElementById('edit_status').value = d.status;
+    new bootstrap.Modal(document.getElementById('editModal')).show();
+  },
+  
+  del(idx) {
+    if(confirm('Delete this document?')) {
+      const po = this.filtered[idx].po;
+      this.data = this.data.filter(d => d.po !== po);
+      this.filtered = this.filtered.filter(d => d.po !== po);
+      localStorage.setItem('pttep_portfolio', JSON.stringify(this.data));
+      this.populateFilters();
+      this.render();
+    }
+  },
+  
+  export() {
+    let csv = 'PO Number,Date,Client,Field/Location,Service Type,Description,Amount (THB),Status\n';
+    this.filtered.forEach(d => {
+      csv += `"${d.po}","${d.date}","${d.client}","${d.field}","${d.service}","${d.desc}",${d.amount},"${d.status}"\n`;
+    });
+    
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `pttep_portfolio_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+  },
+  
+  report(type) {
+    const container = document.getElementById('reportContainer');
+    
+    if(type === 'summary') {
+      const total = this.filtered.reduce((s,d) => s + d.amount, 0);
+      const byField = {};
+      const byService = {};
+      
+      this.filtered.forEach(d => {
+        byField[d.field] = (byField[d.field] || 0) + d.amount;
+        byService[d.service] = (byService[d.service] || 0) + d.amount;
+      });
+      
+      container.innerHTML = `
+        <div class="card">
+          <div class="card-body">
+            <h5>PTTEP Portfolio Summary Report</h5>
+            <hr>
+            <div class="row">
+              <div class="col-md-6">
+                <h6>Overview</h6>
+                <p><strong>Client:</strong> PTT Exploration and Production Public Company Limited</p>
+                <p><strong>Total Portfolio Value:</strong> ฿${total.toLocaleString('th-TH')}</p>
+                <p><strong>Number of Documents:</strong> ${this.filtered.length}</p>
+                <p><strong>Active Fields:</strong> ${Object.keys(byField).length}</p>
+              </div>
+              <div class="col-md-6">
+                <h6>By Field/Location</h6>
+                <ul class="list-unstyled">
+                  ${Object.entries(byField).sort((a,b) => b[1]-a[1]).map(([field,amount]) => 
+                    `<li>• ${field}: ฿${amount.toLocaleString()}</li>`
+                  ).join('')}
+                </ul>
+              </div>
+            </div>
+            <hr>
+            <h6>Service Type Distribution</h6>
+            <ul class="list-unstyled">
+              ${Object.entries(byService).sort((a,b) => b[1]-a[1]).map(([service,amount]) => 
+                `<li>• ${service}: ฿${amount.toLocaleString()}</li>`
+              ).join('')}
+            </ul>
+          </div>
+        </div>
+      `;
+    } else if(type === 'detail') {
+      container.innerHTML = `
+        <div class="table-responsive">
+          <table class="table table-sm">
+            ${this.filtered.map(d => `
+              <tr class="table-light"><td colspan="2"><strong>PO: ${d.po}</strong></td></tr>
+              <tr><td width="30%">Date:</td><td>${new Date(d.date).toLocaleDateString('en-US')}</td></tr>
+              <tr><td>Client:</td><td>PTTEP</td></tr>
+              <tr><td>Field:</td><td>${d.field}</td></tr>
+              <tr><td>Service:</td><td>${d.service}</td></tr>
+              <tr><td>Description:</td><td>${d.desc}</td></tr>
+              <tr><td>Amount:</td><td>฿${d.amount.toLocaleString()}</td></tr>
+              <tr><td>Status:</td><td><span class="badge bg-${d.status === 'active' ? 'success' : d.status === 'completed' ? 'primary' : 'warning'}">${d.status}</span></td></tr>
+              <tr><td colspan="2"><hr></td></tr>
+            `).join('')}
+          </table>
+        </div>
+      `;
+    } else if(type === 'print') {
+      window.print();
+    }
+  }
+};
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  app.init();
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PTTEPI BOM Management System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); 
+            min-height: 100vh; 
+            padding: 20px; 
+        }
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            position: relative;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        .status-bar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .status-indicator {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            background: rgba(255,255,255,0.2);
+        }
+        .nav-tabs {
+            display: flex;
+            background: #34495e;
+        }
+        .nav-tab {
+            flex: 1;
+            padding: 15px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        .nav-tab.active {
+            background: #2c3e50;
+            border-bottom-color: #3498db;
+        }
+        .nav-tab:hover {
+            background: #2c3e50;
+        }
+        .tab-content {
+            display: none;
+            padding: 30px;
+            animation: fadeIn 0.3s;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #ecf0f1;
+            border-radius: 8px;
+        }
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; transition: all 0.3s; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-primary { background: #3498db; color: white; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn-warning { background: #f39c12; color: white; }
+        .btn-danger { background: #e74c3c; color: white; }
+        .btn-info { background: #9b59b6; color: white; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .search-box { padding: 10px 15px; border: 2px solid #bdc3c7; border-radius: 5px; width: 300px; font-size: 14px; }
+        .storage-info { padding: 15px; background: #e8f4f8; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .storage-item { display: flex; align-items: center; gap: 10px; }
+        .table-container { background: white; border-radius: 10px; overflow-x: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #2c3e50; color: white; padding: 12px; text-align: left; position: sticky; top: 0; z-index: 10; font-weight: 600; white-space: nowrap; }
+        td { padding: 10px 12px; border-bottom: 1px solid #ecf0f1; }
+        tr:hover { background: #f8f9fa; }
+        tr.selected { background: #d4e6f1; }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.6);
+        }
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        .modal-header h2 {
+            color: #2c3e50;
+            font-size: 1.8em;
+        }
+        .close {
+            font-size: 32px;
+            cursor: pointer;
+            color: #95a5a6;
+            line-height: 1;
+        }
+        .close:hover {
+            color: #2c3e50;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #bdc3c7;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .summary-card {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .summary-card h3 {
+            font-size: 1em;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+        .summary-card .amount {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .summary-card .detail {
+            font-size: 0.85em;
+            opacity: 0.8;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        .action-edit { background: #3498db; color: white; }
+        .action-delete { background: #e74c3c; color: white; }
+        .action-view { background: #27ae60; color: white; }
+        .cost-breakdown {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            padding: 20px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+        }
+        .cost-label {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .cost-value {
+            color: #3498db;
+            font-weight: bold;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 2000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .notification.show {
+            transform: translateX(0);
+        }
+        .notification.success { background: #27ae60; }
+        .notification.error { background: #e74c3c; }
+        .notification.info { background: #3498db; }
+        .notification.warning { background: #f39c12; }
+        select.form-control {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 30px;
+        }
+        @media (max-width: 768px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .summary-cards { grid-template-columns: 1fr; }
+            .cost-breakdown { grid-template-columns: 1fr; }
+            .toolbar { flex-direction: column; gap: 10px; }
+            .search-box { width: 100%; }
+            .storage-info { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📦 PTTEPI BOM Management System</h1>
+            <p>Bill of Materials & Cost Management for ZPQ-ZWP4 Project</p>
+            <div class="status-bar">
+                <div class="status-indicator">
+                    <span id="itemCount">0</span> Items
+                </div>
+                <div class="status-indicator">
+                    <span id="totalCost">$0</span> Total Cost
+                </div>
+                <div class="status-indicator">
+                    Project: ZPQ-ZWP4
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('bom', this)">📋 BOM List</button>
+            <button class="nav-tab" onclick="switchTab('costing', this)">💰 Costing Analysis</button>
+            <button class="nav-tab" onclick="switchTab('quotation', this)">📄 Quotation Link</button>
+        </div>
+
+        <!-- BOM List Tab -->
+        <div id="bom" class="tab-content active">
+            <div class="toolbar">
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="openModal('add')">
+                        ➕ Add Item
+                    </button>
+                    <button class="btn btn-success" onclick="saveData()">
+                        💾 Save to Browser
+                    </button>
+                    <button class="btn btn-info" onclick="loadSavedData()">
+                        📂 Reload Data
+                    </button>
+                    <button class="btn btn-warning" onclick="exportBOM()">
+                        📤 Export Excel/JSON
+                    </button>
+                    <button class="btn btn-danger" onclick="deleteSelected()">
+                        🗑️ Delete Selected
+                    </button>
+                </div>
+                <input type="text" class="search-box" id="searchBox" placeholder="🔍 Search BOM items..." onkeyup="filterItems()">
+            </div>
+            
+            <div class="storage-info">
+                <div class="storage-item">
+                    <strong>💾 Storage Status:</strong> 
+                    <span id="storageStatus" style="color: green;">✓ Ready</span>
+                </div>
+                <div class="storage-item">
+                    <strong>📍 Location:</strong> 
+                    <span>Browser LocalStorage</span>
+                </div>
+                <div class="storage-item">
+                    <strong>📊 Items:</strong> 
+                    <span id="itemCountStatus">0</span>
+                </div>
+                <div class="storage-item">
+                    <strong>🕐 Last Save:</strong> 
+                    <span id="lastSaveTime">Never</span>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="bomTable">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                            <th>Item Code</th>
+                            <th>Description</th>
+                            <th>Part Number</th>
+                            <th>Unit</th>
+                            <th>Qty</th>
+                            <th>Unit Cost</th>
+                            <th>Total Cost</th>
+                            <th>Notes</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bomList"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Costing Analysis Tab -->
+        <div id="costing" class="tab-content">
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <h3>Total BOM Cost</h3>
+                    <div class="amount" id="totalBomCost">$0</div>
+                    <div class="detail">Base Cost</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Total with Overhead</h3>
+                    <div class="amount" id="totalWithOverhead">$0</div>
+                    <div class="detail">Including Freight & Duties</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Markup (30%)</h3>
+                    <div class="amount" id="markupAmount">$0</div>
+                    <div class="detail">Selling Margin</div>
+                </div>
+                <div class="summary-card">
+                    <h3>Final Quote Price</h3>
+                    <div class="amount" id="finalQuotePriceCard">$0</div>
+                    <div class="detail">Customer Price</div>
+                </div>
+            </div>
+            
+            <div class="cost-breakdown">
+                <div class="cost-item">
+                    <span class="cost-label">Base Cost:</span>
+                    <span class="cost-value" id="baseCost">$0</span>
+                </div>
+                <div class="cost-item">
+                    <span class="cost-label">Freight & Logistics (5%):</span>
+                    <span class="cost-value" id="freightCost">$0</span>
+                </div>
+                <div class="cost-item">
+                    <span class="cost-label">Import Duties (7%):</span>
+                    <span class="cost-value" id="dutiesCost">$0</span>
+                </div>
+                <div class="cost-item">
+                    <span class="cost-label">Contingency (10%):</span>
+                    <span class="cost-value" id="contingencyCost">$0</span>
+                </div>
+                <div class="cost-item">
+                    <span class="cost-label">Subtotal:</span>
+                    <span class="cost-value" id="subtotal">$0</span>
+                </div>
+                <div class="cost-item">
+                    <span class="cost-label">Final Quote Price:</span>
+                    <span class="cost-value" id="finalQuotePrice" style="font-size: 1.2em;">$0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quotation Link Tab -->
+        <div id="quotation" class="tab-content">
+            <div class="toolbar">
+                <h3>Link BOM to Quotations</h3>
+                <button class="btn btn-primary" onclick="linkToQuotation()">🔗 Create Quote from BOM</button>
+                <button class="btn btn-success" onclick="syncWithQuotation()">🔄 Sync with Quotation System</button>
+            </div>
+            <div class="table-container">
+                <table id="quotationLinkTable">
+                    <thead>
+                        <tr>
+                            <th>Quote ID</th>
+                            <th>Date</th>
+                            <th>Client</th>
+                            <th>BOM Items</th>
+                            <th>BOM Cost</th>
+                            <th>Quote Price</th>
+                            <th>Margin</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="quotationLinkList"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Add/Edit Item -->
+    <div id="bomModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add BOM Item</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <form id="bomForm" onsubmit="saveItem(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Item Code *</label>
+                        <input type="text" id="itemCode" class="form-control" required placeholder="e.g., CRG-IP50CX-01">
+                    </div>
+                    <div class="form-group">
+                        <label>Part Number</label>
+                        <input type="text" id="partNumber" class="form-control" placeholder="Manufacturer P/N">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Description *</label>
+                        <input type="text" id="description" class="form-control" required placeholder="e.g., Ceragon IP-50CX Radio Unit">
+                    </div>
+                    <div class="form-group">
+                        <label>Unit *</label>
+                        <select id="unit" class="form-control" required>
+                            <option value="EA">Each (EA)</option>
+                            <option value="SET">Set</option>
+                            <option value="M">Meter</option>
+                            <option value="KG">Kilogram</option>
+                            <option value="DAY">Day</option>
+                            <option value="HR">Hour</option>
+                            <option value="LOT">Lot</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity *</label>
+                        <input type="number" id="quantity" class="form-control" required min="1" value="1">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Unit Cost (USD) *</label>
+                        <input type="number" id="unitCost" class="form-control" required step="0.01" min="0">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Notes</label>
+                        <textarea id="notes" class="form-control" rows="3" placeholder="Additional specifications or requirements"></textarea>
+                    </div>
+                </div>
+                <div style="margin-top: 25px; text-align: right;">
+                    <button type="button" class="btn btn-danger" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // Data Storage
+        let bomItems = [];
+        let quotations = [];
+        let editingId = null;
+        const MARKUP_PERCENTAGE = 30;
+        const CONTINGENCY_PERCENTAGE = 10;
+        const FREIGHT_PERCENTAGE = 5;
+        const DUTIES_PERCENTAGE = 7;
+
+        // Simplified BOM data for Zawtika ZPQ-ZWP4 Project
+        const sampleBOMData = [
+            {
+                id: 'BOM001',
+                itemCode: 'CRG-IP50CX-ODU-01',
+                description: 'Ceragon IP-50CX Radio Unit ODU (Outdoor Unit)',
+                partNumber: 'IP50CX-23GHZ-Z2',
+                unit: 'EA',
+                quantity: 2,
+                unitCost: 8500,
+                notes: 'Main radio unit for ZPQ-ZWP4 link'
+            },
+            {
+                id: 'BOM002',
+                itemCode: 'CRG-IP50CX-IDU-01',
+                description: 'Ceragon IP-50CX Indoor Unit (IDU)',
+                partNumber: 'IP50CX-IDU-1G',
+                unit: 'EA',
+                quantity: 2,
+                unitCost: 6200,
+                notes: 'Indoor unit with 1G capacity'
+            },
+            {
+                id: 'BOM003',
+                itemCode: 'CRG-ANT-HP2-23',
+                description: '2ft High Performance Antenna 23GHz',
+                partNumber: 'ANT-HP2-23GHZ',
+                unit: 'EA',
+                quantity: 2,
+                unitCost: 1200,
+                notes: 'High performance antenna for 23GHz band'
+            },
+            {
+                id: 'BOM004',
+                itemCode: 'CRG-RADOME-2FT',
+                description: 'Antenna Radome 2ft',
+                partNumber: 'RADOME-2FT',
+                unit: 'EA',
+                quantity: 2,
+                unitCost: 350,
+                notes: 'Protective radome for antenna'
+            },
+            {
+                id: 'BOM005',
+                itemCode: 'CBL-IF-30M',
+                description: 'IF Cable RG-8 Type 30m',
+                partNumber: 'CBL-IF-RG8-30M',
+                unit: 'EA',
+                quantity: 4,
+                unitCost: 180,
+                notes: 'IF cable for ODU-IDU connection'
+            },
+            {
+                id: 'BOM006',
+                itemCode: 'CBL-CAT6A-SFTP',
+                description: 'CAT6A S/FTP Outdoor Cable',
+                partNumber: 'CAT6A-SFTP-OUT',
+                unit: 'M',
+                quantity: 200,
+                unitCost: 8,
+                notes: 'Shielded outdoor Ethernet cable'
+            },
+            {
+                id: 'BOM007',
+                itemCode: 'SRV-FAT-BKK',
+                description: 'Factory Acceptance Testing - Bangkok',
+                partNumber: 'FAT-BKK-2DAYS',
+                unit: 'DAY',
+                quantity: 2,
+                unitCost: 1500,
+                notes: 'FAT at Bangkok facility'
+            },
+            {
+                id: 'BOM008',
+                itemCode: 'SRV-SAT-SITE',
+                description: 'Site Acceptance Testing - Offshore',
+                partNumber: 'SAT-OFFSHORE-3D',
+                unit: 'DAY',
+                quantity: 3,
+                unitCost: 2200,
+                notes: 'SAT at ZPQ-ZWP4 platforms'
+            },
+            {
+                id: 'BOM009',
+                itemCode: 'SRV-TRN-OPS',
+                description: 'Operations Training - Bangkok',
+                partNumber: 'TRN-OPS-2D',
+                unit: 'DAY',
+                quantity: 2,
+                unitCost: 1200,
+                notes: 'Operations team training in Bangkok'
+            },
+            {
+                id: 'BOM010',
+                itemCode: 'SPR-IP50CX-ODU',
+                description: 'IP-50CX ODU Complete Spare Unit',
+                partNumber: 'IP50CX-ODU-SPARE',
+                unit: 'EA',
+                quantity: 1,
+                unitCost: 8500,
+                notes: 'Complete spare ODU for Mytel Yangon'
+            },
+            {
+                id: 'BOM011',
+                itemCode: 'SPR-PWR-SUPPLY',
+                description: 'Power Supply Unit (Spare)',
+                partNumber: 'PSU-IP50-SPARE',
+                unit: 'EA',
+                quantity: 2,
+                unitCost: 850,
+                notes: 'Spare PSU modules'
+            }
+        ];
+
+        // Initialize
+        function init() {
+            loadData();
+            if (bomItems.length === 0) {
+                bomItems = sampleBOMData;
+                saveData();
+            }
+            renderBOMList();
+            updateDashboard();
+        }
+
+        // Generate unique ID
+        function generateId() {
+            return 'BOM' + Date.now().toString(36).toUpperCase();
+        }
+
+        // Switch tabs
+        function switchTab(tabName, element) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            
+            document.getElementById(tabName).classList.add('active');
+            element.classList.add('active');
+            
+            if (tabName === 'costing') updateCostingAnalysis();
+            if (tabName === 'quotation') renderQuotationLinks();
+        }
+
+        // Modal functions
+        function openModal(mode, id = null) {
+            editingId = id;
+            const modal = document.getElementById('bomModal');
+            const form = document.getElementById('bomForm');
+            
+            if (mode === 'add') {
+                form.reset();
+                document.getElementById('modalTitle').textContent = 'Add New BOM Item';
+            } else if (mode === 'edit' && id) {
+                const item = bomItems.find(i => i.id === id);
+                if (item) {
+                    document.getElementById('modalTitle').textContent = 'Edit BOM Item';
+                    document.getElementById('itemCode').value = item.itemCode;
+                    document.getElementById('description').value = item.description;
+                    document.getElementById('partNumber').value = item.partNumber || '';
+                    document.getElementById('unit').value = item.unit;
+                    document.getElementById('quantity').value = item.quantity;
+                    document.getElementById('unitCost').value = item.unitCost;
+                    document.getElementById('notes').value = item.notes || '';
+                }
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('bomModal').classList.remove('active');
+            editingId = null;
+        }
+
+        // Save item
+        function saveItem(event) {
+            event.preventDefault();
+            
+            const item = {
+                id: editingId || generateId(),
+                itemCode: document.getElementById('itemCode').value,
+                description: document.getElementById('description').value,
+                partNumber: document.getElementById('partNumber').value,
+                unit: document.getElementById('unit').value,
+                quantity: parseInt(document.getElementById('quantity').value),
+                unitCost: parseFloat(document.getElementById('unitCost').value),
+                notes: document.getElementById('notes').value
+            };
+            
+            if (editingId) {
+                const index = bomItems.findIndex(i => i.id === editingId);
+                if (index > -1) {
+                    bomItems[index] = item;
+                    showNotification('✅ BOM item updated successfully', 'success');
+                }
+            } else {
+                bomItems.push(item);
+                showNotification('✅ BOM item added successfully', 'success');
+            }
+            
+            saveData();
+            renderBOMList();
+            updateDashboard();
+            closeModal();
+        }
+
+        // Render BOM list
+        function renderBOMList() {
+            const tbody = document.getElementById('bomList');
+            tbody.innerHTML = bomItems.map(item => {
+                const totalCost = item.quantity * item.unitCost;
+                return `
+                    <tr>
+                        <td><input type="checkbox" class="checkbox" value="${item.id}"></td>
+                        <td>${item.itemCode}</td>
+                        <td>${item.description}</td>
+                        <td>${item.partNumber || '-'}</td>
+                        <td>${item.unit}</td>
+                        <td>${item.quantity}</td>
+                        <td>$${item.unitCost.toLocaleString()}</td>
+                        <td><strong>$${totalCost.toLocaleString()}</strong></td>
+                        <td>${item.notes || '-'}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="action-btn action-view" onclick="viewItem('${item.id}')">👁️</button>
+                                <button class="action-btn action-edit" onclick="openModal('edit', '${item.id}')">✏️</button>
+                                <button class="action-btn action-delete" onclick="deleteItem('${item.id}')">🗑️</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            document.getElementById('itemCountStatus').textContent = bomItems.length;
+        }
+
+        // Update dashboard
+        function updateDashboard() {
+            const totalItems = bomItems.length;
+            const totalCost = bomItems.reduce((sum, item) => sum + (item.quantity * item.unitCost), 0);
+            
+            document.getElementById('itemCount').textContent = totalItems;
+            document.getElementById('totalCost').textContent = '$' + totalCost.toLocaleString();
+            document.getElementById('itemCountStatus').textContent = totalItems;
+        }
+
+        // Update costing analysis
+        function updateCostingAnalysis() {
+            const totalBomCost = bomItems.reduce((sum, item) => sum + (item.quantity * item.unitCost), 0);
+            
+            const freightCost = totalBomCost * (FREIGHT_PERCENTAGE / 100);
+            const dutiesCost = totalBomCost * (DUTIES_PERCENTAGE / 100);
+            const baseCost = totalBomCost;
+            const totalWithOverhead = baseCost + freightCost + dutiesCost;
+            const contingencyCost = totalWithOverhead * (CONTINGENCY_PERCENTAGE / 100);
+            const subtotal = totalWithOverhead + contingencyCost;
+            const markupAmount = subtotal * (MARKUP_PERCENTAGE / 100);
+            const finalQuotePrice = subtotal + markupAmount;
+            
+            // Update summary cards
+            document.getElementById('totalBomCost').textContent = '$' + Math.round(totalBomCost).toLocaleString();
+            document.getElementById('totalWithOverhead').textContent = '$' + Math.round(totalWithOverhead).toLocaleString();
+            document.getElementById('markupAmount').textContent = '$' + Math.round(markupAmount).toLocaleString();
+            document.getElementById('finalQuotePriceCard').textContent = '$' + Math.round(finalQuotePrice).toLocaleString();
+            
+            // Update cost breakdown
+            document.getElementById('baseCost').textContent = '$' + Math.round(baseCost).toLocaleString();
+            document.getElementById('freightCost').textContent = '$' + Math.round(freightCost).toLocaleString();
+            document.getElementById('dutiesCost').textContent = '$' + Math.round(dutiesCost).toLocaleString();
+            document.getElementById('contingencyCost').textContent = '$' + Math.round(contingencyCost).toLocaleString();
+            document.getElementById('subtotal').textContent = '$' + Math.round(subtotal).toLocaleString();
+            document.getElementById('finalQuotePrice').textContent = '$' + Math.round(finalQuotePrice).toLocaleString();
+        }
+
+        // Export BOM
+        function exportBOM() {
+            const dataStr = JSON.stringify(bomItems, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'PTTEPI_ZPQ-ZWP4_BOM_' + new Date().toISOString().split('T')[0] + '.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showNotification('📤 BOM exported successfully', 'success');
+        }
+
+        // Delete item
+        function deleteItem(id) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                bomItems = bomItems.filter(item => item.id !== id);
+                saveData();
+                renderBOMList();
+                updateDashboard();
+                showNotification('🗑️ Item deleted', 'warning');
+            }
+        }
+
+        // Delete selected items
+        function deleteSelected() {
+            const selected = document.querySelectorAll('.checkbox:checked');
+            if (selected.length === 0) {
+                showNotification('⚠️ No items selected', 'warning');
+                return;
+            }
+            
+            if (confirm(`Delete ${selected.length} selected items?`)) {
+                const ids = Array.from(selected).map(cb => cb.value);
+                bomItems = bomItems.filter(item => !ids.includes(item.id));
+                saveData();
+                renderBOMList();
+                updateDashboard();
+                showNotification(`🗑️ ${selected.length} items deleted`, 'warning');
+            }
+        }
+
+        // View item details
+        function viewItem(id) {
+            const item = bomItems.find(i => i.id === id);
+            if (item) {
+                alert(`Item Details:\n\n` +
+                    `Code: ${item.itemCode}\n` +
+                    `Category: ${item.category || 'Equipment'}\n` +
+                    `Description: ${item.description}\n` +
+                    `Part Number: ${item.partNumber || 'N/A'}\n` +
+                    `Quantity: ${item.quantity} ${item.unit}\n` +
+                    `Unit Cost: ${item.unitCost}\n` +
+                    `Total Cost: ${item.quantity * item.unitCost}\n` +
+                    `Notes: ${item.notes || 'None'}`);
+            }
+        }
+
+        // Toggle select all
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.checkbox');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        }
+
+        // Filter items
+        function filterItems() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            const rows = document.querySelectorAll('#bomList tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('pttepi_bom_items', JSON.stringify(bomItems));
+            localStorage.setItem('pttepi_quotations', JSON.stringify(quotations));
+            const now = new Date().toLocaleString();
+            localStorage.setItem('pttepi_last_save', now);
+            document.getElementById('lastSaveTime').textContent = now;
+            showNotification('💾 Data saved to browser', 'success');
+        }
+
+        // Load data from localStorage
+        function loadData() {
+            const savedItems = localStorage.getItem('pttepi_bom_items');
+            const savedQuotations = localStorage.getItem('pttepi_quotations');
+            const lastSave = localStorage.getItem('pttepi_last_save');
+            
+            if (savedItems) {
+                bomItems = JSON.parse(savedItems);
+            }
+            if (savedQuotations) {
+                quotations = JSON.parse(savedQuotations);
+            }
+            if (lastSave) {
+                document.getElementById('lastSaveTime').textContent = lastSave;
+            }
+        }
+
+        // Load saved data manually
+        function loadSavedData() {
+            loadData();
+            renderBOMList();
+            updateDashboard();
+            showNotification('📂 Data reloaded from browser', 'info');
+        }
+
+        // Show notification
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = 'notification ' + type + ' show';
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Quotation functions
+        function linkToQuotation() {
+            const totalBomCost = bomItems.reduce((sum, item) => sum + (item.quantity * item.unitCost), 0);
+            const finalPrice = totalBomCost * 1.43; // Including all markups
+            
+            const newQuote = {
+                id: 'QT-' + Date.now(),
+                date: new Date().toISOString().split('T')[0],
+                client: 'PTTEPI Myanmar',
+                bomItems: bomItems.length,
+                bomCost: totalBomCost,
+                quotePrice: finalPrice,
+                margin: ((finalPrice - totalBomCost) / totalBomCost * 100).toFixed(1) + '%',
+                status: 'Draft'
+            };
+            
+            quotations.push(newQuote);
+            saveData();
+            renderQuotationLinks();
+            showNotification('🔗 Quotation created successfully', 'success');
+        }
+
+        function syncWithQuotation() {
+            showNotification('🔄 Syncing with quotation system...', 'info');
+            setTimeout(() => {
+                showNotification('✅ Sync completed', 'success');
+            }, 1500);
+        }
+
+        function renderQuotationLinks() {
+            const tbody = document.getElementById('quotationLinkList');
+            
+            if (quotations.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No quotations linked yet</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = quotations.map(quote => `
+                <tr>
+                    <td>${quote.id}</td>
+                    <td>${quote.date}</td>
+                    <td>${quote.client}</td>
+                    <td>${quote.bomItems}</td>
+                    <td>$${Math.round(quote.bomCost).toLocaleString()}</td>
+                    <td>$${Math.round(quote.quotePrice).toLocaleString()}</td>
+                    <td>${quote.margin}</td>
+                    <td><span style="color: #27ae60; font-weight: bold;">${quote.status}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        // Initialize on page load
+        window.onload = init;
+    </script>
+</body>
+</html>

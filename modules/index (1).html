@@ -1,0 +1,171 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Cost Dashboard</title>
+  <style>
+    table { border-collapse: collapse; width: 100%; margin: 20px 0; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #f2f2f2; }
+    .total { font-weight: bold; color: #0066cc; }
+    .input-group { margin: 10px 0; }
+    button { padding: 5px 10px; background-color: #4CAF50; color: white; border: none; cursor: pointer; }
+    button:hover { background-color: #45a049; }
+    .edit-input { width: 80px; }
+  </style>
+</head>
+<body>
+  <h2>Project Cost Dashboard</h2>
+  <div class="input-group">
+    <input type="text" id="newCategory" placeholder="Category">
+    <input type="text" id="newItem" placeholder="Item">
+    <input type="number" id="newCost" placeholder="Cost (USD)" step="0.01">
+    <button onclick="addItem()">Add</button>
+  </div>
+  <table id="costTable">
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>Item</th>
+        <th>Cost (USD)</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="costBody">
+      <!-- Initial data will be populated by JavaScript -->
+    </tbody>
+  </table>
+  <div>Total: <span id="totalCost">$0.00</span></div>
+  <div>Contingency (10%): <span id="contingency">$0.00</span></div>
+  <div>Grand Total: <span id="grandTotal">$0.00</span></div>
+
+  <script>
+    let costs = [
+      { category: "Equipment & Spares", item: "Radio System", cost: 45365.875 },
+      { category: "Equipment & Spares", item: "Spare Parts", cost: 0 },
+      { category: "Equipment & Spares", item: "Accessories", cost: 408 },
+      { category: "Implementation Services", item: "PMO & Engineering", cost: 4025 },
+      { category: "Implementation Services", item: "iFAT", cost: 2300 },
+      { category: "Implementation Services", item: "Site Survey", cost: 8000 },
+      { category: "Implementation Services", item: "Installation Supervision", cost: 6000 },
+      { category: "Implementation Services", item: "SAT Execution", cost: 2500 },
+      { category: "Implementation Services", item: "Training Program", cost: 7500 },
+      { category: "Implementation Services", item: "Logistics & Import", cost: 2500 },
+      { category: "Implementation Services", item: "Cable Testing", cost: 1000 },
+      { category: "Implementation Services", item: "Fusion Splicing", cost: 800 },
+      { category: "Implementation Services", item: "Document Archiving", cost: 1000 },
+      { category: "Implementation Services", item: "Scaffolding Oversight", cost: 1500 },
+      { category: "Implementation Services", item: "Office Operation Costs", cost: 2500 },
+      { category: "5-Year Maintenance", item: "Preventive Maintenance", cost: 20000 },
+      { category: "5-Year Maintenance", item: "Corrective Maintenance", cost: 20000 },
+      { category: "5-Year Maintenance", item: "Technology Refresh", cost: 5000 },
+      { category: "5-Year Maintenance", item: "Annual Health Check", cost: 17500 },
+      { category: "5-Year Maintenance", item: "SLA", cost: 7900 },
+      { category: "5-Year Maintenance", item: "Operation Cost", cost: 5000 },
+      { category: "Labor & Travel Costs", item: "Payroll", cost: 203057.34 },
+      { category: "Labor & Travel Costs", item: "Mob/Domob", cost: 34500 },
+      { category: "Labor & Travel Costs", item: "Accommodation", cost: 25875 },
+      { category: "Labor & Travel Costs", item: "Per Diem", cost: 34500 },
+      { category: "Labor & Travel Costs", item: "Health Check", cost: 13685 },
+      { category: "Labor & Travel Costs", item: "Travel Insurance", cost: 3651.25 },
+      { category: "Labor & Travel Costs", item: "Safety Training", cost: 2300 }
+    ];
+
+    function updateTable() {
+      const tbody = document.getElementById('costBody');
+      tbody.innerHTML = '';
+      costs.forEach((item, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${item.category}</td>
+          <td>${item.item}</td>
+          <td>
+            <input type="number" class="edit-input" value="${item.cost.toFixed(2)}" onchange="modifyItem(${index}, this.value)">
+          </td>
+          <td><button onclick="removeItem(${index})">Remove</button></td>
+        `;
+        tbody.appendChild(row);
+      });
+      updateTotals();
+    }
+
+    function addItem() {
+      const category = document.getElementById('newCategory').value || "Uncategorized";
+      const item = document.getElementById('newItem').value;
+      const cost = parseFloat(document.getElementById('newCost').value) || 0;
+      if (item && cost > 0) {
+        costs.push({ category, item, cost });
+        document.getElementById('newCategory').value = '';
+        document.getElementById('newItem').value = '';
+        document.getElementById('newCost').value = '';
+        updateTable();
+      }
+    }
+
+    function removeItem(index) {
+      if (confirm(`Remove ${costs[index].item}?`)) {
+        costs.splice(index, 1);
+        updateTable();
+      }
+    }
+
+    function modifyItem(index, newCost) {
+      const cost = parseFloat(newCost) || 0;
+      costs[index].cost = cost;
+      updateTable();
+    }
+
+    function updateTotals() {
+      const total = costs.reduce((sum, item) => sum + item.cost, 0);
+      const contingency = total * 0.10;
+      const grandTotal = total + contingency;
+      document.getElementById('totalCost').textContent = `$${total.toFixed(2)}`;
+      document.getElementById('contingency').textContent = `$${contingency.toFixed(2)}`;
+      document.getElementById('grandTotal').textContent = `$${grandTotal.toFixed(2)}`;
+    }
+
+    // Initialize table on load
+    document.addEventListener('DOMContentLoaded', updateTable);
+  </script>
+</body>
+</html>

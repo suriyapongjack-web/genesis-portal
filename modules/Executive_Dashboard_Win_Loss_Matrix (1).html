@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive Dashboard - Win/Loss Matrix</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            padding: 20px;
+        }
+        
+        .dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+        }
+        
+        h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        /* Quick Score Matrix */
+        .quick-matrix {
+            background: #0f3460;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .quick-matrix h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #4fbdba;
+        }
+        
+        .score-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        
+        .score-card {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .score-card:hover {
+            transform: translateY(-5px);
+            border-color: #4fbdba;
+        }
+        
+        .company-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #7ec8e3;
+        }
+        
+        .metric {
+            margin: 10px 0;
+            padding: 8px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 5px;
+        }
+        
+        .metric-label {
+            font-size: 12px;
+            color: #aaa;
+            display: block;
+            margin-bottom: 3px;
+        }
+        
+        .metric-value {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .profit { color: #4ade80; }
+        .loss { color: #f87171; }
+        .neutral { color: #fbbf24; }
+        
+        /* Winner Podium */
+        .podium {
+            background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .podium h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #ffd700;
+        }
+        
+        .podium-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 10px;
+            height: 250px;
+        }
+        
+        .podium-place {
+            flex: 1;
+            max-width: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px 10px 0 0;
+            padding: 20px 10px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+        
+        .first { height: 100%; background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #333; }
+        .second { height: 85%; background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%); color: #333; }
+        .third { height: 70%; background: linear-gradient(135deg, #cd7f32 0%, #e6a55c 100%); color: #fff; }
+        .fourth { height: 55%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        
+        .rank {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        
+        .podium-company {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .podium-score {
+            font-size: 14px;
+        }
+        
+        /* Advantage Matrix */
+        .advantage-matrix {
+            background: #16213e;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .advantage-matrix h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #4ade80;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: rgba(79, 189, 186, 0.2);
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+            color: #4fbdba;
+            border: 1px solid rgba(79, 189, 186, 0.3);
+        }
+        
+        td {
+            padding: 10px;
+            border: 1px solid rgba(79, 189, 186, 0.2);
+            font-size: 13px;
+        }
+        
+        .win { background: rgba(74, 222, 128, 0.1); }
+        .lose { background: rgba(248, 113, 113, 0.1); }
+        .neutral-cell { background: rgba(251, 191, 36, 0.1); }
+        
+        /* Risk-Return Chart */
+        .risk-return {
+            background: #0f3460;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .risk-return h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #f87171;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .axis-label {
+            position: absolute;
+            font-size: 12px;
+            color: #aaa;
+        }
+        
+        .x-label {
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .y-label {
+            top: 50%;
+            left: 5px;
+            transform: rotate(-90deg);
+            transform-origin: left center;
+        }
+        
+        .plot-point {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 11px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            text-align: center;
+        }
+        
+        .plot-point:hover {
+            transform: scale(1.2);
+            z-index: 10;
+        }
+        
+        /* Final Verdict */
+        .verdict {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .verdict h2 {
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        
+        .verdict-text {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+        
+        .highlight {
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                color: black;
+            }
+            
+            .quick-matrix, .podium, .advantage-matrix, .risk-return {
+                background: white;
+                border: 2px solid #000;
+            }
+            
+            .score-card {
+                border: 1px solid #000;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎯 Executive Decision Matrix</h1>
+            <div class="subtitle">PTTEP Zawtika Project - Stakeholder Win/Loss Analysis</div>
+        </div>
+        
+        <!-- Quick Score Matrix -->
+        <div class="quick-matrix">
+            <h2>💰 Financial Performance Matrix</h2>
+            <div class="score-grid">
+                <div class="score-card">
+                    <div class="company-name">PTTEP</div>
+                    <div class="metric">
+                        <span class="metric-label">Investment</span>
+                        <span class="metric-value profit">$0</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">5-Year Cost</span>
+                        <span class="metric-value loss">-$300,000</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Risk Level</span>
+                        <span class="metric-value profit">ZERO</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Strategic Value</span>
+                        <span class="metric-value profit">HIGH</span>
+                    </div>
+                </div>
+                
+                <div class="score-card">
+                    <div class="company-name">MYTEL</div>
+                    <div class="metric">
+                        <span class="metric-label">Investment</span>
+                        <span class="metric-value profit">$0</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Net Profit</span>
+                        <span class="metric-value profit">+$90,000</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Margin</span>
+                        <span class="metric-value profit">30%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Risk Level</span>
+                        <span class="metric-value neutral">MEDIUM</span>
+                    </div>
+                </div>
+                
+                <div class="score-card">
+                    <div class="company-name">ADDVALUE</div>
+                    <div class="metric">
+                        <span class="metric-label">Investment</span>
+                        <span class="metric-value loss">-$45,590</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Net Profit</span>
+                        <span class="metric-value profit">+$164,410</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">ROI</span>
+                        <span class="metric-value profit">360%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Risk Level</span>
+                        <span class="metric-value loss">HIGH</span>
+                    </div>
+                </div>
+                
+                <div class="score-card">
+                    <div class="company-name">NEXTG</div>
+                    <div class="metric">
+                        <span class="metric-label">Investment</span>
+                        <span class="metric-value neutral">-$29,467</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Net Profit</span>
+                        <span class="metric-value profit">+$7,394</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Margin</span>
+                        <span class="metric-value neutral">25%</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Risk Level</span>
+                        <span class="metric-value profit">ZERO</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Winner Podium -->
+        <div class="podium">
+            <h2>🏆 Overall Winner Ranking</h2>
+            <div class="podium-container">
+                <div class="podium-place second">
+                    <div class="rank">🥈</div>
+                    <div class="podium-company">PTTEP</div>
+                    <div class="podium-score">Zero Risk<br>Full Service</div>
+                </div>
+                <div class="podium-place first">
+                    <div class="rank">🥇</div>
+                    <div class="podium-company">ADDVALUE</div>
+                    <div class="podium-score">ROI 360%<br>Exclusivity</div>
+                </div>
+                <div class="podium-place third">
+                    <div class="rank">🥉</div>
+                    <div class="podium-company">MYTEL</div>
+                    <div class="podium-score">30% Margin<br>Partnership</div>
+                </div>
+                <div class="podium-place fourth">
+                    <div class="rank">4️⃣</div>
+                    <div class="podium-company">NEXTG</div>
+                    <div class="podium-score">25% Margin<br>No Risk</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Advantage/Disadvantage Matrix -->
+        <div class="advantage-matrix">
+            <h2>✅ Win/Loss Summary Matrix</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="20%">Stakeholder</th>
+                        <th width="40%">Major Advantages ✅</th>
+                        <th width="40%">Major Disadvantages ⚠️</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>PTTEP</strong></td>
+                        <td class="win">
+                            • Zero CAPEX investment<br>
+                            • 100% risk transfer<br>
+                            • SLA guarantee 99.95%<br>
+                            • Predictable OPEX
+                        </td>
+                        <td class="lose">
+                            • Pays 6.5x equipment cost<br>
+                            • No asset ownership<br>
+                            • Long-term commitment
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>MYTEL</strong></td>
+                        <td class="win">
+                            • $90,000 net profit<br>
+                            • Strategic partnership<br>
+                            • Market leadership<br>
+                            • No technical risk
+                        </td>
+                        <td class="lose">
+                            • Cash flow gap risk<br>
+                            • Locked with Addvalue<br>
+                            • Regulatory responsibility
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>ADDVALUE</strong></td>
+                        <td class="win">
+                            • $164,410 net profit<br>
+                            • 360% ROI<br>
+                            • Exclusivity agreement<br>
+                            • Technical monopoly
+                        </td>
+                        <td class="lose">
+                            • High technical risk<br>
+                            • CAPEX investment<br>
+                            • 24/7 support burden
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>NEXTG</strong></td>
+                        <td class="win">
+                            • $7,394 profit<br>
+                            • Zero risk<br>
+                            • Quick turnover<br>
+                            • Simple business model
+                        </td>
+                        <td class="lose">
+                            • Lowest profit margin<br>
+                            • Replaceable position<br>
+                            • No strategic value
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Risk-Return Visualization -->
+        <div class="risk-return">
+            <h2>📈 Risk-Return Position Map</h2>
+            <div class="chart-container">
+                <div class="axis-label x-label">Return (Profit/Value) →</div>
+                <div class="axis-label y-label">Risk Level ↑</div>
+                
+                <!-- Plot points positioned based on risk (y) and return (x) -->
+                <div class="plot-point" style="bottom: 80%; left: 75%; background: linear-gradient(135deg, #ffd700, #ffed4e); color: #333;">
+                    <div>ADDVALUE<br>High Risk<br>High Return</div>
+                </div>
+                <div class="plot-point" style="bottom: 20%; left: 60%; background: linear-gradient(135deg, #667eea, #764ba2);">
+                    <div>PTTEP<br>Low Risk<br>High Value</div>
+                </div>
+                <div class="plot-point" style="bottom: 50%; left: 45%; background: linear-gradient(135deg, #4fbdba, #7ec8e3);">
+                    <div>MYTEL<br>Med Risk<br>Med Return</div>
+                </div>
+                <div class="plot-point" style="bottom: 20%; left: 25%; background: linear-gradient(135deg, #94a3b8, #cbd5e1); color: #333;">
+                    <div>NEXTG<br>Low Risk<br>Low Return</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Final Verdict -->
+        <div class="verdict">
+            <h2>🎯 FINAL VERDICT</h2>
+            <div class="verdict-text">
+                <p>โครงการนี้เป็น <span class="highlight">WIN-WIN-WIN-WIN</span> ที่ทุกฝ่ายได้ประโยชน์</p>
+                <p style="margin-top: 20px;">
+                    <strong>ADDVALUE</strong> ชนะในเชิง ROI (360%) และได้ exclusivity<br>
+                    <strong>PTTEP</strong> ชนะในเชิง risk mitigation และความสะดวก<br>
+                    <strong>MYTEL</strong> ชนะในเชิงกลยุทธ์และ partnership<br>
+                    <strong>NEXTG</strong> ได้กำไรพอสมควรแบบไร้ความเสี่ยง
+                </p>
+                <p style="margin-top: 20px; font-size: 20px;">
+                    <strong>💡 Recommendation: PROCEED WITH PROJECT</strong>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

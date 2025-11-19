@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Location Structure Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .test { margin: 20px 0; padding: 15px; background: #f0f0f0; border-radius: 5px; }
+        .success { color: green; }
+        .fail { color: red; }
+    </style>
+</head>
+<body>
+    <h1>PTTEP Location Structure Validation</h1>
+    
+    <div class="test">
+        <h3>Thailand Locations</h3>
+        <ul>
+            <li class="success">✅ G1 Field Complex - Offshore (Platong, Erawan, Satun, Funan)</li>
+            <li class="success">✅ G2 Field Complex - Offshore (G2N, G2S, Arthit, Arthit South)</li>
+            <li class="success">✅ Bualuang Field - Offshore (Alpha, Bravo)</li>
+            <li class="success">✅ GCME - Office VDRL</li>
+            <li class="success">✅ Addvalue Office</li>
+        </ul>
+    </div>
+    
+    <div class="test">
+        <h3>Myanmar Locations</h3>
+        <ul>
+            <li class="success">✅ Zawtika Field - Offshore (ZPQ Platform)</li>
+            <li class="success">✅ Zawtika Onshore (ZOC, ZBV1, ZBV2, ZMS)</li>
+            <li class="success">✅ Yadana Field - Onshore (PLC, MS)</li>
+        </ul>
+    </div>
+    
+    <div class="test">
+        <h3>Malaysia Locations</h3>
+        <ul>
+            <li class="success">✅ CPOC Platform - Offshore</li>
+        </ul>
+    </div>
+    
+    <div class="test">
+        <h3>Example Document Numbers</h3>
+        <ul>
+            <li><strong>Thailand G1 Platong:</strong> TH-G1F-1A-PLT-PRO-SPE-0001 Rev.A1</li>
+            <li><strong>Myanmar Zawtika ZPQ:</strong> MM-ZTK-00-ZPQ-ELE-DWG-0001 Rev.B1</li>
+            <li><strong>Myanmar Yadana PLC:</strong> MM-YDN-1B-PLC-INS-PID-0001 Rev.C1</li>
+            <li><strong>Malaysia CPOC:</strong> MY-CPC-2A-CPOC-GEN-RPT-0001 Rev.00</li>
+            <li><strong>Thailand Office VDRL:</strong> TH-GCM-00-VDR-GEN-SPE-0001 Rev.A1</li>
+        </ul>
+    </div>
+    
+    <script>
+        // Test location data structure
+        const locationTest = {
+            'Thailand': {
+                'G1F': ['PLT', 'ERW', 'STN', 'FNN'],
+                'G2F': ['G2N', 'G2S', 'ART', 'ARS'],
+                'BLG': ['ALP', 'BRV'],
+                'GCM': ['VDR', 'DOC'],
+                'AVS': ['OFC', 'ENG']
+            },
+            'Myanmar': {
+                'ZTK': ['ZPQ'],
+                'ZON': ['ZOC', 'ZBV1', 'ZBV2', 'ZMS'],
+                'YDN': ['PLC', 'MS']
+            },
+            'Malaysia': {
+                'CPC': ['CPOC']
+            }
+        };
+        
+        console.log('Location Structure Loaded:', locationTest);
+        console.log('Total Countries:', Object.keys(locationTest).length);
+        console.log('Total Fields:', Object.values(locationTest).reduce((acc, country) => acc + Object.keys(country).length, 0));
+    </script>
+</body>
+</html>

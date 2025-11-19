@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PTTEP Portfolio Management System - Complete Database</title>
+  <style>
+    * {box-sizing: border-box; margin: 0; padding: 0}
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      animation: fadeIn 0.5s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .header {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 30px;
+      border-radius: 20px;
+      margin-bottom: 25px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    }
+    .header h1 {
+      font-size: 2rem;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .header p {
+      color: #6b7280;
+      font-size: 0.95rem;
+    }
+    .tabs {
+      background: rgba(255, 255, 255, 0.95);
+      display: flex;
+      border-radius: 15px 15px 0 0;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+    .tab {
+      padding: 18px 35px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      font-weight: 600;
+      color: #6b7280;
+      position: relative;
+      transition: all 0.3s;
+      font-size: 0.95rem;
+    }
+    .tab:hover {
+      color: #667eea;
+    }
+    .tab.active {
+      color: #667eea;
+      background: rgba(102, 126, 234, 0.05);
+    }
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+    }
+    .tab-content {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      padding: 30px;
+      border-radius: 0 0 15px 15px;
+      min-height: 500px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+    .tab-panel {
+      display: none;
+      animation: slideIn 0.3s ease;
+    }
+    .tab-panel.active {
+      display: block;
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin: 25px 0;
+    }
+    .stat-card {
+      background: linear-gradient(135deg, #fff, #f9fafb);
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      border: 1px solid rgba(102, 126, 234, 0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+    }
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-top: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .filter-bar {
+      background: linear-gradient(135deg, #f9fafb, #fff);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 25px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    }
+    .filter-grid {
+      display: flex;
+      gap: 15px;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+    .filter-item {
+      flex: 1;
+      min-width: 150px;
+    }
+    .filter-item label {
+      display: block;
+      font-size: 0.8rem;
+      color: #6b7280;
+      font-weight: 600;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      letter-spacing: 0.3px;
+    }
+    .filter-item input,
+    .filter-item select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      transition: border-color 0.3s;
+    }
+    .filter-item input:focus,
+    .filter-item select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    .data-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: 0.85rem;
+    }
+    .data-table th {
+      background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+      padding: 14px 10px;
+      text-align: left;
+      font-weight: 600;
+      color: #4b5563;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .data-table td {
+      padding: 12px 10px;
+      border-top: 1px solid #e5e7eb;
+    }
+    .data-table tbody tr {
+      transition: background 0.2s;
+    }
+    .data-table tbody tr:hover {
+      background: rgba(102, 126, 234, 0.03);
+    }
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      margin: 5px;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    .btn-primary { 
+      background: linear-gradient(135deg, #667eea, #764ba2); 
+      color: white; 
+    }
+    .btn-success { 
+      background: linear-gradient(135deg, #10b981, #059669); 
+      color: white; 
+    }
+    .btn-info { 
+      background: linear-gradient(135deg, #3b82f6, #2563eb); 
+      color: white; 
+    }
+    .btn-warning { 
+      background: linear-gradient(135deg, #f59e0b, #d97706); 
+      color: white; 
+    }
+    .btn-danger { 
+      background: linear-gradient(135deg, #ef4444, #dc2626); 
+      color: white; 
+    }
+    .client-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      background: linear-gradient(135deg, #e0f2fe, #bae6fd);
+      color: #0369a1;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.75rem;
+    }
+    .project-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      background: linear-gradient(135deg, #e9d5ff, #d8b4fe);
+      color: #7c3aed;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 15px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .status-badge.delivered { 
+      background: linear-gradient(135deg, #dcfce7, #bbf7d0); 
+      color: #166534; 
+    }
+    .status-badge.pending { 
+      background: linear-gradient(135deg, #fef3c7, #fde68a); 
+      color: #92400e; 
+    }
+    .status-badge.amendment { 
+      background: linear-gradient(135deg, #fee2e2, #fecaca); 
+      color: #991b1b; 
+    }
+    .amount-thb { 
+      font-weight: 700; 
+      color: #1e293b; 
+      text-align: right; 
+    }
+    .amount-usd { 
+      font-size: 0.75rem; 
+      color: #6b7280; 
+      text-align: right; 
+    }
+    .po-number { 
+      font-weight: 700; 
+      color: #667eea; 
+    }
+    .table-container {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+      overflow-x: auto;
+    }
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+      margin: 25px 0;
+    }
+    .summary-card {
+      background: linear-gradient(135deg, #fff, #f9fafb);
+      padding: 25px;
+      border-radius: 15px;
+      border: 1px solid rgba(102, 126, 234, 0.1);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    .summary-card h3 {
+      color: #4b5563;
+      margin-bottom: 20px;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .chart-container {
+      position: relative;
+      height: 300px;
+    }
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 25px;
+    }
+    .pagination button {
+      padding: 10px 14px;
+      border: 2px solid #e5e7eb;
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    .pagination button:hover {
+      border-color: #667eea;
+      background: rgba(102, 126, 234, 0.05);
+    }
+    .pagination button.active {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border-color: #667eea;
+    }
+    .pagination button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      animation: fadeIn 0.3s;
+    }
+    .modal-content {
+      background: white;
+      margin: 50px auto;
+      width: 90%;
+      max-width: 600px;
+      border-radius: 15px;
+      padding: 30px;
+      animation: slideDown 0.3s;
+    }
+    @keyframes slideDown {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+    }
+    .form-group label {
+      font-size: 0.85rem;
+      color: #6b7280;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+    .form-group input,
+    .form-group select {
+      padding: 10px 12px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+    @media (max-width: 768px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .filter-grid { flex-direction: column; }
+      .summary-grid { grid-template-columns: 1fr; }
+      .header h1 { font-size: 1.5rem; }
+      .tab { padding: 14px 20px; font-size: 0.85rem; }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>PTTEP Portfolio Management System</h1>
+    <p>Complete Project Database with Real Purchase Orders • Automated Data Processing</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('dashboard', event)">📊 Dashboard</button>
+    <button class="tab" onclick="switchTab('data', event)">📋 Data Management</button>
+    <button class="tab" onclick="switchTab('analytics', event)">📈 Analytics</button>
+    <button class="tab" onclick="switchTab('reports', event)">📄 Reports</button>
+  </div>
+
+  <div class="tab-content">
+    <!-- Dashboard Tab -->
+    <div id="dashboard-tab" class="tab-panel active">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="totalPO">31</div>
+          <div class="stat-label">Total PO/SO</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="totalValueTHB">฿20.8M</div>
+          <div class="stat-label">Total THB</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="totalValueUSD">$640K</div>
+          <div class="stat-label">Total USD</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="totalClients">5</div>
+          <div class="stat-label">Active Clients</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="totalProjects">15</div>
+          <div class="stat-label">Projects</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="avgValue">฿670K</div>
+          <div class="stat-label">Average Value</div>
+        </div>
+      </div>
+
+      <div class="summary-grid">
+        <div class="summary-card">
+          <h3>📅 Recent Orders (2023)</h3>
+          <div id="recentOrders"></div>
+        </div>
+        <div class="summary-card">
+          <h3>🏆 Top Clients</h3>
+          <div id="topClients"></div>
+        </div>
+        <div class="summary-card">
+          <h3>🎯 Major Projects</h3>
+          <div id="mainProjects"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Data Management Tab -->
+    <div id="data-tab" class="tab-panel">
+      <div class="filter-bar">
+        <div class="filter-grid">
+          <div class="filter-item">
+            <label>PO Number</label>
+            <input type="text" id="searchPO" placeholder="Search PO/SO">
+          </div>
+          <div class="filter-item">
+            <label>Client</label>
+            <select id="filterClient">
+              <option value="">All Clients</option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <label>Project</label>
+            <select id="filterProject">
+              <option value="">All Projects</option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <label>Year</label>
+            <select id="filterYear">
+              <option value="">All Years</option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <label>Status</label>
+            <select id="filterStatus">
+              <option value="">All Status</option>
+              <option value="delivered">Delivered</option>
+              <option value="pending">Pending</option>
+              <option value="amendment">Amendment</option>
+            </select>
+          </div>
+          <div class="filter-item">
+            <button class="btn btn-primary" onclick="searchData()">🔍 Search</button>
+          </div>
+          <div class="filter-item">
+            <button class="btn btn-warning" onclick="clearFilters()">🔄 Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;">
+          <h3 style="color:#4b5563;">Purchase Orders Database</h3>
+          <div>
+            <button class="btn btn-success" onclick="showAddModal()">➕ Add New</button>
+            <button class="btn btn-info" onclick="exportCSV()">📥 Export CSV</button>
+            <button class="btn btn-primary" onclick="exportJSON()">📥 Export JSON</button>
+          </div>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Date</th>
+              <th>PO Number</th>
+              <th>Client</th>
+              <th>Project</th>
+              <th>Title/Description</th>
+              <th>THB Value</th>
+              <th>USD Value</th>
+              <th>Incoterms</th>
+              <th>Delivery</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="dataTable"></tbody>
+        </table>
+        <div class="pagination" id="pagination"></div>
+      </div>
+    </div>
+
+    <!-- Analytics Tab -->
+    <div id="analytics-tab" class="tab-panel">
+      <div class="summary-grid">
+        <div class="summary-card">
+          <h3>📊 Value by Year</h3>
+          <div class="chart-container">
+            <canvas id="yearChart"></canvas>
+          </div>
+        </div>
+        <div class="summary-card">
+          <h3>🏢 Client Distribution</h3>
+          <div class="chart-container">
+            <canvas id="clientChart"></canvas>
+          </div>
+        </div>
+        <div class="summary-card">
+          <h3>📁 Project Types</h3>
+          <div class="chart-container">
+            <canvas id="projectChart"></canvas>
+          </div>
+        </div>
+      </div>
+      
+      <div class="summary-card" style="margin-top: 25px;">
+        <h3>📈 Trend Analysis</h3>
+        <div class="chart-container" style="height: 400px;">
+          <canvas id="trendChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reports Tab -->
+    <div id="reports-tab" class="tab-panel">
+      <div class="summary-grid">
+        <div class="summary-card">
+          <h3>📊 Full Report</h3>
+          <p style="color:#6b7280;margin:15px 0;">Complete portfolio analysis with all transactions</p>
+          <button class="btn btn-primary" onclick="generateFullReport()">Generate Report</button>
+        </div>
+        <div class="summary-card">
+          <h3>💰 Financial Report</h3>
+          <p style="color:#6b7280;margin:15px 0;">Financial summary and revenue analysis</p>
+          <button class="btn btn-success" onclick="generateFinancialReport()">Generate Report</button>
+        </div>
+        <div class="summary-card">
+          <h3>📋 Executive Summary</h3>
+          <p style="color:#6b7280;margin:15px 0;">High-level overview for management</p>
+          <button class="btn btn-info" onclick="generateSummaryReport()">Generate Report</button>
+        </div>
+      </div>
+      <div id="reportContent" style="margin-top:25px;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div id="poModal" class="modal">
+  <div class="modal-content">
+    <h3 style="margin-bottom:20px;">Add New Purchase Order</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Item No</label>
+        <input type="number" id="modalItem" placeholder="32">
+      </div>
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="modalDate">
+      </div>
+      <div class="form-group">
+        <label>PO Number</label>
+        <input type="text" id="modalPO" placeholder="e.g., 3450000000">
+      </div>
+      <div class="form-group">
+        <label>Client</label>
+        <input type="text" id="modalClient" placeholder="Client name">
+      </div>
+      <div class="form-group">
+        <label>Project</label>
+        <input type="text" id="modalProject" placeholder="Project code">
+      </div>
+      <div class="form-group">
+        <label>Title/Description</label>
+        <input type="text" id="modalTitle" placeholder="Description">
+      </div>
+      <div class="form-group">
+        <label>THB Value</label>
+        <input type="number" id="modalTHB" placeholder="0" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>USD Value</label>
+        <input type="number" id="modalUSD" placeholder="0" step="0.01">
+      </div>
+      <div class="form-group">
+        <label>Incoterms</label>
+        <select id="modalIncoterms">
+          <option>N/A</option>
+          <option>DDP</option>
+          <option>DAP</option>
+          <option>FOB</option>
+          <option>CIF</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Delivery</label>
+        <input type="text" id="modalDelivery" placeholder="Delivery location">
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="modalStatus">
+          <option value="delivered">Delivered</option>
+          <option value="pending">Pending</option>
+          <option value="amendment">Amendment</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:25px;">
+      <button class="btn btn-danger" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-success" onclick="savePO()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Complete PTTEP Portfolio Data
+let portfolioData = [];
+
+let filteredData = [...portfolioData];
+let currentPage = 1;
+const perPage = 10;
+let editingIndex = -1;
+
+// Utility Functions
+function formatNumber(num) {
+  if (num >= 1e6) return '฿' + (num/1e6).toFixed(1) + 'M';
+  if (num >= 1e3) return '฿' + (num/1e3).toFixed(0) + 'K';
+  return '฿' + num.toLocaleString();
+}
+
+function formatUSD(num) {
+  if (num >= 1e3) return '$' + (num/1e3).toFixed(0) + 'K';
+  return '$' + num.toLocaleString();
+}
+
+// Tab Switching
+function switchTab(tab, e) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  e.target.classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById(`${tab}-tab`).classList.add('active');
+  
+  if (tab === 'analytics') {
+    setTimeout(() => renderCharts(), 100);
+  }
+}
+
+// Update Statistics
+function updateStats() {
+  const totalTHB = portfolioData.reduce((sum, record) => sum + record.value_thb, 0);
+  const totalUSD = portfolioData.reduce((sum, record) => sum + record.value_usd, 0);
+  const avgValue = totalTHB / portfolioData.length;
+  
+  const uniqueClients = new Set();
+  portfolioData.forEach(record => {
+    const clientName = record.client.split('(')[0].trim();
+    uniqueClients.add(clientName);
+  });
+  
+  const uniqueProjects = new Set(portfolioData.map(r => r.project.split(' ')[0]));
+  
+  document.getElementById('totalPO').textContent = portfolioData.length;
+  document.getElementById('totalValueTHB').textContent = formatNumber(totalTHB);
+  document.getElementById('totalValueUSD').textContent = formatUSD(totalUSD);
+  document.getElementById('totalClients').textContent = uniqueClients.size;
+  document.getElementById('totalProjects').textContent = uniqueProjects.size;
+  document.getElementById('avgValue').textContent = formatNumber(avgValue);
+}
+
+// Update Filters
+function updateFilters() {
+  const clients = [...new Set(portfolioData.map(r => r.client))].sort();
+  const clientSelect = document.getElementById('filterClient');
+  clientSelect.innerHTML = '<option value="">All Clients</option>' +
+    clients.map(client => {
+      const displayName = client.length > 50 ? client.substring(0, 50) + '...' : client;
+      return `<option value="${client}">${displayName}</option>`;
+    }).join('');
+  
+  const projects = [...new Set(portfolioData.map(r => r.project))].sort();
+  const projectSelect = document.getElementById('filterProject');
+  projectSelect.innerHTML = '<option value="">All Projects</option>' +
+    projects.map(project => `<option value="${project}">${project}</option>`).join('');
+  
+  const years = [...new Set(portfolioData.map(r => r.date.substring(0, 4)))].sort((a, b) => b - a);
+  const yearSelect = document.getElementById('filterYear');
+  yearSelect.innerHTML = '<option value="">All Years</option>' +
+    years.map(year => `<option value="${year}">${year}</option>`).join('');
+}
+
+// Render Table
+function renderTable() {
+  const start = (currentPage - 1) * perPage;
+  const end = start + perPage;
+  const pageData = filteredData.slice(start, end);
+  
+  const tbody = document.getElementById('dataTable');
+  tbody.innerHTML = pageData.map((record, idx) => {
+    const globalIndex = start + idx;
+    const statusClass = record.status === 'delivered' ? 'delivered' : 
+                       record.status === 'amendment' ? 'amendment' : 'pending';
+    
+    return `
+      <tr>
+        <td style="text-align:center;font-weight:600;">${record.item}</td>
+        <td>${record.date}</td>
+        <td><span class="po-number">${record.po}</span></td>
+        <td>
+          <span class="client-badge" title="${record.client}">
+            ${record.client.length > 30 ? record.client.substring(0, 30) + '...' : record.client}
+          </span>
+        </td>
+        <td><span class="project-badge">${record.project}</span></td>
+        <td title="${record.title}">
+          ${record.title.length > 40 ? record.title.substring(0, 40) + '...' : record.title}
+        </td>
+        <td class="amount-thb">฿${record.value_thb.toLocaleString()}</td>
+        <td class="amount-usd">$${record.value_usd.toLocaleString()}</td>
+        <td>${record.incoterms}</td>
+        <td title="${record.delivery}">
+          ${record.delivery.length > 15 ? record.delivery.substring(0, 15) + '...' : record.delivery}
+        </td>
+        <td><span class="status-badge ${statusClass}">${record.status}</span></td>
+        <td>
+          <button onclick="editRecord(${globalIndex})" style="padding:5px 10px;border:none;background:#667eea;color:white;border-radius:4px;cursor:pointer;font-size:0.75rem;">Edit</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+  
+  renderPagination();
+}
+
+// Pagination
+function renderPagination() {
+  const totalPages = Math.ceil(filteredData.length / perPage);
+  const pagination = document.getElementById('pagination');
+  
+  if (totalPages <= 1) {
+    pagination.innerHTML = '';
+    return;
+  }
+  
+  let html = '';
+  html += `<button onclick="changePage(1)" ${currentPage === 1 ? 'disabled' : ''}>«</button>`;
+  html += `<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
+  
+  let startPage = Math.max(1, currentPage - 2);
+  let endPage = Math.min(totalPages, currentPage + 2);
+  
+  if (startPage > 1) {
+    html += `<button onclick="changePage(1)">1</button>`;
+    if (startPage > 2) html += `<button disabled>...</button>`;
+  }
+  
+  for (let i = startPage; i <= endPage; i++) {
+    html += `<button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`;
+  }
+  
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) html += `<button disabled>...</button>`;
+    html += `<button onclick="changePage(${totalPages})">${totalPages}</button>`;
+  }
+  
+  html += `<button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>›</button>`;
+  html += `<button onclick="changePage(${totalPages})" ${currentPage === totalPages ? 'disabled' : ''}">»</button>`;
+  
+  pagination.innerHTML = html;
+}
+
+function changePage(page) {
+  const totalPages = Math.ceil(filteredData.length / perPage);
+  if (page >= 1 && page <= totalPages) {
+    currentPage = page;
+    renderTable();
+  }
+}
+
+// Search and Filter
+function searchData() {
+  const searchPO = document.getElementById('searchPO').value.toLowerCase();
+  const filterClient = document.getElementById('filterClient').value;
+  const filterProject = document.getElementById('filterProject').value;
+  const filterYear = document.getElementById('filterYear').value;
+  const filterStatus = document.getElementById('filterStatus').value;
+  
+  filteredData = portfolioData.filter(record => {
+    const matchPO = !searchPO || record.po.toLowerCase().includes(searchPO);
+    const matchClient = !filterClient || record.client === filterClient;
+    const matchProject = !filterProject || record.project === filterProject;
+    const matchYear = !filterYear || record.date.startsWith(filterYear);
+    const matchStatus = !filterStatus || record.status === filterStatus;
+    
+    return matchPO && matchClient && matchProject && matchYear && matchStatus;
+  });
+  
+  currentPage = 1;
+  renderTable();
+}
+
+function clearFilters() {
+  document.getElementById('searchPO').value = '';
+  document.getElementById('filterClient').value = '';
+  document.getElementById('filterProject').value = '';
+  document.getElementById('filterYear').value = '';
+  document.getElementById('filterStatus').value = '';
+  
+  filteredData = [...portfolioData];
+  currentPage = 1;
+  renderTable();
+}
+
+// Dashboard
+function renderDashboard() {
+  // Recent Orders
+  const recentOrders = portfolioData
+    .filter(r => r.date.startsWith('2023'))
+    .slice(0, 5);
+  
+  document.getElementById('recentOrders').innerHTML = recentOrders.map(order => `
+    <div style="padding:10px 0;border-bottom:1px solid #e5e7eb;">
+      <div style="display:flex;justify-content:space-between;align-items:start;">
+        <div>
+          <strong style="color:#667eea;">${order.po}</strong>
+          <div style="font-size:0.8rem;color:#6b7280;margin-top:2px;">
+            ${order.title.substring(0, 35)}...
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-weight:600;">฿${(order.value_thb/1000).toFixed(0)}K</div>
+          <div style="font-size:0.75rem;color:#6b7280;">${order.date}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  
+  // Top Clients
+  const clientTotals = {};
+  portfolioData.forEach(record => {
+    const clientName = record.client.split('(')[0].trim();
+    clientTotals[clientName] = (clientTotals[clientName] || 0) + record.value_thb;
+  });
+  
+  const topClients = Object.entries(clientTotals)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+  
+  document.getElementById('topClients').innerHTML = topClients.map(([client, value], idx) => `
+    <div style="padding:10px 0;border-bottom:1px solid #e5e7eb;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <span style="background:linear-gradient(135deg, #667eea, #764ba2);color:white;padding:2px 8px;border-radius:4px;font-size:0.7rem;margin-right:8px;">
+            #${idx + 1}
+          </span>
+          <strong>${client}</strong>
+        </div>
+        <div style="font-weight:600;color:#667eea;">
+          ฿${(value/1e6).toFixed(2)}M
+        </div>
+      </div>
+    </div>
+  `).join('');
+  
+  // Main Projects
+  const projectCounts = {};
+  portfolioData.forEach(record => {
+    const projectName = record.project.split(' ')[0];
+    projectCounts[projectName] = (projectCounts[projectName] || 0) + 1;
+  });
+  
+  const mainProjects = Object.entries(projectCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
+  
+  document.getElementById('mainProjects').innerHTML = mainProjects.map(([project, count]) => `
+    <div style="padding:10px 0;border-bottom:1px solid #e5e7eb;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <strong style="color:#764ba2;">${project}</strong>
+        <span style="background:#e9d5ff;color:#7c3aed;padding:4px 12px;border-radius:12px;font-size:0.8rem;">
+          ${count} orders
+        </span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Charts
+let charts = {};
+
+function renderCharts() {
+  // Year Chart
+  const yearData = {};
+  portfolioData.forEach(record => {
+    const year = record.date.substring(0, 4);
+    yearData[year] = (yearData[year] || 0) + record.value_thb;
+  });
+  
+  const years = Object.keys(yearData).sort();
+  const yearCtx = document.getElementById('yearChart').getContext('2d');
+  
+  if (charts.year) charts.year.destroy();
+  charts.year = new Chart(yearCtx, {
+    type: 'bar',
+    data: {
+      labels: years,
+      datasets: [{
+        label: 'Value (THB Million)',
+        data: years.map(year => yearData[year] / 1e6),
+        backgroundColor: 'rgba(102, 126, 234, 0.8)',
+        borderColor: 'rgba(102, 126, 234, 1)',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return '฿' + context.parsed.y.toFixed(2) + 'M';
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            callback: function(value) {
+              return '฿' + value + 'M';
+            }
+          }
+        }
+      }
+    }
+  });
+  
+  // Client Chart
+  const clientData = {};
+  portfolioData.forEach(record => {
+    const client = record.client.split('(')[0].trim();
+    clientData[client] = (clientData[client] || 0) + record.value_thb;
+  });
+  
+  const clientCtx = document.getElementById('clientChart').getContext('2d');
+  if (charts.client) charts.client.destroy();
+  charts.client = new Chart(clientCtx, {
+    type: 'doughnut',
+    data: {
+      labels: Object.keys(clientData),
+      datasets: [{
+        data: Object.values(clientData).map(v => v / 1e6),
+        backgroundColor: [
+          'rgba(102, 126, 234, 0.8)',
+          'rgba(118, 75, 162, 0.8)',
+          'rgba(59, 130, 246, 0.8)',
+          'rgba(16, 185, 129, 0.8)',
+          'rgba(245, 158, 11, 0.8)'
+        ],
+        borderColor: 'white',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            padding: 15,
+            font: {
+              size: 11
+            }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return context.label + ': ฿' + context.parsed.toFixed(2) + 'M';
+            }
+          }
+        }
+      }
+    }
+  });
+  
+  // Project Chart
+  const projectCounts = {};
+  portfolioData.forEach(record => {
+    const project = record.project.split(' ')[0];
+    projectCounts[project] = (projectCounts[project] || 0) + 1;
+  });
+  
+  const topProjects = Object.entries(projectCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 6);
+  
+  const projectCtx = document.getElementById('projectChart').getContext('2d');
+  if (charts.project) charts.project.destroy();
+  charts.project = new Chart(projectCtx, {
+    type: 'pie',
+    data: {
+      labels: topProjects.map(p => p[0]),
+      datasets: [{
+        data: topProjects.map(p => p[1]),
+        backgroundColor: [
+          'rgba(102, 126, 234, 0.8)',
+          'rgba(118, 75, 162, 0.8)',
+          'rgba(239, 68, 68, 0.8)',
+          'rgba(16, 185, 129, 0.8)',
+          'rgba(245, 158, 11, 0.8)',
+          'rgba(139, 92, 246, 0.8)'
+        ],
+        borderColor: 'white',
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            padding: 15,
+            font: {
+              size: 11
+            }
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              return context.label + ': ' + context.parsed + ' orders';
+            }
+          }
+        }
+      }
+    }
+  });
+  
+  // Trend Chart
+  const monthlyData = {};
+  portfolioData.forEach(record => {
+    const yearMonth = record.date.substring(0, 7);
+    monthlyData[yearMonth] = (monthlyData[yearMonth] || 0) + record.value_thb;
+  });
+  
+  const months = Object.keys(monthlyData).sort().slice(-24);
+  const trendCtx = document.getElementById('trendChart');
+  
+  if (trendCtx) {
+    if (charts.trend) charts.trend.destroy();
+    charts.trend = new Chart(trendCtx.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: months.map(m => {
+          const [year, month] = m.split('-');
+          return `${month}/${year.substring(2)}`;
+        }),
+        datasets: [{
+          label: 'Monthly Revenue (THB)',
+          data: months.map(m => monthlyData[m] / 1e6),
+          borderColor: 'rgba(102, 126, 234, 1)',
+          backgroundColor: 'rgba(102, 126, 234, 0.1)',
+          borderWidth: 2,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          },
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                return '฿' + context.parsed.y.toFixed(2) + 'M';
+              }
+            }
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: function(value) {
+                return '฿' + value + 'M';
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+}
+
+// Modal Functions
+function showAddModal() {
+  editingIndex = -1;
+  document.getElementById('modalItem').value = portfolioData.length + 1;
+  document.getElementById('modalDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('modalPO').value = '';
+  document.getElementById('modalClient').value = '';
+  document.getElementById('modalProject').value = '';
+  document.getElementById('modalTitle').value = '';
+  document.getElementById('modalTHB').value = '';
+  document.getElementById('modalUSD').value = '';
+  document.getElementById('modalIncoterms').value = 'N/A';
+  document.getElementById('modalDelivery').value = '';
+  document.getElementById('modalStatus').value = 'pending';
+  
+  document.getElementById('poModal').style.display = 'block';
+}
+
+function editRecord(index) {
+  editingIndex = index;
+  const record = filteredData[index];
+  
+  document.getElementById('modalItem').value = record.item;
+  document.getElementById('modalDate').value = record.date;
+  document.getElementById('modalPO').value = record.po;
+  document.getElementById('modalClient').value = record.client;
+  document.getElementById('modalProject').value = record.project;
+  document.getElementById('modalTitle').value = record.title;
+  document.getElementById('modalTHB').value = record.value_thb;
+  document.getElementById('modalUSD').value = record.value_usd;
+  document.getElementById('modalIncoterms').value = record.incoterms;
+  document.getElementById('modalDelivery').value = record.delivery;
+  document.getElementById('modalStatus').value = record.status;
+  
+  document.getElementById('poModal').style.display = 'block';
+}
+
+function closeModal() {
+  document.getElementById('poModal').style.display = 'none';
+  editingIndex = -1;
+}
+
+function savePO() {
+  const newRecord = {
+    item: parseInt(document.getElementById('modalItem').value) || 0,
+    date: document.getElementById('modalDate').value,
+    po: document.getElementById('modalPO').value,
+    client: document.getElementById('modalClient').value,
+    project: document.getElementById('modalProject').value,
+    title: document.getElementById('modalTitle').value,
+    value_thb: parseFloat(document.getElementById('modalTHB').value) || 0,
+    value_usd: parseFloat(document.getElementById('modalUSD').value) || 0,
+    incoterms: document.getElementById('modalIncoterms').value,
+    delivery: document.getElementById('modalDelivery').value,
+    status: document.getElementById('modalStatus').value,
+    duplicate: 'ไม่ซ้ำ'
+  };
+  
+  if (!newRecord.po || !newRecord.client || !newRecord.project) {
+    alert('Please fill in required fields: PO Number, Client, and Project');
+    return;
+  }
+  
+  if (editingIndex >= 0) {
+    portfolioData[editingIndex] = newRecord;
+  } else {
+    portfolioData.unshift(newRecord);
+  }
+  
+  closeModal();
+  init();
+  alert(editingIndex >= 0 ? 'Record updated successfully!' : 'New PO added successfully!');
+}
+
+// Export Functions
+function exportCSV() {
+  let csv = '\uFEFF"Item","Date","PO Number","Client","Project","Title","THB Value","USD Value","Incoterms","Delivery","Status"\n';
+  
+  portfolioData.forEach(record => {
+    csv += `"${record.item}","${record.date}","${record.po}","${record.client}","${record.project}","${record.title}",${record.value_thb},${record.value_usd},"${record.incoterms}","${record.delivery}","${record.status}"\n`;
+  });
+  
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `PTTEP_Portfolio_${new Date().toISOString().split('T')[0]}.csv`;
+  link.click();
+}
+
+function exportJSON() {
+  const json = JSON.stringify(portfolioData, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `PTTEP_Portfolio_${new Date().toISOString().split('T')[0]}.json`;
+  link.click();
+}
+
+// Report Functions
+function generateFullReport() {
+  const totalTHB = portfolioData.reduce((sum, r) => sum + r.value_thb, 0);
+  const totalUSD = portfolioData.reduce((sum, r) => sum + r.value_usd, 0);
+  const delivered = portfolioData.filter(r => r.status === 'delivered').length;
+  const pending = portfolioData.filter(r => r.status === 'pending').length;
+  const amendments = portfolioData.filter(r => r.status === 'amendment').length;
+  
+  document.getElementById('reportContent').innerHTML = `
+    <div class="summary-card">
+      <h3>📊 PTTEP Portfolio Full Report</h3>
+      <div style="margin-top:20px;">
+        <p><strong>Report Generated:</strong> ${new Date().toLocaleString()}</p>
+        <hr style="margin:15px 0;border:none;border-top:1px solid #e5e7eb;">
+        
+        <h4 style="color:#667eea;margin:20px 0 15px;">Executive Summary</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;">
+          <div style="background:#f9fafb;padding:15px;border-radius:8px;">
+            <div style="color:#6b7280;font-size:0.8rem;">Total Portfolio Value</div>
+            <div style="font-size:1.2rem;font-weight:700;color:#1e293b;">฿${totalTHB.toLocaleString()}</div>
+            <div style="color:#6b7280;font-size:0.85rem;">($${totalUSD.toLocaleString()})</div>
+          </div>
+          <div style="background:#f9fafb;padding:15px;border-radius:8px;">
+            <div style="color:#6b7280;font-size:0.8rem;">Total Orders</div>
+            <div style="font-size:1.2rem;font-weight:700;color:#1e293b;">${portfolioData.length}</div>
+          </div>
+          <div style="background:#f9fafb;padding:15px;border-radius:8px;">
+            <div style="color:#6b7280;font-size:0.8rem;">Date Range</div>
+            <div style="font-size:1.2rem;font-weight:700;color:#1e293b;">2008 - 2023</div>
+            <div style="color:#6b7280;font-size:0.85rem;">15 Years</div>
+          </div>
+        </div>
+        
+        <h4 style="color:#667eea;margin:20px 0 15px;">Order Status Breakdown</h4>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
+          <div style="background:linear-gradient(135deg, #dcfce7, #bbf7d0);padding:12px;border-radius:8px;">
+            <div style="font-weight:600;color:#166534;">Delivered: ${delivered}</div>
+          </div>
+          <div style="background:linear-gradient(135deg, #fef3c7, #fde68a);padding:12px;border-radius:8px;">
+            <div style="font-weight:600;color:#92400e;">Pending: ${pending}</div>
+          </div>
+          <div style="background:linear-gradient(135deg, #fee2e2, #fecaca);padding:12px;border-radius:8px;">
+            <div style="font-weight:600;color:#991b1b;">Amendments: ${amendments}</div>
+          </div>
+        </div>
+        
+        <div style="margin-top:20px;">
+          <button class="btn btn-info" onclick="exportCSV()">📥 Download Full Data</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function generateFinancialReport() {
+  const totalTHB = portfolioData.reduce((sum, r) => sum + r.value_thb, 0);
+  const totalUSD = portfolioData.reduce((sum, r) => sum + r.value_usd, 0);
+  const avgTHB = totalTHB / portfolioData.length;
+  
+  const yearlyRevenue = {};
+  portfolioData.forEach(r => {
+    const year = r.date.substring(0, 4);
+    yearlyRevenue[year] = (yearlyRevenue[year] || 0) + r.value_thb;
+  });
+  
+  const bestYear = Object.entries(yearlyRevenue).sort((a, b) => b[1] - a[1])[0];
+  
+  document.getElementById('reportContent').innerHTML = `
+    <div class="summary-card">
+      <h3>💰 Financial Report</h3>
+      <div style="margin-top:20px;">
+        <p><strong>Report Generated:</strong> ${new Date().toLocaleString()}</p>
+        <hr style="margin:15px 0;border:none;border-top:1px solid #e5e7eb;">
+        
+        <h4 style="color:#10b981;margin:20px 0 15px;">Revenue Analysis</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;">
+          <div>
+            <div style="color:#6b7280;font-size:0.9rem;margin-bottom:5px;">Total Revenue (THB)</div>
+            <div style="font-size:1.5rem;font-weight:700;color:#1e293b;">฿${totalTHB.toLocaleString()}</div>
+          </div>
+          <div>
+            <div style="color:#6b7280;font-size:0.9rem;margin-bottom:5px;">Total Revenue (USD)</div>
+            <div style="font-size:1.5rem;font-weight:700;color:#1e293b;">$${totalUSD.toLocaleString()}</div>
+          </div>
+          <div>
+            <div style="color:#6b7280;font-size:0.9rem;margin-bottom:5px;">Average Order Value</div>
+            <div style="font-size:1.5rem;font-weight:700;color:#1e293b;">฿${avgTHB.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
+          </div>
+          <div>
+            <div style="color:#6b7280;font-size:0.9rem;margin-bottom:5px;">Best Year</div>
+            <div style="font-size:1.5rem;font-weight:700;color:#1e293b;">${bestYear[0]}</div>
+            <div style="color:#6b7280;font-size:0.85rem;">฿${(bestYear[1]/1e6).toFixed(2)}M</div>
+          </div>
+        </div>
+        
+        <h4 style="color:#10b981;margin:25px 0 15px;">Yearly Revenue Breakdown</h4>
+        <div style="background:#f9fafb;padding:15px;border-radius:8px;">
+          ${Object.entries(yearlyRevenue)
+            .sort((a, b) => b[0] - a[0])
+            .map(([year, revenue]) => `
+              <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #e5e7eb;">
+                <span style="font-weight:600;">${year}</span>
+                <span>฿${revenue.toLocaleString()} (${((revenue/totalTHB)*100).toFixed(1)}%)</span>
+              </div>
+            `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function generateSummaryReport() {
+  const clientTotals = {};
+  portfolioData.forEach(r => {
+    const client = r.client.split('(')[0].trim();
+    clientTotals[client] = (clientTotals[client] || 0) + r.value_thb;
+  });
+  
+  const topClient = Object.entries(clientTotals).sort((a, b) => b[1] - a[1])[0];
+  
+  const projectCounts = {};
+  portfolioData.forEach(r => {
+    projectCounts[r.project] = (projectCounts[r.project] || 0) + 1;
+  });
+  
+  const topProject = Object.entries(projectCounts).sort((a, b) => b[1] - a[1])[0];
+  
+  document.getElementById('reportContent').innerHTML = `
+    <div class="summary-card">
+      <h3>📋 Executive Summary</h3>
+      <div style="margin-top:20px;">
+        <p><strong>Report Generated:</strong> ${new Date().toLocaleString()}</p>
+        <hr style="margin:15px 0;border:none;border-top:1px solid #e5e7eb;">
+        
+        <h4 style="color:#764ba2;margin:20px 0 15px;">Key Performance Indicators</h4>
+        <div style="display:grid;gap:15px;">
+          <div style="background:#f9fafb;padding:15px;border-radius:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="color:#6b7280;">Primary Client</span>
+              <strong style="color:#667eea;">${topClient[0]}</strong>
+            </div>
+            <div style="text-align:right;color:#6b7280;font-size:0.85rem;margin-top:5px;">
+              ฿${(topClient[1]/1e6).toFixed(2)}M (${((topClient[1]/portfolioData.reduce((s,r)=>s+r.value_thb,0))*100).toFixed(1)}%)
+            </div>
+          </div>
+          
+          <div style="background:#f9fafb;padding:15px;border-radius:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="color:#6b7280;">Most Active Project</span>
+              <strong style="color:#764ba2;">${topProject[0]}</strong>
+            </div>
+            <div style="text-align:right;color:#6b7280;font-size:0.85rem;margin-top:5px;">
+              ${topProject[1]} orders
+            </div>
+          </div>
+          
+          <div style="background:#f9fafb;padding:15px;border-radius:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="color:#6b7280;">Total Projects</span>
+              <strong style="color:#10b981;">${Object.keys(projectCounts).length}</strong>
+            </div>
+          </div>
+          
+          <div style="background:#f9fafb;padding:15px;border-radius:8px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="color:#6b7280;">Average Contract Duration</span>
+              <strong style="color:#f59e0b;">15 years</strong>
+            </div>
+            <div style="text-align:right;color:#6b7280;font-size:0.85rem;margin-top:5px;">
+              2008 - 2023
+            </div>
+          </div>
+        </div>
+        
+        <h4 style="color:#764ba2;margin:25px 0 15px;">Strategic Insights</h4>
+        <ul style="color:#4b5563;line-height:1.8;">
+          <li>Strong partnership with PTTEP spanning over 15 years</li>
+          <li>Diverse project portfolio across multiple locations</li>
+          <li>Consistent delivery track record with ${((portfolioData.filter(r=>r.status==='delivered').length/portfolioData.length)*100).toFixed(1)}% completion rate</li>
+          <li>Growing contract values indicating client confidence</li>
+        </ul>
+      </div>
+    </div>
+  `;
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+  const modal = document.getElementById('poModal');
+  if (event.target === modal) {
+    closeModal();
+  }
+}
+
+// Initialize
+function init() {
+  updateStats();
+  updateFilters();
+  renderTable();
+  renderDashboard();
+  filteredData = [...portfolioData];
+}
+
+// Start the application
+document.addEventListener('DOMContentLoaded', init);
+
+// === Connected Mode: API integration ===
+async function loadFromAPI() {
+  try {
+    const url = '/api/pttep_portfolio';
+    const res = await fetch(url);
+    const data = await res.json();
+    portfolioData = data;
+    filteredData = [...portfolioData];
+    init();
+  } catch (e) {
+    console.error('API load failed:', e);
+    filteredData = [];
+    init();
+    alert('ไม่สามารถเชื่อมต่อ API ได้ กรุณาตรวจสอบ backend');
+  }
+}
+
+// Override to persist via API
+async function savePO() {
+  const newRecord = {
+    item: parseInt(document.getElementById('modalItem').value) || 0,
+    date: document.getElementById('modalDate').value,
+    po: document.getElementById('modalPO').value,
+    client: document.getElementById('modalClient').value,
+    project: document.getElementById('modalProject').value,
+    title: document.getElementById('modalTitle').value,
+    value_thb: parseFloat(document.getElementById('modalTHB').value) || 0,
+    value_usd: parseFloat(document.getElementById('modalUSD').value) || 0,
+    incoterms: document.getElementById('modalIncoterms').value,
+    delivery: document.getElementById('modalDelivery').value,
+    status: document.getElementById('modalStatus').value,
+    duplicate: 'ไม่ซ้ำ'
+  };
+  if (!newRecord.po || !newRecord.client || !newRecord.project) {
+    alert('Please fill in required fields: PO Number, Client, and Project');
+    return;
+  }
+  try {
+    if (editingIndex >= 0) {
+      const start = (currentPage - 1) * perPage;
+      const record = filteredData[start + (editingIndex % perPage)];
+      const itemId = record.item;
+      const resp = await fetch('/api/pttep_portfolio/' + itemId, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(newRecord)
+      });
+      if (!resp.ok) throw new Error('Update failed');
+      alert('Record updated successfully!');
+    } else {
+      const resp = await fetch('/api/pttep_portfolio', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(newRecord)
+      });
+      if (!resp.ok) throw new Error('Create failed');
+      alert('New PO added successfully!');
+    }
+    closeModal();
+    await loadFromAPI();
+  } catch (e) {
+    console.error(e);
+    alert('ไม่สามารถบันทึกข้อมูลได้: ' + e.message);
+  }
+}
+
+// Bootstrap app: load via API instead of local data
+document.addEventListener('DOMContentLoaded', loadFromAPI);
+
+</script>
+
+</body>
+</html>

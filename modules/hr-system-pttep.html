@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Addvalue HR System v4.0 - PTTEP Enhanced</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #107c10;
+            --warning: #ca5010;
+            --danger: #d13438;
+            --info: #0078d4;
+            --dark: #323130;
+            --light: #f8f9fa;
+            --border: #e1e1e1;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+        
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header h1 {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .main-content {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .work-experience-card {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+        
+        .wage-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .wage-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        
+        .wage-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        
+        .wage-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .site-selector {
+            background: var(--light);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        
+        .site-path {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+        
+        .allowance-display {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+        
+        .employee-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .employee-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .employee-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--primary), var(--secondary)); 
+            color: white; 
+        }
+        
+        .btn-success { background: var(--success); color: white; }
+        .btn-warning { background: var(--warning); color: white; }
+        .btn-info { background: var(--info); color: white; }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        @media (max-width: 768px) {
+            .wage-breakdown { grid-template-columns: 1fr 1fr; }
+            .employee-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Addvalue HR System</h1>
+            <p>Professional HR & PTTEP Site Management Platform v4.0</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalEmployees">0</div>
+                    <div>Total Employees</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgSalary">฿0</div>
+                    <div>Average Salary</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalPayroll">฿0</div>
+                    <div>Total Payroll</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalAllowances">฿0</div>
+                    <div>Total Field Allowances</div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <div class="search-box">
+                    <input type="text" class="form-input" id="searchInput" 
+                           placeholder="Search by name, ID, department..." 
+                           oninput="HRSystem.search(this.value)">
+                </div>
+                <select class="form-select" id="deptFilter" style="width: 200px;" 
+                        onchange="HRSystem.filterByDept(this.value)">
+                    <option value="">All Departments</option>
+                    <option value="Management">Management</option>
+                    <option value="Engineering">Engineering</option>
+                    <option value="Technical">Technical</option>
+                    <option value="Sales">Sales & Marketing</option>
+                    <option value="Accounting">Accounting & Finance</option>
+                    <option value="Administration">Administration</option>
+                </select>
+                <button class="btn btn-primary" onclick="HRSystem.showAddModal()">
+                    ➕ Add Employee
+                </button>
+            </div>
+            
+            <div id="employeeDetail" style="display: none;">
+                <h3 id="employeeName" style="margin-bottom: 1rem;"></h3>
+                
+                <div class="work-experience-card">
+                    <h4>Work Experience & Wage Breakdown</h4>
+                    <div id="experienceInfo"></div>
+                    <div class="wage-breakdown" id="wageBreakdown"></div>
+                </div>
+                
+                <div class="site-selector">
+                    <h4>PTTEP Site Assignment</h4>
+                    <select class="form-select" id="siteSelect" onchange="HRSystem.updateSiteAssignment(this.value)">
+                        <option value="">Not Assigned</option>
+                    </select>
+                    <div class="site-path" id="sitePath"></div>
+                    
+                    <div style="margin-top: 1rem;">
+                        <label>Days on Site:</label>
+                        <input type="number" class="form-input" id="siteDays" min="0" 
+                               placeholder="Enter days worked on site" 
+                               onchange="HRSystem.updateSiteDays(this.value)">
+                    </div>
+                    
+                    <div class="allowance-display" id="allowanceInfo"></div>
+                </div>
+                
+                <button class="btn btn-info" onclick="HRSystem.backToList()">
+                    ← Back to List
+                </button>
+            </div>
+            
+            <div id="employeeList">
+                <div class="employee-grid" id="employeeGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+// PTTEP Sites Module
+const PTTEPSites = {
+    database: {
+        domestic: {
+            offshore: {
+                'PTTEP Thailand': {
+                    'G1': {
+                        platforms: {
+                            'ERAWAN': ['ERLQ1', 'ERLQ2'],
+                            'PLATONG': ['PLCPP1', 'PLCPP2', 'PLLQ1', 'PLLQ2'],
+                            'FUNAN': [],
+                            'SATUN': []
+                        }
+                    },
+                    'G2': {
+                        platforms: {
+                            'G2N': [],
+                            'G2S': [],
+                            'Arthit': [
+                                'ArthitPlem', 'AWP-1N', 'AWP-2', 'AWP-2N', 'AWP-3', 'AWP-3N',
+                                'AWP-4', 'AWP-5', 'AWP-6', 'AWP-7', 'AWP-8', 'AWP-9',
+                                'AWP-10', 'AWP-11', 'AWP-12', 'AWP-13', 'AWP-14', 'AWP-15',
+                                'AWP-16', 'AWP-17', 'AWP-18', 'AWP-19', 'AWP-20', 'AWP-21',
+                                'AWP-22', 'AWP-23', 'AWP-24', 'AWP-25', 'AWP-26', 'AWP-27',
+                                'AWP-28', 'AWP-29', 'AWP-30', 'AWP-31', 'AWP-32', 'AWP-33',
+                                'AWP-34', 'AWP-35', 'AWP-36', 'AWP-37', 'AWP-38', 'AWP-39',
+                                'AWP-40', 'AWP-41', 'AWP-42', 'AWP-45', 'HTA-01', 'HTA-03', 'HTA-05'
+                            ]
+                        }
+                    },
+                    'Bualuang': {
+                        platforms: {
+                            'Alpha': [],
+                            'Bravo': []
+                        }
+                    }
+                }
+            }
+        },
+        international: {
+            offshore: {
+                'PTTEPI MALAYSIA/THAI': {
+                    'JDA': {
+                        platforms: {
+                            'CPOC': {
+                                'Phase1': ['MDLQ', 'MDPP', 'MFP', 'MDA', 'MDB', 'MDC', 'JKA', 'RTU SKL'],
+                                'Phase2': ['MDD', 'MDE', 'JKB'],
+                                'Phase3': ['MRP', 'MDF', 'TPA', 'AMA', 'MTA'],
+                                'Phase4': ['ADA', 'ADB', 'TJA'],
+                                'Phase5': ['MDG', 'TPB'],
+                                'Phase6': ['JKC', 'JKD', 'ADC', 'ADD', 'ADE'],
+                                'Phase7': ['MDH', 'JKE', 'JKF', 'ADF']
+                            }
+                        }
+                    }
+                }
+            },
+            onshore: {
+                'PTTEPI Myanmar': {
+                    'ZAWTIKA': {
+                        platforms: {
+                            'ZOC': ['ZMS', 'ZBV1', 'ZBV2', 'KB30']
+                        }
+                    },
+                    'MOATTAMA': {
+                        platforms: {
+                            'PLC': ['MS']
+                        }
+                    }
+                }
+            }
+        }
+    },
+    
+    allowanceRates: {
+        offshore: {
+            domestic: 1500,
+            international: 2500
+        },
+        onshore: {
+            domestic: 500,
+            international: 1500
+        }
+    },
+    
+    getSiteList() {
+        const sites = [];
+        const extract = (obj, path = []) => {
+            for (const key in obj) {
+                const newPath = [...path, key];
+                if (obj[key]) {
+                    if (Array.isArray(obj[key])) {
+                        obj[key].forEach(site => {
+                            sites.push({
+                                value: `${newPath.join('/')}_${site}`,
+                                label: `${newPath.slice(2).join(' > ')} > ${site}`,
+                                location: path[0],
+                                type: path[1]
+                            });
+                        });
+                    } else if (typeof obj[key] === 'object') {
+                        extract(obj[key], newPath);
+                    }
+                }
+            }
+        };
+        extract(this.database);
+        return sites;
+    },
+    
+    getAllowance(location, type, days) {
+        const rate = this.allowanceRates[type]?.[location] || 0;
+        return rate * (days || 0);
+    }
+};
+
+// Main HR System
+const HRSystem = {
+    employees: [
+        {
+            id: 1,
+            idCard: '1100123456789',
+            name: 'Yuttapong Eakimphon',
+            department: 'Technical',
+            position: 'Chief Technical',
+            email: 'yuttapong@addvaluesystem.com',
+            phone: '0846998570',
+            employmentDate: '2001-10-03',
+            salary: 37000,
+            siteAssignment: null,
+            siteDays: 0
+        },
+        {
+            id: 2,
+            idCard: '1100234567890',
+            name: 'Sakda Wongjam',
+            department: 'Engineering',
+            position: 'Chief Engineer',
+            email: 'sakda@addvaluesystem.com',
+            phone: '0894446913',
+            employmentDate: '2001-10-03',
+            salary: 82000,
+            siteAssignment: null,
+            siteDays: 0
+        },
+        {
+            id: 3,
+            idCard: '1100345678901',
+            name: 'Suriyapong Yoo-om-sin',
+            department: 'Management',
+            position: 'CEO',
+            email: 'suriyapong@addvaluesystem.com',
+            phone: '0814661816',
+            employmentDate: '2000-10-03',
+            salary: 120000,
+            siteAssignment: null,
+            siteDays: 0
+        }
+    ],
+    
+    filteredEmployees: [],
+    selectedEmployee: null,
+    
+    init() {
+        this.filteredEmployees = [...this.employees];
+        this.updateStats();
+        this.renderEmployees();
+        this.populateSiteDropdown();
+    },
+    
+    updateStats() {
+        const totalEmployees = this.employees.length;
+        const totalSalary = this.employees.reduce((sum, emp) => sum + emp.salary, 0);
+        const avgSalary = totalEmployees > 0 ? totalSalary / totalEmployees : 0;
+        
+        const totalAllowances = this.employees.reduce((sum, emp) => {
+            if (emp.siteAssignment) {
+                const site = this.parseSiteId(emp.siteAssignment);
+                return sum + PTTEPSites.getAllowance(site.location, site.type, emp.siteDays);
+            }
+            return sum;
+        }, 0);
+        
+        document.getElementById('totalEmployees').textContent = totalEmployees;
+        document.getElementById('avgSalary').textContent = '฿' + Math.round(avgSalary).toLocaleString();
+        document.getElementById('totalPayroll').textContent = '฿' + totalSalary.toLocaleString();
+        document.getElementById('totalAllowances').textContent = '฿' + totalAllowances.toLocaleString();
+    },
+    
+    calculateWorkExperience(startDate) {
+        if (!startDate) return { years: 0, months: 0, days: 0, total: 'N/A' };
+        
+        const start = new Date(startDate);
+        const today = new Date();
+        
+        let years = today.getFullYear() - start.getFullYear();
+        let months = today.getMonth() - start.getMonth();
+        let days = today.getDate() - start.getDate();
+        
+        if (days < 0) {
+            months--;
+            days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+        }
+        
+        if (months < 0) {
+            years--;
+            months += 12;
+        }
+        
+        const totalDays = Math.floor((today - start) / (1000 * 60 * 60 * 24));
+        
+        return {
+            years,
+            months,
+            days,
+            totalDays,
+            total: `${years} years, ${months} months, ${days} days`
+        };
+    },
+    
+    calculateWages(salary, workDays = 30, hoursPerDay = 8) {
+        return {
+            yearly: salary * 12,
+            monthly: salary,
+            daily: Math.round(salary / workDays),
+            hourly: Math.round(salary / (workDays * hoursPerDay))
+        };
+    },
+    
+    renderEmployees() {
+        const grid = document.getElementById('employeeGrid');
+        grid.innerHTML = '';
+        
+        this.filteredEmployees.forEach(emp => {
+            const exp = this.calculateWorkExperience(emp.employmentDate);
+            const wages = this.calculateWages(emp.salary);
+            
+            const card = document.createElement('div');
+            card.className = 'employee-card';
+            card.onclick = () => this.showEmployee(emp);
+            
+            let fieldAllowance = 0;
+            if (emp.siteAssignment && emp.siteDays) {
+                const site = this.parseSiteId(emp.siteAssignment);
+                fieldAllowance = PTTEPSites.getAllowance(site.location, site.type, emp.siteDays);
+            }
+            
+            card.innerHTML = `
+                <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                    <div>
+                        <div style="font-size: 1.2rem; font-weight: 600;">${emp.name}</div>
+                        <div style="color: #666;">${emp.position}</div>
+                        <div style="color: #999; font-size: 0.85rem;">ID: ${emp.idCard}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="color: var(--primary); font-weight: 600;">
+                            ${emp.department}
+                        </div>
+                    </div>
+                </div>
+                <div style="background: var(--light); padding: 0.75rem; border-radius: 8px; margin-bottom: 0.75rem;">
+                    <div style="font-size: 0.85rem; color: #666;">Experience</div>
+                    <div style="font-weight: 600;">${exp.total}</div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.9rem;">
+                    <div>
+                        <span style="color: #666;">Monthly:</span>
+                        <span style="font-weight: 600; color: var(--success);">
+                            ฿${wages.monthly.toLocaleString()}
+                        </span>
+                    </div>
+                    <div>
+                        <span style="color: #666;">Daily:</span>
+                        <span style="font-weight: 600;">฿${wages.daily.toLocaleString()}</span>
+                    </div>
+                    <div>
+                        <span style="color: #666;">Email:</span>
+                    </div>
+                    <div style="font-size: 0.8rem; word-break: break-all;">
+                        ${emp.email}
+                    </div>
+                    ${emp.siteAssignment ? `
+                        <div style="grid-column: 1 / -1; margin-top: 0.5rem; padding: 0.5rem; 
+                                    background: #d4edda; border-radius: 5px;">
+                            <div style="font-size: 0.85rem; color: #155724;">
+                                <strong>Field Allowance:</strong> ฿${fieldAllowance.toLocaleString()} 
+                                (${emp.siteDays} days)
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            grid.appendChild(card);
+        });
+    },
+    
+    showEmployee(emp) {
+        this.selectedEmployee = emp;
+        document.getElementById('employeeList').style.display = 'none';
+        document.getElementById('employeeDetail').style.display = 'block';
+        
+        document.getElementById('employeeName').textContent = `${emp.name} - ${emp.position}`;
+        
+        const exp = this.calculateWorkExperience(emp.employmentDate);
+        const wages = this.calculateWages(emp.salary);
+        
+        document.getElementById('experienceInfo').innerHTML = `
+            <p><strong>Employment Date:</strong> ${emp.employmentDate || 'N/A'}</p>
+            <p><strong>Total Experience:</strong> ${exp.total}</p>
+            <p><strong>Total Days Worked:</strong> ${exp.totalDays.toLocaleString()} days</p>
+        `;
+        
+        document.getElementById('wageBreakdown').innerHTML = `
+            <div class="wage-item">
+                <div class="wage-label">Per Year</div>
+                <div class="wage-value">฿${wages.yearly.toLocaleString()}</div>
+            </div>
+            <div class="wage-item">
+                <div class="wage-label">Per Month</div>
+                <div class="wage-value">฿${wages.monthly.toLocaleString()}</div>
+            </div>
+            <div class="wage-item">
+                <div class="wage-label">Per Day</div>
+                <div class="wage-value">฿${wages.daily.toLocaleString()}</div>
+            </div>
+            <div class="wage-item">
+                <div class="wage-label">Per Hour</div>
+                <div class="wage-value">฿${wages.hourly.toLocaleString()}</div>
+            </div>
+        `;
+        
+        document.getElementById('siteSelect').value = emp.siteAssignment || '';
+        document.getElementById('siteDays').value = emp.siteDays || '';
+        this.updateSiteAssignment(emp.siteAssignment);
+    },
+    
+    backToList() {
+        document.getElementById('employeeDetail').style.display = 'none';
+        document.getElementById('employeeList').style.display = 'block';
+        this.selectedEmployee = null;
+    },
+    
+    populateSiteDropdown() {
+        const select = document.getElementById('siteSelect');
+        const sites = PTTEPSites.getSiteList();
+        
+        select.innerHTML = '<option value="">Not Assigned</option>';
+        sites.forEach(site => {
+            const option = document.createElement('option');
+            option.value = site.value;
+            option.textContent = site.label;
+            select.appendChild(option);
+        });
+    },
+    
+    parseSiteId(siteId) {
+        if (!siteId) return null;
+        const [path, site] = siteId.split('_');
+        const parts = path.split('/');
+        return {
+            location: parts[0],
+            type: parts[1],
+            company: parts[2],
+            contract: parts[3],
+            platform: parts[4],
+            site: site
+        };
+    },
+    
+    updateSiteAssignment(siteId) {
+        if (!this.selectedEmployee) return;
+        
+        this.selectedEmployee.siteAssignment = siteId;
+        
+        if (siteId) {
+            const site = this.parseSiteId(siteId);
+            document.getElementById('sitePath').innerHTML = `
+                <strong>Location:</strong> ${site.location} > ${site.type}<br>
+                <strong>Company:</strong> ${site.company}<br>
+                <strong>Platform:</strong> ${site.platform || 'N/A'}<br>
+                <strong>Site:</strong> ${site.site || 'N/A'}
+            `;
+            this.updateAllowanceDisplay();
+        } else {
+            document.getElementById('sitePath').innerHTML = '';
+            document.getElementById('allowanceInfo').innerHTML = '';
+        }
+        
+        this.updateEmployeeData();
+    },
+    
+    updateSiteDays(days) {
+        if (!this.selectedEmployee) return;
+        
+        this.selectedEmployee.siteDays = parseInt(days) || 0;
+        this.updateAllowanceDisplay();
+        this.updateEmployeeData();
+    },
+    
+    updateAllowanceDisplay() {
+        const emp = this.selectedEmployee;
+        if (!emp || !emp.siteAssignment) {
+            document.getElementById('allowanceInfo').innerHTML = '';
+            return;
+        }
+        
+        const site = this.parseSiteId(emp.siteAssignment);
+        const rate = PTTEPSites.allowanceRates[site.type]?.[site.location] || 0;
+        const total = rate * (emp.siteDays || 0);
+        
+        document.getElementById('allowanceInfo').innerHTML = `
+            <strong>Field Allowance Rate:</strong> ฿${rate.toLocaleString()} per day<br>
+            <strong>Days on Site:</strong> ${emp.siteDays || 0} days<br>
+            <strong>Total Allowance:</strong> ฿${total.toLocaleString()}
+        `;
+    },
+    
+    updateEmployeeData() {
+        const idx = this.employees.findIndex(e => e.id === this.selectedEmployee.id);
+        if (idx !== -1) {
+            this.employees[idx] = this.selectedEmployee;
+        }
+        this.updateStats();
+        this.renderEmployees();
+    },
+    
+    search(query) {
+        if (!query) {
+            this.filteredEmployees = [...this.employees];
+        } else {
+            const q = query.toLowerCase();
+            this.filteredEmployees = this.employees.filter(emp =>
+                emp.name.toLowerCase().includes(q) ||
+                emp.idCard.includes(q) ||
+                emp.department.toLowerCase().includes(q) ||
+                emp.position.toLowerCase().includes(q)
+            );
+        }
+        this.renderEmployees();
+    },
+    
+    filterByDept(dept) {
+        if (!dept) {
+            this.filteredEmployees = [...this.employees];
+        } else {
+            this.filteredEmployees = this.employees.filter(e => e.department === dept);
+        }
+        this.renderEmployees();
+    },
+    
+    showAddModal() {
+        alert('Add Employee Modal - To be implemented');
+    }
+};
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', () => HRSystem.init());
+    </script>
+</body>
+</html>

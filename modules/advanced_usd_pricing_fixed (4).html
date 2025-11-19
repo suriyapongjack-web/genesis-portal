@@ -1,0 +1,3603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AVS Service Catalog & Pricing System</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font: 12px 'Segoe UI', Arial, sans-serif; background: #f0f2f5; }
+.container { max-width: 1600px; margin: 0 auto; padding: 10px; }
+
+/* Header */
+.header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.header h1 { font-size: 24px; margin-bottom: 5px; }
+.header-info { text-align: right; font-size: 11px; opacity: 0.9; }
+
+/* Project Bar */
+.project-bar {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.project-bar input, .project-bar select {
+    padding: 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 12px;
+}
+.project-bar label {
+    font-weight: 600;
+    color: #374151;
+}
+
+/* Service Navigation */
+.service-nav {
+    background: white;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.nav-tabs {
+    display: flex;
+    gap: 5px;
+}
+.nav-tab {
+    padding: 10px 20px;
+    background: #e5e7eb;
+    border: none;
+    border-radius: 4px 4px 0 0;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+.nav-tab.active {
+    background: #3b82f6;
+    color: white;
+}
+.nav-tab:hover {
+    background: #60a5fa;
+    color: white;
+}
+
+/* Main Content Grid */
+.content-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 20px;
+}
+
+/* Service Catalog Tree */
+.catalog-panel {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    max-height: 700px;
+    overflow-y: auto;
+}
+.catalog-title {
+    font-size: 14px;
+    font-weight: bold;
+    color: #1f2937;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #3b82f6;
+}
+.service-group {
+    margin-bottom: 15px;
+}
+.group-header {
+    background: #f3f4f6;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.group-header:hover {
+    background: #e5e7eb;
+}
+.service-items {
+    margin-left: 20px;
+    margin-top: 5px;
+}
+.service-item {
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.service-item:hover {
+    background: #eff6ff;
+}
+.service-item.selected {
+    background: #dbeafe;
+    font-weight: 600;
+}
+.service-code {
+    font-size: 10px;
+    background: #6366f1;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+/* Work Panel */
+.work-panel {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Service Configuration */
+.config-section {
+    margin-bottom: 25px;
+}
+.config-title {
+    font-size: 16px;
+    font-weight: bold;
+    color: #1f2937;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #10b981;
+}
+.config-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+.config-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.config-item label {
+    font-weight: 600;
+    color: #4b5563;
+    font-size: 11px;
+}
+.config-item input,
+.config-item select {
+    padding: 6px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 11px;
+}
+
+/* Resource Table */
+.resource-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+.resource-table th {
+    background: #f9fafb;
+    padding: 10px;
+    text-align: left;
+    font-weight: 600;
+    border: 1px solid #e5e7eb;
+    font-size: 11px;
+}
+.resource-table td {
+    padding: 8px;
+    border: 1px solid #e5e7eb;
+    font-size: 11px;
+}
+.resource-table tr:hover {
+    background: #f9fafb;
+}
+.add-resource-btn {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 600;
+}
+.add-resource-btn:hover {
+    background: #059669;
+}
+.remove-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 10px;
+}
+
+/* Document Management */
+.doc-status {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+}
+.status-ifr { background: #fef3c7; color: #92400e; }
+.status-ifc { background: #dbeafe; color: #1e40af; }
+.status-ifa { background: #d1fae5; color: #065f46; }
+.status-afc { background: #fee2e2; color: #991b1b; }
+
+.revision-tag {
+    display: inline-block;
+    background: #e5e7eb;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    margin-left: 5px;
+}
+
+/* Summary Panel */
+.summary-panel {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 2px solid #3b82f6;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+}
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 15px;
+}
+.summary-item {
+    text-align: center;
+}
+.summary-label {
+    font-size: 11px;
+    color: #6b7280;
+    margin-bottom: 5px;
+}
+.summary-value {
+    font-size: 20px;
+    font-weight: bold;
+    color: #1e40af;
+}
+.summary-unit {
+    font-size: 11px;
+    color: #6b7280;
+}
+
+/* Buttons */
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 12px;
+    transition: all 0.3s;
+}
+.btn-primary {
+    background: #3b82f6;
+    color: white;
+}
+.btn-primary:hover {
+    background: #2563eb;
+}
+.btn-success {
+    background: #10b981;
+    color: white;
+}
+.btn-warning {
+    background: #f59e0b;
+    color: white;
+}
+.btn-export {
+    background: #8b5cf6;
+    color: white;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .content-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Location Info Panel */
+.location-info {
+    background: #f0f9ff;
+    border: 1px solid #3b82f6;
+    border-radius: 4px;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 11px;
+    display: none;
+}
+.location-info.active {
+    display: block;
+}
+.location-info-title {
+    font-weight: 600;
+    color: #1e40af;
+    margin-bottom: 5px;
+}
+.location-info-details {
+    color: #4b5563;
+}
+
+/* Integration Status */
+.integration-status {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 8px 12px;
+    background: #10b981;
+    color: white;
+    border-radius: 4px;
+    font-size: 11px;
+    display: none;
+    z-index: 1000;
+}
+.integration-status.active {
+    display: block;
+}
+
+/* Service Recommendations */
+.service-item.recommended {
+    background-color: #fef3c7 !important;
+    border-left: 3px solid #f59e0b;
+}
+
+/* Location Type Badges */
+.location-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-left: 5px;
+}
+.badge-offshore { background: #dbeafe; color: #1e40af; }
+.badge-onshore { background: #d1fae5; color: #065f46; }
+.badge-document { background: #fee2e2; color: #991b1b; }
+
+/* Employee Status Badges */
+.status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+/* Employee Select Styling */
+.employee-select option:disabled {
+    font-weight: bold;
+    color: #6b7280;
+    background: #f3f4f6;
+}
+
+/* Resource Table Enhancement */
+.resource-table .employee-status {
+    text-align: center;
+}
+
+/* Quick View Panel */
+#employeeQuickView {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <!-- Header -->
+    <div class="header">
+        <div>
+            <h1>🏢 ADDVALUE SYSTEM CO., LTD.</h1>
+            <p>Standard Service Catalog & Pricing System v4.0</p>
+        </div>
+        <div class="header-info">
+            <p>User: Engineering Team</p>
+            <p id="datetime">Loading...</p>
+            <p>Session: #2025-001</p>
+        </div>
+    </div>
+
+    <!-- Project Information Bar -->
+    <div class="project-bar">
+        <div>
+            <label>Project:</label>
+            <input type="text" id="projectName" placeholder="Enter Project Name" style="width: 200px;">
+        </div>
+        <div>
+            <label>Client:</label>
+            <select id="clientType" onchange="updateLocations()">
+                <option value="">-- Select Client --</option>
+                <option>PTTEP</option>
+                <option>Chevron</option>
+                <option>MUBADALA</option>
+                <option>TOTAL</option>
+                <option>Other O&G</option>
+                <option>Non-O&G</option>
+            </select>
+        </div>
+        <div>
+            <label>Country:</label>
+            <select id="country" onchange="updateLocationsByCountry()">
+                <option value="">-- Select Country --</option>
+                <option value="thailand">🇹🇭 Thailand</option>
+                <option value="myanmar">🇲🇲 Myanmar</option>
+                <option value="malaysia">🇲🇾 Malaysia</option>
+            </select>
+        </div>
+        <div>
+            <label>Location:</label>
+            <select id="location">
+                <option value="">-- Select Location --</option>
+            </select>
+        </div>
+        <div>
+            <label>Quote No:</label>
+            <input type="text" id="quoteNo" value="Q-2025-001" style="width: 120px;">
+        </div>
+        <div>
+            <label>Rev:</label>
+            <select id="revision">
+                <option>Rev.0</option>
+                <option>Rev.A</option>
+                <option>Rev.B</option>
+                <option>Rev.C</option>
+            </select>
+        </div>
+    </div>
+    
+    <!-- Price Adjustment Settings -->
+    <div class="project-bar" style="background: #fef3c7; border: 2px solid #f59e0b;">
+        <div style="width: 100%; display: flex; gap: 20px; align-items: center; flex-wrap: wrap;">
+            <div style="font-weight: bold; color: #92400e; font-size: 13px;">
+                💰 Location Price Adjustment<br>
+                <span style="font-size: 10px; font-weight: normal;">(ปรับราคา CORE TEAM เท่านั้น → ไปแสดงที่ Location Adjustment)</span>
+            </div>
+            <div>
+                <label style="font-size: 11px;">Offshore (+%):</label>
+                <input type="number" id="offshoreAdjust" value="30" min="-100" max="200" style="width: 60px;">
+                <span style="font-size: 11px;">%</span>
+            </div>
+            <div>
+                <label style="font-size: 11px;">Onshore (+%):</label>
+                <input type="number" id="onshoreAdjust" value="30" min="-100" max="200" style="width: 60px;">
+                <span style="font-size: 11px;">%</span>
+            </div>
+            <div>
+                <label style="font-size: 11px;">Document Center (+%):</label>
+                <input type="number" id="documentAdjust" value="0" min="-100" max="200" style="width: 60px;">
+                <span style="font-size: 11px;">%</span>
+            </div>
+            <button onclick="applyPriceAdjustment()" style="padding: 6px 12px; background: #f59e0b; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600;">
+                📊 Apply to Core Team
+            </button>
+            <span id="adjustmentStatus" style="font-size: 11px; color: #065f46; font-weight: bold; display: none;">✅ Applied to Core Team</span>
+        </div>
+    </div>
+    
+    <!-- Location Info Panel -->
+    <div class="location-info" id="locationInfo">
+        <div class="location-info-title">📍 Selected Location Details</div>
+        <div class="location-info-details" id="locationDetails">
+            No location selected
+        </div>
+    </div>
+
+    <!-- Integration Status Indicator -->
+    <div class="integration-status" id="integrationStatus">
+        ✅ Location Dashboard Connected
+    </div>
+
+    <!-- Service Navigation -->
+    <div class="service-nav">
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('field')">🔧 Field Engineering</button>
+            <button class="nav-tab" onclick="switchTab('document')">📄 Document Engineering</button>
+            <button class="nav-tab" onclick="switchTab('testing')">🧪 Testing & Commissioning</button>
+            <button class="nav-tab" onclick="switchTab('specialized')">🚀 Specialized Services</button>
+            <button class="nav-tab" onclick="switchTab('summary')">📊 Summary</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content-grid">
+        <!-- Service Catalog Tree -->
+        <div class="catalog-panel">
+            <div class="catalog-title">📚 Service Catalog</div>
+            
+            <!-- Field Engineering Services -->
+            <div class="service-group">
+                <div class="group-header" onclick="toggleGroup('field-group')">
+                    <span>▼</span> Field Engineering Services
+                </div>
+                <div class="service-items" id="field-group">
+                    <div class="service-item" onclick="selectService('SURVEY')">
+                        <span>Site Survey</span>
+                        <span class="service-code">SURVEY</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('INSTALL')">
+                        <span>Installation & Config</span>
+                        <span class="service-code">INSTALL</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('MAINT')">
+                        <span>Maintenance Service</span>
+                        <span class="service-code">MAINT</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('TROUBLE')">
+                        <span>Troubleshooting</span>
+                        <span class="service-code">TROUBLE</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('UPGRADE')">
+                        <span>System Upgrade</span>
+                        <span class="service-code">UPGRADE</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Testing Services -->
+            <div class="service-group">
+                <div class="group-header" onclick="toggleGroup('test-group')">
+                    <span>▼</span> Testing & Commissioning
+                </div>
+                <div class="service-items" id="test-group">
+                    <div class="service-item" onclick="selectService('FAT')">
+                        <span>Factory Acceptance Test</span>
+                        <span class="service-code">FAT</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('SAT')">
+                        <span>Site Acceptance Test</span>
+                        <span class="service-code">SAT</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('SIT')">
+                        <span>System Integration Test</span>
+                        <span class="service-code">SIT</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('COMM')">
+                        <span>Commissioning</span>
+                        <span class="service-code">COMM</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('LOOP')">
+                        <span>Loop Check</span>
+                        <span class="service-code">LOOP</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Document Engineering -->
+            <div class="service-group">
+                <div class="group-header" onclick="toggleGroup('doc-group')">
+                    <span>▼</span> Document Engineering
+                </div>
+                <div class="service-items" id="doc-group">
+                    <div class="service-item" onclick="selectService('PRE-FEED')">
+                        <span>Pre-FEED Package</span>
+                        <span class="service-code">PRE-FEED</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('FEED')">
+                        <span>FEED Package</span>
+                        <span class="service-code">FEED</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('DETAIL')">
+                        <span>Detail Design</span>
+                        <span class="service-code">DETAIL</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('VDRL')">
+                        <span>VDRL Documents</span>
+                        <span class="service-code">VDRL</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('AS-BUILT')">
+                        <span>As-Built Package</span>
+                        <span class="service-code">AS-BUILT</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Specialized Services -->
+            <div class="service-group">
+                <div class="group-header" onclick="toggleGroup('spec-group')">
+                    <span>▼</span> Specialized Services
+                </div>
+                <div class="service-items" id="spec-group">
+                    <div class="service-item" onclick="selectService('PM')">
+                        <span>Project Management</span>
+                        <span class="service-code">PM</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('CONSULT')">
+                        <span>Technical Consultancy</span>
+                        <span class="service-code">CONSULT</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('TRAINING')">
+                        <span>Training Services</span>
+                        <span class="service-code">TRAINING</span>
+                    </div>
+                    <div class="service-item" onclick="selectService('AUDIT')">
+                        <span>System Audit</span>
+                        <span class="service-code">AUDIT</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Work Configuration Panel -->
+        <div class="work-panel">
+            <!-- Service Configuration -->
+            <div class="config-section">
+                <div class="config-title">⚙️ Service Configuration: <span id="selectedService">Site Survey</span></div>
+                
+                <div class="config-grid">
+                    <div class="config-item">
+                        <label>Service Type:</label>
+                        <select id="serviceType">
+                            <option>Standard Package</option>
+                            <option>Custom Configuration</option>
+                            <option>Emergency Response</option>
+                        </select>
+                    </div>
+                    <div class="config-item">
+                        <label>Duration (Days):</label>
+                        <input type="number" id="duration" value="5" min="1">
+                    </div>
+                    <div class="config-item">
+                        <label>Complexity:</label>
+                        <select id="complexity">
+                            <option>Low</option>
+                            <option selected>Medium</option>
+                            <option>High</option>
+                            <option>Very High</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resource Assignment -->
+            <div class="config-section">
+                <div class="config-title">👥 Resource Assignment</div>
+                
+                <!-- Team Category Tabs -->
+                <div style="display: flex; gap: 5px; margin-bottom: 15px; background: #f3f4f6; padding: 5px; border-radius: 6px;">
+                    <button class="team-tab active" onclick="switchTeamTab('core')" style="padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer;">
+                        🎯 Core Team
+                    </button>
+                    <button class="team-tab" onclick="switchTeamTab('support')" style="padding: 8px 16px; background: #e5e7eb; color: #4b5563; border: none; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer;">
+                        🛠️ Support Team
+                    </button>
+                    <button class="team-tab" onclick="switchTeamTab('admin')" style="padding: 8px 16px; background: #e5e7eb; color: #4b5563; border: none; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer;">
+                        📋 Admin Team
+                    </button>
+                    <button onclick="showTeamSummary()" style="margin-left: auto; padding: 8px 16px; background: #10b981; color: white; border: none; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer;">
+                        📊 Team Summary
+                    </button>
+                </div>
+                
+                <!-- Team Recommendation Box -->
+                <div id="teamRecommendation" style="background: #fef3c7; border: 1px solid #f59e0b; border-radius: 6px; padding: 10px; margin-bottom: 10px; font-size: 11px;">
+                    <strong style="color: #92400e;">💡 Recommended Core Team:</strong>
+                    <div style="margin-top: 5px; color: #78716c;">
+                        For Field Engineering Services: Chief Engineer (1), Senior Engineer (1), Engineer (2), Technician (1)
+                    </div>
+                </div>
+                
+                <!-- Core Team Table -->
+                <div id="coreTeamSection" class="team-section">
+                    <table class="resource-table">
+                        <thead>
+                            <tr style="background: #dbeafe;">
+                                <th colspan="8" style="text-align: center; background: #3b82f6; color: white; font-weight: bold;">🎯 CORE TEAM - Primary Resources</th>
+                            </tr>
+                            <tr>
+                                <th>Position</th>
+                                <th>Employee Name</th>
+                                <th>Qty</th>
+                                <th>Days</th>
+                                <th>Daily Rate (THB)</th>
+                                <th>Man-Hours</th>
+                                <th>Subtotal</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="coreTeamTable">
+                            <!-- Core team rows will be added here -->
+                        </tbody>
+                    </table>
+                    <button class="add-resource-btn" onclick="addResourceToTeam('core')">+ Add Core Team Member</button>
+                </div>
+                
+                <!-- Support Team Table -->
+                <div id="supportTeamSection" class="team-section" style="display: none;">
+                    <table class="resource-table">
+                        <thead>
+                            <tr style="background: #fef3c7;">
+                                <th colspan="8" style="text-align: center; background: #f59e0b; color: white; font-weight: bold;">🛠️ SUPPORT TEAM - Technical Support</th>
+                            </tr>
+                            <tr>
+                                <th>Position</th>
+                                <th>Employee Name</th>
+                                <th>Qty</th>
+                                <th>Days</th>
+                                <th>Daily Rate (THB)</th>
+                                <th>Man-Hours</th>
+                                <th>Subtotal</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="supportTeamTable">
+                            <!-- Support team rows will be added here -->
+                        </tbody>
+                    </table>
+                    <button class="add-resource-btn" onclick="addResourceToTeam('support')" style="background: #f59e0b;">+ Add Support Team Member</button>
+                </div>
+                
+                <!-- Admin Team Table -->
+                <div id="adminTeamSection" class="team-section" style="display: none;">
+                    <table class="resource-table">
+                        <thead>
+                            <tr style="background: #d1fae5;">
+                                <th colspan="8" style="text-align: center; background: #10b981; color: white; font-weight: bold;">📋 ADMIN TEAM - Administrative Support</th>
+                            </tr>
+                            <tr>
+                                <th>Position</th>
+                                <th>Employee Name</th>
+                                <th>Qty</th>
+                                <th>Days</th>
+                                <th>Daily Rate (THB)</th>
+                                <th>Man-Hours</th>
+                                <th>Subtotal</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTeamTable">
+                            <!-- Admin team rows will be added here -->
+                        </tbody>
+                    </table>
+                    <button class="add-resource-btn" onclick="addResourceToTeam('admin')" style="background: #10b981;">+ Add Admin Team Member</button>
+                </div>
+                
+                <!-- Original resource table (hidden, kept for backward compatibility) -->
+                <table class="resource-table" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Position</th>
+                            <th>Employee Name</th>
+                            <th>Qty</th>
+                            <th>Days</th>
+                            <th>Daily Rate (THB)</th>
+                            <th>Man-Hours</th>
+                            <th>Subtotal</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resourceTable">
+                        <!-- Rows will be dynamically generated -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Document Details (for Document Engineering) -->
+            <div class="config-section" id="documentSection" style="display: none;">
+                <div class="config-title">📋 Document Deliverables</div>
+                
+                <table class="resource-table">
+                    <thead>
+                        <tr>
+                            <th>Document Code</th>
+                            <th>Document Title</th>
+                            <th>Type</th>
+                            <th>Rev</th>
+                            <th>Status</th>
+                            <th>Man-Hours</th>
+                            <th>Responsible</th>
+                            <th>Progress</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>TSI-DDS-001</td>
+                            <td>System Design Specification</td>
+                            <td>Technical</td>
+                            <td><span class="revision-tag">Rev.B</span></td>
+                            <td><span class="doc-status status-ifc">IFC</span></td>
+                            <td>120</td>
+                            <td>Sr. Engineer</td>
+                            <td>75%</td>
+                        </tr>
+                        <tr>
+                            <td>TSI-PID-001</td>
+                            <td>P&ID Telecom System</td>
+                            <td>Drawing</td>
+                            <td><span class="revision-tag">Rev.A</span></td>
+                            <td><span class="doc-status status-ifr">IFR</span></td>
+                            <td>80</td>
+                            <td>CAD Designer</td>
+                            <td>50%</td>
+                        </tr>
+                        <tr>
+                            <td>TSI-BOQ-001</td>
+                            <td>Bill of Quantity</td>
+                            <td>Commercial</td>
+                            <td><span class="revision-tag">Rev.C</span></td>
+                            <td><span class="doc-status status-ifa">IFA</span></td>
+                            <td>40</td>
+                            <td>Engineer</td>
+                            <td>100%</td>
+                        </tr>
+                        <tr>
+                            <td>TSI-MTO-001</td>
+                            <td>Material Take Off</td>
+                            <td>Procurement</td>
+                            <td><span class="revision-tag">Rev.0</span></td>
+                            <td><span class="doc-status status-afc">AFC</span></td>
+                            <td>60</td>
+                            <td>Engineer</td>
+                            <td>25%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Cost Summary -->
+            <div class="summary-panel">
+                <!-- Editable Cost Components -->
+                <div style="background: #f0f9ff; border: 1px solid #3b82f6; border-radius: 6px; padding: 15px; margin-bottom: 15px;">
+                    <div style="font-size: 14px; font-weight: bold; color: #1e40af; margin-bottom: 10px;">💼 Cost Components (Editable)</div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <!-- Base Service Cost with Formula -->
+                        <div style="background: white; padding: 10px; border-radius: 4px; border: 1px solid #d1d5db; grid-column: span 2;">
+                            <label style="font-size: 11px; color: #4b5563; font-weight: 600;">1. Base Service Cost Calculation</label>
+                            
+                            <!-- Formula Selection -->
+                            <div style="margin: 8px 0; padding: 8px; background: #fef3c7; border-radius: 4px;">
+                                <label style="font-size: 10px; font-weight: 600; color: #92400e;">Select Calculation Method:</label>
+                                <select id="costCalculationMethod" onchange="updateCostCalculation()" style="margin-left: 10px; padding: 3px; font-size: 11px;">
+                                    <option value="standard">Standard (Sum of all resources)</option>
+                                    <option value="withMultiplier">With Multiplier Factor</option>
+                                    <option value="withMinimum">With Minimum Charge</option>
+                                    <option value="custom">Custom Formula</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Current Formula Display -->
+                            <div style="background: #f9fafb; padding: 8px; border-radius: 4px; margin: 8px 0; font-family: monospace; font-size: 11px;">
+                                <strong>Current Formula:</strong><br>
+                                <span id="currentFormula">Base Cost = Σ(Qty × Days × Daily Rate)</span>
+                            </div>
+                            
+                            <!-- Breakdown Table -->
+                            <div style="max-height: 120px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 4px; margin: 8px 0;">
+                                <table style="width: 100%; font-size: 10px; border-collapse: collapse;">
+                                    <thead style="background: #f3f4f6; position: sticky; top: 0;">
+                                        <tr>
+                                            <th style="padding: 4px; border-bottom: 1px solid #e5e7eb;">Position</th>
+                                            <th style="padding: 4px; border-bottom: 1px solid #e5e7eb;">Qty</th>
+                                            <th style="padding: 4px; border-bottom: 1px solid #e5e7eb;">Days</th>
+                                            <th style="padding: 4px; border-bottom: 1px solid #e5e7eb;">Rate</th>
+                                            <th style="padding: 4px; border-bottom: 1px solid #e5e7eb;">Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="costBreakdownTable">
+                                        <!-- Will be populated dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <!-- Additional Parameters (shown based on method) -->
+                            <div id="additionalParameters" style="display: none; margin: 8px 0;">
+                                <div style="display: flex; gap: 10px; align-items: center;">
+                                    <label style="font-size: 10px; color: #4b5563;">Multiplier:</label>
+                                    <input type="number" id="costMultiplier" value="1.0" min="0.1" max="5" step="0.1" style="width: 60px; padding: 3px; border: 1px solid #e5e7eb; border-radius: 3px;" onchange="calculateTotals()">
+                                    <label style="font-size: 10px; color: #4b5563;">Min Charge:</label>
+                                    <input type="number" id="minimumCharge" value="50000" min="0" style="width: 80px; padding: 3px; border: 1px solid #e5e7eb; border-radius: 3px;" onchange="calculateTotals()">
+                                </div>
+                            </div>
+                            
+                            <!-- Final Base Cost -->
+                            <div style="display: flex; align-items: center; margin-top: 8px; padding-top: 8px; border-top: 1px solid #e5e7eb;">
+                                <span style="font-size: 11px; font-weight: 600; margin-right: 10px;">Calculated Base Cost:</span>
+                                <span style="margin-right: 5px;">฿</span>
+                                <input type="number" id="baseServiceCostInput" value="0" style="width: 120px; padding: 5px; border: 2px solid #3b82f6; border-radius: 3px; background: #eff6ff; font-weight: bold;" onchange="overrideBaseServiceCost()">
+                                <button onclick="resetBaseServiceCost()" style="margin-left: 10px; padding: 4px 8px; background: #6b7280; color: white; border: none; border-radius: 3px; font-size: 10px; cursor: pointer;">Reset</button>
+                            </div>
+                            <div style="font-size: 9px; color: #6b7280; margin-top: 3px;">You can manually override by typing a new value</div>
+                        </div>
+                        
+                        <!-- Management Fee -->
+                        <div style="background: white; padding: 10px; border-radius: 4px; border: 1px solid #d1d5db;">
+                            <label style="font-size: 11px; color: #4b5563; font-weight: 600;">2. Management Fee (%)</label>
+                            <div style="display: flex; align-items: center; margin-top: 5px;">
+                                <input type="number" id="managementFeePercent" value="15" min="0" max="100" style="width: 60px; padding: 5px; border: 1px solid #e5e7eb; border-radius: 3px;" onchange="updateManagementFee()">
+                                <span style="margin: 0 10px;">% = ฿</span>
+                                <input type="number" id="managementFeeAmount" value="0" readonly style="flex: 1; padding: 5px; border: 1px solid #e5e7eb; border-radius: 3px; background: #f9fafb; font-weight: bold;">
+                            </div>
+                            <div style="font-size: 10px; color: #6b7280; margin-top: 3px;">Percentage of base cost</div>
+                        </div>
+                        
+                        <!-- Other Expenses -->
+                        <div style="background: white; padding: 10px; border-radius: 4px; border: 1px solid #d1d5db;">
+                            <label style="font-size: 11px; color: #4b5563; font-weight: 600;">3. Other Expenses (Manual)</label>
+                            <div style="display: flex; align-items: center; margin-top: 5px;">
+                                <span style="margin-right: 5px;">฿</span>
+                                <input type="number" id="otherExpenses" value="0" min="0" style="width: 100%; padding: 5px; border: 1px solid #e5e7eb; border-radius: 3px;" onchange="calculateTotals()">
+                            </div>
+                            <div style="font-size: 10px; color: #6b7280; margin-top: 3px;">Transportation, accommodation, etc.</div>
+                        </div>
+                        
+                        <!-- Location Adjustment -->
+                        <div style="background: white; padding: 10px; border-radius: 4px; border: 1px solid #d1d5db; grid-column: span 2;">
+                            <label style="font-size: 11px; color: #4b5563; font-weight: 600;">4. Location Adjustment (Core Team Only)</label>
+                            <div style="display: flex; align-items: center; margin-top: 5px;">
+                                <span style="margin-right: 5px;">฿</span>
+                                <input type="number" id="locationAdjustmentInput" value="0" readonly style="width: 100%; padding: 5px; border: 1px solid #e5e7eb; border-radius: 3px; background: #f9fafb; font-weight: bold;">
+                            </div>
+                            <div style="font-size: 10px; color: #6b7280; margin-top: 3px;">Applied to Core Team rates only based on location type</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <div class="summary-label">Total Man-Days</div>
+                        <div class="summary-value">30</div>
+                        <div class="summary-unit">days</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Total Man-Hours</div>
+                        <div class="summary-value">360</div>
+                        <div class="summary-unit">hours</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label">Service Cost</div>
+                        <div class="summary-value">฿180,000</div>
+                        <div class="summary-unit">THB</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-label" id="managementFeeLabel">Management Fee (15%)</div>
+                        <div class="summary-value">฿27,000</div>
+                        <div class="summary-unit">THB</div>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Total Package Price Display -->
+                <div style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); color: white; padding: 20px; border-radius: 8px; margin-top: 15px;">
+                    <div style="font-size: 16px; font-weight: bold; margin-bottom: 15px; text-align: center;">📊 GRAND TOTAL CALCULATION DETAILS</div>
+                    
+                    <!-- Formula Display -->
+                    <div style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 6px; margin-bottom: 15px; font-family: monospace;">
+                        <div style="font-size: 13px; margin-bottom: 8px;">📐 <strong>Management Fee Formula:</strong></div>
+                        <div style="font-size: 12px; padding-left: 20px; line-height: 1.6;">
+                            Management Fee = Service Cost × <span id="formulaPercent">15</span>%<br>
+                            Management Fee = <span id="formulaServiceCost">฿180,000</span> × <span id="formulaPercentDecimal">0.15</span><br>
+                            Management Fee = <span id="formulaManagementFee">฿27,000</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Price Breakdown -->
+                    <div style="background: rgba(255,255,255,0.1); padding: 15px; border-radius: 6px;">
+                        <table style="width: 100%; font-size: 13px; border-collapse: collapse;">
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                                <td style="padding: 8px 0;">1. Base Service Cost</td>
+                                <td style="text-align: right; padding: 8px 0; font-weight: bold;" id="detailServiceCost">฿180,000</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                                <td style="padding: 8px 0;">2. Management Fee (<span id="detailManagementPercent">15</span>%)</td>
+                                <td style="text-align: right; padding: 8px 0; font-weight: bold;" id="detailManagementFee">฿27,000</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.2);">
+                                <td style="padding: 8px 0;">3. Location Adjustment (Core Team) <span id="locationAdjustmentPercent">(0%)</span></td>
+                                <td style="text-align: right; padding: 8px 0; font-weight: bold;" id="locationAdjustmentDisplay">฿0</td>
+                            </tr>
+                            <tr style="border-bottom: 2px solid rgba(255,255,255,0.3);">
+                                <td style="padding: 8px 0;">4. Other Expenses</td>
+                                <td style="text-align: right; padding: 8px 0; font-weight: bold;" id="detailOtherExpenses">฿0</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 12px 0; font-size: 15px;"><strong>GRAND TOTAL:</strong></td>
+                                <td style="text-align: right; padding: 12px 0; font-size: 18px; font-weight: bold; color: #fef3c7;" id="grandTotalAmount">฿207,000</td>
+                            </tr>
+                        </table>
+                    </div>
+                    
+                    <!-- Final Grand Total -->
+                    <div style="text-align: center; margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.2); border-radius: 8px;">
+                        <div style="font-size: 14px; opacity: 0.9; margin-bottom: 5px;">💰 Grand Total Package Price</div>
+                        <div style="font-size: 36px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);" id="finalGrandTotal">฿207,000</div>
+                        <div style="font-size: 12px; opacity: 0.8; margin-top: 5px;">(Excluding VAT)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="saveConfiguration()">💾 Save Configuration</button>
+                <button class="btn" style="background: #059669; color: white;" onclick="loadConfiguration()">📂 Load Saved</button>
+                <button class="btn btn-success">✓ Add to Quote</button>
+                <button class="btn btn-warning" onclick="initializeFieldEngineeringResources()">👥 Load Default Team</button>
+                <button class="btn" style="background: #ef4444; color: white;" onclick="autoCorrectRates()">🔧 Fix Rate Errors</button>
+                <button class="btn btn-export" onclick="exportResourceAllocation()">📥 Export JSON</button>
+                <button class="btn" style="background: #8b5cf6; color: white;" onclick="exportToExcel()">📤 Export Excel</button>
+                <button class="btn" style="background: #6b7280; color: white;" onclick="resetAll()">🔄 Reset</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Employee Database
+const employees = [
+  {
+    id: 1,
+    name: 'Natcha Yodin',
+    position: 'Admin Officer',
+    department: 'Administration',
+    salary: 14000,
+    dailyRate: 467,
+    hourlyRate: 58,
+    otRate: 87,
+    email: 'natcha@addvaluesystemcompany.onmicrosoft.com',
+    phone: '0891234567',
+    birthdate: '1995-03-15',
+    address: '59/66 Moo 1 Ban Mai Sub-distric Pakkret city Nonthaburi Province 11120',
+    status: 'available'
+  },
+  {
+    id: 2,
+    name: 'Aurnchalee Meenak',
+    position: 'CFO',
+    department: 'Management',
+    salary: 50000,
+    dailyRate: 1667,
+    hourlyRate: 208,
+    otRate: 312,
+    email: 'aurnchalee@addvaluesystem.com',
+    phone: '0812345678',
+    birthdate: '1988-07-22',
+    address: '456 ถ.พหลโยธิน แขวงสามเสนใน เขตพญาไท กรุงเทพฯ 10400',
+    status: 'available'
+  },
+  {
+    id: 3,
+    name: 'Ratchaneekorn Mo-on',
+    position: 'Telecommunication Engineer',
+    department: 'Engineering',
+    salary: 24000,
+    dailyRate: 800,
+    hourlyRate: 100,
+    otRate: 150,
+    email: 'ratchaneekom@addvaluesystem.com',
+    phone: '0823456789',
+    birthdate: '1992-11-08',
+    address: '789 ถ.รามอินทรา แขวงอนุสาวรีย์ เขตบางเขน กรุงเทพฯ 10220',
+    status: 'available'
+  },
+  {
+    id: 4,
+    name: 'Sakda Wongjam',
+    position: 'Chief Telecommunication Engineer',
+    department: 'Engineering',
+    salary: 82000,
+    dailyRate: 2733,
+    hourlyRate: 342,
+    otRate: 513,
+    email: 'sakda@addvaluesystem.com',
+    phone: '0834567890',
+    birthdate: '1985-05-10',
+    address: '321 ถ.ลาดพร้าว แขวงจอมพล เขตจตุจักร กรุงเทพฯ 10900',
+    status: 'available'
+  },
+  {
+    id: 5,
+    name: 'Suriyapong Yoo-om-sin',
+    position: 'CEO',
+    department: 'Management',
+    salary: 120000,
+    dailyRate: 4000,
+    hourlyRate: 500,
+    otRate: 750,
+    email: 'suriyapong@addvaluesystem.com',
+    phone: '0845678901',
+    birthdate: '1980-12-25',
+    address: '654 ถ.เพชรบุรี แขวงถนนพญาไท เขตราชเทวี กรุงเทพฯ 10400',
+    status: 'available'
+  },
+  {
+    id: 6,
+    name: 'Suttirak Nunsong',
+    position: 'Senior Telecommunication Engineer',
+    department: 'Engineering',
+    salary: 36000,
+    dailyRate: 1200,
+    hourlyRate: 150,
+    otRate: 225,
+    email: 'suttirak@addvaluesystem.com',
+    phone: '0856789012',
+    birthdate: '1990-09-18',
+    address: '987 ถ.รัชดาภิเษก แขวงดินแดง เขตดินแดง กรุงเทพฯ 10400',
+    status: 'available'
+  },
+  {
+    id: 7,
+    name: 'Wasupol Amonthat',
+    position: 'Sales Representative',
+    department: 'Sales & Marketing',
+    salary: 18000,
+    dailyRate: 600,
+    hourlyRate: 75,
+    otRate: 113,
+    email: 'wasupol@addvaluesystem.com',
+    phone: '0867890123',
+    birthdate: '1993-06-30',
+    address: '147 ถ.วิภาวดีรังสิต แขวงสนามบิน เขตดอนเมือง กรุงเทพฯ 10210',
+    status: 'available'
+  },
+  {
+    id: 8,
+    name: 'Yuttapong Eakimphon',
+    position: 'Chief Telecommunication Technician',
+    department: 'Engineering',
+    salary: 37000,
+    dailyRate: 1233,
+    hourlyRate: 154,
+    otRate: 231,
+    email: 'yuttapong@addvaluesystem.com',
+    phone: '0878901234',
+    birthdate: '1991-02-14',
+    address: '258 ถ.พระราม 4 แขวงคลองเตย เขตคลองเตย กรุงเทพฯ 10110',
+    status: 'available'
+  }
+];
+
+// Position Mapping for Field Engineering Services
+const positionMapping = {
+  'Chief Telecommunication Engineer': {
+    defaultEmployee: 'Sakda Wongjam',
+    alternatives: [],
+    standardRate: 2733,
+    level: 'Chief'
+  },
+  'Senior Telecommunication Engineer': {
+    defaultEmployee: 'Suttirak Nunsong',
+    alternatives: [],
+    standardRate: 1200,
+    level: 'Senior'
+  },
+  'Telecommunication Engineer': {
+    defaultEmployee: 'Ratchaneekorn Mo-on',
+    alternatives: ['Ratchaneekom Mo-on'], // Alternative spelling
+    standardRate: 800,
+    level: 'Mid'
+  },
+  'Chief Telecommunication Technician': {
+    defaultEmployee: 'Yuttapong Eakimphon',
+    alternatives: [],
+    standardRate: 1233,
+    level: 'Chief'
+  },
+  'Lead Engineer': {
+    defaultEmployee: null,
+    alternatives: ['Sakda Wongjam', 'Suttirak Nunsong'],
+    standardRate: 2733,
+    level: 'Senior'
+  },
+  'Sr. Engineer': {
+    defaultEmployee: 'Suttirak Nunsong',
+    alternatives: [],
+    standardRate: 1200,
+    level: 'Senior'
+  },
+  'Engineer': {
+    defaultEmployee: null,
+    alternatives: ['Ratchaneekorn Mo-on'],
+    standardRate: 800,
+    level: 'Mid'
+  },
+  'Technician': {
+    defaultEmployee: null,
+    alternatives: ['Yuttapong Eakimphon'],
+    standardRate: 1233,
+    level: 'Junior'
+  },
+  // Admin positions
+  'Admin Officer': {
+    defaultEmployee: 'Natcha Yodin',
+    alternatives: [],
+    standardRate: 467,
+    level: 'Junior'
+  },
+  'Document Controller': {
+    defaultEmployee: null,
+    alternatives: ['Natcha Yodin'],
+    standardRate: 500,
+    level: 'Junior'
+  },
+  'Secretary': {
+    defaultEmployee: null,
+    alternatives: ['Natcha Yodin'],
+    standardRate: 450,
+    level: 'Junior'
+  },
+  'CAD Designer': {
+    defaultEmployee: null,
+    alternatives: [],
+    standardRate: 1000,
+    level: 'Mid'
+  }
+};
+
+// Function to get employee by name
+function getEmployeeByName(name) {
+  // Handle alternative spellings
+  const nameVariations = {
+    'Ratchaneekorn Mo-on': 'Ratchaneekom Mo-on',
+    'Ratchaneekom Mo-on': 'Ratchaneekorn Mo-on'
+  };
+  
+  let searchName = name;
+  if (nameVariations[name]) {
+    // Try both variations
+    let emp = employees.find(e => e.name === name);
+    if (!emp) {
+      emp = employees.find(e => e.name === nameVariations[name]);
+    }
+    return emp;
+  }
+  
+  return employees.find(e => e.name === name);
+}
+
+// Function to get employees by position
+function getEmployeesByPosition(position) {
+  return employees.filter(e => e.position === position);
+}
+
+// Function to get available employees
+function getAvailableEmployees() {
+  return employees.filter(e => e.status === 'available');
+}
+
+// Function to auto-assign employee to position
+function autoAssignEmployee(position) {
+  const mapping = positionMapping[position];
+  if (mapping) {
+    if (mapping.defaultEmployee) {
+      const emp = getEmployeeByName(mapping.defaultEmployee);
+      if (emp) {
+        // Return default employee regardless of status (will show status in UI)
+        return emp;
+      }
+    }
+    
+    // Try alternatives if default is not found
+    for (const altName of mapping.alternatives) {
+      const emp = getEmployeeByName(altName);
+      if (emp && emp.status === 'available') {
+        return emp;
+      }
+    }
+  }
+  
+  // If no mapping, try to find by position title
+  const availableByPosition = employees.filter(e => 
+    e.position.toLowerCase().includes(position.toLowerCase()) && 
+    e.status === 'available'
+  );
+  
+  if (availableByPosition.length > 0) {
+    return availableByPosition[0];
+  }
+  
+  return null;
+}
+
+// Update datetime
+function updateDateTime() {
+    const now = new Date();
+    document.getElementById('datetime').textContent = now.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    });
+}
+setInterval(updateDateTime, 1000);
+updateDateTime();
+
+// Toggle service group
+function toggleGroup(groupId) {
+    const group = document.getElementById(groupId);
+    group.style.display = group.style.display === 'none' ? 'block' : 'none';
+}
+
+// Switch tabs
+function switchTab(tab) {
+    const tabs = document.querySelectorAll('.nav-tab');
+    tabs.forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Show/hide document section based on tab
+    const docSection = document.getElementById('documentSection');
+    if (tab === 'document') {
+        docSection.style.display = 'block';
+    } else {
+        docSection.style.display = 'none';
+    }
+}
+
+// Select service
+function selectService(serviceCode) {
+    // Update UI
+    const items = document.querySelectorAll('.service-item');
+    items.forEach(item => item.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    
+    // Update selected service display
+    const serviceName = event.currentTarget.querySelector('span').textContent;
+    document.getElementById('selectedService').textContent = serviceName;
+    
+    // Show service details panel
+    showServiceDetails(serviceCode, serviceName);
+    
+    // Load service-specific configuration
+    loadServiceConfig(serviceCode);
+    
+    // Auto-load recommended team for this service
+    autoLoadServiceTeam(serviceCode);
+    
+    // Update recommendations
+    updateServiceRecommendations(serviceCode);
+    
+    // Show notification
+    showNotification(`📌 Selected: ${serviceName}`, 'info');
+}
+
+// Show service details in a popup
+function showServiceDetails(serviceCode, serviceName) {
+    // Service details data
+    const serviceDetails = {
+        'SURVEY': {
+            description: 'Site Survey & Assessment Service',
+            scope: [
+                'Site inspection and assessment',
+                'Equipment inventory and condition check',
+                'Infrastructure evaluation',
+                'Technical documentation',
+                'Risk assessment report'
+            ],
+            duration: '3-7 days',
+            deliverables: ['Survey Report', 'Photo Documentation', 'Equipment List', 'Recommendation'],
+            recommendedTeam: 'Chief Engineer (1), Engineer (2), Technician (1)'
+        },
+        'INSTALL': {
+            description: 'Installation & Configuration Service',
+            scope: [
+                'Equipment installation',
+                'System configuration',
+                'Cable termination',
+                'Testing and commissioning',
+                'Training for operators'
+            ],
+            duration: '5-15 days',
+            deliverables: ['Installation Report', 'Test Results', 'As-Built Drawings', 'Training Records'],
+            recommendedTeam: 'Chief Engineer (1), Sr. Engineer (1), Engineer (2), Technician (2)'
+        },
+        'MAINT': {
+            description: 'Preventive & Corrective Maintenance',
+            scope: [
+                'Routine inspection',
+                'Preventive maintenance',
+                'Troubleshooting',
+                'Parts replacement',
+                'System optimization'
+            ],
+            duration: '2-5 days',
+            deliverables: ['Maintenance Report', 'Parts List', 'Service Record'],
+            recommendedTeam: 'Sr. Engineer (1), Technician (2)'
+        },
+        'TROUBLE': {
+            description: 'Troubleshooting & Problem Resolution',
+            scope: [
+                'System diagnosis',
+                'Fault finding',
+                'Emergency repair',
+                'Root cause analysis',
+                'Corrective action'
+            ],
+            duration: '1-3 days',
+            deliverables: ['Fault Report', 'RCA Document', 'Repair Record'],
+            recommendedTeam: 'Sr. Engineer (1), Engineer (1), Technician (1)'
+        },
+        'FAT': {
+            description: 'Factory Acceptance Test',
+            scope: [
+                'Equipment inspection',
+                'Functional testing',
+                'Performance verification',
+                'Documentation review',
+                'Witness testing'
+            ],
+            duration: '2-5 days',
+            deliverables: ['FAT Report', 'Test Certificates', 'Punch List'],
+            recommendedTeam: 'Chief Engineer (1), Sr. Engineer (1)'
+        },
+        'SAT': {
+            description: 'Site Acceptance Test',
+            scope: [
+                'On-site testing',
+                'Integration testing',
+                'Performance validation',
+                'Compliance check',
+                'Final acceptance'
+            ],
+            duration: '3-7 days',
+            deliverables: ['SAT Report', 'Test Results', 'Acceptance Certificate'],
+            recommendedTeam: 'Chief Engineer (1), Sr. Engineer (1), Engineer (1)'
+        },
+        'FEED': {
+            description: 'Front End Engineering Design',
+            scope: [
+                'Conceptual design',
+                'Technical specifications',
+                'P&ID development',
+                'Cost estimation',
+                'Project planning'
+            ],
+            duration: '15-30 days',
+            deliverables: ['FEED Package', 'Design Basis', 'Cost Estimate', 'Project Schedule'],
+            recommendedTeam: 'Lead Engineer (1), Sr. Engineer (2), Engineer (3)'
+        }
+    };
+    
+    const details = serviceDetails[serviceCode] || {
+        description: serviceName,
+        scope: ['Service implementation'],
+        duration: '5 days',
+        deliverables: ['Service Report'],
+        recommendedTeam: 'Engineer (1)'
+    };
+    
+    // Create details panel
+    const detailsPanel = document.createElement('div');
+    detailsPanel.id = 'serviceDetailsPanel';
+    detailsPanel.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        z-index: 10001;
+        width: 600px;
+        max-height: 80vh;
+        overflow-y: auto;
+        animation: fadeIn 0.3s ease-out;
+    `;
+    
+    detailsPanel.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="color: #1e40af; margin: 0;">📋 ${serviceName}</h2>
+            <button onclick="closeServiceDetails()" style="background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">✕</button>
+        </div>
+        
+        <div style="color: #4b5563; margin-bottom: 15px; font-size: 14px;">
+            <strong>${details.description}</strong>
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <h4 style="color: #059669; margin-bottom: 8px;">📌 Scope of Work:</h4>
+            <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #4b5563;">
+                ${details.scope.map(item => `<li>${item}</li>`).join('')}
+            </ul>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
+            <div style="background: #f0f9ff; padding: 10px; border-radius: 6px;">
+                <strong style="color: #1e40af; font-size: 12px;">⏱️ Duration:</strong>
+                <div style="font-size: 14px; margin-top: 5px;">${details.duration}</div>
+            </div>
+            <div style="background: #fef3c7; padding: 10px; border-radius: 6px;">
+                <strong style="color: #92400e; font-size: 12px;">👥 Recommended Team:</strong>
+                <div style="font-size: 12px; margin-top: 5px;">${details.recommendedTeam}</div>
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <h4 style="color: #7c3aed; margin-bottom: 8px;">📦 Deliverables:</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                ${details.deliverables.map(item => `
+                    <span style="background: #ede9fe; color: #5b21b6; padding: 4px 10px; border-radius: 15px; font-size: 12px;">
+                        ${item}
+                    </span>
+                `).join('')}
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 10px;">
+            <button onclick="applyServiceTemplate('${serviceCode}')" style="flex: 1; background: #10b981; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                ✅ Apply This Service
+            </button>
+            <button onclick="closeServiceDetails()" style="flex: 1; background: #6b7280; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                Close
+            </button>
+        </div>
+    `;
+    
+    // Add backdrop
+    const backdrop = document.createElement('div');
+    backdrop.id = 'serviceDetailsBackdrop';
+    backdrop.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 10000;
+    `;
+    backdrop.onclick = closeServiceDetails;
+    
+    document.body.appendChild(backdrop);
+    document.body.appendChild(detailsPanel);
+}
+
+// Close service details panel
+function closeServiceDetails() {
+    const panel = document.getElementById('serviceDetailsPanel');
+    const backdrop = document.getElementById('serviceDetailsBackdrop');
+    if (panel) panel.remove();
+    if (backdrop) backdrop.remove();
+}
+
+// Apply service template
+function applyServiceTemplate(serviceCode) {
+    // Close details panel
+    closeServiceDetails();
+    
+    // Determine service type
+    let templateKey = 'field';
+    if (['FEED', 'PRE-FEED', 'DETAIL', 'VDRL', 'AS-BUILT'].includes(serviceCode)) {
+        templateKey = 'document';
+    } else if (['FAT', 'SAT', 'SIT', 'COMM', 'LOOP'].includes(serviceCode)) {
+        templateKey = 'testing';
+    }
+    
+    // Load team templates
+    loadTeamTemplate(templateKey, 'core');
+    
+    // Set service duration based on service type
+    const durations = {
+        'SURVEY': 5,
+        'INSTALL': 10,
+        'MAINT': 3,
+        'TROUBLE': 2,
+        'FAT': 3,
+        'SAT': 5,
+        'FEED': 20,
+        'DETAIL': 30
+    };
+    
+    document.getElementById('duration').value = durations[serviceCode] || 5;
+    
+    showNotification(`✅ ${serviceCode} template applied successfully!`, 'success');
+}
+
+// Auto-load service team
+function autoLoadServiceTeam(serviceCode) {
+    // Add highlight effect
+    const coreSection = document.getElementById('coreTeamSection');
+    if (coreSection) {
+        coreSection.style.border = '2px solid #3b82f6';
+        coreSection.style.borderRadius = '8px';
+        coreSection.style.padding = '5px';
+        setTimeout(() => {
+            coreSection.style.border = '';
+            coreSection.style.padding = '';
+        }, 2000);
+    }
+}
+
+// Update service recommendations
+function updateServiceRecommendations(serviceCode) {
+    const recommendationBox = document.getElementById('teamRecommendation');
+    if (recommendationBox) {
+        const recommendations = {
+            'SURVEY': 'Site Survey: Chief Engineer (1), Engineer (2), Technician (1) for 5 days',
+            'INSTALL': 'Installation: Chief Engineer (1), Sr. Engineer (1), Engineer (2), Technician (2) for 10 days',
+            'MAINT': 'Maintenance: Sr. Engineer (1), Technician (2) for 3 days',
+            'TROUBLE': 'Troubleshooting: Sr. Engineer (1), Engineer (1), Technician (1) for 2 days',
+            'FAT': 'FAT: Chief Engineer (1), Sr. Engineer (1) for 3 days',
+            'SAT': 'SAT: Chief Engineer (1), Sr. Engineer (1), Engineer (1) for 5 days'
+        };
+        
+        const recommendation = recommendations[serviceCode] || 'Standard team configuration';
+        recommendationBox.innerHTML = `
+            <strong style="color: #92400e;">💡 Recommended for ${serviceCode}:</strong>
+            <div style="margin-top: 5px; color: #78716c;">${recommendation}</div>
+        `;
+    }
+}
+
+// Load service configuration
+function loadServiceConfig(serviceCode) {
+    // This would load specific configurations based on service type
+    console.log('Loading configuration for:', serviceCode);
+    
+    // Show document section for document services
+    const docSection = document.getElementById('documentSection');
+    if (['PRE-FEED', 'FEED', 'DETAIL', 'VDRL', 'AS-BUILT'].includes(serviceCode)) {
+        docSection.style.display = 'block';
+    } else {
+        docSection.style.display = 'none';
+    }
+}
+
+// Add resource row with employee assignment
+function addResource() {
+    const table = document.getElementById('resourceTable');
+    const newRow = table.insertRow();
+    const rowId = 'resource-row-' + Date.now();
+    newRow.id = rowId;
+    
+    newRow.innerHTML = `
+        <td>
+            <select class="position-select" onchange="onPositionChange('${rowId}')">
+                <option value="">-- Select Position --</option>
+                <option value="Chief Telecommunication Engineer">Chief Telecom Engineer</option>
+                <option value="Senior Telecommunication Engineer">Sr. Telecom Engineer</option>
+                <option value="Telecommunication Engineer">Telecom Engineer</option>
+                <option value="Chief Telecommunication Technician">Chief Telecom Technician</option>
+                <option value="Lead Engineer">Lead Engineer</option>
+                <option value="Sr. Engineer">Sr. Engineer</option>
+                <option value="Engineer">Engineer</option>
+                <option value="Technician">Technician</option>
+            </select>
+        </td>
+        <td>
+            <select class="employee-select" style="width: 150px;" onchange="onEmployeeChange('${rowId}')">
+                <option value="">-- Select Employee --</option>
+            </select>
+        </td>
+        <td><input type="number" value="1" min="1" style="width: 50px;" class="qty-input" onchange="calculateRowTotal('${rowId}')"></td>
+        <td><input type="number" value="1" min="1" style="width: 50px;" class="days-input" onchange="calculateRowTotal('${rowId}')"></td>
+        <td><input type="number" value="0" style="width: 90px;" class="rate-input" onchange="calculateRowTotal('${rowId}')"></td>
+        <td class="man-hours">0</td>
+        <td class="subtotal" style="font-weight: bold; color: #059669;">฿0</td>
+        <td><button class="remove-btn" onclick="this.closest('tr').remove(); calculateTotals()">Remove</button></td>
+    `;
+}
+
+// Handle position change
+function onPositionChange(rowId) {
+    const row = document.getElementById(rowId);
+    const position = row.querySelector('.position-select').value;
+    const employeeSelect = row.querySelector('.employee-select');
+    
+    // Clear current selection
+    employeeSelect.innerHTML = '<option value="">-- Select Employee --</option>';
+    
+    if (position) {
+        // Try to auto-assign employee
+        const assignedEmployee = autoAssignEmployee(position);
+        
+        // Add all available employees as options
+        const availableEmps = getAvailableEmployees();
+        const busyEmps = employees.filter(e => e.status === 'busy');
+        
+        // Add recommended employee first if exists
+        if (assignedEmployee) {
+            const option = document.createElement('option');
+            option.value = assignedEmployee.id;
+            option.textContent = `⭐ ${assignedEmployee.name} (Recommended)`;
+            option.selected = true;
+            employeeSelect.appendChild(option);
+        }
+        
+        // Add separator
+        if (assignedEmployee && availableEmps.length > 1) {
+            const separator = document.createElement('option');
+            separator.disabled = true;
+            separator.textContent = '--- Other Available ---';
+            employeeSelect.appendChild(separator);
+        }
+        
+        // Add other available employees
+        availableEmps.forEach(emp => {
+            if (!assignedEmployee || emp.id !== assignedEmployee.id) {
+                const option = document.createElement('option');
+                option.value = emp.id;
+                option.textContent = `${emp.name} (${emp.position})`;
+                employeeSelect.appendChild(option);
+            }
+        });
+        
+        // Add busy employees with warning
+        if (busyEmps.length > 0) {
+            const separator = document.createElement('option');
+            separator.disabled = true;
+            separator.textContent = '--- Busy (On Project) ---';
+            employeeSelect.appendChild(separator);
+            
+            busyEmps.forEach(emp => {
+                const option = document.createElement('option');
+                option.value = emp.id;
+                option.textContent = `${emp.name} (${emp.position}) ⚠️`;
+                option.style.color = '#ef4444';
+                employeeSelect.appendChild(option);
+            });
+        }
+        
+        // If auto-assigned, update employee details
+        if (assignedEmployee) {
+            employeeSelect.value = assignedEmployee.id;
+            
+            // Special fix for Sr. Telecom Engineer rate
+            if (position === 'Senior Telecommunication Engineer') {
+                // Force correct rate for Sr. Telecom Engineer
+                row.querySelector('.rate-input').value = 1200;
+                console.log('Set Sr. Telecom Engineer rate to 1200');
+            } else {
+                onEmployeeChange(rowId);
+            }
+        }
+        
+        // Set standard rate if no employee assigned
+        if (!assignedEmployee && positionMapping[position]) {
+            let standardRate = positionMapping[position].standardRate;
+            
+            // Double-check for Sr. Telecom Engineer
+            if (position === 'Senior Telecommunication Engineer') {
+                standardRate = 1200; // Force correct rate
+            }
+            
+            row.querySelector('.rate-input').value = standardRate;
+            calculateRowTotal(rowId);
+        }
+    }
+}
+
+// Handle employee change
+function onEmployeeChange(rowId) {
+    const row = document.getElementById(rowId);
+    const employeeId = row.querySelector('.employee-select').value;
+    
+    if (employeeId) {
+        const employee = employees.find(e => e.id == employeeId);
+        if (employee) {
+            // Update rate with employee's actual daily rate
+            const rateInput = row.querySelector('.rate-input');
+            
+            // Special fix for Suttirak (Sr. Telecom Engineer)
+            if (employee.name === 'Suttirak Nunsong') {
+                rateInput.value = 1200; // Force correct rate, NOT 12000
+                console.log('Fixed Suttirak rate to 1200 (not 12000)');
+            } else {
+                rateInput.value = employee.dailyRate;
+            }
+            
+            // Validate rate to prevent errors
+            validateAndCorrectRate(rateInput, employee);
+            
+            // Apply location adjustment if active
+            const locationSelect = document.getElementById('location');
+            const selectedOption = locationSelect.options[locationSelect.selectedIndex];
+            if (selectedOption && selectedOption.value) {
+                const locationType = selectedOption.getAttribute('data-type');
+                if (locationType) {
+                    adjustPricingByLocation(locationType);
+                }
+            }
+            
+            calculateRowTotal(rowId);
+        }
+    }
+}
+
+// Validate and correct daily rate
+function validateAndCorrectRate(rateInput, employee) {
+    const currentRate = parseFloat(rateInput.value);
+    const expectedRate = employee ? employee.dailyRate : 0;
+    
+    // Check for common typing errors
+    if (employee) {
+        // If rate is abnormally high (like 11700 instead of 1200)
+        if (currentRate > expectedRate * 5) {
+            // Check if it's a typing error (extra digit)
+            const rateString = currentRate.toString();
+            const expectedString = expectedRate.toString();
+            
+            // Common errors: 11200 -> 1200, 11700 -> 1200, etc.
+            if (rateString.includes(expectedString)) {
+                console.warn(`Rate correction: ${currentRate} → ${expectedRate}`);
+                rateInput.value = expectedRate;
+                
+                // Flash to show correction
+                rateInput.style.backgroundColor = '#fee2e2';
+                setTimeout(() => {
+                    rateInput.style.backgroundColor = '#d1fae5';
+                    setTimeout(() => {
+                        rateInput.style.backgroundColor = 'white';
+                    }, 500);
+                }, 300);
+            }
+        }
+        
+        // Special case for Suttirak (Sr. Telecom Engineer)
+        if (employee.name === 'Suttirak Nunsong' && currentRate > 10000) {
+            rateInput.value = 1200; // Correct rate for Suttirak
+            console.warn('Corrected Suttirak rate to 1200');
+        }
+    }
+}
+
+// Add validation on rate input change
+function onRateInputChange(rowId) {
+    const row = document.getElementById(rowId);
+    const rateInput = row.querySelector('.rate-input');
+    const employeeSelect = row.querySelector('.employee-select');
+    
+    if (employeeSelect && employeeSelect.value) {
+        const employee = employees.find(e => e.id == employeeSelect.value);
+        if (employee) {
+            validateAndCorrectRate(rateInput, employee);
+        }
+    }
+    
+    calculateRowTotal(rowId);
+}
+
+// Calculate row total
+function calculateRowTotal(rowId) {
+    const row = document.getElementById(rowId);
+    const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+    const days = parseFloat(row.querySelector('.days-input').value) || 0;
+    const rate = parseFloat(row.querySelector('.rate-input').value) || 0;
+    
+    const manHours = qty * days * 8; // 8 hours per day
+    const subtotal = qty * days * rate;
+    
+    row.querySelector('.man-hours').textContent = manHours;
+    row.querySelector('.subtotal').textContent = `฿${subtotal.toLocaleString()}`;
+    
+    calculateTotals();
+}
+
+// Calculate totals
+function calculateTotals() {
+    let totalManDays = 0;
+    let totalManHours = 0;
+    let totalRawCost = 0;
+    
+    // Calculate from all team tables
+    const allTeamTables = ['coreTeamTable', 'supportTeamTable', 'adminTeamTable', 'resourceTable'];
+    
+    allTeamTables.forEach(tableId => {
+        const rows = document.querySelectorAll(`#${tableId} tr`);
+        rows.forEach(row => {
+            const qty = parseFloat(row.querySelector('.qty-input')?.value) || 0;
+            const days = parseFloat(row.querySelector('.days-input')?.value) || 0;
+            const rate = parseFloat(row.querySelector('.rate-input')?.value) || 0;
+            
+            totalManDays += qty * days;
+            totalManHours += qty * days * 8;
+            totalRawCost += qty * days * rate;
+        });
+    });
+    
+    // Calculate base service cost based on selected method
+    const method = document.getElementById('costCalculationMethod')?.value || 'standard';
+    let totalCost = totalRawCost;
+    
+    switch(method) {
+        case 'withMultiplier':
+            const multiplier = parseFloat(document.getElementById('costMultiplier')?.value) || 1.0;
+            totalCost = totalRawCost * multiplier;
+            document.getElementById('currentFormula').textContent = 
+                `Base Cost = Σ(Qty × Days × Daily Rate) × ${multiplier} = ฿${totalRawCost.toLocaleString()} × ${multiplier}`;
+            break;
+            
+        case 'withMinimum':
+            const minCharge = parseFloat(document.getElementById('minimumCharge')?.value) || 50000;
+            totalCost = Math.max(totalRawCost, minCharge);
+            document.getElementById('currentFormula').textContent = 
+                `Base Cost = MAX(฿${totalRawCost.toLocaleString()}, ฿${minCharge.toLocaleString()})`;
+            break;
+            
+        case 'custom':
+            const customValue = parseFloat(document.getElementById('baseServiceCostInput')?.value);
+            if (customValue && customValue > 0) {
+                totalCost = customValue;
+                document.getElementById('currentFormula').textContent = 
+                    `Base Cost = User Defined (฿${customValue.toLocaleString()})`;
+            }
+            break;
+            
+        default: // standard
+            totalCost = totalRawCost;
+            document.getElementById('currentFormula').textContent = 
+                `Base Cost = Σ(Qty × Days × Daily Rate) = ฿${totalRawCost.toLocaleString()}`;
+    }
+    
+    // Update base service cost input (if not custom)
+    if (method !== 'custom') {
+        const baseServiceCostInput = document.getElementById('baseServiceCostInput');
+        if (baseServiceCostInput) {
+            baseServiceCostInput.value = Math.round(totalCost);
+        }
+    }
+    
+    // Update cost breakdown table
+    updateCostBreakdownTable();
+    
+    // Update summary values
+    const summaryValues = document.querySelectorAll('.summary-value');
+    if (summaryValues.length >= 3) {
+        summaryValues[0].textContent = totalManDays;
+        summaryValues[1].textContent = totalManHours;
+        summaryValues[2].textContent = `฿${Math.round(totalCost).toLocaleString()}`;
+    }
+    
+    // Calculate management fee based on percentage
+    const managementPercent = parseFloat(document.getElementById('managementFeePercent')?.value) || 15;
+    const managementFee = totalCost * (managementPercent / 100);
+    
+    // Update management fee amount
+    const managementFeeAmount = document.getElementById('managementFeeAmount');
+    if (managementFeeAmount) {
+        managementFeeAmount.value = Math.round(managementFee);
+    }
+    
+    // Update management fee label with percentage
+    const managementFeeLabel = document.getElementById('managementFeeLabel');
+    if (managementFeeLabel) {
+        managementFeeLabel.textContent = `Management Fee (${managementPercent}%)`;
+    }
+    
+    if (summaryValues.length >= 4) {
+        summaryValues[3].textContent = `฿${Math.round(managementFee).toLocaleString()}`;
+    }
+    
+    // Update formula display
+    const formulaPercent = document.getElementById('formulaPercent');
+    if (formulaPercent) {
+        formulaPercent.textContent = managementPercent;
+    }
+    
+    const formulaPercentDecimal = document.getElementById('formulaPercentDecimal');
+    if (formulaPercentDecimal) {
+        formulaPercentDecimal.textContent = (managementPercent / 100).toFixed(2);
+    }
+    
+    const formulaServiceCost = document.getElementById('formulaServiceCost');
+    if (formulaServiceCost) {
+        formulaServiceCost.textContent = `฿${Math.round(totalCost).toLocaleString()}`;
+    }
+    
+    const formulaManagementFee = document.getElementById('formulaManagementFee');
+    if (formulaManagementFee) {
+        formulaManagementFee.textContent = `฿${Math.round(managementFee).toLocaleString()}`;
+    }
+    
+    // Update detail breakdown
+    const detailServiceCost = document.getElementById('detailServiceCost');
+    if (detailServiceCost) {
+        detailServiceCost.textContent = `฿${Math.round(totalCost).toLocaleString()}`;
+    }
+    
+    const detailManagementPercent = document.getElementById('detailManagementPercent');
+    if (detailManagementPercent) {
+        detailManagementPercent.textContent = managementPercent;
+    }
+    
+    const detailManagementFee = document.getElementById('detailManagementFee');
+    if (detailManagementFee) {
+        detailManagementFee.textContent = `฿${Math.round(managementFee).toLocaleString()}`;
+    }
+    
+    // Get other expenses
+    const otherExpenses = parseFloat(document.getElementById('otherExpenses')?.value) || 0;
+    const detailOtherExpenses = document.getElementById('detailOtherExpenses');
+    if (detailOtherExpenses) {
+        detailOtherExpenses.textContent = `฿${otherExpenses.toLocaleString()}`;
+    }
+    
+    // Get location adjustment (calculated from Core Team only)
+    let locationAdjustmentAmount = 0;
+    
+    // Check if location is selected and calculate adjustment
+    const locationSelect = document.getElementById('location');
+    const selectedOption = locationSelect?.options[locationSelect.selectedIndex];
+    if (selectedOption && selectedOption.value) {
+        const locationType = selectedOption.getAttribute('data-type');
+        
+        // Get adjustment percentage based on location type
+        let adjustmentPercent = 0;
+        if (locationType === 'offshore') {
+            adjustmentPercent = parseFloat(document.getElementById('offshoreAdjust')?.value) || 30;
+        } else if (locationType === 'onshore') {
+            adjustmentPercent = parseFloat(document.getElementById('onshoreAdjust')?.value) || 30;
+        } else if (locationType === 'document') {
+            adjustmentPercent = parseFloat(document.getElementById('documentAdjust')?.value) || 0;
+        }
+        
+        // Calculate Core Team cost only
+        let coreTeamCost = 0;
+        const coreRows = document.querySelectorAll('#coreTeamTable tr');
+        coreRows.forEach(row => {
+            const qty = parseFloat(row.querySelector('.qty-input')?.value) || 0;
+            const days = parseFloat(row.querySelector('.days-input')?.value) || 0;
+            const rate = parseFloat(row.querySelector('.rate-input')?.value) || 0;
+            coreTeamCost += qty * days * rate;
+        });
+        
+        // Location adjustment = Core Team Cost * adjustment percentage
+        locationAdjustmentAmount = coreTeamCost * (adjustmentPercent / 100);
+        
+        // Update location adjustment input
+        const locationAdjustmentInput = document.getElementById('locationAdjustmentInput');
+        if (locationAdjustmentInput) {
+            locationAdjustmentInput.value = Math.round(locationAdjustmentAmount);
+        }
+        
+        // Update location adjustment display
+        const locationAdjustmentDisplay = document.getElementById('locationAdjustmentDisplay');
+        if (locationAdjustmentDisplay) {
+            locationAdjustmentDisplay.textContent = `฿${Math.round(locationAdjustmentAmount).toLocaleString()}`;
+        }
+        
+        // Update percentage display
+        const locationAdjustmentPercentElem = document.getElementById('locationAdjustmentPercent');
+        if (locationAdjustmentPercentElem) {
+            locationAdjustmentPercentElem.textContent = `(${adjustmentPercent > 0 ? '+' : ''}${adjustmentPercent}% of Core)`;
+        }
+    } else {
+        // No location selected, set to 0
+        const locationAdjustmentInput = document.getElementById('locationAdjustmentInput');
+        if (locationAdjustmentInput) {
+            locationAdjustmentInput.value = 0;
+        }
+        const locationAdjustmentDisplay = document.getElementById('locationAdjustmentDisplay');
+        if (locationAdjustmentDisplay) {
+            locationAdjustmentDisplay.textContent = '฿0';
+        }
+    }
+    
+    // Calculate Grand Total
+    const grandTotal = totalCost + managementFee + locationAdjustmentAmount + otherExpenses;
+    
+    // Update Grand Total in multiple places
+    const grandTotalAmount = document.getElementById('grandTotalAmount');
+    if (grandTotalAmount) {
+        grandTotalAmount.textContent = `฿${Math.round(grandTotal).toLocaleString()}`;
+    }
+    
+    const finalGrandTotal = document.getElementById('finalGrandTotal');
+    if (finalGrandTotal) {
+        finalGrandTotal.textContent = `฿${Math.round(grandTotal).toLocaleString()}`;
+    }
+}
+
+// Update management fee when percentage changes
+function updateManagementFee() {
+    calculateTotals();
+}
+
+// Team management functions
+const teamTemplates = {
+    'field': {
+        core: [
+            { position: 'Chief Telecommunication Engineer', qty: 1, days: 5 },
+            { position: 'Senior Telecommunication Engineer', qty: 1, days: 5 },
+            { position: 'Telecommunication Engineer', qty: 2, days: 5 },
+            { position: 'Chief Telecommunication Technician', qty: 1, days: 5 }
+        ],
+        support: [
+            { position: 'Technician', qty: 2, days: 3 },
+            { position: 'Engineer', qty: 1, days: 2 }
+        ],
+        admin: [
+            { position: 'Admin Officer', qty: 1, days: 5 }
+        ]
+    },
+    'document': {
+        core: [
+            { position: 'Lead Engineer', qty: 1, days: 10 },
+            { position: 'Senior Telecommunication Engineer', qty: 2, days: 10 },
+            { position: 'Engineer', qty: 3, days: 10 }
+        ],
+        support: [
+            { position: 'CAD Designer', qty: 2, days: 5 },
+            { position: 'Technician', qty: 1, days: 5 }
+        ],
+        admin: [
+            { position: 'Admin Officer', qty: 1, days: 10 },
+            { position: 'Document Controller', qty: 1, days: 10 }
+        ]
+    },
+    'testing': {
+        core: [
+            { position: 'Chief Telecommunication Engineer', qty: 1, days: 3 },
+            { position: 'Senior Telecommunication Engineer', qty: 2, days: 5 },
+            { position: 'Telecommunication Engineer', qty: 2, days: 5 }
+        ],
+        support: [
+            { position: 'Chief Telecommunication Technician', qty: 2, days: 5 },
+            { position: 'Technician', qty: 3, days: 5 }
+        ],
+        admin: [
+            { position: 'Admin Officer', qty: 1, days: 3 }
+        ]
+    }
+};
+
+// Switch between team tabs
+function switchTeamTab(team) {
+    // Update tab styles
+    const tabs = document.querySelectorAll('.team-tab');
+    tabs.forEach(tab => {
+        tab.style.background = '#e5e7eb';
+        tab.style.color = '#4b5563';
+    });
+    
+    // Set active tab
+    event.target.style.background = team === 'core' ? '#3b82f6' : 
+                                   team === 'support' ? '#f59e0b' : '#10b981';
+    event.target.style.color = 'white';
+    
+    // Hide all sections
+    document.getElementById('coreTeamSection').style.display = 'none';
+    document.getElementById('supportTeamSection').style.display = 'none';
+    document.getElementById('adminTeamSection').style.display = 'none';
+    
+    // Show selected section
+    document.getElementById(`${team}TeamSection`).style.display = 'block';
+    
+    // Update recommendations
+    updateTeamRecommendations(team);
+}
+
+// Update team recommendations based on service type
+function updateTeamRecommendations(team) {
+    const recommendationBox = document.getElementById('teamRecommendation');
+    const serviceType = document.getElementById('selectedService')?.textContent || 'Field Engineering';
+    
+    let templateKey = 'field';
+    if (serviceType.includes('Document')) templateKey = 'document';
+    if (serviceType.includes('Test') || serviceType.includes('Commission')) templateKey = 'testing';
+    
+    const template = teamTemplates[templateKey][team];
+    
+    let html = `<strong style="color: #92400e;">💡 Recommended ${team.charAt(0).toUpperCase() + team.slice(1)} Team:</strong>`;
+    html += `<div style="margin-top: 5px; color: #78716c;">`;
+    
+    template.forEach(member => {
+        html += `${member.position} (${member.qty} person${member.qty > 1 ? 's' : ''} × ${member.days} days), `;
+    });
+    
+    html = html.slice(0, -2) + '</div>';
+    
+    if (team === 'core') {
+        html += `<button onclick="loadTeamTemplate('${templateKey}', 'core')" style="margin-top: 5px; padding: 4px 8px; background: #3b82f6; color: white; border: none; border-radius: 3px; font-size: 10px; cursor: pointer;">Apply Core Template</button>`;
+    } else if (team === 'support') {
+        html += `<button onclick="loadTeamTemplate('${templateKey}', 'support')" style="margin-top: 5px; padding: 4px 8px; background: #f59e0b; color: white; border: none; border-radius: 3px; font-size: 10px; cursor: pointer;">Apply Support Template</button>`;
+    } else {
+        html += `<button onclick="loadTeamTemplate('${templateKey}', 'admin')" style="margin-top: 5px; padding: 4px 8px; background: #10b981; color: white; border: none; border-radius: 3px; font-size: 10px; cursor: pointer;">Apply Admin Template</button>`;
+    }
+    
+    recommendationBox.innerHTML = html;
+}
+
+// Add resource to specific team
+function addResourceToTeam(teamType) {
+    const tableId = `${teamType}TeamTable`;
+    const table = document.getElementById(tableId);
+    const newRow = table.insertRow();
+    const rowId = `${teamType}-row-${Date.now()}`;
+    newRow.id = rowId;
+    newRow.setAttribute('data-team', teamType);
+    
+    newRow.innerHTML = `
+        <td>
+            <select class="position-select" onchange="onPositionChange('${rowId}')">
+                <option value="">-- Select Position --</option>
+                ${teamType === 'admin' ? 
+                    `<option value="Admin Officer">Admin Officer</option>
+                     <option value="Document Controller">Document Controller</option>
+                     <option value="Secretary">Secretary</option>` :
+                    `<option value="Chief Telecommunication Engineer">Chief Telecom Engineer</option>
+                     <option value="Senior Telecommunication Engineer">Sr. Telecom Engineer</option>
+                     <option value="Telecommunication Engineer">Telecom Engineer</option>
+                     <option value="Chief Telecommunication Technician">Chief Telecom Technician</option>
+                     <option value="Lead Engineer">Lead Engineer</option>
+                     <option value="Sr. Engineer">Sr. Engineer</option>
+                     <option value="Engineer">Engineer</option>
+                     <option value="Technician">Technician</option>`
+                }
+            </select>
+        </td>
+        <td>
+            <select class="employee-select" style="width: 150px;" onchange="onEmployeeChange('${rowId}')">
+                <option value="">-- Select Employee --</option>
+            </select>
+        </td>
+        <td><input type="number" value="1" min="1" style="width: 50px;" class="qty-input" onchange="calculateRowTotal('${rowId}')"></td>
+        <td><input type="number" value="1" min="1" style="width: 50px;" class="days-input" onchange="calculateRowTotal('${rowId}')"></td>
+        <td><input type="number" value="0" style="width: 90px;" class="rate-input" onchange="calculateRowTotal('${rowId}')"></td>
+        <td class="man-hours">0</td>
+        <td class="subtotal" style="font-weight: bold; color: #059669;">฿0</td>
+        <td><button class="remove-btn" onclick="this.closest('tr').remove(); calculateAllTeamsTotals()">Remove</button></td>
+    `;
+}
+
+// Load team template
+function loadTeamTemplate(serviceType, teamType) {
+    const template = teamTemplates[serviceType][teamType];
+    const tableId = `${teamType}TeamTable`;
+    const table = document.getElementById(tableId);
+    
+    // Clear existing rows
+    table.innerHTML = '';
+    
+    // Add template members
+    template.forEach((member, index) => {
+        setTimeout(() => {
+            addResourceToTeam(teamType);
+            const rows = table.querySelectorAll('tr');
+            const lastRow = rows[rows.length - 1];
+            
+            // Set position
+            lastRow.querySelector('.position-select').value = member.position;
+            onPositionChange(lastRow.id);
+            
+            // Set qty and days
+            setTimeout(() => {
+                lastRow.querySelector('.qty-input').value = member.qty;
+                lastRow.querySelector('.days-input').value = member.days;
+                
+                // Special check for Sr. Telecom Engineer rate
+                const rateInput = lastRow.querySelector('.rate-input');
+                if (member.position === 'Senior Telecommunication Engineer') {
+                    // Force correct rate for Suttirak
+                    rateInput.value = 1200;
+                    console.log('Set Sr. Telecom Engineer rate to 1200');
+                }
+                
+                // Validate all rates to prevent errors
+                const currentRate = parseFloat(rateInput.value);
+                if (currentRate > 10000) {
+                    // Check position and correct if needed
+                    const position = member.position;
+                    const mapping = positionMapping[position];
+                    if (mapping) {
+                        rateInput.value = mapping.standardRate;
+                        console.warn(`Corrected abnormal rate: ${currentRate} → ${mapping.standardRate}`);
+                    }
+                }
+                
+                calculateRowTotal(lastRow.id);
+            }, 100);
+        }, index * 200);
+    });
+}
+
+// Auto-correct known rate errors
+function autoCorrectRates() {
+    // Check all rate inputs in all teams
+    const allRateInputs = document.querySelectorAll('.rate-input');
+    
+    allRateInputs.forEach(input => {
+        const rate = parseFloat(input.value);
+        const row = input.closest('tr');
+        
+        if (row) {
+            const positionSelect = row.querySelector('.position-select');
+            const employeeSelect = row.querySelector('.employee-select');
+            
+            if (positionSelect) {
+                const position = positionSelect.value;
+                
+                // Special case: Sr. Telecom Engineer should be 1200, not 11700 or 12000
+                if (position === 'Senior Telecommunication Engineer' && rate > 10000) {
+                    input.value = 1200;
+                    input.style.backgroundColor = '#fee2e2';
+                    setTimeout(() => {
+                        input.style.backgroundColor = '#d1fae5';
+                        setTimeout(() => {
+                            input.style.backgroundColor = 'white';
+                        }, 500);
+                    }, 300);
+                    console.warn(`Auto-corrected Sr. Telecom Engineer rate: ${rate} → 1200`);
+                }
+                
+                // Check if rate is unreasonably high
+                if (rate > 10000 && position !== 'CEO' && position !== 'CFO') {
+                    const mapping = positionMapping[position];
+                    if (mapping) {
+                        input.value = mapping.standardRate;
+                        console.warn(`Corrected abnormal rate for ${position}: ${rate} → ${mapping.standardRate}`);
+                    }
+                }
+            }
+        }
+    });
+    
+    // Recalculate after corrections
+    calculateTotals();
+}
+
+// Show team summary
+function showTeamSummary() {
+    let coreTotal = 0, supportTotal = 0, adminTotal = 0;
+    let coreHours = 0, supportHours = 0, adminHours = 0;
+    let coreCount = 0, supportCount = 0, adminCount = 0;
+    
+    // Calculate Core Team
+    document.querySelectorAll('#coreTeamTable tr').forEach(row => {
+        const subtotalText = row.querySelector('.subtotal')?.textContent.replace('฿', '').replace(/,/g, '');
+        const manHours = parseFloat(row.querySelector('.man-hours')?.textContent) || 0;
+        if (subtotalText) {
+            coreTotal += parseFloat(subtotalText) || 0;
+            coreHours += manHours;
+            coreCount++;
+        }
+    });
+    
+    // Calculate Support Team
+    document.querySelectorAll('#supportTeamTable tr').forEach(row => {
+        const subtotalText = row.querySelector('.subtotal')?.textContent.replace('฿', '').replace(/,/g, '');
+        const manHours = parseFloat(row.querySelector('.man-hours')?.textContent) || 0;
+        if (subtotalText) {
+            supportTotal += parseFloat(subtotalText) || 0;
+            supportHours += manHours;
+            supportCount++;
+        }
+    });
+    
+    // Calculate Admin Team
+    document.querySelectorAll('#adminTeamTable tr').forEach(row => {
+        const subtotalText = row.querySelector('.subtotal')?.textContent.replace('฿', '').replace(/,/g, '');
+        const manHours = parseFloat(row.querySelector('.man-hours')?.textContent) || 0;
+        if (subtotalText) {
+            adminTotal += parseFloat(subtotalText) || 0;
+            adminHours += manHours;
+            adminCount++;
+        }
+    });
+    
+    const totalCost = coreTotal + supportTotal + adminTotal;
+    const totalHours = coreHours + supportHours + adminHours;
+    const totalPeople = coreCount + supportCount + adminCount;
+    
+    // Create summary popup
+    const summaryHtml = `
+        <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+                    background: white; padding: 20px; border-radius: 8px; 
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 10000; width: 500px;">
+            <h3 style="margin-bottom: 15px; color: #1e40af;">📊 Team Summary Report</h3>
+            
+            <table style="width: 100%; font-size: 12px; border-collapse: collapse;">
+                <tr style="background: #f3f4f6;">
+                    <th style="padding: 8px; text-align: left;">Team Type</th>
+                    <th style="padding: 8px; text-align: center;">People</th>
+                    <th style="padding: 8px; text-align: center;">Man-Hours</th>
+                    <th style="padding: 8px; text-align: right;">Cost (THB)</th>
+                </tr>
+                <tr style="border-bottom: 1px solid #e5e7eb;">
+                    <td style="padding: 8px;"><strong style="color: #3b82f6;">🎯 Core Team</strong></td>
+                    <td style="padding: 8px; text-align: center;">${coreCount}</td>
+                    <td style="padding: 8px; text-align: center;">${coreHours}</td>
+                    <td style="padding: 8px; text-align: right;">฿${coreTotal.toLocaleString()}</td>
+                </tr>
+                <tr style="border-bottom: 1px solid #e5e7eb;">
+                    <td style="padding: 8px;"><strong style="color: #f59e0b;">🛠️ Support Team</strong></td>
+                    <td style="padding: 8px; text-align: center;">${supportCount}</td>
+                    <td style="padding: 8px; text-align: center;">${supportHours}</td>
+                    <td style="padding: 8px; text-align: right;">฿${supportTotal.toLocaleString()}</td>
+                </tr>
+                <tr style="border-bottom: 2px solid #e5e7eb;">
+                    <td style="padding: 8px;"><strong style="color: #10b981;">📋 Admin Team</strong></td>
+                    <td style="padding: 8px; text-align: center;">${adminCount}</td>
+                    <td style="padding: 8px; text-align: center;">${adminHours}</td>
+                    <td style="padding: 8px; text-align: right;">฿${adminTotal.toLocaleString()}</td>
+                </tr>
+                <tr style="background: #dbeafe;">
+                    <td style="padding: 10px;"><strong>TOTAL</strong></td>
+                    <td style="padding: 10px; text-align: center;"><strong>${totalPeople}</strong></td>
+                    <td style="padding: 10px; text-align: center;"><strong>${totalHours}</strong></td>
+                    <td style="padding: 10px; text-align: right; font-size: 14px;"><strong>฿${totalCost.toLocaleString()}</strong></td>
+                </tr>
+            </table>
+            
+            <div style="margin-top: 15px; padding: 10px; background: #fef3c7; border-radius: 4px;">
+                <strong>💡 Efficiency Metrics:</strong><br>
+                <span style="font-size: 11px;">
+                • Core Team: ${((coreTotal/totalCost)*100).toFixed(1)}% of total cost<br>
+                • Support Team: ${((supportTotal/totalCost)*100).toFixed(1)}% of total cost<br>
+                • Admin Team: ${((adminTotal/totalCost)*100).toFixed(1)}% of total cost<br>
+                • Average cost per person: ฿${Math.round(totalCost/totalPeople).toLocaleString()}
+                </span>
+            </div>
+            
+            <button onclick="this.parentElement.remove()" 
+                    style="margin-top: 15px; padding: 8px 16px; background: #6b7280; color: white; 
+                           border: none; border-radius: 4px; cursor: pointer;">Close</button>
+        </div>
+        <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; 
+                    background: rgba(0,0,0,0.5); z-index: 9999;" 
+             onclick="this.remove(); this.previousElementSibling.remove()"></div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', summaryHtml);
+}
+
+// Calculate all teams totals
+function calculateAllTeamsTotals() {
+    calculateTotals();
+}
+
+// Update cost calculation method
+function updateCostCalculation() {
+    const method = document.getElementById('costCalculationMethod').value;
+    const additionalParams = document.getElementById('additionalParameters');
+    const currentFormula = document.getElementById('currentFormula');
+    
+    switch(method) {
+        case 'standard':
+            currentFormula.textContent = 'Base Cost = Σ(Qty × Days × Daily Rate)';
+            additionalParams.style.display = 'none';
+            break;
+        case 'withMultiplier':
+            currentFormula.textContent = 'Base Cost = Σ(Qty × Days × Daily Rate) × Multiplier';
+            additionalParams.style.display = 'block';
+            break;
+        case 'withMinimum':
+            currentFormula.textContent = 'Base Cost = MAX(Σ(Qty × Days × Daily Rate), Minimum Charge)';
+            additionalParams.style.display = 'block';
+            break;
+        case 'custom':
+            currentFormula.textContent = 'Base Cost = User Defined Value';
+            additionalParams.style.display = 'none';
+            break;
+    }
+    calculateTotals();
+}
+
+// Override base service cost manually
+function overrideBaseServiceCost() {
+    const method = document.getElementById('costCalculationMethod');
+    method.value = 'custom';
+    updateCostCalculation();
+}
+
+// Reset base service cost to auto-calculated
+function resetBaseServiceCost() {
+    const method = document.getElementById('costCalculationMethod');
+    method.value = 'standard';
+    updateCostCalculation();
+    calculateTotals();
+}
+
+// Update cost breakdown table
+function updateCostBreakdownTable() {
+    const tbody = document.getElementById('costBreakdownTable');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '';
+    
+    const allTeamTables = ['coreTeamTable', 'supportTeamTable', 'adminTeamTable', 'resourceTable'];
+    let totalRawCost = 0;
+    let teamCosts = { core: 0, support: 0, admin: 0 };
+    
+    allTeamTables.forEach(tableId => {
+        const rows = document.querySelectorAll(`#${tableId} tr`);
+        let teamSubtotal = 0;
+        
+        rows.forEach(row => {
+            const positionSelect = row.querySelector('.position-select');
+            const employeeSelect = row.querySelector('.employee-select');
+            const qtyInput = row.querySelector('.qty-input');
+            const daysInput = row.querySelector('.days-input');
+            const rateInput = row.querySelector('.rate-input');
+            
+            if (positionSelect && qtyInput && daysInput && rateInput) {
+                const position = positionSelect.value || '-';
+                const employee = employeeSelect?.options[employeeSelect.selectedIndex]?.text.replace(' (Recommended)', '').replace('⭐ ', '') || '-';
+                const qty = parseFloat(qtyInput.value) || 0;
+                const days = parseFloat(daysInput.value) || 0;
+                const rate = parseFloat(rateInput.value) || 0;
+                const subtotal = qty * days * rate;
+                
+                if (position !== '-' && subtotal > 0) {
+                    const tr = document.createElement('tr');
+                    let teamLabel = '';
+                    let teamColor = '';
+                    
+                    if (tableId === 'coreTeamTable') {
+                        teamLabel = '🎯';
+                        teamColor = '#3b82f6';
+                        teamCosts.core += subtotal;
+                    } else if (tableId === 'supportTeamTable') {
+                        teamLabel = '🛠️';
+                        teamColor = '#f59e0b';
+                        teamCosts.support += subtotal;
+                    } else if (tableId === 'adminTeamTable') {
+                        teamLabel = '📋';
+                        teamColor = '#10b981';
+                        teamCosts.admin += subtotal;
+                    }
+                    
+                    tr.innerHTML = `
+                        <td style="padding: 4px; border-bottom: 1px solid #f3f4f6;">
+                            <span style="color: ${teamColor};">${teamLabel}</span> ${position.substring(0, 20)}...
+                        </td>
+                        <td style="padding: 4px; border-bottom: 1px solid #f3f4f6; text-align: center;">${qty}</td>
+                        <td style="padding: 4px; border-bottom: 1px solid #f3f4f6; text-align: center;">${days}</td>
+                        <td style="padding: 4px; border-bottom: 1px solid #f3f4f6; text-align: right;">฿${rate.toLocaleString()}</td>
+                        <td style="padding: 4px; border-bottom: 1px solid #f3f4f6; text-align: right; font-weight: bold;">฿${subtotal.toLocaleString()}</td>
+                    `;
+                    tbody.appendChild(tr);
+                    teamSubtotal += subtotal;
+                    totalRawCost += subtotal;
+                }
+            }
+        });
+    });
+    
+    // Add team subtotals
+    if (teamCosts.core > 0) {
+        const coreRow = document.createElement('tr');
+        coreRow.innerHTML = `
+            <td colspan="4" style="padding: 4px; background: #dbeafe; color: #1e40af; font-weight: bold;">Core Team Subtotal:</td>
+            <td style="padding: 4px; text-align: right; font-weight: bold; background: #dbeafe; color: #1e40af;">฿${teamCosts.core.toLocaleString()}</td>
+        `;
+        tbody.appendChild(coreRow);
+    }
+    
+    if (teamCosts.support > 0) {
+        const supportRow = document.createElement('tr');
+        supportRow.innerHTML = `
+            <td colspan="4" style="padding: 4px; background: #fef3c7; color: #92400e; font-weight: bold;">Support Team Subtotal:</td>
+            <td style="padding: 4px; text-align: right; font-weight: bold; background: #fef3c7; color: #92400e;">฿${teamCosts.support.toLocaleString()}</td>
+        `;
+        tbody.appendChild(supportRow);
+    }
+    
+    if (teamCosts.admin > 0) {
+        const adminRow = document.createElement('tr');
+        adminRow.innerHTML = `
+            <td colspan="4" style="padding: 4px; background: #d1fae5; color: #065f46; font-weight: bold;">Admin Team Subtotal:</td>
+            <td style="padding: 4px; text-align: right; font-weight: bold; background: #d1fae5; color: #065f46;">฿${teamCosts.admin.toLocaleString()}</td>
+        `;
+        tbody.appendChild(adminRow);
+    }
+    
+    // Add total row
+    if (tbody.children.length > 0) {
+        const totalRow = document.createElement('tr');
+        totalRow.innerHTML = `
+            <td colspan="4" style="padding: 6px; font-weight: bold; background: #1e40af; color: white;">GRAND TOTAL:</td>
+            <td style="padding: 6px; text-align: right; font-weight: bold; background: #1e40af; color: white; font-size: 12px;">฿${totalRawCost.toLocaleString()}</td>
+        `;
+        tbody.appendChild(totalRow);
+    } else {
+        tbody.innerHTML = '<tr><td colspan="5" style="padding: 8px; text-align: center; color: #6b7280;">No resources added yet</td></tr>';
+    }
+}
+
+// Initialize default resources for Field Engineering Service
+function initializeFieldEngineeringResources() {
+    // Clear existing rows in all teams
+    document.getElementById('coreTeamTable').innerHTML = '';
+    document.getElementById('supportTeamTable').innerHTML = '';
+    document.getElementById('adminTeamTable').innerHTML = '';
+    
+    // Show core team tab
+    document.getElementById('coreTeamSection').style.display = 'block';
+    document.getElementById('supportTeamSection').style.display = 'none';
+    document.getElementById('adminTeamSection').style.display = 'none';
+    
+    // Update tab styles
+    const tabs = document.querySelectorAll('.team-tab');
+    tabs.forEach((tab, index) => {
+        if (index === 0) { // Core team tab
+            tab.style.background = '#3b82f6';
+            tab.style.color = 'white';
+        } else {
+            tab.style.background = '#e5e7eb';
+            tab.style.color = '#4b5563';
+        }
+    });
+    
+    // Load default core team template
+    loadTeamTemplate('field', 'core');
+    
+    // Optionally load other teams
+    setTimeout(() => {
+        if (confirm('Do you want to add default Support Team?')) {
+            loadTeamTemplate('field', 'support');
+        }
+    }, 1500);
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('AVS Service Catalog System loaded');
+    console.log('Employee Database loaded:', employees.length, 'employees');
+    
+    // Fix Suttirak's rate to ensure it's 1200, not 12000
+    const suttirak = employees.find(e => e.name === 'Suttirak Nunsong');
+    if (suttirak) {
+        suttirak.dailyRate = 1200; // Force correct rate
+        console.log('Fixed Suttirak rate to 1200');
+    }
+    
+    initializeLocationData();
+    initializeFieldEngineeringResources();
+    
+    // Add employee quick view panel
+    addEmployeeQuickView();
+    
+    // Run auto-correct after initialization
+    setTimeout(() => {
+        autoCorrectRates();
+    }, 1000);
+});
+
+// Location Data from Location Dashboard v4
+const locationData = {
+    thailand: {
+        name: '🇹🇭 Thailand',
+        locations: [
+            { id: 'th-g1', name: 'G1 Platform', type: 'offshore', details: 'Platong, Erawan, Satun, Funan' },
+            { id: 'th-g2', name: 'G2 Platform', type: 'offshore', details: 'G2N, G2S, Arthit' },
+            { id: 'th-bualuang', name: 'Bualuang Field', type: 'offshore', details: 'Alpha, Bravo' },
+            { id: 'th-gcme', name: 'GCME Platform', type: 'offshore', details: 'Arthit South' },
+            { id: 'th-bkk', name: 'Bangkok DCC', type: 'document', details: 'Main, VDRL, ESO, PMO' }
+        ]
+    },
+    myanmar: {
+        name: '🇲🇲 Myanmar',
+        locations: [
+            { id: 'mm-zawtika-off', name: 'ZAWTIKA Offshore', type: 'offshore', details: 'ZPQ, Z1D, Z1E' },
+            { id: 'mm-zawtika-on', name: 'ZAWTIKA Onshore', type: 'onshore', details: 'ATL' },
+            { id: 'mm-yadana', name: 'YADANA', type: 'onshore', details: 'PLC-MS' }
+        ]
+    },
+    malaysia: {
+        name: '🇲🇾 Malaysia',
+        locations: [
+            { id: 'my-jda', name: 'JDA Platform', type: 'offshore', details: 'CPOC' }
+        ]
+    }
+};
+
+// Client-Location Mapping
+const clientLocationMap = {
+    'PTTEP': ['thailand', 'myanmar', 'malaysia'],
+    'Chevron': ['thailand'],
+    'MUBADALA': ['thailand', 'myanmar'],
+    'TOTAL': ['myanmar'],
+    'Other O&G': ['thailand', 'myanmar', 'malaysia'],
+    'Non-O&G': ['thailand']
+};
+
+// Initialize location data
+function initializeLocationData() {
+    console.log('Initializing Location Data from Dashboard v4');
+    
+    // Add event listeners
+    const clientSelect = document.getElementById('clientType');
+    const countrySelect = document.getElementById('country');
+    
+    if (clientSelect) {
+        clientSelect.addEventListener('change', updateLocations);
+    }
+    
+    if (countrySelect) {
+        countrySelect.addEventListener('change', updateLocationsByCountry);
+    }
+}
+
+// Update available countries based on selected client
+function updateLocations() {
+    const client = document.getElementById('clientType').value;
+    const countrySelect = document.getElementById('country');
+    const locationSelect = document.getElementById('location');
+    
+    // Clear selections
+    countrySelect.innerHTML = '<option value="">-- Select Country --</option>';
+    locationSelect.innerHTML = '<option value="">-- Select Location --</option>';
+    
+    if (client && clientLocationMap[client]) {
+        const availableCountries = clientLocationMap[client];
+        
+        availableCountries.forEach(country => {
+            if (locationData[country]) {
+                const option = document.createElement('option');
+                option.value = country;
+                option.textContent = locationData[country].name;
+                countrySelect.appendChild(option);
+            }
+        });
+        
+        // Enable country select
+        countrySelect.disabled = false;
+    } else if (client === '') {
+        // If no client selected, show all countries
+        Object.keys(locationData).forEach(country => {
+            const option = document.createElement('option');
+            option.value = country;
+            option.textContent = locationData[country].name;
+            countrySelect.appendChild(option);
+        });
+    }
+}
+
+// Update locations based on selected country
+function updateLocationsByCountry() {
+    const country = document.getElementById('country').value;
+    const locationSelect = document.getElementById('location');
+    
+    // Clear current locations
+    locationSelect.innerHTML = '<option value="">-- Select Location --</option>';
+    
+    if (country && locationData[country]) {
+        const locations = locationData[country].locations;
+        
+        locations.forEach(loc => {
+            const option = document.createElement('option');
+            option.value = loc.id;
+            option.textContent = `${loc.name} (${loc.type.charAt(0).toUpperCase() + loc.type.slice(1)})`;
+            option.setAttribute('data-type', loc.type);
+            option.setAttribute('data-details', loc.details);
+            
+            // Add icon based on type
+            if (loc.type === 'offshore') {
+                option.textContent = '🛢️ ' + option.textContent;
+            } else if (loc.type === 'onshore') {
+                option.textContent = '🏭 ' + option.textContent;
+            } else if (loc.type === 'document') {
+                option.textContent = '📄 ' + option.textContent;
+            }
+            
+            locationSelect.appendChild(option);
+        });
+        
+        // Auto-adjust service recommendations based on location type
+        locationSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption && selectedOption.value) {
+                const locationType = selectedOption.getAttribute('data-type');
+                const details = selectedOption.getAttribute('data-details');
+                
+                // Show location info
+                showLocationInfo(selectedOption.textContent, locationType, details);
+                
+                // Recommend services
+                recommendServices(locationType);
+                
+                // Auto-adjust pricing based on location
+                adjustPricingByLocation(locationType);
+            } else {
+                hideLocationInfo();
+            }
+        });
+    }
+}
+
+// Show location information panel
+function showLocationInfo(locationName, locationType, details) {
+    const locationInfo = document.getElementById('locationInfo');
+    const locationDetails = document.getElementById('locationDetails');
+    
+    let badgeClass = '';
+    if (locationType === 'offshore') badgeClass = 'badge-offshore';
+    else if (locationType === 'onshore') badgeClass = 'badge-onshore';
+    else if (locationType === 'document') badgeClass = 'badge-document';
+    
+    locationDetails.innerHTML = `
+        <strong>${locationName}</strong>
+        <span class="location-badge ${badgeClass}">${locationType.toUpperCase()}</span>
+        <br>
+        <span style="color: #6b7280; font-size: 10px;">Facilities: ${details}</span>
+    `;
+    
+    locationInfo.classList.add('active');
+    
+    // Show integration status briefly
+    showIntegrationStatus();
+}
+
+// Hide location information panel
+function hideLocationInfo() {
+    const locationInfo = document.getElementById('locationInfo');
+    locationInfo.classList.remove('active');
+}
+
+// Show integration status notification
+function showIntegrationStatus() {
+    const status = document.getElementById('integrationStatus');
+    status.classList.add('active');
+    setTimeout(() => {
+        status.classList.remove('active');
+    }, 2000);
+}
+
+// Adjust pricing based on location type
+function adjustPricingByLocation(locationType) {
+    // Get custom adjustment percentages from inputs
+    const offshoreAdjust = parseFloat(document.getElementById('offshoreAdjust').value) || 30;
+    const onshoreAdjust = parseFloat(document.getElementById('onshoreAdjust').value) || 30;
+    const documentAdjust = parseFloat(document.getElementById('documentAdjust').value) || 0;
+    
+    const multipliers = {
+        'offshore': 1 + (offshoreAdjust / 100),  // Custom % adjustment
+        'onshore': 1 + (onshoreAdjust / 100),    // Custom % adjustment
+        'document': 1 + (documentAdjust / 100)    // Custom % adjustment (default 0%)
+    };
+    
+    const multiplier = multipliers[locationType] || 1.0;
+    const adjustPercent = multiplier > 1 ? `+${((multiplier - 1) * 100).toFixed(0)}%` : 
+                          multiplier < 1 ? `-${((1 - multiplier) * 100).toFixed(0)}%` : 
+                          'Standard';
+    
+    console.log(`Pricing adjustment for ${locationType} location (${adjustPercent}) - CORE TEAM ONLY`);
+    
+    // Update location info to show adjustment
+    const locationDetails = document.getElementById('locationDetails');
+    if (locationDetails && locationDetails.innerHTML !== 'No location selected') {
+        const currentHTML = locationDetails.innerHTML;
+        if (!currentHTML.includes('Price Adjustment:')) {
+            locationDetails.innerHTML += `<br><span style="color: #f59e0b; font-weight: bold;">💰 Core Team Price Adjustment: ${adjustPercent}</span>`;
+        } else {
+            // Update existing adjustment info
+            locationDetails.innerHTML = currentHTML.replace(/Core Team Price Adjustment:.*?<\/span>/, `Core Team Price Adjustment: ${adjustPercent}</span>`);
+        }
+    }
+    
+    // Note: Actual price adjustment is now done in applyPriceAdjustment function
+    // This function now only shows the adjustment info in location details
+}
+
+// Apply custom price adjustment
+function applyPriceAdjustment() {
+    const locationSelect = document.getElementById('location');
+    const selectedOption = locationSelect.options[locationSelect.selectedIndex];
+    
+    if (selectedOption && selectedOption.value) {
+        const locationType = selectedOption.getAttribute('data-type');
+        
+        // Get adjustment percentage
+        let adjustmentPercent = 0;
+        if (locationType === 'offshore') {
+            adjustmentPercent = parseFloat(document.getElementById('offshoreAdjust').value) || 30;
+        } else if (locationType === 'onshore') {
+            adjustmentPercent = parseFloat(document.getElementById('onshoreAdjust').value) || 30;
+        } else if (locationType === 'document') {
+            adjustmentPercent = parseFloat(document.getElementById('documentAdjust').value) || 0;
+        }
+        
+        // Apply adjustment ONLY to CORE TEAM rates
+        adjustCoreTeamRates(adjustmentPercent);
+        
+        // Calculate location adjustment amount (CORE TEAM ONLY)
+        let coreTeamCost = 0;
+        const coreRows = document.querySelectorAll('#coreTeamTable tr');
+        coreRows.forEach(row => {
+            const qty = parseFloat(row.querySelector('.qty-input')?.value) || 0;
+            const days = parseFloat(row.querySelector('.days-input')?.value) || 0;
+            const rate = parseFloat(row.querySelector('.rate-input')?.value) || 0;
+            coreTeamCost += qty * days * rate;
+        });
+        
+        const adjustmentAmount = coreTeamCost * (adjustmentPercent / 100);
+        
+        // Update location adjustment input
+        const locationAdjustmentInput = document.getElementById('locationAdjustmentInput');
+        if (locationAdjustmentInput) {
+            locationAdjustmentInput.value = Math.round(adjustmentAmount);
+        }
+        
+        // Update location adjustment display
+        const locationAdjustmentDisplay = document.getElementById('locationAdjustmentDisplay');
+        if (locationAdjustmentDisplay) {
+            if (adjustmentPercent > 0) {
+                locationAdjustmentDisplay.textContent = `฿${Math.round(adjustmentAmount).toLocaleString()}`;
+            } else if (adjustmentPercent < 0) {
+                locationAdjustmentDisplay.textContent = `-฿${Math.round(Math.abs(adjustmentAmount)).toLocaleString()}`;
+            } else {
+                locationAdjustmentDisplay.textContent = '฿0';
+            }
+        }
+        
+        // Update percentage display
+        const locationAdjustmentPercentElem = document.getElementById('locationAdjustmentPercent');
+        if (locationAdjustmentPercentElem) {
+            locationAdjustmentPercentElem.textContent = `(${adjustmentPercent > 0 ? '+' : ''}${adjustmentPercent}% of Core Team)`;
+        }
+        
+        // Show confirmation with details
+        const status = document.getElementById('adjustmentStatus');
+        status.textContent = `✅ Applied ${adjustmentPercent > 0 ? '+' : ''}${adjustmentPercent}% to CORE TEAM Only`;
+        status.style.display = 'inline';
+        
+        // Flash only Core Team rate columns
+        const coreRateInputs = document.querySelectorAll('#coreTeamTable .rate-input');
+        coreRateInputs.forEach(input => {
+            input.style.backgroundColor = '#fef3c7';
+            input.style.transition = 'background-color 0.5s';
+            setTimeout(() => {
+                input.style.backgroundColor = 'white';
+            }, 1500);
+        });
+        
+        // Flash location adjustment field
+        if (locationAdjustmentInput) {
+            locationAdjustmentInput.style.backgroundColor = '#d1fae5';
+            locationAdjustmentInput.style.transition = 'background-color 0.5s';
+            setTimeout(() => {
+                locationAdjustmentInput.style.backgroundColor = '#f9fafb';
+            }, 1500);
+        }
+        
+        // Recalculate totals
+        calculateTotals();
+        
+        setTimeout(() => {
+            status.style.display = 'none';
+        }, 3000);
+    } else {
+        alert('Please select a location first to apply price adjustment');
+    }
+}
+
+// Adjust only Core Team rates by location
+function adjustCoreTeamRates(adjustmentPercent) {
+    // Store base rates if not already stored
+    if (!window.coreTeamBaseRates) {
+        window.coreTeamBaseRates = new Map();
+        // Store current Core Team rates as base
+        document.querySelectorAll('#coreTeamTable tr').forEach((row, index) => {
+            const rateInput = row.querySelector('.rate-input');
+            if (rateInput) {
+                window.coreTeamBaseRates.set(index, parseFloat(rateInput.value) || 0);
+            }
+        });
+    }
+    
+    // Apply adjustment to Core Team only
+    document.querySelectorAll('#coreTeamTable tr').forEach((row, index) => {
+        const rateInput = row.querySelector('.rate-input');
+        if (rateInput && window.coreTeamBaseRates.has(index)) {
+            const baseRate = window.coreTeamBaseRates.get(index);
+            const adjustedRate = Math.round(baseRate * (1 + adjustmentPercent / 100));
+            rateInput.value = adjustedRate;
+        }
+    });
+    
+    // Recalculate row totals for Core Team
+    document.querySelectorAll('#coreTeamTable tr').forEach(row => {
+        if (row.id) {
+            calculateRowTotal(row.id);
+        }
+    });
+}
+
+// Reset price adjustment to defaults
+function resetPriceAdjustment() {
+    document.getElementById('offshoreAdjust').value = 30;
+    document.getElementById('onshoreAdjust').value = 30;
+    document.getElementById('documentAdjust').value = 0;
+    
+    const locationSelect = document.getElementById('location');
+    const selectedOption = locationSelect.options[locationSelect.selectedIndex];
+    
+    if (selectedOption && selectedOption.value) {
+        const locationType = selectedOption.getAttribute('data-type');
+        adjustPricingByLocation(locationType);
+    }
+}
+
+// Recommend services based on location type
+function recommendServices(locationType) {
+    console.log('Recommending services for location type:', locationType);
+    
+    // Highlight recommended services based on location type
+    const recommendations = {
+        'offshore': ['SURVEY', 'INSTALL', 'MAINT', 'COMM', 'SAT'],
+        'onshore': ['INSTALL', 'UPGRADE', 'FAT', 'TRAINING'],
+        'document': ['PRE-FEED', 'FEED', 'DETAIL', 'VDRL', 'AS-BUILT']
+    };
+    
+    // Clear all highlights first
+    document.querySelectorAll('.service-item').forEach(item => {
+        item.style.backgroundColor = '';
+    });
+    
+    // Highlight recommended services
+    if (recommendations[locationType]) {
+        recommendations[locationType].forEach(serviceCode => {
+            document.querySelectorAll('.service-code').forEach(code => {
+                if (code.textContent === serviceCode) {
+                    code.parentElement.style.backgroundColor = '#fef3c7';
+                }
+            });
+        });
+    }
+}
+
+// Integration with Location Dashboard (if embedded in iframe)
+window.addEventListener('message', function(event) {
+    if (event.data.type === 'LOCATION_SELECTED') {
+        console.log('Location selected from dashboard:', event.data.data);
+        
+        // Parse location ID to set country and location
+        const locationId = event.data.data.id;
+        if (locationId) {
+            const parts = locationId.split('-');
+            const countryMap = { 'th': 'thailand', 'mm': 'myanmar', 'my': 'malaysia' };
+            const country = countryMap[parts[0]];
+            
+            if (country) {
+                document.getElementById('country').value = country;
+                updateLocationsByCountry();
+                
+                // Set the specific location after a short delay
+                setTimeout(() => {
+                    document.getElementById('location').value = locationId;
+                }, 100);
+            }
+        }
+    }
+});
+
+// Send system status to parent window (if in iframe)
+function sendSystemStatus() {
+    if (window.parent !== window) {
+        window.parent.postMessage({
+            type: 'AVS_CATALOG_STATUS',
+            module: 'service-catalog',
+            version: '4.0',
+            ready: true,
+            timestamp: new Date().toISOString()
+        }, '*');
+    }
+}
+
+// Call on load
+setTimeout(sendSystemStatus, 1000);
+
+// Save Configuration Function
+function saveConfiguration() {
+    const config = {
+        project: {
+            name: document.getElementById('projectName').value,
+            client: document.getElementById('clientType').value,
+            country: document.getElementById('country').value,
+            location: document.getElementById('location').value,
+            quoteNo: document.getElementById('quoteNo').value,
+            revision: document.getElementById('revision').value
+        },
+        service: {
+            type: document.getElementById('serviceType').value,
+            duration: document.getElementById('duration').value,
+            complexity: document.getElementById('complexity').value,
+            selectedService: document.getElementById('selectedService').textContent
+        },
+        teams: {
+            core: [],
+            support: [],
+            admin: []
+        },
+        costs: {
+            baseServiceCost: document.getElementById('baseServiceCostInput').value,
+            managementFeePercent: document.getElementById('managementFeePercent').value,
+            managementFeeAmount: document.getElementById('managementFeeAmount').value,
+            otherExpenses: document.getElementById('otherExpenses').value,
+            locationAdjustment: document.getElementById('locationAdjustmentInput').value
+        },
+        priceAdjustment: {
+            offshore: document.getElementById('offshoreAdjust').value,
+            onshore: document.getElementById('onshoreAdjust').value,
+            document: document.getElementById('documentAdjust').value
+        },
+        savedDate: new Date().toISOString()
+    };
+    
+    // Collect team data
+    ['core', 'support', 'admin'].forEach(teamType => {
+        const rows = document.querySelectorAll(`#${teamType}TeamTable tr`);
+        rows.forEach(row => {
+            const position = row.querySelector('.position-select')?.value;
+            const employee = row.querySelector('.employee-select')?.options[row.querySelector('.employee-select')?.selectedIndex]?.text;
+            const qty = row.querySelector('.qty-input')?.value;
+            const days = row.querySelector('.days-input')?.value;
+            const rate = row.querySelector('.rate-input')?.value;
+            
+            if (position) {
+                config.teams[teamType].push({
+                    position: position,
+                    employee: employee || '',
+                    qty: qty,
+                    days: days,
+                    rate: rate
+                });
+            }
+        });
+    });
+    
+    // Save to localStorage
+    const configName = `AVS_Config_${config.project.quoteNo}_${Date.now()}`;
+    localStorage.setItem(configName, JSON.stringify(config));
+    localStorage.setItem('AVS_LastConfig', configName);
+    
+    // Show success message
+    showNotification('✅ Configuration Saved Successfully!', 'success');
+    console.log('Configuration saved:', configName);
+}
+
+// Load Saved Configuration
+function loadConfiguration() {
+    const lastConfigName = localStorage.getItem('AVS_LastConfig');
+    if (lastConfigName) {
+        const config = JSON.parse(localStorage.getItem(lastConfigName));
+        if (config) {
+            // Load project info
+            document.getElementById('projectName').value = config.project.name || '';
+            document.getElementById('clientType').value = config.project.client || '';
+            document.getElementById('country').value = config.project.country || '';
+            document.getElementById('location').value = config.project.location || '';
+            document.getElementById('quoteNo').value = config.project.quoteNo || '';
+            document.getElementById('revision').value = config.project.revision || '';
+            
+            // Load service config
+            document.getElementById('serviceType').value = config.service.type || '';
+            document.getElementById('duration').value = config.service.duration || '';
+            document.getElementById('complexity').value = config.service.complexity || '';
+            
+            // Load costs
+            document.getElementById('baseServiceCostInput').value = config.costs.baseServiceCost || 0;
+            document.getElementById('managementFeePercent').value = config.costs.managementFeePercent || 15;
+            document.getElementById('otherExpenses').value = config.costs.otherExpenses || 0;
+            
+            showNotification('✅ Configuration Loaded Successfully!', 'success');
+        }
+    }
+}
+
+// Export to Excel Function
+function exportToExcel() {
+    // Prepare data for Excel
+    const data = [];
+    
+    // Header information
+    data.push(['ADDVALUE SYSTEM CO., LTD.']);
+    data.push(['Service Catalog & Pricing System v4.0']);
+    data.push(['Export Date:', new Date().toLocaleString()]);
+    data.push([]);
+    
+    // Project Information
+    data.push(['PROJECT INFORMATION']);
+    data.push(['Project Name:', document.getElementById('projectName').value || '-']);
+    data.push(['Client:', document.getElementById('clientType').value || '-']);
+    data.push(['Country:', document.getElementById('country').value || '-']);
+    data.push(['Location:', document.getElementById('location').options[document.getElementById('location').selectedIndex]?.text || '-']);
+    data.push(['Quote No:', document.getElementById('quoteNo').value || '-']);
+    data.push(['Revision:', document.getElementById('revision').value || '-']);
+    data.push([]);
+    
+    // Service Configuration
+    data.push(['SERVICE CONFIGURATION']);
+    data.push(['Service:', document.getElementById('selectedService').textContent]);
+    data.push(['Service Type:', document.getElementById('serviceType').value]);
+    data.push(['Duration:', document.getElementById('duration').value + ' days']);
+    data.push(['Complexity:', document.getElementById('complexity').value]);
+    data.push([]);
+    
+    // Resource Assignment - Core Team
+    data.push(['CORE TEAM']);
+    data.push(['Position', 'Employee Name', 'Qty', 'Days', 'Daily Rate (THB)', 'Man-Hours', 'Subtotal (THB)']);
+    
+    let coreRows = document.querySelectorAll('#coreTeamTable tr');
+    coreRows.forEach(row => {
+        const cols = [];
+        cols.push(row.querySelector('.position-select')?.value || '');
+        const employeeSelect = row.querySelector('.employee-select');
+        cols.push(employeeSelect?.options[employeeSelect?.selectedIndex]?.text.replace('⭐ ', '').replace(' (Recommended)', '') || '');
+        cols.push(row.querySelector('.qty-input')?.value || '');
+        cols.push(row.querySelector('.days-input')?.value || '');
+        cols.push(row.querySelector('.rate-input')?.value || '');
+        cols.push(row.querySelector('.man-hours')?.textContent || '');
+        cols.push(row.querySelector('.subtotal')?.textContent.replace('฿', '').replace(/,/g, '') || '');
+        if (cols[0]) data.push(cols);
+    });
+    data.push([]);
+    
+    // Support Team
+    data.push(['SUPPORT TEAM']);
+    data.push(['Position', 'Employee Name', 'Qty', 'Days', 'Daily Rate (THB)', 'Man-Hours', 'Subtotal (THB)']);
+    
+    let supportRows = document.querySelectorAll('#supportTeamTable tr');
+    supportRows.forEach(row => {
+        const cols = [];
+        cols.push(row.querySelector('.position-select')?.value || '');
+        const employeeSelect = row.querySelector('.employee-select');
+        cols.push(employeeSelect?.options[employeeSelect?.selectedIndex]?.text.replace('⭐ ', '').replace(' (Recommended)', '') || '');
+        cols.push(row.querySelector('.qty-input')?.value || '');
+        cols.push(row.querySelector('.days-input')?.value || '');
+        cols.push(row.querySelector('.rate-input')?.value || '');
+        cols.push(row.querySelector('.man-hours')?.textContent || '');
+        cols.push(row.querySelector('.subtotal')?.textContent.replace('฿', '').replace(/,/g, '') || '');
+        if (cols[0]) data.push(cols);
+    });
+    data.push([]);
+    
+    // Admin Team
+    data.push(['ADMIN TEAM']);
+    data.push(['Position', 'Employee Name', 'Qty', 'Days', 'Daily Rate (THB)', 'Man-Hours', 'Subtotal (THB)']);
+    
+    let adminRows = document.querySelectorAll('#adminTeamTable tr');
+    adminRows.forEach(row => {
+        const cols = [];
+        cols.push(row.querySelector('.position-select')?.value || '');
+        const employeeSelect = row.querySelector('.employee-select');
+        cols.push(employeeSelect?.options[employeeSelect?.selectedIndex]?.text.replace('⭐ ', '').replace(' (Recommended)', '') || '');
+        cols.push(row.querySelector('.qty-input')?.value || '');
+        cols.push(row.querySelector('.days-input')?.value || '');
+        cols.push(row.querySelector('.rate-input')?.value || '');
+        cols.push(row.querySelector('.man-hours')?.textContent || '');
+        cols.push(row.querySelector('.subtotal')?.textContent.replace('฿', '').replace(/,/g, '') || '');
+        if (cols[0]) data.push(cols);
+    });
+    data.push([]);
+    
+    // Cost Summary
+    data.push(['COST SUMMARY']);
+    data.push(['Base Service Cost:', document.getElementById('baseServiceCostInput').value]);
+    data.push(['Management Fee %:', document.getElementById('managementFeePercent').value]);
+    data.push(['Management Fee Amount:', document.getElementById('managementFeeAmount').value]);
+    data.push(['Other Expenses:', document.getElementById('otherExpenses').value]);
+    data.push(['Location Adjustment:', document.getElementById('locationAdjustmentInput').value]);
+    data.push([]);
+    
+    // Grand Total
+    const grandTotal = document.getElementById('grandTotalAmount')?.textContent || '฿0';
+    data.push(['GRAND TOTAL:', grandTotal]);
+    data.push(['(Excluding VAT)']);
+    
+    // Convert to CSV
+    const csv = convertToCSV(data);
+    
+    // Download CSV file
+    downloadCSV(csv, `AVS_Quote_${document.getElementById('quoteNo').value}_${new Date().getTime()}.csv`);
+}
+
+// Convert array to CSV
+function convertToCSV(data) {
+    return data.map(row => {
+        return row.map(cell => {
+            // Handle cells that contain commas or quotes
+            if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"') || cell.includes('\n'))) {
+                return '"' + cell.replace(/"/g, '""') + '"';
+            }
+            return cell;
+        }).join(',');
+    }).join('\n');
+}
+
+// Download CSV file
+function downloadCSV(csv, filename) {
+    // Add BOM for Excel to recognize UTF-8
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    
+    if (link.download !== undefined) {
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        showNotification('✅ Excel file exported successfully!', 'success');
+    }
+}
+
+// Show notification
+function showNotification(message, type = 'info') {
+    // Remove existing notification if any
+    const existingNotif = document.getElementById('notification');
+    if (existingNotif) {
+        existingNotif.remove();
+    }
+    
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.id = 'notification';
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+        color: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        z-index: 10000;
+        animation: slideIn 0.3s ease-out;
+        font-weight: 600;
+        font-size: 14px;
+    `;
+    notification.textContent = message;
+    
+    // Add animation
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+    `;
+    if (!document.querySelector('style[data-notification]')) {
+        style.setAttribute('data-notification', 'true');
+        document.head.appendChild(style);
+    }
+    
+    document.body.appendChild(notification);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 3000);
+}
+
+// Add load configuration button if needed
+function addLoadConfigButton() {
+    const actionButtons = document.querySelector('.action-buttons');
+    if (actionButtons && !document.getElementById('loadConfigBtn')) {
+        const loadBtn = document.createElement('button');
+        loadBtn.id = 'loadConfigBtn';
+        loadBtn.className = 'btn';
+        loadBtn.style.cssText = 'background: #059669; color: white;';
+        loadBtn.innerHTML = '📂 Load Saved';
+        loadBtn.onclick = loadConfiguration;
+        actionButtons.insertBefore(loadBtn, actionButtons.children[1]);
+    }
+}
+
+// Reset all configurations
+function resetAll() {
+    if (confirm('Are you sure you want to reset all configurations? This will clear all data.')) {
+        // Clear project information
+        document.getElementById('projectName').value = '';
+        document.getElementById('clientType').value = '';
+        document.getElementById('country').value = '';
+        document.getElementById('location').innerHTML = '<option value="">-- Select Location --</option>';
+        document.getElementById('quoteNo').value = 'Q-2025-001';
+        document.getElementById('revision').value = 'Rev.0';
+        
+        // Clear service configuration
+        document.getElementById('serviceType').value = 'Standard Package';
+        document.getElementById('duration').value = '5';
+        document.getElementById('complexity').value = 'Medium';
+        
+        // Clear all team tables
+        document.getElementById('coreTeamTable').innerHTML = '';
+        document.getElementById('supportTeamTable').innerHTML = '';
+        document.getElementById('adminTeamTable').innerHTML = '';
+        
+        // Reset costs
+        document.getElementById('baseServiceCostInput').value = '0';
+        document.getElementById('managementFeePercent').value = '15';
+        document.getElementById('managementFeeAmount').value = '0';
+        document.getElementById('otherExpenses').value = '0';
+        document.getElementById('locationAdjustmentInput').value = '0';
+        
+        // Reset price adjustments
+        document.getElementById('offshoreAdjust').value = '30';
+        document.getElementById('onshoreAdjust').value = '30';
+        document.getElementById('documentAdjust').value = '0';
+        
+        // Recalculate totals
+        calculateTotals();
+        
+        showNotification('🔄 All configurations have been reset', 'info');
+    }
+}
+
+// Add employee quick view panel
+function addEmployeeQuickView() {
+    // Create floating employee panel
+    const panel = document.createElement('div');
+    panel.id = 'employeeQuickView';
+    panel.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 300px;
+        max-height: 400px;
+        background: white;
+        border: 2px solid #3b82f6;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        display: none;
+        overflow-y: auto;
+        z-index: 1000;
+    `;
+    
+    panel.innerHTML = `
+        <div style="font-weight: bold; color: #1f2937; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+            👥 Employee Quick View
+            <button onclick="document.getElementById('employeeQuickView').style.display='none'" style="background: #ef4444; color: white; border: none; padding: 2px 8px; border-radius: 4px; cursor: pointer; font-size: 10px;">✕</button>
+        </div>
+        <div id="employeeDetails"></div>
+    `;
+    
+    document.body.appendChild(panel);
+    
+    // Add toggle button in header
+    const header = document.querySelector('.header-info');
+    if (header) {
+        const toggleBtn = document.createElement('button');
+        toggleBtn.innerHTML = '👥 Team Info';
+        toggleBtn.style.cssText = `
+            margin-top: 5px;
+            padding: 4px 8px;
+            background: #60a5fa;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+        `;
+        toggleBtn.onclick = toggleEmployeePanel;
+        header.appendChild(toggleBtn);
+    }
+}
+
+// Toggle employee panel
+function toggleEmployeePanel() {
+    const panel = document.getElementById('employeeQuickView');
+    const details = document.getElementById('employeeDetails');
+    
+    if (panel.style.display === 'none' || !panel.style.display) {
+        // Generate employee list
+        let html = '<div style="font-size: 11px;">';
+        
+        // Available employees
+        html += '<div style="margin-bottom: 10px;"><strong style="color: #10b981;">Available Employees:</strong>';
+        const available = employees.filter(e => e.status === 'available');
+        available.forEach(emp => {
+            html += `
+                <div style="padding: 5px; margin: 3px 0; background: #f0f9ff; border-radius: 4px;">
+                    <strong>${emp.name}</strong><br>
+                    ${emp.position}<br>
+                    Daily: ฿${emp.dailyRate.toLocaleString()} | Hour: ฿${emp.hourlyRate}
+                </div>
+            `;
+        });
+        html += '</div>';
+        
+        // Busy employees
+        html += '<div><strong style="color: #f59e0b;">Busy Employees:</strong>';
+        const busy = employees.filter(e => e.status === 'busy');
+        busy.forEach(emp => {
+            html += `
+                <div style="padding: 5px; margin: 3px 0; background: #fef3c7; border-radius: 4px;">
+                    <strong>${emp.name}</strong><br>
+                    ${emp.position}<br>
+                    Daily: ฿${emp.dailyRate.toLocaleString()} | Hour: ฿${emp.hourlyRate}
+                </div>
+            `;
+        });
+        html += '</div></div>';
+        
+        details.innerHTML = html;
+        panel.style.display = 'block';
+    } else {
+        panel.style.display = 'none';
+    }
+}
+
+// Export resource allocation to JSON
+function exportResourceAllocation() {
+    const rows = document.querySelectorAll('#resourceTable tr');
+    const allocation = [];
+    
+    rows.forEach(row => {
+        const position = row.querySelector('.position-select')?.value;
+        const employeeId = row.querySelector('.employee-select')?.value;
+        const employee = employees.find(e => e.id == employeeId);
+        const qty = row.querySelector('.qty-input')?.value;
+        const days = row.querySelector('.days-input')?.value;
+        const rate = row.querySelector('.rate-input')?.value;
+        
+        if (position && employee) {
+            allocation.push({
+                position: position,
+                employee: employee.name,
+                employeeId: employee.id,
+                email: employee.email,
+                quantity: qty,
+                days: days,
+                dailyRate: rate,
+                totalCost: qty * days * rate,
+                status: employee.status
+            });
+        }
+    });
+    
+    const exportData = {
+        project: document.getElementById('projectName').value,
+        client: document.getElementById('clientType').value,
+        location: document.getElementById('location').options[document.getElementById('location').selectedIndex]?.text,
+        quoteNo: document.getElementById('quoteNo').value,
+        revision: document.getElementById('revision').value,
+        resourceAllocation: allocation,
+        exportDate: new Date().toISOString()
+    };
+    
+    // Create download link
+    const dataStr = JSON.stringify(exportData, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    
+    const exportFileDefaultName = `resource_allocation_${exportData.quoteNo}_${new Date().getTime()}.json`;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+}
+</script>
+</body>
+</html>

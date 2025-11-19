@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZQP-ZWP4 Project Relationship & Workflow</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/dist/vis-network.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.6/dist/vis-network.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Sarabun', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+        }
+        
+        .control-panel {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        label {
+            font-weight: 600;
+            color: #555;
+        }
+        
+        select {
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+            cursor: pointer;
+            background: white;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legend-color {
+            width: 25px;
+            height: 25px;
+            border-radius: 5px;
+            border: 2px solid #333;
+        }
+        
+        #network {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: #fafafa;
+            margin: 20px 0;
+        }
+        
+        .info-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .info-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+        
+        .info-card:hover {
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .info-card h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .cost-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .cost-table th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        .cost-table td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .cost-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+        }
+        
+        .metric-item {
+            text-align: center;
+            color: white;
+        }
+        
+        .metric-value {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .metric-label {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            #network {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌐 ZQP-ZWP4 Telecommunications Project</h1>
+            <div class="subtitle">Interactive Relationship & Workflow Visualization</div>
+        </div>
+        
+        <div class="control-panel">
+            <div class="control-group">
+                <label for="viewMode">View Mode:</label>
+                <select id="viewMode" onchange="updateView()">
+                    <option value="relationship">🔗 Relationship View</option>
+                    <option value="workflow">📊 Workflow View</option>
+                    <option value="financial">💰 Financial Flow</option>
+                </select>
+            </div>
+            <button onclick="resetNetwork()">🔄 Reset View</button>
+            <button onclick="togglePhysics()">⚡ Toggle Animation</button>
+            <button onclick="highlightCritical()">🎯 Highlight Critical</button>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ff6b6b;"></div>
+                <span><strong>End User</strong> (PTTEP)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #4ecdc4;"></div>
+                <span><strong>Service Provider</strong> (Mytel)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #45b7d1;"></div>
+                <span><strong>Integrator</strong> (Addvalue)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #96ceb4;"></div>
+                <span><strong>Supplier</strong> (NextG/Ceragon)</span>
+            </div>
+        </div>
+        
+        <div id="network"></div>
+        
+        <div class="info-section">
+            <div class="info-card">
+                <h3>💵 Cost Structure (ต้นทุนล่าสุด)</h3>
+                <table class="cost-table">
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Cost (USD)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Equipment (Ceragon IP-50CX)</td>
+                            <td><strong>$22,515</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Professional Services</td>
+                            <td><strong>$7,752</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Additional Costs</td>
+                            <td><strong>$8,729</strong></td>
+                        </tr>
+                        <tr style="background: #f8f9fa;">
+                            <td><strong>Total to Addvalue</strong></td>
+                            <td><strong style="color: #667eea;">$38,996</strong></td>
+                        </tr>
+                        <tr>
+                            <td>Price to Mytel (+15%)</td>
+                            <td><strong>$45,000</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="info-card">
+                <h3>📅 Key Milestones</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="margin: 10px 0;">
+                        <strong style="color: #667eea;">Week 1-2:</strong> 
+                        Mytel negotiation & feasibility
+                    </li>
+                    <li style="margin: 10px 0;">
+                        <strong style="color: #667eea;">Week 3-4:</strong> 
+                        PTTEP approval process
+                    </li>
+                    <li style="margin: 10px 0;">
+                        <strong style="color: #667eea;">Week 5-28:</strong> 
+                        Procurement & delivery (24 weeks)
+                    </li>
+                    <li style="margin: 10px 0;">
+                        <strong style="color: #667eea;">Week 29-30:</strong> 
+                        Installation & commissioning
+                    </li>
+                    <li style="margin: 10px 0;">
+                        <strong style="color: #667eea;">Month 2-60:</strong> 
+                        5-year operation period
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="info-card">
+                <h3>⚠️ Critical Success Factors</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="margin: 10px 0;">
+                        ✅ <span class="highlight">Mytel accepts 15% margin model</span>
+                    </li>
+                    <li style="margin: 10px 0;">
+                        ✅ <span class="highlight">PTTEP confirms $5,000/month</span>
+                    </li>
+                    <li style="margin: 10px 0;">
+                        ✅ Payment security (BG/LC)
+                    </li>
+                    <li style="margin: 10px 0;">
+                        ✅ Back-to-back contracts
+                    </li>
+                    <li style="margin: 10px 0;">
+                        ✅ SLA 99.95% guarantee
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="metric-grid">
+            <div class="metric-item">
+                <div class="metric-value">567%</div>
+                <div class="metric-label">Mytel ROI (5 years)</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value">9</div>
+                <div class="metric-label">Months Payback</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value">$300K</div>
+                <div class="metric-label">Total Contract Value</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value">99.95%</div>
+                <div class="metric-label">SLA Guarantee</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let container = document.getElementById('network');
+        let nodes = null;
+        let edges = null;
+        let network = null;
+        let physicsEnabled = true;
+        
+        function drawRelationshipView() {
+            nodes = new vis.DataSet([
+                {
+                    id: 1, 
+                    label: 'PTTEP\n(End User)\n$300K/5yr', 
+                    color: { background: '#ff6b6b', border: '#cc5555' },
+                    shape: 'box',
+                    font: { color: 'white', size: 14, face: 'Arial' },
+                    size: 30
+                },
+                {
+                    id: 2, 
+                    label: 'Mytel\n(License Holder)\nService Provider', 
+                    color: { background: '#4ecdc4', border: '#3ca39c' },
+                    shape: 'box',
+                    font: { color: 'white', size: 14, face: 'Arial' },
+                    size: 30
+                },
+                {
+                    id: 3, 
+                    label: 'Addvalue\n(System Integrator)\nTechnical Expert', 
+                    color: { background: '#45b7d1', border: '#3691a7' },
+                    shape: 'box',
+                    font: { color: 'white', size: 14, face: 'Arial' },
+                    size: 30
+                },
+                {
+                    id: 4, 
+                    label: 'NextG\n(Procurement)\n+25% margin', 
+                    color: { background: '#96ceb4', border: '#78a593' },
+                    shape: 'ellipse',
+                    font: { color: '#333', size: 13, face: 'Arial' },
+                    size: 25
+                },
+                {
+                    id: 5, 
+                    label: 'Ceragon\n(Equipment)\nManufacturer', 
+                    color: { background: '#96ceb4', border: '#78a593' },
+                    shape: 'ellipse',
+                    font: { color: '#333', size: 13, face: 'Arial' },
+                    size: 25
+                }
+            ]);
+            
+            edges = new vis.DataSet([
+                {
+                    from: 1, to: 2, 
+                    label: '5-yr Rental\n$5K/month', 
+                    arrows: 'to',
+                    color: { color: '#ff6b6b', highlight: '#ff0000' },
+                    width: 3,
+                    font: { color: '#333', size: 12, face: 'Arial' }
+                },
+                {
+                    from: 2, to: 3, 
+                    label: 'Turnkey\n$45K one-time', 
+                    arrows: 'to',
+                    color: { color: '#4ecdc4', highlight: '#00a39c' },
+                    width: 3,
+                    font: { color: '#333', size: 12, face: 'Arial' }
+                },
+                {
+                    from: 3, to: 4, 
+                    label: 'Equipment\n$22.5K', 
+                    arrows: 'to',
+                    color: { color: '#45b7d1', highlight: '#0091a7' },
+                    width: 2,
+                    font: { color: '#333', size: 11, face: 'Arial' }
+                },
+                {
+                    from: 4, to: 5, 
+                    label: 'Purchase\n$18K', 
+                    arrows: 'to',
+                    color: { color: '#96ceb4', highlight: '#68a593' },
+                    width: 2,
+                    font: { color: '#333', size: 11, face: 'Arial' }
+                },
+                {
+                    from: 2, to: 1, 
+                    label: 'License\n& Service', 
+                    arrows: 'to',
+                    color: { color: '#4ecdc4', highlight: '#00a39c' },
+                    width: 2,
+                    dashes: true,
+                    font: { color: '#333', size: 11, face: 'Arial' }
+                }
+            ]);
+            
+            createNetwork();
+        }
+        
+        function drawWorkflowView() {
+            nodes = new vis.DataSet([
+                { id: 1, label: 'Start', color: { background: '#ffd93d' }, shape: 'circle' },
+                { id: 2, label: 'Technical\nDesign', color: { background: '#45b7d1' }, shape: 'box' },
+                { id: 3, label: 'Cost\nEstimation', color: { background: '#45b7d1' }, shape: 'box' },
+                { id: 4, label: 'Mytel\nNegotiation', color: { background: '#4ecdc4' }, shape: 'box' },
+                { id: 5, label: 'PTTEP\nApproval', color: { background: '#ff6b6b' }, shape: 'box' },
+                { id: 6, label: 'Contract\nSigning', color: { background: '#ffd93d' }, shape: 'box' },
+                { id: 7, label: 'Procurement', color: { background: '#96ceb4' }, shape: 'box' },
+                { id: 8, label: 'Delivery', color: { background: '#96ceb4' }, shape: 'box' },
+                { id: 9, label: 'Installation', color: { background: '#45b7d1' }, shape: 'box' },
+                { id: 10, label: 'Testing', color: { background: '#45b7d1' }, shape: 'box' },
+                { id: 11, label: 'Go-Live', color: { background: '#6bcf7f' }, shape: 'circle' }
+            ]);
+            
+            edges = new vis.DataSet([
+                { from: 1, to: 2, arrows: 'to', width: 2 },
+                { from: 2, to: 3, arrows: 'to', width: 2 },
+                { from: 3, to: 4, arrows: 'to', width: 3, color: '#ff0000' },
+                { from: 4, to: 5, arrows: 'to', width: 3, color: '#ff0000' },
+                { from: 5, to: 6, arrows: 'to', width: 3, color: '#ff0000' },
+                { from: 6, to: 7, arrows: 'to', width: 2 },
+                { from: 7, to: 8, arrows: 'to', width: 2 },
+                { from: 8, to: 9, arrows: 'to', width: 2 },
+                { from: 9, to: 10, arrows: 'to', width: 2 },
+                { from: 10, to: 11, arrows: 'to', width: 2 }
+            ]);
+            
+            createNetwork();
+        }
+        
+        function drawFinancialFlow() {
+            nodes = new vis.DataSet([
+                {
+                    id: 1,
+                    label: 'PTTEP\n$300,000\n(5 years)',
+                    color: { background: '#ff6b6b' },
+                    shape: 'box',
+                    font: { color: 'white', size: 16, face: 'Arial' },
+                    size: 35
+                },
+                {
+                    id: 2,
+                    label: 'Mytel\n$255,000\nNet Profit',
+                    color: { background: '#4ecdc4' },
+                    shape: 'box',
+                    font: { color: 'white', size: 16, face: 'Arial' },
+                    size: 35
+                },
+                {
+                    id: 3,
+                    label: 'Addvalue\n$6,000\nMargin',
+                    color: { background: '#45b7d1' },
+                    shape: 'box',
+                    font: { color: 'white', size: 14, face: 'Arial' },
+                    size: 30
+                },
+                {
+                    id: 4,
+                    label: 'NextG\n$7,394\nMargin',
+                    color: { background: '#96ceb4' },
+                    shape: 'ellipse',
+                    size: 25
+                },
+                {
+                    id: 5,
+                    label: 'Ceragon\n$18,000\nBase Cost',
+                    color: { background: '#96ceb4' },
+                    shape: 'ellipse',
+                    size: 25
+                },
+                {
+                    id: 6,
+                    label: 'Services\n$7,752',
+                    color: { background: '#45b7d1' },
+                    shape: 'diamond',
+                    size: 20
+                },
+                {
+                    id: 7,
+                    label: 'Logistics\n$8,729',
+                    color: { background: '#45b7d1' },
+                    shape: 'diamond',
+                    size: 20
+                }
+            ]);
+            
+            edges = new vis.DataSet([
+                { from: 1, to: 2, label: '$5,000/month', arrows: 'to', color: '#ff6b6b', width: 4 },
+                { from: 2, to: 3, label: '$45,000', arrows: 'to', color: '#4ecdc4', width: 3 },
+                { from: 3, to: 4, label: '$22,515', arrows: 'to', color: '#45b7d1', width: 2 },
+                { from: 4, to: 5, label: '$18,000', arrows: 'to', color: '#96ceb4', width: 2 },
+                { from: 3, to: 6, arrows: 'to', color: '#45b7d1', width: 1 },
+                { from: 3, to: 7, arrows: 'to', color: '#45b7d1', width: 1 }
+            ]);
+            
+            createNetwork();
+        }
+        
+        function createNetwork() {
+            let data = {
+                nodes: nodes,
+                edges: edges
+            };
+            
+            let options = {
+                physics: {
+                    enabled: physicsEnabled,
+                    barnesHut: {
+                        gravitationalConstant: -5000,
+                        centralGravity: 0.3,
+                        springLength: 200,
+                        springConstant: 0.04
+                    },
+                    stabilization: {
+                        iterations: 200
+                    }
+                },
+                interaction: {
+                    hover: true,
+                    tooltipDelay: 200,
+                    zoomView: true,
+                    dragView: true
+                },
+                edges: {
+                    font: {
+                        size: 12,
+                        align: 'middle',
+                        face: 'Arial'
+                    },
+                    smooth: {
+                        type: 'curvedCW',
+                        roundness: 0.2
+                    }
+                },
+                nodes: {
+                    font: {
+                        size: 14,
+                        face: 'Arial'
+                    },
+                    borderWidth: 2
+                }
+            };
+            
+            network = new vis.Network(container, data, options);
+            
+            network.on("click", function(params) {
+                if (params.nodes.length > 0) {
+                    let nodeId = params.nodes[0];
+                    let node = nodes.get(nodeId);
+                    console.log('Selected:', node.label);
+                }
+            });
+        }
+        
+        function updateView() {
+            let viewMode = document.getElementById('viewMode').value;
+            switch(viewMode) {
+                case 'relationship':
+                    drawRelationshipView();
+                    break;
+                case 'workflow':
+                    drawWorkflowView();
+                    break;
+                case 'financial':
+                    drawFinancialFlow();
+                    break;
+            }
+        }
+        
+        function resetNetwork() {
+            network.fit();
+        }
+        
+        function togglePhysics() {
+            physicsEnabled = !physicsEnabled;
+            network.setOptions({ physics: { enabled: physicsEnabled } });
+        }
+        
+        function highlightCritical() {
+            let viewMode = document.getElementById('viewMode').value;
+            if (viewMode === 'workflow') {
+                // Highlight critical path in workflow
+                edges.update([
+                    { id: 3, color: { color: '#ff0000' }, width: 4 },
+                    { id: 4, color: { color: '#ff0000' }, width: 4 },
+                    { id: 5, color: { color: '#ff0000' }, width: 4 }
+                ]);
+            } else if (viewMode === 'relationship') {
+                // Highlight main flow
+                edges.update([
+                    { id: 1, width: 5 },
+                    { id: 2, width: 5 }
+                ]);
+            }
+        }
+        
+        // Initialize with relationship view
+        drawRelationshipView();
+    </script>
+</body>
+</html>

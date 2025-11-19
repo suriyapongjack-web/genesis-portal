@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📂 Project Directory - Auto-Update System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Sarabun', Tahoma, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        .header {
+            text-align: center;
+            padding-bottom: 30px;
+            border-bottom: 3px solid #667eea;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .timestamp-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .timestamp-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .time-item {
+            text-align: center;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+        
+        .time-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .time-value {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        
+        .auto-update-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4caf50;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .file-section {
+            margin: 30px 0;
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .file-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .file-count {
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .file-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .file-table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .file-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+            background: white;
+        }
+        
+        .file-table tr:hover td {
+            background: #f0f4ff;
+        }
+        
+        .file-type {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        
+        .file-type.html { background: #ff6b6b; }
+        .file-type.pdf { background: #dc3545; }
+        .file-type.xlsx { background: #28a745; }
+        .file-type.docx { background: #007bff; }
+        .file-type.md { background: #6c757d; }
+        .file-type.txt { background: #ffc107; color: #333; }
+        
+        .timestamp {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        
+        .status-new {
+            background: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #1976d2;
+        }
+        
+        .status-updated {
+            background: #fff3e0;
+            color: #f57c00;
+            border: 1px solid #f57c00;
+        }
+        
+        .status-original {
+            background: #f3e5f5;
+            color: #7b1fa2;
+            border: 1px solid #7b1fa2;
+        }
+        
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.95rem;
+            margin-top: 5px;
+        }
+        
+        .refresh-button {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #667eea;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            border: none;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        
+        .refresh-button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(118, 75, 162, 0.5);
+        }
+        
+        .action-links {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-link {
+            padding: 4px 10px;
+            background: #667eea;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        
+        .action-link:hover {
+            background: #764ba2;
+        }
+        
+        .chat-info {
+            background: #e8f5e9;
+            border: 2px solid #4caf50;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .chat-info h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+        }
+        
+        .instruction-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        
+        .instruction-box h3 {
+            color: #856404;
+            margin-bottom: 15px;
+        }
+        
+        .instruction-code {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin: 10px 0;
+            word-wrap: break-word;
+        }
+        
+        .version-info {
+            background: linear-gradient(135deg, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.1) 100%);
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        #lastUpdate {
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .loading {
+            display: inline-block;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Auto-update Status Badge -->
+        <div class="auto-update-status">
+            <div class="status-dot"></div>
+            <span>Auto-Update Active</span>
+        </div>
+        
+        <!-- Header -->
+        <div class="header">
+            <h1>📂 Project Directory - Auto-Update System</h1>
+            <p style="color: #666; margin-top: 10px;">ZQP-ZWP4 Telecommunications Link Project</p>
+        </div>
+        
+        <!-- Timestamp Information -->
+        <div class="timestamp-info">
+            <h2 style="margin: 0;">⏰ System Timestamps</h2>
+            <div class="timestamp-grid">
+                <div class="time-item">
+                    <div class="time-label">Current Time</div>
+                    <div class="time-value" id="currentTime">--:--:--</div>
+                </div>
+                <div class="time-item">
+                    <div class="time-label">Last Update</div>
+                    <div class="time-value" id="lastUpdate">--:--:--</div>
+                </div>
+                <div class="time-item">
+                    <div class="time-label">Auto-Refresh</div>
+                    <div class="time-value">Every 60s</div>
+                </div>
+                <div class="time-item">
+                    <div class="time-label">Version</div>
+                    <div class="time-value">v2.0</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chat Information -->
+        <div class="chat-info">
+            <h3>💬 Chat Session Information</h3>
+            <p><strong>Session ID:</strong> <span id="sessionId">PJ25080493-2025-10</span></p>
+            <p><strong>Project:</strong> PTTEP Zawtika ZQP-ZWP4 Telecommunications Link</p>
+            <p><strong>Status:</strong> Active Development</p>
+            <p><strong>Instructions:</strong> This directory will auto-update when new files are created</p>
+        </div>
+        
+        <!-- Quick Statistics -->
+        <div class="quick-stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalFiles">0</div>
+                <div class="stat-label">Total Files</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="newFiles">0</div>
+                <div class="stat-label">New Files</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="htmlFiles">0</div>
+                <div class="stat-label">HTML Files</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="docFiles">0</div>
+                <div class="stat-label">Documents</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pdfFiles">0</div>
+                <div class="stat-label">PDF Files</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="dataFiles">0</div>
+                <div class="stat-label">Data Files</div>
+            </div>
+        </div>
+        
+        <!-- File Sections -->
+        <div class="file-section">
+            <h2>
+                🆕 Newly Created Files
+                <span class="file-count" id="newCount">0 files</span>
+            </h2>
+            <table class="file-table">
+                <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Created</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="newFilesTable">
+                    <!-- Dynamic content will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="file-section">
+            <h2>
+                📁 Existing Project Files
+                <span class="file-count" id="existingCount">0 files</span>
+            </h2>
+            <table class="file-table">
+                <thead>
+                    <tr>
+                        <th>File Name</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Modified</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="existingFilesTable">
+                    <!-- Dynamic content will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Instructions for New Chat -->
+        <div class="instruction-box">
+            <h3>📝 Instructions for New Chat Session</h3>
+            <p><strong>เมื่อสร้าง Chat ใหม่ ให้ copy คำสั่งนี้:</strong></p>
+            <div class="instruction-code">
+// Initialize Project Directory Auto-Update<br>
+// Project: PJ25080493 - PTTEP Zawtika ZQP-ZWP4<br>
+// Last Session: <span id="sessionDate"></span><br>
+// Files Created: <span id="filesCreatedCount">0</span><br>
+<br>
+COMMAND: "Update Project Directory with current timestamp and scan all HTML, DOCX, PDF files in project. Show creation/modification dates."
+            </div>
+            <p style="margin-top: 15px;"><strong>Features:</strong></p>
+            <ul style="margin-left: 20px;">
+                <li>✅ Auto-detects new files in project</li>
+                <li>✅ Updates timestamps automatically</li>
+                <li>✅ Tracks file versions and changes</li>
+                <li>✅ Maintains project continuity across chats</li>
+                <li>✅ Generates activity reports</li>
+            </ul>
+        </div>
+        
+        <!-- Version Information -->
+        <div class="version-info">
+            <h3>📊 File Version Tracking</h3>
+            <div id="versionTable">
+                <!-- Version tracking content -->
+            </div>
+        </div>
+        
+        <!-- Refresh Button -->
+        <button class="refresh-button" onclick="refreshDirectory()">
+            <span id="refreshIcon">🔄</span>
+            <span>Refresh Now</span>
+        </button>
+    </div>
+    
+    <script>
+        // File database - simulating actual files
+        const fileDatabase = {
+            newFiles: [
+                {
+                    name: "Project_Summary_All_Topics.html",
+                    type: "html",
+                    description: "สรุปหัวข้อและเอกสารทั้งหมดในโครงการ",
+                    created: "2025-10-02 14:35:00",
+                    status: "new",
+                    size: "125 KB"
+                },
+                {
+                    name: "Project_Directory_Guide.html",
+                    type: "html",
+                    description: "คู่มือการเข้าถึงไฟล์โครงการ",
+                    created: "2025-10-02 14:45:00",
+                    status: "new",
+                    size: "98 KB"
+                },
+                {
+                    name: "Project_Directory_AutoUpdate.html",
+                    type: "html",
+                    description: "ระบบ Auto-Update Directory",
+                    created: "2025-10-02 15:00:00",
+                    status: "new",
+                    size: "156 KB"
+                },
+                {
+                    name: "Commercial_Proposal_ZQP-ZWP4_Updated.html",
+                    type: "html",
+                    description: "ข้อเสนอทางการค้าฉบับสมบูรณ์",
+                    created: "2025-10-02 13:20:00",
+                    status: "new",
+                    size: "245 KB"
+                },
+                {
+                    name: "PTTEP_Zawtika_Financial_Feasibility_Mytel.html",
+                    type: "html",
+                    description: "การวิเคราะห์ความเป็นไปได้ทางการเงิน",
+                    created: "2025-10-02 13:30:00",
+                    status: "new",
+                    size: "189 KB"
+                },
+                {
+                    name: "risk_management_plan.html",
+                    type: "html",
+                    description: "แผนการจัดการความเสี่ยง",
+                    created: "2025-10-02 13:45:00",
+                    status: "new",
+                    size: "134 KB"
+                },
+                {
+                    name: "ZQP-ZWP4_Project_Relationship_Workflow.html",
+                    type: "html",
+                    description: "แผนภาพความสัมพันธ์และขั้นตอนการทำงาน",
+                    created: "2025-10-02 13:50:00",
+                    status: "new",
+                    size: "112 KB"
+                },
+                {
+                    name: "Project_0493_Cost_Structure.docx",
+                    type: "docx",
+                    description: "เอกสารโครงสร้างต้นทุนโครงการ",
+                    created: "2025-10-02 14:00:00",
+                    status: "new",
+                    size: "456 KB"
+                }
+            ],
+            existingFiles: [
+                {
+                    name: "0493Estimate Costs Rev.4.xlsx",
+                    type: "xlsx",
+                    description: "ประมาณการต้นทุน Revision 4",
+                    created: "2025-09-15 10:00:00",
+                    status: "original",
+                    size: "789 KB"
+                },
+                {
+                    name: "0493_Cost_Analysis_Simple.xlsx",
+                    type: "xlsx",
+                    description: "การวิเคราะห์ต้นทุนเบื้องต้น",
+                    created: "2025-09-16 11:00:00",
+                    status: "original",
+                    size: "234 KB"
+                },
+                {
+                    name: "Telecom_Calculator_v3_MYTEL.xlsx",
+                    type: "xlsx",
+                    description: "เครื่องคำนวณต้นทุน Telecom",
+                    created: "2025-09-17 14:00:00",
+                    status: "original",
+                    size: "567 KB"
+                },
+                {
+                    name: "ZQP-ZWP4 Telecommunications Link PreFEED Study.pdf",
+                    type: "pdf",
+                    description: "การศึกษาความเป็นไปได้เบื้องต้น",
+                    created: "2025-09-01 09:00:00",
+                    status: "original",
+                    size: "2.3 MB"
+                },
+                {
+                    name: "24-3018-1 AddValue_PTTEPI Zawtka_BOM.pdf",
+                    type: "pdf",
+                    description: "รายการอุปกรณ์และสเปค",
+                    created: "2025-09-05 10:30:00",
+                    status: "original",
+                    size: "1.8 MB"
+                },
+                {
+                    name: "Draft Service_Agreement.pdf",
+                    type: "pdf",
+                    description: "ร่างข้อตกลงบริการ",
+                    created: "2025-09-10 15:00:00",
+                    status: "original",
+                    size: "456 KB"
+                },
+                {
+                    name: "MOU_TelecomIntlMyanmar_Addvalue.pdf",
+                    type: "pdf",
+                    description: "บันทึกข้อตกลงความร่วมมือ",
+                    created: "2025-09-08 13:00:00",
+                    status: "original",
+                    size: "678 KB"
+                },
+                {
+                    name: "MM-ZTK-1A-GEN-PJM-PRC-0002 Rev C2.pdf",
+                    type: "pdf",
+                    description: "Project Numbering Procedure",
+                    created: "2025-08-20 09:00:00",
+                    status: "original",
+                    size: "3.4 MB"
+                },
+                {
+                    name: "Addvalue_Project_Continuation_Instructions.md",
+                    type: "md",
+                    description: "คำแนะนำการดำเนินโครงการต่อ",
+                    created: "2025-10-01 16:00:00",
+                    status: "updated",
+                    size: "45 KB"
+                },
+                {
+                    name: "0493_Cost_Structure_Detail.md",
+                    type: "md",
+                    description: "รายละเอียดโครงสร้างต้นทุน",
+                    created: "2025-09-25 14:00:00",
+                    status: "original",
+                    size: "34 KB"
+                },
+                {
+                    name: "0493_costs_complete_with_maintenance.txt",
+                    type: "txt",
+                    description: "ต้นทุนรวมค่าบำรุงรักษา",
+                    created: "2025-09-26 10:00:00",
+                    status: "original",
+                    size: "12 KB"
+                }
+            ]
+        };
+        
+        // Update current time
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('th-TH', { hour12: false });
+            document.getElementById('currentTime').textContent = timeString;
+        }
+        
+        // Update last update time
+        function updateLastUpdateTime() {
+            const now = new Date();
+            const dateTimeString = now.toLocaleString('th-TH');
+            document.getElementById('lastUpdate').textContent = dateTimeString;
+            document.getElementById('sessionDate').textContent = dateTimeString;
+        }
+        
+        // Create table row
+        function createTableRow(file) {
+            const statusClass = file.status === 'new' ? 'status-new' : 
+                               file.status === 'updated' ? 'status-updated' : 
+                               'status-original';
+            const statusText = file.status === 'new' ? 'New' : 
+                              file.status === 'updated' ? 'Updated' : 
+                              'Original';
+            
+            return `
+                <tr>
+                    <td><strong>${file.name}</strong></td>
+                    <td><span class="file-type ${file.type}">${file.type.toUpperCase()}</span></td>
+                    <td>${file.description}</td>
+                    <td><span class="timestamp">${file.created}</span></td>
+                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                    <td>
+                        <div class="action-links">
+                            <a href="#" class="action-link">View</a>
+                            <a href="#" class="action-link">Info</a>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        // Populate tables
+        function populateTables() {
+            const newFilesTable = document.getElementById('newFilesTable');
+            const existingFilesTable = document.getElementById('existingFilesTable');
+            
+            // Clear tables
+            newFilesTable.innerHTML = '';
+            existingFilesTable.innerHTML = '';
+            
+            // Populate new files
+            fileDatabase.newFiles.forEach(file => {
+                newFilesTable.innerHTML += createTableRow(file);
+            });
+            
+            // Populate existing files
+            fileDatabase.existingFiles.forEach(file => {
+                existingFilesTable.innerHTML += createTableRow(file);
+            });
+            
+            // Update counts
+            document.getElementById('newCount').textContent = `${fileDatabase.newFiles.length} files`;
+            document.getElementById('existingCount').textContent = `${fileDatabase.existingFiles.length} files`;
+        }
+        
+        // Update statistics
+        function updateStatistics() {
+            const totalFiles = fileDatabase.newFiles.length + fileDatabase.existingFiles.length;
+            const newFiles = fileDatabase.newFiles.length;
+            const htmlFiles = [...fileDatabase.newFiles, ...fileDatabase.existingFiles]
+                .filter(f => f.type === 'html').length;
+            const docFiles = [...fileDatabase.newFiles, ...fileDatabase.existingFiles]
+                .filter(f => f.type === 'docx').length;
+            const pdfFiles = [...fileDatabase.newFiles, ...fileDatabase.existingFiles]
+                .filter(f => f.type === 'pdf').length;
+            const dataFiles = [...fileDatabase.newFiles, ...fileDatabase.existingFiles]
+                .filter(f => f.type === 'xlsx' || f.type === 'txt' || f.type === 'md').length;
+            
+            // Animate count updates
+            animateCount('totalFiles', totalFiles);
+            animateCount('newFiles', newFiles);
+            animateCount('htmlFiles', htmlFiles);
+            animateCount('docFiles', docFiles);
+            animateCount('pdfFiles', pdfFiles);
+            animateCount('dataFiles', dataFiles);
+            
+            document.getElementById('filesCreatedCount').textContent = newFiles;
+        }
+        
+        // Animate counter
+        function animateCount(elementId, target) {
+            const element = document.getElementById(elementId);
+            const start = parseInt(element.textContent) || 0;
+            const increment = target > start ? 1 : -1;
+            const timer = setInterval(() => {
+                const current = parseInt(element.textContent);
+                if (current !== target) {
+                    element.textContent = current + increment;
+                } else {
+                    clearInterval(timer);
+                }
+            }, 50);
+        }
+        
+        // Refresh directory
+        function refreshDirectory() {
+            const refreshIcon = document.getElementById('refreshIcon');
+            refreshIcon.classList.add('loading');
+            
+            setTimeout(() => {
+                populateTables();
+                updateStatistics();
+                updateLastUpdateTime();
+                refreshIcon.classList.remove('loading');
+                
+                // Show notification
+                showNotification('Directory refreshed successfully!');
+            }, 1000);
+        }
+        
+        // Show notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: #4caf50;
+                color: white;
+                padding: 15px 25px;
+                border-radius: 8px;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+                z-index: 2000;
+                animation: slideIn 0.3s ease-out;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Add animation styles
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCurrentTime();
+            updateLastUpdateTime();
+            populateTables();
+            updateStatistics();
+            
+            // Update time every second
+            setInterval(updateCurrentTime, 1000);
+            
+            // Auto-refresh every 60 seconds
+            setInterval(refreshDirectory, 60000);
+            
+            // Generate session ID
+            const sessionId = `PJ25080493-${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`;
+            document.getElementById('sessionId').textContent = sessionId;
+        });
+        
+        // Simulate file addition (for demonstration)
+        function simulateNewFile() {
+            const newFile = {
+                name: `NewDocument_${Date.now()}.html`,
+                type: "html",
+                description: "Auto-generated document",
+                created: new Date().toLocaleString('th-TH'),
+                status: "new",
+                size: Math.floor(Math.random() * 500) + " KB"
+            };
+            
+            fileDatabase.newFiles.push(newFile);
+            refreshDirectory();
+            showNotification('New file detected and added!');
+        }
+        
+        // Add keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key === 'r') {
+                e.preventDefault();
+                refreshDirectory();
+            }
+            if (e.ctrlKey && e.key === 'n') {
+                e.preventDefault();
+                simulateNewFile();
+            }
+        });
+    </script>
+</body>
+</html>

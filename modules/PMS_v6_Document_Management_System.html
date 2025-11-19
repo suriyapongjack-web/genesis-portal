@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PMS v6.0 | Document Management System | PJ25080493</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --primary: #4f46e5;
+            --secondary: #7c3aed;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --border: #e5e7eb;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f3f4f6;
+            min-height: 100vh;
+        }
+        
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            transition: opacity 0.5s;
+        }
+        
+        .loading-screen.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--light);
+            border-radius: 8px;
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9rem;
+        }
+        
+        .btn-sync {
+            padding: 8px 16px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .btn-sync:hover {
+            background: #059669;
+        }
+        
+        /* Layout */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px;
+            display: flex;
+            gap: 24px;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+        
+        .sidebar-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 16px;
+        }
+        
+        .doc-tree {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .doc-category {
+            margin-bottom: 12px;
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .category-header:hover {
+            background: var(--light);
+        }
+        
+        .category-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .category-name {
+            flex: 1;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .category-count {
+            padding: 2px 6px;
+            background: var(--light);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        
+        .doc-list {
+            margin-left: 28px;
+            display: none;
+        }
+        
+        .doc-category.expanded .doc-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            margin-top: 4px;
+        }
+        
+        .doc-item {
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.2s;
+        }
+        
+        .doc-item:hover {
+            background: var(--light);
+        }
+        
+        .doc-item.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .doc-name {
+            font-size: 0.9rem;
+        }
+        
+        .doc-type {
+            font-size: 0.7rem;
+            padding: 2px 4px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 2px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .content-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .content-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .content-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-action {
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .btn-action:hover {
+            background: var(--light);
+        }
+        
+        .document-viewer {
+            padding: 24px;
+            height: calc(100vh - 250px);
+            overflow-y: auto;
+        }
+        
+        /* Document Grid View */
+        .doc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+        }
+        
+        .doc-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .doc-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .doc-card-header {
+            display: flex;
+            align-items: start;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .doc-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--light);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        .doc-info {
+            flex: 1;
+        }
+        
+        .doc-card-title {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+        
+        .doc-meta {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+        
+        .doc-preview {
+            padding: 12px;
+            background: var(--light);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: #4b5563;
+            max-height: 100px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        
+        .doc-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        
+        .doc-tag {
+            padding: 4px 8px;
+            background: var(--light);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        
+        /* Search Bar */
+        .search-container {
+            margin-bottom: 20px;
+        }
+        
+        .search-box {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        /* Status Bar */
+        .status-bar {
+            padding: 12px 24px;
+            background: var(--light);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+        
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .sync-indicator {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <p style="margin-top: 20px; color: #6b7280;">Loading Document Management System...</p>
+    </div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">DMS</div>
+                <div class="logo-text">PMS v6.0 - Document Central</div>
+            </div>
+            <div class="header-actions">
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <span>Admin User</span>
+                </div>
+                <button class="btn-sync" onclick="DMS.sync()">
+                    🔄 Sync Documents
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-title">Document Library</div>
+            
+            <div class="search-container">
+                <input type="text" class="search-box" placeholder="Search documents..." 
+                       oninput="DMS.search(this.value)">
+            </div>
+            
+            <div class="doc-tree" id="docTree"></div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h2 class="content-title" id="contentTitle">All Documents</h2>
+                <div class="content-actions">
+                    <button class="btn-action" onclick="DMS.viewMode('grid')">
+                        📱 Grid View
+                    </button>
+                    <button class="btn-action" onclick="DMS.viewMode('list')">
+                        📋 List View
+                    </button>
+                    <button class="btn-action" onclick="DMS.exportAll()">
+                        📥 Export All
+                    </button>
+                </div>
+            </div>
+            
+            <div class="document-viewer" id="documentViewer">
+                <!-- Documents will be loaded here -->
+            </div>
+            
+            <div class="status-bar">
+                <div class="sync-status">
+                    <div class="sync-indicator"></div>
+                    <span>Connected to Central Database</span>
+                </div>
+                <div>
+                    <span id="docCount">0</span> documents • 
+                    Last sync: <span id="lastSync">Just now</span>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Document Management System v6.0
+        const DMS = {
+            // Configuration for multi-user & database
+            config: {
+                projectId: 'PJ25080493',
+                apiEndpoint: '/api/v1/documents', // Ready for backend
+                userId: 'admin',
+                syncInterval: 30000, // 30 seconds
+                github: {
+                    repo: 'pms-documents',
+                    branch: 'main'
+                }
+            },
+            
+            // Central Document Repository
+            documents: {
+                'Commercial': [
+                    {
+                        id: 'COM001',
+                        name: 'Commercial_Proposal_ZQP-ZWP4',
+                        type: 'HTML',
+                        size: '156KB',
+                        date: '2024-12-24',
+                        author: 'Suriyapong',
+                        status: 'Final',
+                        content: `<h1>Commercial Proposal - PTTEPI Myanmar</h1>
+                        <h2>Project: Zawtika ZPQ-ZWP4 Telecommunications Link</h2>
+                        <p><strong>Date:</strong> December 2024</p>
+                        <h3>Executive Summary</h3>
+                        <p>AddValue Systems proposes a comprehensive 5-year rental service model for establishing a 30km microwave link between Zawtika platforms.</p>
+                        <h3>Service Offering</h3>
+                        <ul>
+                            <li>Turnkey telecommunications solution</li>
+                            <li>99.95% availability guarantee</li>
+                            <li>24/7 NOC monitoring</li>
+                            <li>Complete maintenance included</li>
+                        </ul>
+                        <h3>Commercial Terms</h3>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr><th style="border: 1px solid #ddd; padding: 8px;">Item</th><th style="border: 1px solid #ddd; padding: 8px;">Value</th></tr>
+                            <tr><td style="border: 1px solid #ddd; padding: 8px;">Contract Type</td><td style="border: 1px solid #ddd; padding: 8px;">5-year rental</td></tr>
+                            <tr><td style="border: 1px solid #ddd; padding: 8px;">Monthly Fee</td><td style="border: 1px solid #ddd; padding: 8px;">$3,500</td></tr>
+                            <tr><td style="border: 1px solid #ddd; padding: 8px;">Installation</td><td style="border: 1px solid #ddd; padding: 8px;">$56,268</td></tr>
+                            <tr><td style="border: 1px solid #ddd; padding: 8px;">Delivery</td><td style="border: 1px solid #ddd; padding: 8px;">24 weeks</td></tr>
+                        </table>`,
+                        tags: ['proposal', 'commercial', 'final']
+                    },
+                    {
+                        id: 'COM002',
+                        name: 'Service_Agreement_Draft',
+                        type: 'PDF',
+                        size: '2.1MB',
+                        date: '2024-12-10',
+                        author: 'Legal Team',
+                        status: 'Draft',
+                        content: `<h1>Service Agreement (Draft)</h1>
+                        <p>Between: PTTEP International Ltd. and AddValue Systems Co., Ltd.</p>
+                        <p>Through: Telecom International Myanmar Co., Ltd. (Mytel)</p>
+                        <h3>Terms and Conditions</h3>
+                        <ul>
+                            <li>5-year service agreement</li>
+                            <li>SLA: 99.95% availability</li>
+                            <li>Response time: 15 minutes</li>
+                            <li>Service credits for downtime</li>
+                        </ul>`,
+                        tags: ['agreement', 'legal', 'draft']
+                    }
+                ],
+                
+                'Financial': [
+                    {
+                        id: 'FIN001',
+                        name: '0493_Cost_Structure_Detail',
+                        type: 'XLSX',
+                        size: '780KB',
+                        date: '2024-12-22',
+                        author: 'Finance Team',
+                        status: 'Approved',
+                        content: `<h1>Project 0493 Cost Structure</h1>
+                        <h3>Total Project Cost: $167,456</h3>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr><th style="border: 1px solid #ddd; padding: 8px;">Component</th><th style="border: 1px solid #ddd; padding: 8px;">Amount</th><th style="border: 1px solid #ddd; padding: 8px;">%</th></tr>
+                            <tr><td style="border: 1px solid #ddd; padding: 8px;">Equipment</td><td style="border: 1px solid #ddd; padding: 8px;">$29,688</td><td style="border: 1px solid #ddd; padding: 8px;">17.7%</td></tr>
+                            <tr><td style="border: 1px solid #ddd; padding: 8px;">Implementation</td><td style="border: 1px solid #ddd; padding: 8px;">$56,268</td><td style="border: 1px solid #ddd; padding: 8px;">33.6%</td></tr>
+                            <tr><td style="border: 1px solid #ddd; padding: 8px;">5-Year Maintenance</td><td style="border: 1px solid #ddd; padding: 8px;">$81,500</td><td style="border: 1px solid #ddd; padding: 8px;">48.7%</td></tr>
+                        </table>
+                        <h3>ROI Analysis</h3>
+                        <ul>
+                            <li>5-Year ROI: 25.4%</li>
+                            <li>Payback Period: 25 months</li>
+                            <li>NPV: $42,544</li>
+                        </ul>`,
+                        tags: ['cost', 'financial', 'analysis']
+                    },
+                    {
+                        id: 'FIN002',
+                        name: 'ROI_Analysis',
+                        type: 'PDF',
+                        size: '1.2MB',
+                        date: '2024-12-20',
+                        author: 'Finance Team',
+                        status: 'Final',
+                        content: `<h1>Return on Investment Analysis</h1>
+                        <p>This analysis demonstrates positive ROI within 25 months.</p>`,
+                        tags: ['roi', 'analysis', 'financial']
+                    },
+                    {
+                        id: 'FIN003',
+                        name: 'PTTEP_Zawtika_Financial_Feasibility',
+                        type: 'HTML',
+                        size: '92KB',
+                        date: '2024-12-18',
+                        author: 'Strategy Team',
+                        status: 'Final',
+                        content: `<h1>Financial Feasibility Study - Mytel</h1>
+                        <h2>Investment Analysis</h2>
+                        <p>Total Investment: $45,590 (one-time)</p>
+                        <p>Monthly Revenue: $5,000 (guaranteed)</p>
+                        <p>Net Profit: $254,410 over 5 years</p>
+                        <p>ROI: 558% with 9.1-month payback</p>`,
+                        tags: ['feasibility', 'mytel', 'investment']
+                    }
+                ],
+                
+                'Technical': [
+                    {
+                        id: 'TECH001',
+                        name: 'Pre-FEED_Study',
+                        type: 'PDF',
+                        size: '2.4MB',
+                        date: '2024-11-15',
+                        author: 'Engineering',
+                        status: 'Approved',
+                        content: `<h1>Pre-FEED Study</h1>
+                        <h2>Zawtika ZPQ-ZWP4 Platform Connection</h2>
+                        <h3>Technical Requirements</h3>
+                        <ul>
+                            <li>Distance: 30 km over water</li>
+                            <li>Capacity: Minimum 100 Mbps</li>
+                            <li>Availability: >99.95%</li>
+                            <li>Frequency: 7-8 GHz licensed</li>
+                        </ul>`,
+                        tags: ['technical', 'pre-feed', 'engineering']
+                    },
+                    {
+                        id: 'TECH002',
+                        name: 'Ceragon_IP50CX_Datasheet',
+                        type: 'PDF',
+                        size: '1.8MB',
+                        date: '2024-12-10',
+                        author: 'Ceragon',
+                        status: 'Current',
+                        content: `<h1>Ceragon IP-50CX Technical Specifications</h1>
+                        <p>ATEX Zone 2 Certified Equipment</p>`,
+                        tags: ['equipment', 'ceragon', 'atex']
+                    },
+                    {
+                        id: 'TECH003',
+                        name: 'Link_Budget_Calculation',
+                        type: 'XLSX',
+                        size: '450KB',
+                        date: '2024-12-20',
+                        author: 'RF Team',
+                        status: 'Verified',
+                        content: `<h1>Link Budget Analysis</h1>
+                        <p>System Margin: 20 dB</p>
+                        <p>Availability: 99.987%</p>`,
+                        tags: ['rf', 'link-budget', 'technical']
+                    }
+                ],
+                
+                'Management': [
+                    {
+                        id: 'MGT001',
+                        name: 'Risk_Management_Plan',
+                        type: 'HTML',
+                        size: '85KB',
+                        date: '2024-12-25',
+                        author: 'PMO',
+                        status: 'Active',
+                        content: `<h1>Risk Management Plan</h1>
+                        <h2>Critical Risks</h2>
+                        <ul>
+                            <li>Equipment Delivery: HIGH - 24-week lead time</li>
+                            <li>Weather (Monsoon): MEDIUM - Schedule flexibility</li>
+                            <li>Technical Integration: LOW - Proven technology</li>
+                        </ul>
+                        <h3>Mitigation Strategies</h3>
+                        <p>Early ordering, contingency planning, spare equipment strategy.</p>`,
+                        tags: ['risk', 'management', 'planning']
+                    },
+                    {
+                        id: 'MGT002',
+                        name: 'Executive_Dashboard_Win_Loss',
+                        type: 'HTML',
+                        size: '112KB',
+                        date: '2024-12-24',
+                        author: 'Strategy',
+                        status: 'Final',
+                        content: `<h1>Executive Decision Matrix</h1>
+                        <h2>Stakeholder Win/Loss Analysis</h2>
+                        <h3>Winners Ranking</h3>
+                        <ol>
+                            <li>AddValue: ROI 360%, Exclusivity</li>
+                            <li>PTTEP: Zero Risk, Full Service</li>
+                            <li>Mytel: 30% Margin, Partnership</li>
+                            <li>NextG: 25% Margin, No Risk</li>
+                        </ol>`,
+                        tags: ['executive', 'strategy', 'analysis']
+                    },
+                    {
+                        id: 'MGT003',
+                        name: 'Stakeholder_Matrix_Analysis',
+                        type: 'HTML',
+                        size: '96KB',
+                        date: '2024-12-23',
+                        author: 'PMO',
+                        status: 'Current',
+                        content: `<h1>Stakeholder Matrix Analysis</h1>
+                        <h2>Risk Distribution</h2>
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <tr><th style="border: 1px solid #ddd; padding: 8px;">Stakeholder</th><th style="border: 1px solid #ddd; padding: 8px;">Technical Risk</th><th style="border: 1px solid #ddd; padding: 8px;">Financial Risk</th></tr>
+                            <tr><td style="border: 1px solid #ddd; padding: 8px;">PTTEP</td><td style="border: 1px solid #ddd; padding: 8px;">None</td><td style="border: 1px solid #ddd; padding: 8px;">Low</td></tr>
+                            <tr><td style="border: 1px solid #ddd; padding: 8px;">Mytel</td><td style="border: 1px solid #ddd; padding: 8px;">Low</td><td style="border: 1px solid #ddd; padding: 8px;">Medium</td></tr>
+                            <tr><td style="border: 1px solid #ddd; padding: 8px;">AddValue</td><td style="border: 1px solid #ddd; padding: 8px;">High</td><td style="border: 1px solid #ddd; padding: 8px;">Medium</td></tr>
+                        </table>`,
+                        tags: ['stakeholder', 'matrix', 'risk']
+                    },
+                    {
+                        id: 'MGT004',
+                        name: 'Project_Timeline',
+                        type: 'HTML',
+                        size: '52KB',
+                        date: '2024-12-24',
+                        author: 'PMO',
+                        status: 'Current',
+                        content: `<h1>Implementation Timeline</h1>
+                        <h2>24-Week Schedule</h2>
+                        <ul>
+                            <li>Weeks 1-4: Contract & Mobilization</li>
+                            <li>Weeks 5-20: Equipment Procurement</li>
+                            <li>Weeks 21-22: Site Preparation</li>
+                            <li>Weeks 23-24: Installation & Testing</li>
+                        </ul>`,
+                        tags: ['timeline', 'schedule', 'implementation']
+                    }
+                ],
+                
+                'Archive': [
+                    {
+                        id: 'ARC001',
+                        name: 'Addvalue_Continuation_Instructions',
+                        type: 'MD',
+                        size: '12KB',
+                        date: '2024-12-15',
+                        author: 'System',
+                        status: 'Reference',
+                        content: `<h1>Continuation Instructions</h1>
+                        <p>Instructions for new chat sessions...</p>`,
+                        tags: ['instructions', 'reference']
+                    },
+                    {
+                        id: 'ARC002',
+                        name: 'PTP_Pricing_Comparison',
+                        type: 'HTML',
+                        size: '68KB',
+                        date: '2024-09-19',
+                        author: 'Market Research',
+                        status: 'Historical',
+                        content: `<h1>Regional Pricing Analysis</h1>
+                        <p>PTP link pricing across SEA markets...</p>`,
+                        tags: ['pricing', 'comparison', 'archive']
+                    }
+                ]
+            },
+            
+            // Database Schema (for backend integration)
+            schema: {
+                users: {
+                    id: 'UUID',
+                    name: 'STRING',
+                    email: 'STRING',
+                    role: 'ENUM(admin, manager, viewer)',
+                    lastAccess: 'TIMESTAMP'
+                },
+                documents: {
+                    id: 'UUID',
+                    projectId: 'STRING',
+                    name: 'STRING',
+                    type: 'STRING',
+                    content: 'TEXT',
+                    metadata: 'JSON',
+                    createdBy: 'UUID',
+                    createdAt: 'TIMESTAMP',
+                    updatedAt: 'TIMESTAMP',
+                    version: 'INTEGER'
+                },
+                access_log: {
+                    id: 'UUID',
+                    userId: 'UUID',
+                    documentId: 'UUID',
+                    action: 'ENUM(view, edit, download)',
+                    timestamp: 'TIMESTAMP'
+                }
+            },
+            
+            // Initialize
+            init() {
+                this.renderSidebar();
+                this.renderDocuments('all');
+                this.updateStatus();
+                
+                // Hide loading screen
+                setTimeout(() => {
+                    document.getElementById('loadingScreen').classList.add('hide');
+                }, 1000);
+                
+                // Start sync interval
+                setInterval(() => this.sync(), this.config.syncInterval);
+                
+                console.log('DMS v6.0 initialized');
+            },
+            
+            // Render sidebar
+            renderSidebar() {
+                const tree = document.getElementById('docTree');
+                let html = '';
+                
+                Object.keys(this.documents).forEach(category => {
+                    const docs = this.documents[category];
+                    html += `
+                        <div class="doc-category" data-category="${category}">
+                            <div class="category-header" onclick="DMS.toggleCategory('${category}')">
+                                <span class="category-icon">📁</span>
+                                <span class="category-name">${category}</span>
+                                <span class="category-count">${docs.length}</span>
+                            </div>
+                            <div class="doc-list">
+                                ${docs.map(doc => `
+                                    <div class="doc-item" onclick="DMS.openDocument('${doc.id}')">
+                                        <span class="doc-name">${doc.name}</span>
+                                        <span class="doc-type">${doc.type}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                tree.innerHTML = html;
+                
+                // Expand first category
+                tree.querySelector('.doc-category').classList.add('expanded');
+            },
+            
+            // Render documents
+            renderDocuments(category) {
+                const viewer = document.getElementById('documentViewer');
+                const title = document.getElementById('contentTitle');
+                
+                let docs = [];
+                if (category === 'all') {
+                    Object.values(this.documents).forEach(catDocs => {
+                        docs = docs.concat(catDocs);
+                    });
+                    title.textContent = 'All Documents';
+                } else {
+                    docs = this.documents[category] || [];
+                    title.textContent = category + ' Documents';
+                }
+                
+                let html = '<div class="doc-grid">';
+                docs.forEach(doc => {
+                    html += `
+                        <div class="doc-card" onclick="DMS.openDocument('${doc.id}')">
+                            <div class="doc-card-header">
+                                <div class="doc-icon">${this.getIcon(doc.type)}</div>
+                                <div class="doc-info">
+                                    <div class="doc-card-title">${doc.name}</div>
+                                    <div class="doc-meta">${doc.type} • ${doc.size} • ${doc.date}</div>
+                                </div>
+                            </div>
+                            <div class="doc-preview">${doc.content.substring(0, 150)}...</div>
+                            <div class="doc-tags">
+                                ${doc.tags.map(tag => `<span class="doc-tag">#${tag}</span>`).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                
+                viewer.innerHTML = html;
+                this.updateStatus();
+            },
+            
+            // Open document
+            openDocument(docId) {
+                let doc = null;
+                Object.values(this.documents).forEach(catDocs => {
+                    const found = catDocs.find(d => d.id === docId);
+                    if (found) doc = found;
+                });
+                
+                if (!doc) return;
+                
+                const viewer = document.getElementById('documentViewer');
+                const title = document.getElementById('contentTitle');
+                
+                title.textContent = doc.name;
+                viewer.innerHTML = `
+                    <div style="background: white; padding: 24px; border-radius: 8px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                            <div>
+                                <h1 style="margin: 0 0 8px 0;">${doc.name}</h1>
+                                <div style="color: #6b7280; font-size: 0.9rem;">
+                                    ${doc.type} • ${doc.size} • ${doc.date} • Author: ${doc.author} • Status: ${doc.status}
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn-action" onclick="DMS.editDocument('${doc.id}')">✏️ Edit</button>
+                                <button class="btn-action" onclick="DMS.downloadDocument('${doc.id}')">⬇ Download</button>
+                                <button class="btn-action" onclick="DMS.shareDocument('${doc.id}')">🔗 Share</button>
+                            </div>
+                        </div>
+                        <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 20px;">
+                            ${doc.content}
+                        </div>
+                        <div style="margin-top: 20px;">
+                            <strong>Tags:</strong>
+                            ${doc.tags.map(tag => `<span style="padding: 4px 8px; background: #f3f4f6; border-radius: 4px; margin: 0 4px;">#${tag}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+                
+                // Log access
+                this.logAccess(doc.id, 'view');
+            },
+            
+            // Toggle category
+            toggleCategory(category) {
+                const catEl = document.querySelector(`[data-category="${category}"]`);
+                catEl.classList.toggle('expanded');
+            },
+            
+            // Search
+            search(query) {
+                if (!query) {
+                    this.renderDocuments('all');
+                    return;
+                }
+                
+                query = query.toLowerCase();
+                let results = [];
+                
+                Object.values(this.documents).forEach(catDocs => {
+                    catDocs.forEach(doc => {
+                        if (doc.name.toLowerCase().includes(query) ||
+                            doc.tags.some(tag => tag.includes(query)) ||
+                            doc.content.toLowerCase().includes(query)) {
+                            results.push(doc);
+                        }
+                    });
+                });
+                
+                this.renderSearchResults(results);
+            },
+            
+            // Render search results
+            renderSearchResults(docs) {
+                const viewer = document.getElementById('documentViewer');
+                const title = document.getElementById('contentTitle');
+                
+                title.textContent = `Search Results (${docs.length})`;
+                
+                if (docs.length === 0) {
+                    viewer.innerHTML = '<p style="text-align: center; color: #6b7280;">No documents found</p>';
+                    return;
+                }
+                
+                let html = '<div class="doc-grid">';
+                docs.forEach(doc => {
+                    html += `
+                        <div class="doc-card" onclick="DMS.openDocument('${doc.id}')">
+                            <div class="doc-card-header">
+                                <div class="doc-icon">${this.getIcon(doc.type)}</div>
+                                <div class="doc-info">
+                                    <div class="doc-card-title">${doc.name}</div>
+                                    <div class="doc-meta">${doc.type} • ${doc.size}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                
+                viewer.innerHTML = html;
+            },
+            
+            // Sync with database
+            async sync() {
+                console.log('Syncing with central database...');
+                
+                // In production, this would make API calls
+                // await fetch(this.config.apiEndpoint + '/sync', {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify({ projectId: this.config.projectId })
+                // });
+                
+                document.getElementById('lastSync').textContent = 'Just now';
+            },
+            
+            // Update status
+            updateStatus() {
+                let count = 0;
+                Object.values(this.documents).forEach(catDocs => {
+                    count += catDocs.length;
+                });
+                document.getElementById('docCount').textContent = count;
+            },
+            
+            // Get icon for file type
+            getIcon(type) {
+                const icons = {
+                    'HTML': '🌐',
+                    'PDF': '📄',
+                    'XLSX': '📊',
+                    'MD': '📝',
+                    'DOCX': '📃'
+                };
+                return icons[type] || '📋';
+            },
+            
+            // View mode
+            viewMode(mode) {
+                console.log('Switching to', mode, 'view');
+                // Implementation for different view modes
+            },
+            
+            // Export all documents
+            exportAll() {
+                console.log('Exporting all documents...');
+                // Implementation for export
+            },
+            
+            // Edit document
+            editDocument(docId) {
+                console.log('Editing document:', docId);
+                // Implementation for edit
+            },
+            
+            // Download document
+            downloadDocument(docId) {
+                console.log('Downloading document:', docId);
+                // Implementation for download
+            },
+            
+            // Share document
+            shareDocument(docId) {
+                console.log('Sharing document:', docId);
+                // Implementation for share
+            },
+            
+            // Log access (for audit trail)
+            logAccess(docId, action) {
+                const log = {
+                    userId: this.config.userId,
+                    documentId: docId,
+                    action: action,
+                    timestamp: new Date().toISOString()
+                };
+                console.log('Access log:', log);
+                // In production, send to backend
+            }
+        };
+        
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            DMS.init();
+        });
+    </script>
+</body>
+</html>

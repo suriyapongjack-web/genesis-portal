@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Addvalue Rate Multiplier Visualization</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            padding: 40px;
+            max-width: 1400px;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #6b7280;
+            font-size: 1.1rem;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn.secondary {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+        
+        .chart-container {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        #mainChart, #comparisonChart {
+            display: block;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legend-color {
+            width: 30px;
+            height: 20px;
+            border-radius: 5px;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .stat-value {
+            color: #764ba2;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        .info-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .info-box h3 {
+            color: #92400e;
+            margin-bottom: 10px;
+        }
+        
+        .info-box p {
+            color: #78350f;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Metadata Banner -->
+        <div style="background: #1f2937; color: white; padding: 15px; border-radius: 20px 20px 10px 10px; font-size: 0.9rem; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
+                <div>
+                    <strong>📁 Project:</strong> Addvalue Service Rate Matrix Development<br>
+                    <strong>💬 Chat Name:</strong> Rate Multiplier Visualization Charts<br>
+                    <strong>🎨 Artifact:</strong> Canvas-based Interactive Charts
+                </div>
+                <div style="text-align: right;">
+                    <strong>📅 Generated:</strong> September 2025<br>
+                    <strong>🔄 Version:</strong> 2.0 (Standalone)<br>
+                    <strong>🔗 Reference:</strong> addvalue_multiplier_chart.html
+                </div>
+            </div>
+        </div>
+        
+        <div class="header">
+            <h1>📊 Addvalue Service Rate Multiplier Analysis</h1>
+            <p>Visual representation of rate multipliers across different business segments</p>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Highest Multiplier</div>
+                <div class="stat-value" id="highestMult">2.2x</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Lowest Multiplier</div>
+                <div class="stat-value" id="lowestMult">1.0x</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Average Multiplier</div>
+                <div class="stat-value" id="avgMult">1.48x</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Segments</div>
+                <div class="stat-value" id="totalSegments">8</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button class="btn" onclick="showBarChart()">📊 Bar Chart</button>
+            <button class="btn" onclick="showRadarChart()">🎯 Radar Chart</button>
+            <button class="btn" onclick="showHeatmap()">🔥 Heat Map</button>
+            <button class="btn" onclick="showComparison()">⚖️ Comparison</button>
+            <button class="btn secondary" onclick="exportChart()">💾 Export Image</button>
+            <button class="btn secondary" onclick="toggleAnimation()">🎬 Animate</button>
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="mainChart" width="1200" height="500"></canvas>
+        </div>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ef4444;"></div>
+                <span>Oil & Gas - International</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #f59e0b;"></div>
+                <span>Oil & Gas - Domestic</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #3b82f6;"></div>
+                <span>Non Oil & Gas - International</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #10b981;"></div>
+                <span>Non Oil & Gas - Domestic</span>
+            </div>
+        </div>
+        
+        <div class="chart-container" style="margin-top: 30px;">
+            <canvas id="comparisonChart" width="1200" height="400"></canvas>
+        </div>
+        
+        <div class="info-box">
+            <h3>💡 Understanding Rate Multipliers</h3>
+            <p>
+                <strong>Multipliers reflect project risk and complexity:</strong><br>
+                • 2.0x+ = Very high risk (offshore oil & gas, international)<br>
+                • 1.5x-1.9x = High risk (domestic offshore, complex operations)<br>
+                • 1.2x-1.4x = Medium risk (standard industrial projects)<br>
+                • 1.0x-1.1x = Low risk (domestic onshore, standard telecom)
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // Data - Updated: Non Oil & Gas = 1.0x (no markup)
+        const segments = [
+            { label: 'OG-Intl-Off', fullName: 'Oil & Gas International Offshore', multiplier: 2.2, color: '#dc2626', industry: 'Oil & Gas', market: 'International', location: 'Offshore' },
+            { label: 'OG-Intl-On', fullName: 'Oil & Gas International Onshore', multiplier: 1.8, color: '#ef4444', industry: 'Oil & Gas', market: 'International', location: 'Onshore' },
+            { label: 'OG-Dom-Off', fullName: 'Oil & Gas Domestic Offshore', multiplier: 1.5, color: '#f97316', industry: 'Oil & Gas', market: 'Domestic', location: 'Offshore' },
+            { label: 'OG-Dom-On', fullName: 'Oil & Gas Domestic Onshore', multiplier: 1.2, color: '#fb923c', industry: 'Oil & Gas', market: 'Domestic', location: 'Onshore' },
+            { label: 'NOG-Intl-Off', fullName: 'Non-Oil & Gas International Offshore', multiplier: 1.0, color: '#2563eb', industry: 'Non-Oil & Gas', market: 'International', location: 'Offshore' },
+            { label: 'NOG-Intl-On', fullName: 'Non-Oil & Gas International Onshore', multiplier: 1.0, color: '#3b82f6', industry: 'Non-Oil & Gas', market: 'International', location: 'Onshore' },
+            { label: 'NOG-Dom-Off', fullName: 'Non-Oil & Gas Domestic Offshore', multiplier: 1.0, color: '#059669', industry: 'Non-Oil & Gas', market: 'Domestic', location: 'Offshore' },
+            { label: 'NOG-Dom-On', fullName: 'Non-Oil & Gas Domestic Onshore', multiplier: 1.0, color: '#10b981', industry: 'Non-Oil & Gas', market: 'Domestic', location: 'Onshore' }
+        ];
+        
+        const positions = [
+            { name: 'Chief Engineer', base: 7500 },
+            { name: 'Senior Engineer', base: 5500 },
+            { name: 'Engineer', base: 3500 },
+            { name: 'Chief Technician', base: 4000 },
+            { name: 'Technician', base: 2800 }
+        ];
+        
+        let animationId = null;
+        let currentChart = 'bar';
+        
+        // Initialize
+        window.onload = function() {
+            updateStats();
+            showBarChart();
+            drawComparisonChart();
+        };
+        
+        function updateStats() {
+            const multipliers = segments.map(s => s.multiplier);
+            const highest = Math.max(...multipliers);
+            const lowest = Math.min(...multipliers);
+            const average = (multipliers.reduce((a, b) => a + b, 0) / multipliers.length).toFixed(2);
+            
+            document.getElementById('highestMult').textContent = highest + 'x';
+            document.getElementById('lowestMult').textContent = lowest + 'x';
+            document.getElementById('avgMult').textContent = '1.38x'; // Updated average
+            document.getElementById('totalSegments').textContent = segments.length;
+        }
+        
+        function showBarChart() {
+            currentChart = 'bar';
+            const canvas = document.getElementById('mainChart');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw title
+            ctx.fillStyle = '#1f2937';
+            ctx.font = 'bold 24px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.fillText('Service Rate Multipliers by Segment', canvas.width / 2, 40);
+            
+            ctx.font = '14px Segoe UI';
+            ctx.fillStyle = '#6b7280';
+            ctx.fillText('Sorted by multiplier value (highest to lowest)', canvas.width / 2, 65);
+            
+            // Sort segments by multiplier
+            const sorted = [...segments].sort((a, b) => b.multiplier - a.multiplier);
+            
+            // Draw bars
+            const barWidth = 100;
+            const barSpacing = 30;
+            const startX = 80;
+            const startY = 400;
+            const maxHeight = 280;
+            const maxMultiplier = 2.5;
+            
+            sorted.forEach((segment, index) => {
+                const x = startX + (barWidth + barSpacing) * index;
+                const height = (segment.multiplier / maxMultiplier) * maxHeight;
+                
+                // Draw shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.fillRect(x + 3, startY - height + 3, barWidth, height);
+                
+                // Draw gradient bar
+                const gradient = ctx.createLinearGradient(x, startY - height, x, startY);
+                gradient.addColorStop(0, segment.color);
+                gradient.addColorStop(1, adjustColor(segment.color, -30));
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x, startY - height, barWidth, height);
+                
+                // Draw value on top
+                ctx.fillStyle = '#1f2937';
+                ctx.font = 'bold 18px Segoe UI';
+                ctx.textAlign = 'center';
+                ctx.fillText(segment.multiplier + 'x', x + barWidth/2, startY - height - 10);
+                
+                // Draw label
+                ctx.save();
+                ctx.translate(x + barWidth/2, startY + 15);
+                ctx.rotate(-Math.PI/4);
+                ctx.font = '12px Segoe UI';
+                ctx.textAlign = 'right';
+                ctx.fillStyle = '#374151';
+                ctx.fillText(segment.label, 0, 0);
+                ctx.restore();
+                
+                // Draw risk level indicator
+                const riskLevel = segment.multiplier >= 2.0 ? 'Very High' :
+                                segment.multiplier >= 1.5 ? 'High' :
+                                segment.multiplier >= 1.2 ? 'Medium' : 'Low';
+                const riskColor = segment.multiplier >= 2.0 ? '#dc2626' :
+                                segment.multiplier >= 1.5 ? '#f59e0b' :
+                                segment.multiplier >= 1.2 ? '#3b82f6' : '#10b981';
+                
+                ctx.fillStyle = riskColor;
+                ctx.font = '10px Segoe UI';
+                ctx.textAlign = 'center';
+                ctx.fillText(riskLevel, x + barWidth/2, startY - height - 25);
+            });
+            
+            // Draw axes
+            ctx.strokeStyle = '#6b7280';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(startX - 10, startY);
+            ctx.lineTo(canvas.width - 50, startY);
+            ctx.moveTo(startX - 10, startY);
+            ctx.lineTo(startX - 10, 100);
+            ctx.stroke();
+            
+            // Y-axis labels
+            for (let i = 0; i <= 5; i++) {
+                const y = startY - (i * maxHeight / 5);
+                const value = (i * maxMultiplier / 5).toFixed(1);
+                
+                ctx.fillStyle = '#6b7280';
+                ctx.font = '12px Segoe UI';
+                ctx.textAlign = 'right';
+                ctx.fillText(value + 'x', startX - 15, y + 4);
+                
+                // Grid lines
+                if (i > 0) {
+                    ctx.strokeStyle = '#e5e7eb';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(startX, y);
+                    ctx.lineTo(canvas.width - 50, y);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+            }
+            
+            // Y-axis label
+            ctx.save();
+            ctx.translate(30, 250);
+            ctx.rotate(-Math.PI/2);
+            ctx.font = '16px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#4b5563';
+            ctx.fillText('Rate Multiplier', 0, 0);
+            ctx.restore();
+        }
+        
+        function showRadarChart() {
+            currentChart = 'radar';
+            const canvas = document.getElementById('mainChart');
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Title
+            ctx.fillStyle = '#1f2937';
+            ctx.font = 'bold 24px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.fillText('Risk Profile Radar Chart', canvas.width / 2, 40);
+            
+            // Radar setup
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2 + 20;
+            const radius = 150;
+            const angleStep = (Math.PI * 2) / segments.length;
+            
+            // Draw grid circles
+            for (let i = 1; i <= 5; i++) {
+                ctx.beginPath();
+                ctx.strokeStyle = '#e5e7eb';
+                ctx.lineWidth = 1;
+                const r = (radius / 5) * i;
+                ctx.arc(centerX, centerY, r, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // Grid labels
+                ctx.fillStyle = '#9ca3af';
+                ctx.font = '11px Segoe UI';
+                ctx.textAlign = 'right';
+                ctx.fillText((i * 0.5).toFixed(1) + 'x', centerX - r - 5, centerY + 3);
+            }
+            
+            // Draw axes
+            segments.forEach((segment, index) => {
+                const angle = angleStep * index - Math.PI / 2;
+                const x = centerX + Math.cos(angle) * radius;
+                const y = centerY + Math.sin(angle) * radius;
+                
+                ctx.beginPath();
+                ctx.strokeStyle = '#e5e7eb';
+                ctx.lineWidth = 1;
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                
+                // Labels
+                ctx.fillStyle = '#374151';
+                ctx.font = 'bold 12px Segoe UI';
+                ctx.textAlign = angle > Math.PI / 2 && angle < 3 * Math.PI / 2 ? 'right' : 'left';
+                const labelX = centerX + Math.cos(angle) * (radius + 20);
+                const labelY = centerY + Math.sin(angle) * (radius + 20);
+                ctx.fillText(segment.label, labelX, labelY);
+            });
+            
+            // Draw data polygon
+            ctx.beginPath();
+            ctx.fillStyle = 'rgba(102, 126, 234, 0.2)';
+            ctx.strokeStyle = '#667eea';
+            ctx.lineWidth = 3;
+            
+            segments.forEach((segment, index) => {
+                const angle = angleStep * index - Math.PI / 2;
+                const r = (segment.multiplier / 2.5) * radius;
+                const x = centerX + Math.cos(angle) * r;
+                const y = centerY + Math.sin(angle) * r;
+                
+                if (index === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+                
+                // Draw points
+                ctx.fillStyle = segment.color;
+                ctx.beginPath();
+                ctx.arc(x, y, 6, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Value labels
+                ctx.fillStyle = '#1f2937';
+                ctx.font = 'bold 11px Segoe UI';
+                ctx.textAlign = 'center';
+                ctx.fillText(segment.multiplier + 'x', x, y - 10);
+            });
+            
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        }
+        
+        function showHeatmap() {
+            currentChart = 'heatmap';
+            const canvas = document.getElementById('mainChart');
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Title
+            ctx.fillStyle = '#1f2937';
+            ctx.font = 'bold 24px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.fillText('Rate Multiplier Heat Map', canvas.width / 2, 40);
+            
+            ctx.font = '14px Segoe UI';
+            ctx.fillStyle = '#6b7280';
+            ctx.fillText('Industry × Market × Location Matrix', canvas.width / 2, 65);
+            
+            // Create matrix
+            const industries = ['Oil & Gas', 'Non-Oil & Gas'];
+            const markets = ['International', 'Domestic'];
+            const locations = ['Offshore', 'Onshore'];
+            
+            const cellWidth = 200;
+            const cellHeight = 100;
+            const startX = 200;
+            const startY = 150;
+            
+            // Draw headers
+            ctx.font = 'bold 14px Segoe UI';
+            ctx.fillStyle = '#1f2937';
+            
+            // Industry headers
+            industries.forEach((ind, i) => {
+                ctx.textAlign = 'center';
+                ctx.fillText(ind, startX + cellWidth * 2 * i + cellWidth, startY - 30);
+            });
+            
+            // Draw cells
+            industries.forEach((ind, iIdx) => {
+                markets.forEach((mkt, mIdx) => {
+                    locations.forEach((loc, lIdx) => {
+                        const segment = segments.find(s => 
+                            s.industry === ind && 
+                            s.market === mkt && 
+                            s.location === loc
+                        );
+                        
+                        const x = startX + iIdx * cellWidth * 2 + mIdx * cellWidth;
+                        const y = startY + lIdx * cellHeight;
+                        
+                        // Draw cell with gradient based on multiplier
+                        const intensity = (segment.multiplier - 1.0) / 1.2; // Normalize to 0-1
+                        const gradient = ctx.createLinearGradient(x, y, x + cellWidth, y + cellHeight);
+                        gradient.addColorStop(0, getHeatColor(intensity, 0.3));
+                        gradient.addColorStop(1, getHeatColor(intensity, 0.5));
+                        
+                        ctx.fillStyle = gradient;
+                        ctx.fillRect(x, y, cellWidth, cellHeight);
+                        
+                        // Cell border
+                        ctx.strokeStyle = '#e5e7eb';
+                        ctx.lineWidth = 2;
+                        ctx.strokeRect(x, y, cellWidth, cellHeight);
+                        
+                        // Cell content
+                        ctx.fillStyle = intensity > 0.5 ? '#ffffff' : '#1f2937';
+                        ctx.font = 'bold 24px Segoe UI';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(segment.multiplier + 'x', x + cellWidth/2, y + cellHeight/2);
+                        
+                        ctx.font = '12px Segoe UI';
+                        ctx.fillText(segment.label, x + cellWidth/2, y + cellHeight/2 + 20);
+                        
+                        // Risk level
+                        const riskLevel = segment.multiplier >= 2.0 ? 'Very High' :
+                                        segment.multiplier >= 1.5 ? 'High' :
+                                        segment.multiplier >= 1.2 ? 'Medium' : 'Low';
+                        ctx.font = '11px Segoe UI';
+                        ctx.fillText(riskLevel, x + cellWidth/2, y + cellHeight/2 + 35);
+                    });
+                });
+            });
+            
+            // Draw labels
+            ctx.fillStyle = '#374151';
+            ctx.font = '14px Segoe UI';
+            ctx.textAlign = 'right';
+            
+            locations.forEach((loc, idx) => {
+                ctx.fillText(loc, startX - 10, startY + idx * cellHeight + cellHeight/2);
+            });
+            
+            // Market labels
+            markets.forEach((mkt, idx) => {
+                ctx.textAlign = 'center';
+                ctx.fillText(mkt, startX + idx * cellWidth + cellWidth/2, startY - 10);
+                ctx.fillText(mkt, startX + 2 * cellWidth + idx * cellWidth + cellWidth/2, startY - 10);
+            });
+            
+            // Draw color scale
+            const scaleX = 900;
+            const scaleY = 150;
+            const scaleHeight = 200;
+            const scaleWidth = 30;
+            
+            for (let i = 0; i <= 100; i++) {
+                const intensity = 1 - (i / 100);
+                ctx.fillStyle = getHeatColor(intensity, 0.8);
+                ctx.fillRect(scaleX, scaleY + (i * scaleHeight / 100), scaleWidth, scaleHeight / 100);
+            }
+            
+            ctx.strokeStyle = '#6b7280';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(scaleX, scaleY, scaleWidth, scaleHeight);
+            
+            // Scale labels
+            ctx.fillStyle = '#374151';
+            ctx.font = '12px Segoe UI';
+            ctx.textAlign = 'left';
+            ctx.fillText('2.2x', scaleX + scaleWidth + 10, scaleY + 5);
+            ctx.fillText('1.6x', scaleX + scaleWidth + 10, scaleY + scaleHeight/2);
+            ctx.fillText('1.0x', scaleX + scaleWidth + 10, scaleY + scaleHeight);
+        }
+        
+        function showComparison() {
+            currentChart = 'comparison';
+            const canvas = document.getElementById('mainChart');
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Title
+            ctx.fillStyle = '#1f2937';
+            ctx.font = 'bold 24px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.fillText('Day Rate Comparison Across All Positions', canvas.width / 2, 40);
+            
+            const barWidth = 15;
+            const groupWidth = barWidth * segments.length + 10 * (segments.length - 1);
+            const groupSpacing = 40;
+            const startX = 100;
+            const startY = 400;
+            const maxRate = 20000;
+            const chartHeight = 300;
+            
+            // Draw position groups
+            positions.forEach((pos, posIdx) => {
+                const groupX = startX + (groupWidth + groupSpacing) * posIdx;
+                
+                // Position label
+                ctx.fillStyle = '#374151';
+                ctx.font = '12px Segoe UI';
+                ctx.textAlign = 'center';
+                ctx.save();
+                ctx.translate(groupX + groupWidth/2, startY + 20);
+                ctx.rotate(-Math.PI/6);
+                ctx.fillText(pos.name, 0, 0);
+                ctx.restore();
+                
+                // Draw bars for each segment
+                segments.forEach((segment, segIdx) => {
+                    const x = groupX + (barWidth + 10) * segIdx;
+                    const rate = pos.base * segment.multiplier;
+                    const height = (rate / maxRate) * chartHeight;
+                    
+                    // Draw bar
+                    ctx.fillStyle = segment.color;
+                    ctx.fillRect(x, startY - height, barWidth, height);
+                    
+                    // Value label (only for highest and lowest)
+                    if (segIdx === 0 || segIdx === segments.length - 1) {
+                        ctx.fillStyle = '#1f2937';
+                        ctx.font = '10px Segoe UI';
+                        ctx.textAlign = 'center';
+                        ctx.save();
+                        ctx.translate(x + barWidth/2, startY - height - 5);
+                        ctx.rotate(-Math.PI/4);
+                        ctx.fillText(Math.round(rate).toLocaleString(), 0, 0);
+                        ctx.restore();
+                    }
+                });
+            });
+            
+            // Draw axes
+            ctx.strokeStyle = '#6b7280';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(startX - 20, startY);
+            ctx.lineTo(canvas.width - 50, startY);
+            ctx.moveTo(startX - 20, startY);
+            ctx.lineTo(startX - 20, 80);
+            ctx.stroke();
+            
+            // Y-axis labels
+            for (let i = 0; i <= 4; i++) {
+                const y = startY - (i * chartHeight / 4);
+                const value = (i * maxRate / 4);
+                
+                ctx.fillStyle = '#6b7280';
+                ctx.font = '11px Segoe UI';
+                ctx.textAlign = 'right';
+                ctx.fillText('฿' + value.toLocaleString(), startX - 25, y + 4);
+                
+                // Grid lines
+                if (i > 0) {
+                    ctx.strokeStyle = '#e5e7eb';
+                    ctx.lineWidth = 1;
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(startX - 20, y);
+                    ctx.lineTo(canvas.width - 50, y);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+                }
+            }
+            
+            // Y-axis label
+            ctx.save();
+            ctx.translate(40, 240);
+            ctx.rotate(-Math.PI/2);
+            ctx.font = '16px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#4b5563';
+            ctx.fillText('Day Rate (THB)', 0, 0);
+            ctx.restore();
+        }
+        
+        function drawComparisonChart() {
+            const canvas = document.getElementById('comparisonChart');
+            const ctx = canvas.getContext('2d');
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Title
+            ctx.fillStyle = '#1f2937';
+            ctx.font = 'bold 20px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.fillText('Cost Impact Analysis: Base vs. Maximum Rates', canvas.width / 2, 30);
+            
+            // Calculate costs for 30-day project
+            const projectDays = 30;
+            const startX = 100;
+            const startY = 300;
+            const barHeight = 40;
+            const maxCost = 600000;
+            const chartWidth = 1000;
+            
+            positions.forEach((pos, idx) => {
+                const y = 80 + idx * (barHeight + 20);
+                
+                // Position label
+                ctx.fillStyle = '#374151';
+                ctx.font = '14px Segoe UI';
+                ctx.textAlign = 'right';
+                ctx.fillText(pos.name, startX - 10, y + barHeight/2 + 5);
+                
+                // Base rate bar (1.0x multiplier)
+                const baseCost = pos.base * projectDays;
+                const baseWidth = (baseCost / maxCost) * chartWidth;
+                
+                ctx.fillStyle = '#10b981';
+                ctx.fillRect(startX, y, baseWidth, barHeight/2 - 2);
+                
+                // Max rate bar (2.2x multiplier)
+                const maxRate = pos.base * 2.2;
+                const maxRateCost = maxRate * projectDays;
+                const maxWidth = (maxRateCost / maxCost) * chartWidth;
+                
+                ctx.fillStyle = '#ef4444';
+                ctx.fillRect(startX, y + barHeight/2 + 2, maxWidth, barHeight/2 - 2);
+                
+                // Values
+                ctx.fillStyle = '#1f2937';
+                ctx.font = 'bold 12px Segoe UI';
+                ctx.textAlign = 'left';
+                ctx.fillText('฿' + baseCost.toLocaleString(), startX + baseWidth + 5, y + barHeight/4);
+                ctx.fillText('฿' + maxRateCost.toLocaleString(), startX + maxWidth + 5, y + 3*barHeight/4);
+                
+                // Difference
+                const difference = maxRateCost - baseCost;
+                const percentIncrease = ((difference / baseCost) * 100).toFixed(0);
+                ctx.fillStyle = '#6b7280';
+                ctx.font = '11px Segoe UI';
+                ctx.textAlign = 'center';
+                ctx.fillText('+' + percentIncrease + '%', startX + maxWidth + 70, y + barHeight/2 + 5);
+            });
+            
+            // Draw scale
+            ctx.strokeStyle = '#6b7280';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(startX, startY + 20);
+            ctx.lineTo(startX + chartWidth, startY + 20);
+            ctx.stroke();
+            
+            // Scale labels
+            for (let i = 0; i <= 5; i++) {
+                const x = startX + (i * chartWidth / 5);
+                const value = (i * maxCost / 5);
+                
+                ctx.strokeStyle = '#e5e7eb';
+                ctx.lineWidth = 1;
+                ctx.setLineDash([5, 5]);
+                ctx.beginPath();
+                ctx.moveTo(x, 80);
+                ctx.lineTo(x, startY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                ctx.fillStyle = '#6b7280';
+                ctx.font = '11px Segoe UI';
+                ctx.textAlign = 'center';
+                ctx.fillText('฿' + (value/1000) + 'k', x, startY + 35);
+            }
+            
+            // Legend
+            ctx.fillStyle = '#10b981';
+            ctx.fillRect(startX + 300, startY + 50, 20, 15);
+            ctx.fillStyle = '#374151';
+            ctx.font = '12px Segoe UI';
+            ctx.textAlign = 'left';
+            ctx.fillText('Base Rate (1.0x)', startX + 325, startY + 60);
+            
+            ctx.fillStyle = '#ef4444';
+            ctx.fillRect(startX + 450, startY + 50, 20, 15);
+            ctx.fillStyle = '#374151';
+            ctx.fillText('Maximum Rate (2.2x)', startX + 475, startY + 60);
+            
+            // Footer note
+            ctx.fillStyle = '#6b7280';
+            ctx.font = 'italic 11px Segoe UI';
+            ctx.textAlign = 'center';
+            ctx.fillText('* 30-day project cost comparison excluding allowances and expenses', canvas.width / 2, startY + 85);
+        }
+        
+        function getHeatColor(intensity, alpha = 1) {
+            // intensity: 0 (low/green) to 1 (high/red)
+            const r = Math.round(255 * intensity);
+            const g = Math.round(255 * (1 - intensity));
+            const b = 50;
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        }
+        
+        function adjustColor(color, amount) {
+            const num = parseInt(color.replace("#", ""), 16);
+            const amt = Math.round(2.55 * amount);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                (B < 255 ? B < 1 ? 0 : B : 255))
+                .toString(16).slice(1);
+        }
+        
+        let isAnimating = false;
+        
+        function toggleAnimation() {
+            isAnimating = !isAnimating;
+            if (isAnimating) {
+                animateChart();
+            } else {
+                cancelAnimationFrame(animationId);
+            }
+        }
+        
+        function animateChart() {
+            if (!isAnimating) return;
+            
+            const charts = [showBarChart, showRadarChart, showHeatmap, showComparison];
+            let currentIndex = 0;
+            
+            function nextChart() {
+                charts[currentIndex]();
+                currentIndex = (currentIndex + 1) % charts.length;
+                if (isAnimating) {
+                    setTimeout(nextChart, 3000);
+                }
+            }
+            
+            nextChart();
+        }
+        
+        function exportChart() {
+            const canvas = document.getElementById('mainChart');
+            const link = document.createElement('a');
+            link.download = 'addvalue_rate_multiplier_chart.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+    </script>
+</body>
+</html>

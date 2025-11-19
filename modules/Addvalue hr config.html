@@ -1,0 +1,67 @@
+<?php
+// การตั้งค่า MySQL
+$dsn = 'mysql:host=localhost;dbname=hrms_addvalue;charset=utf8';
+$username = 'root'; // เปลี่ยนเป็น username ของคุณ
+$password = 'your_password'; // เปลี่ยนเป็น password ของคุณ
+
+try {
+    $pdo = new PDO($dsn, $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
+}
+
+// ฟังก์ชันดึงข้อมูลพนักงาน
+function getEmployees($pdo, $id_card = null, $name = null, $position = null) {
+    $query = "SELECT p.*, pay.position as pay_position, pay.monthly_salary 
+              FROM personnel p 
+              LEFT JOIN payroll pay ON p.id_card = pay.id_card 
+              WHERE 1=1";
+    $params = [];
+    
+    if ($id_card) {
+        $query .= " AND p.id_card = :id_card";
+        $params['id_card'] = $id_card;
+    }
+    if ($name) {
+        $query .= " AND p.full_name_en LIKE :name";
+        $params['name'] = "%$name%";
+    }
+    if ($position) {
+        $query .= " AND p.position LIKE :position";
+        $params['position'] = "%$position%";
+    }
+    
+    $stmt = $pdo->prepare($query);
+    $stmt->execute($params);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// ฟังก์ชันดึง passport หมดอายุ
+function getExpiredPassports($pdo, $current_date = '2025-10-26') {
+    $query = "SELECT p.full_name_en, pas.passport_no, pas.expiry_date 
+              FROM personnel p 
+              JOIN passport pas ON p.id_card = pas.id_card 
+              WHERE pas.expiry_date < :current_date";
+    $stmt = $pdo->prepare($query);
+    $stmt->execute(['current_date' => $current_date]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// ฟังก์ชันดึงพนักงาน Fit for Offshore
+function getOffshoreEligible($pdo) {
+    $query = "SELECT p.full_name_en, m.result, m.valid_until 
+              FROM personnel p 
+              JOIN medical m ON p.id_card = m.id_card 
+              WHERE m.result = 'Fit for Offshore'";
+    $stmt = $pdo->query($query);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// ฟังก์ชันคำนวณ payroll รวม
+function getTotalPayroll($pdo) {
+    $query = "SELECT SUM(monthly_salary) as total FROM payroll";
+    $stmt = $pdo->query($query);
+    return $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+}
+?>

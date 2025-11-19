@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard ใบตอบรับผู้รับเหมา - โครงการ LAN 76 จังหวัด</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            border-left: 5px solid #007bff;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card.pending {
+            border-left-color: #ffc107;
+        }
+
+        .stat-card.confirmed {
+            border-left-color: #28a745;
+        }
+
+        .stat-card.rejected {
+            border-left-color: #dc3545;
+        }
+
+        .stat-card h3 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .stat-card p {
+            font-size: 1.1rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .controls {
+            padding: 30px;
+            background: white;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .control-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .search-group {
+            display: flex;
+            gap: 15px;
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .form-control {
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .table-container {
+            padding: 30px;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .data-table thead {
+            background: linear-gradient(135deg, #343a40 0%, #495057 100%);
+            color: white;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .data-table th {
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+            min-width: 80px;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .status-confirmed {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .equipment-count {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .footer {
+            background: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            color: #6c757d;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .export-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .control-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-group {
+                min-width: auto;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-container {
+            background: white;
+            margin: 20px 30px;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .progress-bar {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            height: 100%;
+            transition: width 0.6s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 Dashboard ผู้รับเหมาประจำจังหวัด</h1>
+            <p>โครงการติดตั้งระบบเครือข่าย (LAN) 76 จังหวัด - Add Value System Company Limited</p>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3 id="totalProvinces">76</h3>
+                <p>📍 จำนวนจังหวัดทั้งหมด</p>
+            </div>
+            <div class="stat-card confirmed">
+                <h3 id="confirmedCount">0</h3>
+                <p>✅ ยืนยันเข้าร่วม</p>
+            </div>
+            <div class="stat-card pending">
+                <h3 id="pendingCount">76</h3>
+                <p>⏳ รอการตอบรับ</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="totalPoints">2,373</h3>
+                <p>🔌 จุดติดตั้งทั้งหมด</p>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3>📊 ความคืบหน้าการตอบรับ</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+            </div>
+            <p style="margin-top: 10px; color: #6c757d;">ร้อยละ <span id="progressPercent">0</span> ของจังหวัดทั้งหมด</p>
+        </div>
+
+        <div class="controls">
+            <div class="control-row">
+                <div class="search-group">
+                    <input type="text" id="searchInput" class="form-control" placeholder="🔍 ค้นหาจังหวัด...">
+                    <select id="statusFilter" class="form-control">
+                        <option value="">📋 สถานะทั้งหมด</option>
+                        <option value="confirmed">✅ ยืนยันแล้ว</option>
+                        <option value="pending">⏳ รอการตอบรับ</option>
+                        <option value="rejected">❌ ปฏิเสธ</option>
+                    </select>
+                </div>
+                <div class="export-section">
+                    <button class="btn btn-primary" onclick="exportToJSON()">📁 Export JSON</button>
+                    <button class="btn btn-success" onclick="exportToCSV()">📊 Export CSV</button>
+                    <button class="btn btn-warning" onclick="exportToPowerBI()">⚡ Power BI Format</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="data-table" id="provincesTable">
+                <thead>
+                    <tr>
+                        <th>ลำดับ</th>
+                        <th>จังหวัด</th>
+                        <th>ทีมงาน</th>
+                        <th>อีเมล</th>
+                        <th>จุดติดตั้ง</th>
+                        <th>Switch</th>
+                        <th>Rack Cabinet</th>
+                        <th>สถานะ</th>
+                        <th>ผู้ติดต่อ</th>
+                        <th>เบอร์โทร</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- ข้อมูลจะถูก populate ด้วย JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p>📅 วันที่อัพเดท: <span id="updateDate"></span> | 
+               🏢 Add Value System Company Limited | 
+               📧 addvalue-procurement@addvaluesystemcompany.onmicrosoft.com</p>
+        </div>
+    </div>
+
+    <script>
+        // ข้อมูลจังหวัดทั้ง 76 จังหวัด
+        const provincesData = [
+            {id: 1, name: "กระบี่", team: "Addvalue-กระบี่", email: "addvalue-krabi@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-กระบี่", phone: "-"},
+            {id: 2, name: "กาญจนบุรี", team: "Addvalue-กาญจนบุรี", email: "addvalue-kanchanaburi@outlook.co.th", points: 34, switches: 2, racks: 1, status: "pending", contact: "Addvalue-กาญจนบุรี", phone: "-"},
+            {id: 3, name: "กาฬสินธุ์", team: "Addvalue-กาฬสินธุ์", email: "addvalue-kalasin@outlook.co.th", points: 37, switches: 2, racks: 1, status: "pending", contact: "Addvalue-กาฬสินธุ์", phone: "-"},
+            {id: 4, name: "กำแพงเพชร", team: "Addvalue-กำแพงเพชร", email: "addvalue-kamphaengphet@outlook.co.th", points: 11, switches: 2, racks: 1, status: "pending", contact: "Addvalue-กำแพงเพชร", phone: "-"},
+            {id: 5, name: "ขอนแก่น", team: "Addvalue-ขอนแก่น", email: "addvalue-khonkaen@outlook.co.th", points: 53, switches: 3, racks: 1, status: "pending", contact: "Addvalue-ขอนแก่น", phone: "-"},
+            {id: 6, name: "จันทบุรี", team: "Addvalue-จันทบุรี", email: "addvalue-chanthaburi@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-จันทบุรี", phone: "-"},
+            {id: 7, name: "ฉะเชิงเทรา", team: "Addvalue-ฉะเชิงเทรา", email: "addvalue-chachoengsao@outlook.co.th", points: 31, switches: 2, racks: 1, status: "pending", contact: "Addvalue-ฉะเชิงเทรา", phone: "-"},
+            {id: 8, name: "ชลบุรี", team: "Addvalue-ชลบุรี", email: "addvalue-chonburi@outlook.co.th", points: 48, switches: 3, racks: 1, status: "confirmed", contact: "Addvalue-ชลบุรี", phone: "-"},
+            {id: 9, name: "ชัยนาท", team: "Addvalue-ชัยนาท", email: "addvalue-chainat@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-ชัยนาท", phone: "-"},
+            {id: 10, name: "ชัยภูมิ", team: "Addvalue-ชัยภูมิ", email: "addvalue-chaiyaphum@outlook.co.th", points: 34, switches: 2, racks: 1, status: "pending", contact: "Addvalue-ชัยภูมิ", phone: "-"},
+            {id: 11, name: "ชุมพร", team: "Addvalue-ชุมพร", email: "addvalue-chumphon@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-ชุมพร", phone: "-"},
+            {id: 12, name: "เชียงราย", team: "Addvalue-เชียงราย", email: "addvalue-chiangrai@outlook.co.th", points: 38, switches: 2, racks: 1, status: "pending", contact: "Addvalue-เชียงราย", phone: "-"},
+            {id: 13, name: "เชียงใหม่", team: "Addvalue-เชียงใหม่", email: "addvalue-chiangmai@outlook.co.th", points: 53, switches: 3, racks: 1, status: "confirmed", contact: "Addvalue-เชียงใหม่", phone: "-"},
+            {id: 14, name: "ตรัง", team: "Addvalue-ตรัง", email: "addvalue-trang@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-ตรัง", phone: "-"},
+            {id: 15, name: "ตราด", team: "Addvalue-ตราด", email: "addvalue-trat@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-ตราด", phone: "-"},
+            {id: 16, name: "ตาก", team: "Addvalue-ตาก", email: "addvalue-tak@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-ตาก", phone: "-"},
+            {id: 17, name: "นครนายก", team: "Addvalue-นครนายก", email: "addvalue-nakhonnayok@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-นครนายก", phone: "-"},
+            {id: 18, name: "นครปฐม", team: "Addvalue-นครปฐม", email: "addvalue-nakhonpathom@outlook.co.th", points: 34, switches: 2, racks: 1, status: "pending", contact: "Addvalue-นครปฐม", phone: "-"},
+            {id: 19, name: "นครพนม", team: "Addvalue-นครพนม", email: "addvalue-nakhonphanom@outlook.co.th", points: 11, switches: 2, racks: 1, status: "pending", contact: "Addvalue-นครพนม", phone: "-"},
+            {id: 20, name: "นครราชสีมา", team: "Addvalue-นครราชสีมา", email: "addvalue-nakhonratchasima@outlook.co.th", points: 43, switches: 3, racks: 1, status: "pending", contact: "Addvalue-นครราชสีมา", phone: "-"},
+            {id: 21, name: "นครศรีธรรมราช", team: "Addvalue-นครศรีธรรมราช", email: "addvalue-nakhonsithammarat@outlook.co.th", points: 38, switches: 2, racks: 1, status: "pending", contact: "Addvalue-นครศรีธรรมราช", phone: "-"},
+            {id: 22, name: "นครสวรรค์", team: "Addvalue-นครสวรรค์", email: "addvalue-nakhonsawan@outlook.co.th", points: 34, switches: 2, racks: 1, status: "pending", contact: "Addvalue-นครสวรรค์", phone: "-"},
+            {id: 23, name: "นนทบุรี", team: "Addvalue-นนทบุรี", email: "addvalue-nonthaburi@outlook.co.th", points: 31, switches: 2, racks: 1, status: "pending", contact: "Addvalue-นนทบุรี", phone: "-"},
+            {id: 24, name: "นราธิวาส", team: "Addvalue-นราธิวาส", email: "addvalue-narathiwat@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-นราธิวาส", phone: "-"},
+            {id: 25, name: "น่าน", team: "Addvalue-น่าน", email: "addvalue-nan@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-น่าน", phone: "-"},
+            {id: 26, name: "บึงกาฬ", team: "Addvalue-บึงกาฬ", email: "addvalue-buengkan@outlook.co.th", points: 11, switches: 2, racks: 1, status: "pending", contact: "Addvalue-บึงกาฬ", phone: "-"},
+            {id: 27, name: "บุรีรัมย์", team: "Addvalue-บุรีรัมย์", email: "addvalue-buriram@outlook.co.th", points: 38, switches: 2, racks: 1, status: "pending", contact: "Addvalue-บุรีรัมย์", phone: "-"},
+            {id: 28, name: "ปทุมธานี", team: "Addvalue-ปทุมธานี", email: "addvalue-pathumthani@outlook.co.th", points: 34, switches: 2, racks: 1, status: "pending", contact: "Addvalue-ปทุมธานี", phone: "-"},
+            {id: 29, name: "ประจวบคีรีขันธ์", team: "Addvalue-ประจวบคีรีขันธ์", email: "addvalue-prachuapkhirikhan@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-ประจวบคีรีขันธ์", phone: "-"},
+            {id: 30, name: "ปราจีนบุรี", team: "Addvalue-ปราจีนบุรี", email: "addvalue-prachinburi@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-ปราจีนบุรี", phone: "-"},
+            {id: 31, name: "ปัตตานี", team: "Addvalue-ปัตตานี", email: "addvalue-pattani@outlook.co.th", points: 11, switches: 2, racks: 1, status: "pending", contact: "Addvalue-ปัตตานี", phone: "-"},
+            {id: 32, name: "พระนครศรีอยุธยา", team: "Addvalue-พระนครศรีอยุธยา", email: "addvalue-ayutthaya@outlook.co.th", points: 34, switches: 2, racks: 1, status: "pending", contact: "Addvalue-พระนครศรีอยุธยา", phone: "-"},
+            {id: 33, name: "พะเยา", team: "Addvalue-พะเยา", email: "addvalue-phayao@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-พะเยา", phone: "-"},
+            {id: 34, name: "พังงา", team: "Addvalue-พังงา", email: "addvalue-phangnga@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-พังงา", phone: "-"},
+            {id: 35, name: "พัทลุง", team: "Addvalue-พัทลุง", email: "addvalue-phatthalung@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-พัทลุง", phone: "-"},
+            {id: 36, name: "พิจิตร", team: "Addvalue-พิจิตร", email: "addvalue-phichit@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-พิจิตร", phone: "-"},
+            {id: 37, name: "พิษณุโลก", team: "Addvalue-พิษณุโลก", email: "addvalue-phitsanulok@outlook.co.th", points: 34, switches: 2, racks: 1, status: "pending", contact: "Addvalue-พิษณุโลก", phone: "-"},
+            {id: 38, name: "เพชรบุรี", team: "Addvalue-เพชรบุรี", email: "addvalue-phetchaburi@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-เพชรบุรี", phone: "-"},
+            {id: 39, name: "เพชรบูรณ์", team: "Addvalue-เพชรบูรณ์", email: "addvalue-phetchabun@outlook.co.th", points: 34, switches: 2, racks: 1, status: "pending", contact: "Addvalue-เพชรบูรณ์", phone: "-"},
+            {id: 40, name: "แพร่", team: "Addvalue-แพร่", email: "addvalue-phrae@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-แพร่", phone: "-"},
+            {id: 41, name: "ภูเก็ต", team: "Addvalue-ภูเก็ต", email: "addvalue-phuket@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-ภูเก็ต", phone: "-"},
+            {id: 42, name: "มหาสารคาม", team: "Addvalue-มหาสารคาม", email: "addvalue-mahasarakham@outlook.co.th", points: 34, switches: 2, racks: 1, status: "pending", contact: "Addvalue-มหาสารคาม", phone: "-"},
+            {id: 43, name: "มุกดาหาร", team: "Addvalue-มุกดาหาร", email: "addvalue-mukdahan@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-มุกดาหาร", phone: "-"},
+            {id: 44, name: "แม่ฮ่องสอน", team: "Addvalue-แม่ฮ่องสอน", email: "addvalue-maehongson@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-แม่ฮ่องสอน", phone: "-"},
+            {id: 45, name: "ยโสธร", team: "Addvalue-ยโสธร", email: "addvalue-yasothon@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-ยโสธร", phone: "-"},
+            {id: 46, name: "ยะลา", team: "Addvalue-ยะลา", email: "addvalue-yala@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-ยะลา", phone: "-"},
+            {id: 47, name: "ร้อยเอ็ด", team: "Addvalue-ร้อยเอ็ด", email: "addvalue-roiet@outlook.co.th", points: 38, switches: 2, racks: 1, status: "pending", contact: "Addvalue-ร้อยเอ็ด", phone: "-"},
+            {id: 48, name: "ระนอง", team: "Addvalue-ระนอง", email: "addvalue-ranong@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-ระนอง", phone: "-"},
+            {id: 49, name: "ระยอง", team: "Addvalue-ระยอง", email: "addvalue-rayong@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-ระยอง", phone: "-"},
+            {id: 50, name: "ราชบุรี", team: "Addvalue-ราชบุรี", email: "addvalue-ratchaburi@outlook.co.th", points: 34, switches: 2, racks: 1, status: "pending", contact: "Addvalue-ราชบุรี", phone: "-"},
+            {id: 51, name: "ลพบุรี", team: "Addvalue-ลพบุรี", email: "addvalue-lopburi@outlook.co.th", points: 31, switches: 2, racks: 1, status: "pending", contact: "Addvalue-ลพบุรี", phone: "-"},
+            {id: 52, name: "ลำปาง", team: "Addvalue-ลำปาง", email: "addvalue-lampang@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-ลำปาง", phone: "-"},
+            {id: 53, name: "ลำพูน", team: "Addvalue-ลำพูน", email: "addvalue-lamphun@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-ลำพูน", phone: "-"},
+            {id: 54, name: "เลย", team: "Addvalue-เลย", email: "addvalue-loei@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-เลย", phone: "-"},
+            {id: 55, name: "ศรีสะเกษ", team: "Addvalue-ศรีสะเกษ", email: "addvalue-sisaket@outlook.co.th", points: 38, switches: 2, racks: 1, status: "pending", contact: "Addvalue-ศรีสะเกษ", phone: "-"},
+            {id: 56, name: "สกลนคร", team: "Addvalue-สกลนคร", email: "addvalue-sakonnakhon@outlook.co.th", points: 34, switches: 2, racks: 1, status: "pending", contact: "Addvalue-สกลนคร", phone: "-"},
+            {id: 57, name: "สงขลา", team: "Addvalue-สงขลา", email: "addvalue-songkhla@outlook.co.th", points: 51, switches: 3, racks: 1, status: "pending", contact: "Addvalue-สงขลา", phone: "-"},
+            {id: 58, name: "สตูล", team: "Addvalue-สตูล", email: "addvalue-satun@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-สตูล", phone: "-"},
+            {id: 59, name: "สมุทรปราการ", team: "Addvalue-สมุทรปราการ", email: "addvalue-samutprakan@outlook.co.th", points: 34, switches: 2, racks: 1, status: "pending", contact: "Addvalue-สมุทรปราการ", phone: "-"},
+            {id: 60, name: "สมุทรสงคราม", team: "Addvalue-สมุทรสงคราม", email: "addvalue-samutsongkhram@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-สมุทรสงคราม", phone: "-"},
+            {id: 61, name: "สมุทรสาคร", team: "Addvalue-สมุทรสาคร", email: "addvalue-samutsakhon@outlook.co.th", points: 11, switches: 2, racks: 1, status: "pending", contact: "Addvalue-สมุทรสาคร", phone: "-"},
+            {id: 62, name: "สระแก้ว", team: "Addvalue-สระแก้ว", email: "addvalue-sakaeo@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-สระแก้ว", phone: "-"},
+            {id: 63, name: "สระบุรี", team: "Addvalue-สระบุรี", email: "addvalue-saraburi@outlook.co.th", points: 31, switches: 2, racks: 1, status: "pending", contact: "Addvalue-สระบุรี", phone: "-"},
+            {id: 64, name: "สิงห์บุรี", team: "Addvalue-สิงห์บุรี", email: "addvalue-singburi@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-สิงห์บุรี", phone: "-"},
+            {id: 65, name: "สุโขทัย", team: "Addvalue-สุโขทัย", email: "addvalue-sukhothai@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-สุโขทัย", phone: "-"},
+            {id: 66, name: "สุพรรณบุรี", team: "Addvalue-สุพรรณบุรี", email: "addvalue-suphanburi@outlook.co.th", points: 31, switches: 2, racks: 1, status: "pending", contact: "Addvalue-สุพรรณบุรี", phone: "-"},
+            {id: 67, name: "สุราษฎร์ธานี", team: "Addvalue-สุราษฎร์ธานี", email: "addvalue-suratthani@outlook.co.th", points: 34, switches: 2, racks: 1, status: "pending", contact: "Addvalue-สุราษฎร์ธานี", phone: "-"},
+            {id: 68, name: "สุรินทร์", team: "Addvalue-สุรินทร์", email: "addvalue-surin@outlook.co.th", points: 38, switches: 2, racks: 1, status: "pending", contact: "Addvalue-สุรินทร์", phone: "-"},
+            {id: 69, name: "หนองคาย", team: "Addvalue-หนองคาย", email: "addvalue-nongkhai@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-หนองคาย", phone: "-"},
+            {id: 70, name: "หนองบัวลำภู", team: "Addvalue-หนองบัวลำภู", email: "addvalue-nongbualamphu@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-หนองบัวลำภู", phone: "-"},
+            {id: 71, name: "อ่างทอง", team: "Addvalue-อ่างทอง", email: "addvalue-angthong@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-อ่างทอง", phone: "-"},
+            {id: 72, name: "อำนาจเจริญ", team: "Addvalue-อำนาจเจริญ", email: "addvalue-amnatcharoen@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-อำนาจเจริญ", phone: "-"},
+            {id: 73, name: "อุดรธานี", team: "Addvalue-อุดรธานี", email: "addvalue-udonthani@outlook.co.th", points: 38, switches: 2, racks: 1, status: "pending", contact: "Addvalue-อุดรธานี", phone: "-"},
+            {id: 74, name: "อุตรดิตถ์", team: "Addvalue-อุตรดิตถ์", email: "addvalue-uttaradit@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-อุตรดิตถ์", phone: "-"},
+            {id: 75, name: "อุทัยธานี", team: "Addvalue-อุทัยธานี", email: "addvalue-uthaithani@outlook.co.th", points: 29, switches: 2, racks: 1, status: "pending", contact: "Addvalue-อุทัยธานี", phone: "-"},
+            {id: 76, name: "อุบลราชธานี", team: "Addvalue-อุบลราชธานี", email: "addvalue-ubonratchathani@outlook.co.th", points: 39, switches: 2, racks: 1, status: "pending", contact: "Addvalue-อุบลราชธานี", phone: "-"}
+        ];
+
+        let filteredData = [...provincesData];
+
+        // อัพเดทสถิติ
+        function updateStats() {
+            const confirmed = provincesData.filter(p => p.status === 'confirmed').length;
+            const pending = provincesData.filter(p => p.status === 'pending').length;
+            const rejected = provincesData.filter(p => p.status === 'rejected').length;
+            const totalPoints = provincesData.reduce((sum, p) => sum + p.points, 0);
+
+            document.getElementById('confirmedCount').textContent = confirmed;
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('totalPoints').textContent = totalPoints.toLocaleString();
+
+            // อัพเดท progress bar
+            const progressPercent = Math.round((confirmed / provincesData.length) * 100);
+            document.getElementById('progressPercent').textContent = progressPercent;
+            document.getElementById('progressFill').style.width = progressPercent + '%';
+        }
+
+        // สร้างตาราง
+        function populateTable(data = filteredData) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            data.forEach((province, index) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td><strong>${province.name}</strong></td>
+                    <td>${province.team}</td>
+                    <td><small>${province.email}</small></td>
+                    <td><span class="equipment-count">${province.points} จุด</span></td>
+                    <td><span class="equipment-count">${province.switches} ตัว</span></td>
+                    <td><span class="equipment-count">${province.racks} ตู้</span></td>
+                    <td><span class="status-badge status-${province.status}">${getStatusText(province.status)}</span></td>
+                    <td>${province.contact}</td>
+                    <td>${province.phone}</td>
+                `;
+
+                // เพิ่ม event listener สำหรับเปลี่ยนสถานะ
+                row.addEventListener('click', () => toggleStatus(province.id));
+            });
+        }
+
+        function getStatusText(status) {
+            const statusMap = {
+                'pending': '⏳ รอการตอบรับ',
+                'confirmed': '✅ ยืนยันแล้ว',
+                'rejected': '❌ ปฏิเสธ'
+            };
+            return statusMap[status] || status;
+        }
+
+        // เปลี่ยนสถานะเมื่อคลิก
+        function toggleStatus(id) {
+            const province = provincesData.find(p => p.id === id);
+            if (province) {
+                const statusCycle = ['pending', 'confirmed', 'rejected'];
+                const currentIndex = statusCycle.indexOf(province.status);
+                const nextIndex = (currentIndex + 1) % statusCycle.length;
+                province.status = statusCycle[nextIndex];
+                
+                updateStats();
+                applyFilters();
+            }
+        }
+
+        // ฟังก์ชันค้นหาและกรอง
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+
+            filteredData = provincesData.filter(province => {
+                const matchesSearch = province.name.toLowerCase().includes(searchTerm) || 
+                                    province.team.toLowerCase().includes(searchTerm);
+                const matchesStatus = !statusFilter || province.status === statusFilter;
+                return matchesSearch && matchesStatus;
+            });
+
+            populateTable(filteredData);
+        }
+
+        // Export functions
+        function exportToJSON() {
+            const dataStr = JSON.stringify(provincesData, null, 2);
+            downloadFile(dataStr, 'provinces_data.json', 'application/json');
+        }
+
+        function exportToCSV() {
+            const headers = ['ID', 'จังหวัด', 'ทีม', 'อีเมล', 'จุดติดตั้ง', 'Switch', 'Rack', 'สถานะ', 'ผู้ติดต่อ', 'เบอร์โทร'];
+            const csvContent = [
+                headers.join(','),
+                ...provincesData.map(p => [
+                    p.id, p.name, p.team, p.email, p.points, p.switches, p.racks, 
+                    getStatusText(p.status), p.contact, p.phone
+                ].join(','))
+            ].join('\n');
+            
+            downloadFile(csvContent, 'provinces_data.csv', 'text/csv');
+        }
+
+        function exportToPowerBI() {
+            // สร้างโครงสร้างข้อมูลที่เหมาะกับ Power BI
+            const powerBIData = provincesData.map(p => ({
+                ProvinceID: p.id,
+                ProvinceName: p.name,
+                TeamName: p.team,
+                Email: p.email,
+                InstallationPoints: p.points,
+                SwitchCount: p.switches,
+                RackCount: p.racks,
+                Status: p.status,
+                StatusText: getStatusText(p.status),
+                ContactPerson: p.contact,
+                PhoneNumber: p.phone,
+                IsConfirmed: p.status === 'confirmed',
+                IsPending: p.status === 'pending',
+                IsRejected: p.status === 'rejected',
+                CreatedDate: new Date().toISOString(),
+                ProjectName: 'โครงการติดตั้งระบบเครือข่าย (LAN) 76 จังหวัด'
+            }));
+
+            const dataStr = JSON.stringify(powerBIData, null, 2);
+            downloadFile(dataStr, 'provinces_powerbi_format.json', 'application/json');
+        }
+
+        function downloadFile(content, filename, contentType) {
+            const a = document.createElement('a');
+            const file = new Blob([content], {type: contentType});
+            a.href = URL.createObjectURL(file);
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+        document.getElementById('statusFilter').addEventListener('change', applyFilters);
+
+        // เริ่มต้น
+        document.addEventListener('DOMContentLoaded', function() {
+            updateStats();
+            populateTable();
+            document.getElementById('updateDate').textContent = new Date().toLocaleDateString('th-TH');
+        });
+    </script>
+</body>
+</html>

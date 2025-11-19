@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PTTEP Portfolio Management - SQL Import/Export System</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            min-height: 100vh; 
+            padding: 20px; 
+        }
+        .container { max-width: 1600px; margin: 0 auto; }
+        
+        /* Header */
+        .header { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+        }
+        .header h1 { 
+            color: #667eea; 
+            margin-bottom: 5px; 
+            font-size: 2rem; 
+        }
+        .header p { color: #6b7280; }
+        .system-status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+        .status-empty { background: #fee2e2; color: #dc2626; }
+        .status-loaded { background: #d1fae5; color: #065f46; }
+        
+        /* Navigation */
+        .navigation { 
+            background: white; 
+            display: flex; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            margin-bottom: 20px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08); 
+        }
+        .nav-btn { 
+            padding: 15px 25px; 
+            border: none; 
+            background: transparent; 
+            cursor: pointer; 
+            font-weight: 600; 
+            color: #6b7280; 
+            transition: all 0.3s; 
+            flex: 1;
+            text-align: center;
+        }
+        .nav-btn:hover { 
+            color: #667eea; 
+            background: rgba(102, 126, 234, 0.05); 
+        }
+        .nav-btn.active { 
+            color: #667eea; 
+            background: rgba(102, 126, 234, 0.1); 
+            border-bottom: 3px solid #667eea; 
+        }
+        
+        /* Content */
+        .content { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            min-height: 500px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+        }
+        
+        /* Import Section */
+        .import-section {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .import-box {
+            border: 2px dashed #cbd5e1;
+            border-radius: 10px;
+            padding: 40px;
+            text-align: center;
+            background: #f8fafc;
+            margin: 20px 0;
+        }
+        .import-box.dragover {
+            border-color: #667eea;
+            background: #ede9fe;
+        }
+        .file-input {
+            display: none;
+        }
+        .import-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 10px;
+        }
+        .import-btn:hover { background: #5a67d8; }
+        
+        /* Data Table */
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .filters { 
+            display: flex; 
+            gap: 10px; 
+            flex-wrap: wrap; 
+        }
+        .filters input, .filters select { 
+            padding: 8px 12px; 
+            border: 1px solid #d1d5db; 
+            border-radius: 6px; 
+        }
+        .btn {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .btn:hover { background: #5a67d8; }
+        .btn-success { background: #10b981; }
+        .btn-success:hover { background: #059669; }
+        .btn-danger { background: #ef4444; }
+        .btn-danger:hover { background: #dc2626; }
+        
+        .data-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+        }
+        .data-table th { 
+            background: #f3f4f6; 
+            padding: 12px; 
+            text-align: left; 
+            font-weight: 600; 
+            color: #374151; 
+            position: sticky;
+            top: 0;
+        }
+        .data-table td { 
+            padding: 12px; 
+            border-bottom: 1px solid #e5e7eb; 
+        }
+        .data-table tr:hover { background: #f9fafb; }
+        
+        /* Status Badges */
+        .status-delivered { 
+            background: #10b981; 
+            color: white; 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            font-size: 0.8rem; 
+        }
+        .status-amendment { 
+            background: #f59e0b; 
+            color: white; 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            font-size: 0.8rem; 
+        }
+        .status-pending { 
+            background: #ef4444; 
+            color: white; 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            font-size: 0.8rem; 
+        }
+        
+        /* Pagination */
+        .pagination { 
+            display: flex; 
+            gap: 5px; 
+            justify-content: center; 
+            margin-top: 20px; 
+        }
+        .page-btn { 
+            padding: 5px 10px; 
+            border: 1px solid #d1d5db; 
+            background: white; 
+            cursor: pointer; 
+            border-radius: 4px; 
+        }
+        .page-btn:hover { background: #f3f4f6; }
+        .page-btn.active { 
+            background: #667eea; 
+            color: white; 
+        }
+        
+        /* Stats Grid */
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 20px; 
+            margin-bottom: 30px; 
+        }
+        .stat-card { 
+            background: linear-gradient(135deg, #667eea, #764ba2); 
+            color: white; 
+            padding: 20px; 
+            border-radius: 10px; 
+        }
+        .stat-card h3 { 
+            font-size: 0.9rem; 
+            opacity: 0.9; 
+            margin-bottom: 10px; 
+        }
+        .stat-value { 
+            font-size: 2rem; 
+            font-weight: bold; 
+        }
+        
+        /* Export Section */
+        .export-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .export-card {
+            background: #f9fafb;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .export-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .export-card h3 {
+            color: #374151;
+            margin-bottom: 10px;
+        }
+        .export-card p {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        
+        /* Messages */
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .message-success { 
+            background: #d1fae5; 
+            color: #065f46; 
+            border: 1px solid #6ee7b7;
+        }
+        .message-error { 
+            background: #fee2e2; 
+            color: #991b1b; 
+            border: 1px solid #fca5a5;
+        }
+        .message-info { 
+            background: #dbeafe; 
+            color: #1e3a8a; 
+            border: 1px solid #93c5fd;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+        }
+        .modal-header {
+            margin-bottom: 20px;
+        }
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #374151;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>PTTEP Portfolio Management System</h1>
+            <p>Addvalue Innovation Co., Ltd. - SQL Import/Export System</p>
+            <div id="systemStatus" class="system-status status-empty">
+                📊 No data loaded - Please import SQL file
+            </div>
+        </div>
+        
+        <nav class="navigation">
+            <button class="nav-btn active" data-tab="import">📤 Import Data</button>
+            <button class="nav-btn" data-tab="data">📋 Data Management</button>
+            <button class="nav-btn" data-tab="dashboard">📊 Dashboard</button>
+            <button class="nav-btn" data-tab="export">💾 Export Data</button>
+        </nav>
+        
+        <main class="content" id="content">
+            <!-- Content will be loaded here -->
+        </main>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Record</h2>
+            </div>
+            <div class="modal-body">
+                <form id="recordForm">
+                    <div class="form-group">
+                        <label>PO Number*</label>
+                        <input type="text" id="form_po" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Date*</label>
+                        <input type="date" id="form_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Client*</label>
+                        <input type="text" id="form_client" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Project*</label>
+                        <input type="text" id="form_project" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Title/Description*</label>
+                        <textarea id="form_title" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>THB Value*</label>
+                        <input type="number" id="form_thb" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label>USD Value</label>
+                        <input type="number" id="form_usd" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="form_status">
+                            <option value="delivered">Delivered</option>
+                            <option value="pending">Pending</option>
+                            <option value="amendment">Amendment</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-success" onclick="saveRecord()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Application State
+    const AppState = {
+        data: [],
+        currentTab: 'import',
+        currentPage: 1,
+        perPage: 10,
+        filteredData: [],
+        editingId: null,
+        storageKey: 'pttep_portfolio_data'
+    };
+
+    // Initialize Application
+    document.addEventListener('DOMContentLoaded', function() {
+        loadDataFromStorage();
+        setupEventListeners();
+        renderTab('import');
+    });
+
+    // Setup Event Listeners
+    function setupEventListeners() {
+        // Navigation
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const tab = e.target.dataset.tab;
+                switchTab(tab);
+            });
+        });
+    }
+
+    // Load Data from localStorage
+    function loadDataFromStorage() {
+        try {
+            const stored = localStorage.getItem(AppState.storageKey);
+            if (stored) {
+                AppState.data = JSON.parse(stored);
+                AppState.filteredData = [...AppState.data];
+                updateSystemStatus();
+                console.log(`Loaded ${AppState.data.length} records from storage`);
+            }
+        } catch (error) {
+            console.error('Error loading data:', error);
+        }
+    }
+
+    // Save Data to localStorage
+    function saveDataToStorage() {
+        try {
+            localStorage.setItem(AppState.storageKey, JSON.stringify(AppState.data));
+            updateSystemStatus();
+            return true;
+        } catch (error) {
+            console.error('Error saving data:', error);
+            return false;
+        }
+    }
+
+    // Update System Status
+    function updateSystemStatus() {
+        const status = document.getElementById('systemStatus');
+        if (AppState.data.length > 0) {
+            status.className = 'system-status status-loaded';
+            status.innerHTML = `✅ ${AppState.data.length} records loaded`;
+        } else {
+            status.className = 'system-status status-empty';
+            status.innerHTML = '📊 No data loaded - Please import SQL file';
+        }
+    }
+
+    // Switch Tab
+    function switchTab(tab) {
+        AppState.currentTab = tab;
+        AppState.currentPage = 1;
+        
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.tab === tab);
+        });
+        
+        renderTab(tab);
+    }
+
+    // Render Tab Content
+    function renderTab(tab) {
+        const content = document.getElementById('content');
+        
+        switch(tab) {
+            case 'import':
+                renderImportTab();
+                break;
+            case 'data':
+                renderDataTab();
+                break;
+            case 'dashboard':
+                renderDashboardTab();
+                break;
+            case 'export':
+                renderExportTab();
+                break;
+        }
+    }
+
+    // Render Import Tab
+    function renderImportTab() {
+        const content = document.getElementById('content');
+        content.innerHTML = `
+            <div class="import-section">
+                <h2 style="margin-bottom: 20px; color: #374151;">Import SQL Data</h2>
+                <p style="color: #6b7280; margin-bottom: 30px;">
+                    Import your PTTEP portfolio data from SQL file. The system will parse and load all records automatically.
+                </p>
+                
+                <div class="import-box" id="dropZone">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" style="margin: 0 auto 20px; display: block;">
+                        <path d="M7 10L12 15L17 10" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M12 15V3" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M20 18H4" stroke="#667eea" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <p style="font-size: 1.1rem; margin-bottom: 10px;">Drag & Drop SQL file here</p>
+                    <p style="color: #9ca3af; margin-bottom: 20px;">or</p>
+                    <label for="sqlFile" class="import-btn">Browse Files</label>
+                    <input type="file" id="sqlFile" class="file-input" accept=".sql">
+                </div>
+                
+                <div style="margin-top: 30px;">
+                    <h3 style="color: #374151; margin-bottom: 15px;">Sample SQL Format:</h3>
+                    <pre style="background: #f3f4f6; padding: 15px; border-radius: 6px; overflow-x: auto; font-size: 0.85rem;">
+INSERT INTO purchase_orders VALUES
+(31, '2023-05-25', '4700028986', 'Carigali-PTTEPI Operating Company Sdn Bhd (CPOC)', 'MOD-19/010', 
+ 'PROVISION OF MANPOWER...', 475000, 13571.43, 'N/A', 'Tambol Huasao...', 'delivered'),
+(30, '2023-05-03', '3450044753', 'PTTEP Energy Development Company Limited', '1602 PTTEP ED BG2', 
+ 'Provision of Site Survey...', 384000, 11294.12, 'N/A', '-', 'delivered');
+                    </pre>
+                </div>
+                
+                <div id="importResult"></div>
+            </div>
+        `;
+        
+        setupImportHandlers();
+    }
+
+    // Setup Import Handlers
+    function setupImportHandlers() {
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('sqlFile');
+        
+        // Drag and Drop
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+        
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.name.endsWith('.sql')) {
+                handleSQLImport(file);
+            } else {
+                showMessage('Please select a valid SQL file', 'error');
+            }
+        });
+        
+        // File Input
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                handleSQLImport(file);
+            }
+        });
+    }
+
+    // Handle SQL Import
+    function handleSQLImport(file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const sqlContent = e.target.result;
+                const records = parseSQLInsert(sqlContent);
+                
+                if (records.length > 0) {
+                    AppState.data = records;
+                    AppState.filteredData = [...records];
+                    saveDataToStorage();
+                    
+                    showMessage(`Successfully imported ${records.length} records!`, 'success');
+                    updateSystemStatus();
+                    
+                    // Switch to data tab after successful import
+                    setTimeout(() => switchTab('data'), 1500);
+                } else {
+                    showMessage('No valid records found in SQL file', 'error');
+                }
+            } catch (error) {
+                showMessage('Error parsing SQL file: ' + error.message, 'error');
+                console.error('Import error:', error);
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    // Parse SQL INSERT Statement
+    function parseSQLInsert(sql) {
+        const records = [];
+        
+        // Match INSERT INTO statements with VALUES
+        const insertRegex = /INSERT\s+INTO\s+\w+\s+(?:\([^)]+\)\s+)?VALUES\s*([^;]+)/gi;
+        const matches = sql.match(insertRegex);
+        
+        if (!matches) {
+            // Try to match just the VALUES part
+            const valuesRegex = /\(([^)]+)\)/g;
+            let match;
+            while ((match = valuesRegex.exec(sql)) !== null) {
+                const record = parseValueRow(match[1]);
+                if (record) records.push(record);
+            }
+        } else {
+            matches.forEach(statement => {
+                const valuesRegex = /\(([^)]+)\)/g;
+                let match;
+                while ((match = valuesRegex.exec(statement)) !== null) {
+                    const record = parseValueRow(match[1]);
+                    if (record) records.push(record);
+                }
+            });
+        }
+        
+        return records;
+    }
+
+    // Parse Single Value Row
+    function parseValueRow(valueString) {
+        try {
+            // Clean and split values
+            const values = [];
+            let current = '';
+            let inQuote = false;
+            let quoteChar = null;
+            
+            for (let i = 0; i < valueString.length; i++) {
+                const char = valueString[i];
+                
+                if (!inQuote && (char === "'" || char === '"')) {
+                    inQuote = true;
+                    quoteChar = char;
+                } else if (inQuote && char === quoteChar) {
+                    // Check if it's escaped
+                    if (i + 1 < valueString.length && valueString[i + 1] === quoteChar) {
+                        current += char;
+                        i++; // Skip next quote
+                    } else {
+                        inQuote = false;
+                        quoteChar = null;
+                    }
+                } else if (!inQuote && char === ',') {
+                    values.push(cleanValue(current.trim()));
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+            
+            if (current) {
+                values.push(cleanValue(current.trim()));
+            }
+            
+            // Create record object
+            if (values.length >= 11) {
+                return {
+                    item: parseInt(values[0]) || 0,
+                    date: values[1],
+                    po: values[2],
+                    client: values[3],
+                    project: values[4],
+                    title: values[5],
+                    value_thb: parseFloat(values[6]) || 0,
+                    value_usd: parseFloat(values[7]) || 0,
+                    incoterms: values[8] || 'N/A',
+                    delivery: values[9] || '-',
+                    status: values[10] || 'pending'
+                };
+            }
+        } catch (error) {
+            console.error('Error parsing row:', error);
+        }
+        return null;
+    }
+
+    // Clean Value
+    function cleanValue(value) {
+        // Remove quotes
+        value = value.replace(/^['"]|['"]$/g, '');
+        // Unescape quotes
+        value = value.replace(/''/g, "'").replace(/""/g, '"');
+        return value;
+    }
+
+    // Render Data Tab
+    function renderDataTab() {
+        if (AppState.data.length === 0) {
+            document.getElementById('content').innerHTML = `
+                <div style="text-align: center; padding: 50px;">
+                    <h2 style="color: #6b7280; margin-bottom: 20px;">No Data Available</h2>
+                    <p style="color: #9ca3af; margin-bottom: 30px;">Please import SQL data first to view and manage records.</p>
+                    <button class="btn" onclick="switchTab('import')">Go to Import</button>
+                </div>
+            `;
+            return;
+        }
+        
+        const content = document.getElementById('content');
+        const clients = [...new Set(AppState.data.map(r => r.client))];
+        const projects = [...new Set(AppState.data.map(r => r.project))];
+        
+        content.innerHTML = `
+            <div class="table-controls">
+                <div class="filters">
+                    <input type="text" id="searchPO" placeholder="Search PO..." onkeyup="applyFilters()">
+                    <select id="filterClient" onchange="applyFilters()">
+                        <option value="">All Clients</option>
+                        ${clients.map(c => `<option value="${c}">${c.split('(')[0].trim()}</option>`).join('')}
+                    </select>
+                    <select id="filterProject" onchange="applyFilters()">
+                        <option value="">All Projects</option>
+                        ${projects.map(p => `<option value="${p}">${p}</option>`).join('')}
+                    </select>
+                    <button class="btn" onclick="clearFilters()">Clear</button>
+                </div>
+                <div>
+                    <button class="btn btn-success" onclick="openAddModal()">+ Add Record</button>
+                    <button class="btn btn-danger" onclick="clearAllData()">Clear All</button>
+                </div>
+            </div>
+            
+            <div style="overflow-x: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Date</th>
+                            <th>PO Number</th>
+                            <th>Client</th>
+                            <th>Project</th>
+                            <th>Title</th>
+                            <th>THB Value</th>
+                            <th>USD Value</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTable">
+                        ${renderTableRows()}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="pagination" id="pagination">
+                ${renderPagination()}
+            </div>
+        `;
+    }
+
+    // Render Table Rows
+    function renderTableRows() {
+        const start = (AppState.currentPage - 1) * AppState.perPage;
+        const end = start + AppState.perPage;
+        const pageData = AppState.filteredData.slice(start, end);
+        
+        if (pageData.length === 0) {
+            return '<tr><td colspan="10" style="text-align: center; padding: 30px;">No records found</td></tr>';
+        }
+        
+        return pageData.map(record => `
+            <tr>
+                <td>${record.item}</td>
+                <td>${record.date}</td>
+                <td><strong>${record.po}</strong></td>
+                <td title="${record.client}">${record.client.split('(')[0].trim()}</td>
+                <td>${record.project}</td>
+                <td title="${record.title}">${record.title.substring(0, 40)}...</td>
+                <td>฿${record.value_thb.toLocaleString()}</td>
+                <td>$${record.value_usd.toLocaleString()}</td>
+                <td><span class="status-${record.status}">${record.status}</span></td>
+                <td>
+                    <button onclick="editRecord(${record.item})" style="padding: 4px 8px; margin-right: 5px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">Edit</button>
+                    <button onclick="deleteRecord(${record.item})" style="padding: 4px 8px; background: #ef4444; color: white; border: none; border-radius: 4px; cursor: pointer;">Delete</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // Render Pagination
+    function renderPagination() {
+        const totalPages = Math.ceil(AppState.filteredData.length / AppState.perPage);
+        if (totalPages <= 1) return '';
+        
+        let html = '';
+        for (let i = 1; i <= totalPages; i++) {
+            html += `<button class="page-btn ${i === AppState.currentPage ? 'active' : ''}" 
+                     onclick="changePage(${i})">${i}</button>`;
+        }
+        return html;
+    }
+
+    // Render Dashboard Tab
+    function renderDashboardTab() {
+        if (AppState.data.length === 0) {
+            document.getElementById('content').innerHTML = `
+                <div style="text-align: center; padding: 50px;">
+                    <h2 style="color: #6b7280; margin-bottom: 20px;">No Data for Dashboard</h2>
+                    <p style="color: #9ca3af; margin-bottom: 30px;">Please import data first to view dashboard analytics.</p>
+                    <button class="btn" onclick="switchTab('import')">Go to Import</button>
+                </div>
+            `;
+            return;
+        }
+        
+        const stats = calculateStats();
+        const content = document.getElementById('content');
+        
+        content.innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Records</h3>
+                    <p class="stat-value">${stats.totalRecords}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total THB Value</h3>
+                    <p class="stat-value">฿${(stats.totalTHB / 1e6).toFixed(2)}M</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total USD Value</h3>
+                    <p class="stat-value">$${(stats.totalUSD / 1e3).toFixed(2)}K</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Unique Clients</h3>
+                    <p class="stat-value">${stats.uniqueClients}</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <h2 style="color: #374151; margin-bottom: 20px;">Portfolio Summary</h2>
+                <div style="background: #f9fafb; padding: 20px; border-radius: 10px;">
+                    <p style="line-height: 1.8; color: #4b5563;">
+                        <strong>Date Range:</strong> ${stats.dateRange}<br>
+                        <strong>Top Client:</strong> ${stats.topClient}<br>
+                        <strong>Most Active Project:</strong> ${stats.topProject}<br>
+                        <strong>Average Order Value:</strong> ฿${(stats.avgValue / 1e3).toFixed(2)}K<br>
+                        <strong>Status Distribution:</strong> Delivered (${stats.delivered}), Pending (${stats.pending}), Amendment (${stats.amendment})
+                    </p>
+                </div>
+            </div>
+        `;
+    }
+
+    // Render Export Tab
+    function renderExportTab() {
+        if (AppState.data.length === 0) {
+            document.getElementById('content').innerHTML = `
+                <div style="text-align: center; padding: 50px;">
+                    <h2 style="color: #6b7280; margin-bottom: 20px;">No Data to Export</h2>
+                    <p style="color: #9ca3af; margin-bottom: 30px;">Please import data first before exporting.</p>
+                    <button class="btn" onclick="switchTab('import')">Go to Import</button>
+                </div>
+            `;
+            return;
+        }
+        
+        const content = document.getElementById('content');
+        content.innerHTML = `
+            <h2 style="margin-bottom: 20px; color: #374151;">Export Data</h2>
+            <p style="color: #6b7280; margin-bottom: 30px;">
+                Export your PTTEP portfolio data in various formats. Current database contains ${AppState.data.length} records.
+            </p>
+            
+            <div class="export-grid">
+                <div class="export-card">
+                    <h3>🗃️ SQL Export</h3>
+                    <p>Complete SQL dump with INSERT statements</p>
+                    <button class="btn" onclick="exportSQL()">Export SQL</button>
+                </div>
+                
+                <div class="export-card">
+                    <h3>📊 CSV Export</h3>
+                    <p>Excel-compatible spreadsheet format</p>
+                    <button class="btn btn-success" onclick="exportCSV()">Export CSV</button>
+                </div>
+                
+                <div class="export-card">
+                    <h3>📄 JSON Export</h3>
+                    <p>Structured data for APIs and web apps</p>
+                    <button class="btn" onclick="exportJSON()">Export JSON</button>
+                </div>
+            </div>
+            
+            <div id="exportResult"></div>
+        `;
+    }
+
+    // Calculate Statistics
+    function calculateStats() {
+        const data = AppState.data;
+        const dates = data.map(r => new Date(r.date)).filter(d => !isNaN(d));
+        const clients = {};
+        const projects = {};
+        let delivered = 0, pending = 0, amendment = 0;
+        
+        data.forEach(r => {
+            clients[r.client] = (clients[r.client] || 0) + r.value_thb;
+            projects[r.project] = (projects[r.project] || 0) + 1;
+            if (r.status === 'delivered') delivered++;
+            else if (r.status === 'pending') pending++;
+            else if (r.status === 'amendment') amendment++;
+        });
+        
+        const topClient = Object.entries(clients).sort((a, b) => b[1] - a[1])[0];
+        const topProject = Object.entries(projects).sort((a, b) => b[1] - a[1])[0];
+        
+        return {
+            totalRecords: data.length,
+            totalTHB: data.reduce((sum, r) => sum + r.value_thb, 0),
+            totalUSD: data.reduce((sum, r) => sum + r.value_usd, 0),
+            uniqueClients: Object.keys(clients).length,
+            dateRange: dates.length ? `${Math.min(...dates).toISOString().split('T')[0]} to ${Math.max(...dates).toISOString().split('T')[0]}` : 'N/A',
+            topClient: topClient ? topClient[0].split('(')[0].trim() : 'N/A',
+            topProject: topProject ? topProject[0] : 'N/A',
+            avgValue: data.length ? data.reduce((sum, r) => sum + r.value_thb, 0) / data.length : 0,
+            delivered,
+            pending,
+            amendment
+        };
+    }
+
+    // Apply Filters
+    function applyFilters() {
+        const searchPO = document.getElementById('searchPO')?.value?.toLowerCase() || '';
+        const filterClient = document.getElementById('filterClient')?.value || '';
+        const filterProject = document.getElementById('filterProject')?.value || '';
+        
+        AppState.filteredData = AppState.data.filter(record => {
+            const matchPO = !searchPO || record.po.toLowerCase().includes(searchPO);
+            const matchClient = !filterClient || record.client === filterClient;
+            const matchProject = !filterProject || record.project === filterProject;
+            return matchPO && matchClient && matchProject;
+        });
+        
+        AppState.currentPage = 1;
+        updateTable();
+    }
+
+    // Clear Filters
+    function clearFilters() {
+        document.getElementById('searchPO').value = '';
+        document.getElementById('filterClient').value = '';
+        document.getElementById('filterProject').value = '';
+        AppState.filteredData = [...AppState.data];
+        AppState.currentPage = 1;
+        updateTable();
+    }
+
+    // Update Table
+    function updateTable() {
+        const tbody = document.getElementById('dataTable');
+        const pagination = document.getElementById('pagination');
+        if (tbody) tbody.innerHTML = renderTableRows();
+        if (pagination) pagination.innerHTML = renderPagination();
+    }
+
+    // Change Page
+    function changePage(page) {
+        AppState.currentPage = page;
+        updateTable();
+    }
+
+    // Open Add Modal
+    function openAddModal() {
+        AppState.editingId = null;
+        document.getElementById('modalTitle').textContent = 'Add New Record';
+        document.getElementById('recordForm').reset();
+        document.getElementById('editModal').classList.add('show');
+    }
+
+    // Edit Record
+    function editRecord(id) {
+        const record = AppState.data.find(r => r.item === id);
+        if (!record) return;
+        
+        AppState.editingId = id;
+        document.getElementById('modalTitle').textContent = 'Edit Record';
+        document.getElementById('form_po').value = record.po;
+        document.getElementById('form_date').value = record.date;
+        document.getElementById('form_client').value = record.client;
+        document.getElementById('form_project').value = record.project;
+        document.getElementById('form_title').value = record.title;
+        document.getElementById('form_thb').value = record.value_thb;
+        document.getElementById('form_usd').value = record.value_usd;
+        document.getElementById('form_status').value = record.status;
+        
+        document.getElementById('editModal').classList.add('show');
+    }
+
+    // Close Modal
+    function closeModal() {
+        document.getElementById('editModal').classList.remove('show');
+        document.getElementById('recordForm').reset();
+        AppState.editingId = null;
+    }
+
+    // Save Record
+    function saveRecord() {
+        const form = document.getElementById('recordForm');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+        
+        const record = {
+            po: document.getElementById('form_po').value,
+            date: document.getElementById('form_date').value,
+            client: document.getElementById('form_client').value,
+            project: document.getElementById('form_project').value,
+            title: document.getElementById('form_title').value,
+            value_thb: parseFloat(document.getElementById('form_thb').value) || 0,
+            value_usd: parseFloat(document.getElementById('form_usd').value) || 0,
+            status: document.getElementById('form_status').value,
+            incoterms: 'N/A',
+            delivery: '-'
+        };
+        
+        if (AppState.editingId !== null) {
+            // Update existing record
+            const index = AppState.data.findIndex(r => r.item === AppState.editingId);
+            if (index !== -1) {
+                AppState.data[index] = { ...AppState.data[index], ...record };
+            }
+        } else {
+            // Add new record
+            const maxItem = Math.max(...AppState.data.map(r => r.item), 0);
+            record.item = maxItem + 1;
+            AppState.data.push(record);
+        }
+        
+        AppState.filteredData = [...AppState.data];
+        saveDataToStorage();
+        closeModal();
+        renderDataTab();
+        showMessage('Record saved successfully!', 'success');
+    }
+
+    // Delete Record
+    function deleteRecord(id) {
+        if (!confirm('Are you sure you want to delete this record?')) return;
+        
+        AppState.data = AppState.data.filter(r => r.item !== id);
+        AppState.filteredData = [...AppState.data];
+        saveDataToStorage();
+        renderDataTab();
+        showMessage('Record deleted successfully!', 'success');
+    }
+
+    // Clear All Data
+    function clearAllData() {
+        if (!confirm('Are you sure you want to clear all data? This cannot be undone!')) return;
+        
+        AppState.data = [];
+        AppState.filteredData = [];
+        localStorage.removeItem(AppState.storageKey);
+        updateSystemStatus();
+        renderDataTab();
+        showMessage('All data cleared', 'info');
+    }
+
+    // Export SQL
+    function exportSQL() {
+        let sql = '-- PTTEP Portfolio Data Export\n';
+        sql += '-- Generated: ' + new Date().toISOString() + '\n';
+        sql += '-- Records: ' + AppState.data.length + '\n\n';
+        
+        sql += 'CREATE TABLE IF NOT EXISTS purchase_orders (\n';
+        sql += '  item INT PRIMARY KEY,\n';
+        sql += '  date DATE,\n';
+        sql += '  po VARCHAR(50),\n';
+        sql += '  client VARCHAR(255),\n';
+        sql += '  project VARCHAR(100),\n';
+        sql += '  title TEXT,\n';
+        sql += '  value_thb DECIMAL(12,2),\n';
+        sql += '  value_usd DECIMAL(12,2),\n';
+        sql += '  incoterms VARCHAR(10),\n';
+        sql += '  delivery VARCHAR(255),\n';
+        sql += '  status VARCHAR(20)\n';
+        sql += ');\n\n';
+        
+        sql += '-- Clear existing data\n';
+        sql += 'DELETE FROM purchase_orders;\n\n';
+        
+        sql += '-- Insert data\n';
+        sql += 'INSERT INTO purchase_orders (item, date, po, client, project, title, value_thb, value_usd, incoterms, delivery, status) VALUES\n';
+        
+        AppState.data.forEach((r, i) => {
+            sql += `(${r.item}, '${r.date}', '${r.po}', '${r.client.replace(/'/g, "''")}', `;
+            sql += `'${r.project.replace(/'/g, "''")}', '${r.title.replace(/'/g, "''")}', `;
+            sql += `${r.value_thb}, ${r.value_usd}, '${r.incoterms}', '${r.delivery.replace(/'/g, "''")}', '${r.status}')`;
+            sql += i < AppState.data.length - 1 ? ',\n' : ';\n';
+        });
+        
+        downloadFile(sql, 'pttep_portfolio_export.sql', 'text/plain');
+        showMessage('SQL file exported successfully!', 'success');
+    }
+
+    // Export CSV
+    function exportCSV() {
+        const headers = ['Item', 'Date', 'PO Number', 'Client', 'Project', 'Title', 'THB Value', 'USD Value', 'Incoterms', 'Delivery', 'Status'];
+        const rows = AppState.data.map(r => [
+            r.item,
+            r.date,
+            r.po,
+            r.client,
+            r.project,
+            r.title,
+            r.value_thb,
+            r.value_usd,
+            r.incoterms,
+            r.delivery,
+            r.status
+        ]);
+        
+        let csv = headers.join(',') + '\n';
+        rows.forEach(row => {
+            csv += row.map(cell => {
+                const strCell = String(cell).replace(/"/g, '""');
+                return strCell.includes(',') || strCell.includes('\n') ? `"${strCell}"` : strCell;
+            }).join(',') + '\n';
+        });
+        
+        downloadFile(csv, 'pttep_portfolio_export.csv', 'text/csv');
+        showMessage('CSV file exported successfully!', 'success');
+    }
+
+    // Export JSON
+    function exportJSON() {
+        const json = JSON.stringify({
+            metadata: {
+                total_records: AppState.data.length,
+                exported_at: new Date().toISOString(),
+                company: 'Addvalue Innovation Co., Ltd.',
+                system: 'PTTEP Portfolio Management System'
+            },
+            data: AppState.data
+        }, null, 2);
+        
+        downloadFile(json, 'pttep_portfolio_export.json', 'application/json');
+        showMessage('JSON file exported successfully!', 'success');
+    }
+
+    // Download File
+    function downloadFile(content, filename, mimeType) {
+        const blob = new Blob([content], { type: mimeType + ';charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    // Show Message
+    function showMessage(text, type = 'info') {
+        const resultDiv = document.getElementById('importResult') || document.getElementById('exportResult');
+        if (resultDiv) {
+            resultDiv.innerHTML = `<div class="message message-${type}">${text}</div>`;
+            setTimeout(() => resultDiv.innerHTML = '', 5000);
+        }
+    }
+    </script>
+</body>
+</html>

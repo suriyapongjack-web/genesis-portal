@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Addvalue HR Management System v3.0 - Professional Edition</title>
+    <meta name="description" content="Enterprise HR Management with Complete Payroll System">
+    <meta name="author" content="Addvalue System Co., Ltd.">
+    <meta name="version" content="3.0.0">
+    <meta name="project" content="HR-MGMT-2025">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #667eea;
+            --secondary: #764ba2;
+            --success: #107c10;
+            --warning: #ca5010;
+            --danger: #d13438;
+            --info: #0078d4;
+            --dark: #323130;
+            --light: #f8f9fa;
+            --border: #e1e1e1;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+        
+        .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        
+        /* System Info */
+        .system-info {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .system-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            font-size: 0.85rem;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* File Operations */
+        .file-ops-panel {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .file-ops-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .file-ops-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+        
+        /* Navigation */
+        .nav-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .breadcrumb-item {
+            cursor: pointer;
+            color: var(--info);
+            text-decoration: none;
+        }
+        
+        /* Main Program */
+        .main-program {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: var(--light);
+            border-radius: 10px;
+        }
+        
+        .search-filters {
+            display: flex;
+            gap: 1rem;
+            flex: 1;
+            max-width: 600px;
+        }
+        
+        /* Employee Cards */
+        .employee-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .employee-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .employee-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary);
+        }
+        
+        /* Sub Program */
+        .sub-program {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sub-program.active { display: block; }
+        
+        .employee-details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 12px;
+        }
+        
+        .sub-menu {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .sub-menu-btn {
+            padding: 1rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            background: var(--light);
+            color: var(--dark);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .sub-menu-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+        
+        .sub-content {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sub-content.active { display: block; }
+        
+        /* Payroll Section */
+        .payroll-section {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .payroll-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .payroll-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        
+        .payroll-label {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+        
+        .payroll-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .payroll-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            margin-top: 0.25rem;
+        }
+        
+        /* Salary History */
+        .salary-history-item {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .salary-history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .salary-change {
+            font-size: 1.1rem;
+        }
+        
+        .salary-old {
+            color: var(--danger);
+            text-decoration: line-through;
+        }
+        
+        .salary-new {
+            color: var(--success);
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+        
+        .salary-status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .status-paid {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        /* Forms */
+        .form-input, .form-select, .form-textarea {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            width: 100%;
+            transition: border-color 0.3s ease;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+        }
+        
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-group { margin-bottom: 1rem; }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; }
+        .btn-secondary { background: var(--light); color: var(--dark); border: 1px solid var(--border); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-warning { background: var(--warning); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-info { background: var(--info); color: white; }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        .modal-body { padding: 1.5rem; }
+        
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            background: var(--light);
+            border-radius: 0 0 15px 15px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 1rem; }
+            .header h1 { font-size: 2rem; }
+            .system-info-grid { grid-template-columns: 1fr; }
+            .controls { flex-direction: column; }
+            .search-filters { max-width: none; flex-direction: column; }
+            .employee-grid { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .payroll-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- System Information Bar -->
+        <div class="system-info">
+            <div class="system-info-grid">
+                <div class="info-item">
+                    <span class="info-label">📁 Project:</span>
+                    <span id="projectName">Addvalue HR Management</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">💬 Chat:</span>
+                    <span id="chatName">HR-MGMT-2025</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">📍 Location:</span>
+                    <span id="location">Bangkok, Thailand</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">📅 Modified:</span>
+                    <span id="lastModified">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">💾 Storage:</span>
+                    <span id="storageType">LocalStorage</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">📂 Path:</span>
+                    <span id="storagePath">addvalueHRv3</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">🔢 Version:</span>
+                    <span id="systemVersion">v3.0.0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">👥 Records:</span>
+                    <span id="totalRecords">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Header -->
+        <div class="header">
+            <h1>Addvalue HR Management System</h1>
+            <p>Professional Human Resources & Payroll Management Platform v3.0</p>
+        </div>
+        
+        <!-- File Operations Panel -->
+        <div class="file-ops-panel">
+            <div class="file-ops-header">
+                <h3>📊 Data Management Center</h3>
+                <span id="dataStatus" style="color: var(--success); font-weight: 600;">
+                    ● System Ready
+                </span>
+            </div>
+            <div class="file-ops-grid">
+                <button class="btn btn-success" onclick="HR.saveData()">💾 Save All</button>
+                <button class="btn btn-info" onclick="HR.exportJSON()">📥 Export JSON</button>
+                <button class="btn btn-info" onclick="HR.importJSON()">📤 Import JSON</button>
+                <button class="btn btn-success" onclick="HR.exportExcel()">📊 Export Excel</button>
+                <button class="btn btn-warning" onclick="HR.importExcel()">📈 Import Excel</button>
+                <button class="btn btn-danger" onclick="HR.clearData()">🗑️ Clear Data</button>
+            </div>
+            <input type="file" id="importFile" style="display:none" accept=".json,.xlsx,.xls">
+        </div>
+        
+        <!-- Navigation -->
+        <div class="nav-section">
+            <div class="breadcrumb" id="breadcrumb">
+                <span class="breadcrumb-item" onclick="HR.UI.showMainProgram()">Home</span>
+            </div>
+        </div>
+        
+        <!-- Main Program -->
+        <div class="main-program" id="mainProgram">
+            <!-- Statistics -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalEmployees">0</div>
+                    <div class="stat-label">Total Employees</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgSalary">฿0</div>
+                    <div class="stat-label">Average Salary</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalPayroll">฿0</div>
+                    <div class="stat-label">Total Payroll</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalOT">฿0</div>
+                    <div class="stat-label">Total OT/Month</div>
+                </div>
+            </div>
+            
+            <!-- Controls -->
+            <div class="controls">
+                <div class="search-filters">
+                    <input type="text" class="form-input" placeholder="Search by name, ID, department..." 
+                           oninput="HR.searchEmployees(this.value)" id="searchInput">
+                    <select class="form-select" onchange="HR.filterByDepartment(this.value)" id="departmentFilter">
+                        <option value="">All Departments</option>
+                        <option value="Management">Management</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Technical">Technical</option>
+                        <option value="Sales">Sales & Marketing</option>
+                        <option value="Accounting">Accounting & Finance</option>
+                        <option value="Administration">Administration</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="HR.openAddModal()">➕ Add Employee</button>
+            </div>
+            
+            <!-- Employee List -->
+            <div class="employee-grid" id="employeeGrid"></div>
+        </div>
+        
+        <!-- Sub Program -->
+        <div class="sub-program" id="subProgram">
+            <div class="employee-details-header" id="employeeDetailsHeader"></div>
+            
+            <div class="sub-menu">
+                <button class="sub-menu-btn active" onclick="HR.UI.showSubContent('personal')">
+                    👤 Personal Info
+                </button>
+                <button class="sub-menu-btn" onclick="HR.UI.showSubContent('payroll')">
+                    💰 Payroll & Benefits
+                </button>
+                <button class="sub-menu-btn" onclick="HR.UI.showSubContent('history')">
+                    📈 Salary History
+                </button>
+                <button class="sub-menu-btn" onclick="HR.UI.showSubContent('notes')">
+                    📝 Notes
+                </button>
+            </div>
+            
+            <!-- Personal Information -->
+            <div class="sub-content active" id="personalContent">
+                <h3>Personal Information</h3>
+                <div id="personalInfoGrid"></div>
+                <div style="margin-top: 2rem; text-align: right;">
+                    <button class="btn btn-warning" onclick="HR.editSelectedEmployee()">✏️ Edit</button>
+                </div>
+            </div>
+            
+            <!-- Payroll Content -->
+            <div class="sub-content" id="payrollContent">
+                <h3>Payroll & Benefits</h3>
+                <div id="payrollInfoGrid"></div>
+                <div style="margin-top: 2rem;">
+                    <button class="btn btn-primary" onclick="HR.Payroll.showPayrollModal()">
+                        ➕ Update Payroll Details
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Salary History -->
+            <div class="sub-content" id="historyContent">
+                <h3>Salary History</h3>
+                <div style="margin-bottom: 1rem;">
+                    <button class="btn btn-primary" onclick="HR.Payroll.showSalaryHistoryModal()">
+                        ➕ Add Salary Record
+                    </button>
+                </div>
+                <div id="salaryHistoryList"></div>
+            </div>
+            
+            <!-- Notes -->
+            <div class="sub-content" id="notesContent">
+                <h3>Notes & Comments</h3>
+                <div style="margin-bottom: 1rem; display: flex; gap: 1rem;">
+                    <input type="text" class="form-input" id="newNote" placeholder="Add note..." style="flex: 1;">
+                    <button class="btn btn-primary" onclick="HR.addNote()">Add</button>
+                </div>
+                <div id="notesList"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Employee Modal -->
+    <div class="modal" id="employeeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Employee</h2>
+                <button class="btn" style="background: rgba(255,255,255,0.2)" onclick="HR.closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="employeeForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">ID Card Number *</label>
+                            <input type="text" class="form-input" id="idCard" required maxlength="13">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" class="form-input" id="name" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Department *</label>
+                            <select class="form-select" id="department" required>
+                                <option value="">Select Department</option>
+                                <option value="Management">Management</option>
+                                <option value="Engineering">Engineering</option>
+                                <option value="Technical">Technical</option>
+                                <option value="Sales">Sales & Marketing</option>
+                                <option value="Accounting">Accounting & Finance</option>
+                                <option value="Administration">Administration</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Position *</label>
+                            <input type="text" class="form-input" id="jobPosition" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Email *</label>
+                            <input type="email" class="form-input" id="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone</label>
+                            <input type="tel" class="form-input" id="phone">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Date of Birth</label>
+                            <input type="date" class="form-input" id="dateOfBirth">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Employment Date</label>
+                            <input type="date" class="form-input" id="employmentDate">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Address</label>
+                        <textarea class="form-textarea" id="address" rows="2"></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Base Salary (฿) *</label>
+                            <input type="number" class="form-input" id="salary" required min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Employee Type</label>
+                            <select class="form-select" id="type">
+                                <option value="Internal">Internal</option>
+                                <option value="External">External</option>
+                                <option value="Contract">Contract</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="HR.closeModal()">Cancel</button>
+                <button class="btn btn-success" onclick="HR.saveEmployee()">Save</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Payroll Modal -->
+    <div class="modal" id="payrollModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Update Payroll Details</h2>
+                <button class="btn" style="background: rgba(255,255,255,0.2)" onclick="HR.Payroll.closePayrollModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="payrollForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">OT Hours/Month</label>
+                            <input type="number" class="form-input" id="otHours" min="0" step="0.5">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">OT Rate (฿/hour)</label>
+                            <input type="number" class="form-input" id="otRate" min="0">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Allowances (฿)</label>
+                            <input type="number" class="form-input" id="allowances" min="0" placeholder="Daily allowances">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Accommodation (฿)</label>
+                            <input type="number" class="form-input" id="accommodation" min="0" placeholder="Monthly accommodation">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Social Security (฿)</label>
+                            <input type="number" class="form-input" id="socialSecurity" min="0" placeholder="Monthly deduction">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Other Deductions (฿)</label>
+                            <input type="number" class="form-input" id="otherDeductions" min="0">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="HR.Payroll.closePayrollModal()">Cancel</button>
+                <button class="btn btn-success" onclick="HR.Payroll.savePayrollDetails()">Save</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Salary History Modal -->
+    <div class="modal" id="salaryHistoryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Salary History</h2>
+                <button class="btn" style="background: rgba(255,255,255,0.2)" onclick="HR.Payroll.closeSalaryHistoryModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="salaryHistoryForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Effective Date *</label>
+                            <input type="date" class="form-input" id="effectiveDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Payment Date</label>
+                            <input type="date" class="form-input" id="paymentDate">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Old Salary (฿) *</label>
+                            <input type="number" class="form-input" id="oldSalary" required min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">New Salary (฿) *</label>
+                            <input type="number" class="form-input" id="newSalary" required min="0">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Payment Status *</label>
+                            <select class="form-select" id="paymentStatus" required>
+                                <option value="paid">Paid</option>
+                                <option value="pending">Pending</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Reason</label>
+                            <input type="text" class="form-input" id="reason" placeholder="Annual review, Promotion, etc.">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="HR.Payroll.closeSalaryHistoryModal()">Cancel</button>
+                <button class="btn btn-success" onclick="HR.Payroll.saveSalaryHistory()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+// Modular HR System v3.0
+const HR = (function() {
+    'use strict';
+    
+    // Configuration
+    const CONFIG = {
+        projectName: 'Addvalue HR Management System',
+        chatName: 'HR-MGMT-2025',
+        location: 'Bangkok, Thailand',
+        version: 'v3.0.0',
+        storageKey: 'addvalueHRv3',
+        storageType: 'LocalStorage',
+        departments: {
+            'Management': 'Management',
+            'Engineering': 'Engineering',
+            'Technical': 'Technical',
+            'Sales': 'Sales & Marketing',
+            'Accounting': 'Accounting & Finance',
+            'Administration': 'Administration'
+        }
+    };
+    
+    // State Management
+    let state = {
+        employees: [],
+        filteredEmployees: [],
+        selectedEmployee: null,
+        editingEmployeeId: null
+    };
+    
+    // Default Data
+    const defaultData = [
+        {
+            id: 1,
+            idCard: '1100123456789',
+            name: 'Nadcha Yodin',
+            department: 'Administration',
+            jobPosition: 'Admin Officer',
+            email: 'natcha@addvaluesystem.com',
+            phone: '0944639985',
+            address: '59/66 Moo 1, Pak Kret, Nonthaburi',
+            dateOfBirth: '1995-03-15',
+            employmentDate: '2013-01-01',
+            salary: 14000,
+            type: 'Internal',
+            payroll: {
+                otHours: 0,
+                otRate: 87.5,
+                allowances: 0,
+                accommodation: 0,
+                socialSecurity: 750,
+                otherDeductions: 0
+            },
+            salaryHistory: [],
+            notes: []
+        }
+    ];
+    
+    // Core Module
+    const Core = {
+        init() {
+            this.loadData();
+            this.setupEventListeners();
+            this.updateSystemInfo();
+            UI.updateStatistics();
+            UI.renderEmployees();
+        },
+        
+        loadData() {
+            try {
+                const data = localStorage.getItem(CONFIG.storageKey);
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    state.employees = parsed.employees || parsed;
+                } else {
+                    state.employees = [...defaultData];
+                    this.saveData();
+                }
+                state.filteredEmployees = [...state.employees];
+            } catch (e) {
+                console.error('Load error:', e);
+                state.employees = [...defaultData];
+                state.filteredEmployees = [...state.employees];
+            }
+        },
+        
+        saveData() {
+            try {
+                const dataToSave = {
+                    project: CONFIG.projectName,
+                    version: CONFIG.version,
+                    employees: state.employees,
+                    lastModified: new Date().toISOString()
+                };
+                localStorage.setItem(CONFIG.storageKey, JSON.stringify(dataToSave));
+                this.updateSystemInfo();
+                Utils.notify('Data saved successfully', 'success');
+            } catch (e) {
+                Utils.notify('Failed to save data', 'error');
+            }
+        },
+        
+        clearData() {
+            if (confirm('Clear all data? This cannot be undone.')) {
+                state.employees = [];
+                state.filteredEmployees = [];
+                state.selectedEmployee = null;
+                this.saveData();
+                UI.updateStatistics();
+                UI.renderEmployees();
+            }
+        },
+        
+        setupEventListeners() {
+            document.getElementById('employeeModal').addEventListener('click', function(e) {
+                if (e.target === this) HR.closeModal();
+            });
+            
+            document.getElementById('payrollModal').addEventListener('click', function(e) {
+                if (e.target === this) HR.Payroll.closePayrollModal();
+            });
+            
+            document.getElementById('salaryHistoryModal').addEventListener('click', function(e) {
+                if (e.target === this) HR.Payroll.closeSalaryHistoryModal();
+            });
+            
+            document.getElementById('importFile').addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    if (file.name.endsWith('.json')) {
+                        DataIO.importJSON(file);
+                    } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                        DataIO.importExcel(file);
+                    }
+                    e.target.value = '';
+                }
+            });
+        },
+        
+        updateSystemInfo() {
+            document.getElementById('projectName').textContent = CONFIG.projectName;
+            document.getElementById('chatName').textContent = CONFIG.chatName;
+            document.getElementById('location').textContent = CONFIG.location;
+            document.getElementById('lastModified').textContent = new Date().toLocaleString('en-US');
+            document.getElementById('storageType').textContent = CONFIG.storageType;
+            document.getElementById('storagePath').textContent = CONFIG.storageKey;
+            document.getElementById('systemVersion').textContent = CONFIG.version;
+            document.getElementById('totalRecords').textContent = state.employees.length;
+        }
+    };
+    
+    // UI Module
+    const UI = {
+        updateStatistics() {
+            const employees = state.employees;
+            const totalEmployees = employees.length;
+            const totalSalary = employees.reduce((sum, emp) => sum + emp.salary, 0);
+            const avgSalary = totalEmployees > 0 ? totalSalary / totalEmployees : 0;
+            
+            // Calculate total OT
+            const totalOT = employees.reduce((sum, emp) => {
+                if (emp.payroll) {
+                    return sum + ((emp.payroll.otHours || 0) * (emp.payroll.otRate || 0));
+                }
+                return sum;
+            }, 0);
+            
+            document.getElementById('totalEmployees').textContent = totalEmployees;
+            document.getElementById('avgSalary').textContent = '฿' + Math.round(avgSalary).toLocaleString();
+            document.getElementById('totalPayroll').textContent = '฿' + totalSalary.toLocaleString();
+            document.getElementById('totalOT').textContent = '฿' + Math.round(totalOT).toLocaleString();
+        },
+        
+        renderEmployees() {
+            const container = document.getElementById('employeeGrid');
+            container.innerHTML = '';
+            
+            const employees = Utils.sortEmployees([...state.filteredEmployees]);
+            
+            employees.forEach((emp, idx) => {
+                const card = document.createElement('div');
+                card.className = 'employee-card';
+                card.onclick = () => this.showSubProgram(emp);
+                
+                const netPay = Payroll.calculateNetPay(emp);
+                
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+                        <div>
+                            <div style="font-size: 1.1rem; font-weight: 600;">${emp.name}</div>
+                            <div style="font-size: 0.9rem; color: #666;">${emp.jobPosition || 'N/A'}</div>
+                            <div style="font-size: 0.8rem; color: #999;">ID: ${emp.idCard}</div>
+                        </div>
+                        <span style="background: var(--primary); color: white; padding: 0.5rem; 
+                                     border-radius: 20px; font-size: 0.8rem;">#${idx + 1}</span>
+                    </div>
+                    <div style="display: grid; gap: 0.5rem; font-size: 0.9rem;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #666;">Department:</span>
+                            <span style="font-weight: 500;">${CONFIG.departments[emp.department] || emp.department}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #666;">Base Salary:</span>
+                            <span style="color: var(--success); font-weight: 600;">฿${emp.salary.toLocaleString()}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #666;">Net Pay:</span>
+                            <span style="color: var(--primary); font-weight: 600;">฿${netPay.toLocaleString()}</span>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        },
+        
+        showMainProgram() {
+            document.getElementById('mainProgram').style.display = 'block';
+            document.getElementById('subProgram').classList.remove('active');
+            document.getElementById('breadcrumb').innerHTML = 
+                '<span class="breadcrumb-item" onclick="HR.UI.showMainProgram()">Home</span>';
+            state.selectedEmployee = null;
+            state.filteredEmployees = [...state.employees];
+            this.renderEmployees();
+        },
+        
+        showSubProgram(employee) {
+            state.selectedEmployee = employee;
+            document.getElementById('mainProgram').style.display = 'none';
+            document.getElementById('subProgram').classList.add('active');
+            
+            document.getElementById('breadcrumb').innerHTML = `
+                <span class="breadcrumb-item" onclick="HR.UI.showMainProgram()">Home</span>
+                <span style="color: #999;"> > </span>
+                <span>${employee.name}</span>
+            `;
+            
+            const netPay = Payroll.calculateNetPay(employee);
+            
+            document.getElementById('employeeDetailsHeader').innerHTML = `
+                <div>
+                    <h2>${employee.name}</h2>
+                    <p style="opacity: 0.9;">
+                        ${employee.jobPosition} • ${CONFIG.departments[employee.department]}
+                    </p>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 1.5rem; font-weight: 600;">
+                        ฿${netPay.toLocaleString()}
+                    </div>
+                    <div style="opacity: 0.9;">Net Pay/Month</div>
+                </div>
+            `;
+            
+            this.showSubContent('personal');
+        },
+        
+        showSubContent(content) {
+            document.querySelectorAll('.sub-menu-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('.sub-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(content + 'Content').classList.add('active');
+            
+            switch(content) {
+                case 'personal':
+                    this.loadPersonalInfo();
+                    break;
+                case 'payroll':
+                    this.loadPayrollInfo();
+                    break;
+                case 'history':
+                    this.loadSalaryHistory();
+                    break;
+                case 'notes':
+                    this.loadNotes();
+                    break;
+            }
+        },
+        
+        loadPersonalInfo() {
+            if (!state.selectedEmployee) return;
+            
+            const emp = state.selectedEmployee;
+            const age = Utils.calculateAge(emp.dateOfBirth);
+            const exp = Utils.calculateExperience(emp.employmentDate);
+            
+            document.getElementById('personalInfoGrid').innerHTML = `
+                <div class="payroll-section">
+                    <h4>Identification</h4>
+                    <div class="payroll-grid">
+                        <div class="payroll-item">
+                            <div class="payroll-label">ID Card</div>
+                            <div class="payroll-value">${emp.idCard}</div>
+                        </div>
+                        <div class="payroll-item">
+                            <div class="payroll-label">Full Name</div>
+                            <div class="payroll-value">${emp.name}</div>
+                        </div>
+                        <div class="payroll-item">
+                            <div class="payroll-label">Age</div>
+                            <div class="payroll-value">${age} years</div>
+                        </div>
+                        <div class="payroll-item">
+                            <div class="payroll-label">Experience</div>
+                            <div class="payroll-value">${exp}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="payroll-section">
+                    <h4>Contact Information</h4>
+                    <div class="payroll-grid">
+                        <div class="payroll-item">
+                            <div class="payroll-label">Email</div>
+                            <div class="payroll-value">${emp.email}</div>
+                        </div>
+                        <div class="payroll-item">
+                            <div class="payroll-label">Phone</div>
+                            <div class="payroll-value">${emp.phone || 'N/A'}</div>
+                        </div>
+                        <div class="payroll-item" style="grid-column: 1 / -1;">
+                            <div class="payroll-label">Address</div>
+                            <div class="payroll-value">${emp.address || 'N/A'}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        },
+        
+        loadPayrollInfo() {
+            if (!state.selectedEmployee) return;
+            
+            const emp = state.selectedEmployee;
+            const payroll = emp.payroll || {};
+            const otAmount = (payroll.otHours || 0) * (payroll.otRate || 0);
+            const totalEarnings = emp.salary + otAmount + (payroll.allowances || 0) + (payroll.accommodation || 0);
+            const totalDeductions = (payroll.socialSecurity || 0) + (payroll.otherDeductions || 0);
+            const netPay = totalEarnings - totalDeductions;
+            
+            document.getElementById('payrollInfoGrid').innerHTML = `
+                <div class="payroll-section">
+                    <h4>Earnings</h4>
+                    <div class="payroll-grid">
+                        <div class="payroll-item">
+                            <div class="payroll-label">Base Salary</div>
+                            <div class="payroll-value" style="color: var(--success);">
+                                ฿${emp.salary.toLocaleString()}
+                            </div>
+                        </div>
+                        <div class="payroll-item">
+                            <div class="payroll-label">OT (${payroll.otHours || 0} hrs × ฿${payroll.otRate || 0})</div>
+                            <div class="payroll-value">฿${otAmount.toLocaleString()}</div>
+                        </div>
+                        <div class="payroll-item">
+                            <div class="payroll-label">Allowances</div>
+                            <div class="payroll-value">฿${(payroll.allowances || 0).toLocaleString()}</div>
+                        </div>
+                        <div class="payroll-item">
+                            <div class="payroll-label">Accommodation</div>
+                            <div class="payroll-value">฿${(payroll.accommodation || 0).toLocaleString()}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="payroll-section">
+                    <h4>Deductions</h4>
+                    <div class="payroll-grid">
+                        <div class="payroll-item">
+                            <div class="payroll-label">Social Security</div>
+                            <div class="payroll-value" style="color: var(--danger);">
+                                -฿${(payroll.socialSecurity || 0).toLocaleString()}
+                            </div>
+                        </div>
+                        <div class="payroll-item">
+                            <div class="payroll-label">Other Deductions</div>
+                            <div class="payroll-value" style="color: var(--danger);">
+                                -฿${(payroll.otherDeductions || 0).toLocaleString()}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="payroll-section" style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white;">
+                    <h4 style="color: white;">Summary</h4>
+                    <div class="payroll-grid">
+                        <div class="payroll-item" style="background: rgba(255,255,255,0.1);">
+                            <div class="payroll-label" style="color: rgba(255,255,255,0.9);">Total Earnings</div>
+                            <div class="payroll-value" style="color: white;">
+                                ฿${totalEarnings.toLocaleString()}
+                            </div>
+                        </div>
+                        <div class="payroll-item" style="background: rgba(255,255,255,0.1);">
+                            <div class="payroll-label" style="color: rgba(255,255,255,0.9);">Total Deductions</div>
+                            <div class="payroll-value" style="color: white;">
+                                -฿${totalDeductions.toLocaleString()}
+                            </div>
+                        </div>
+                        <div class="payroll-item" style="background: rgba(255,255,255,0.2); grid-column: 1 / -1;">
+                            <div class="payroll-label" style="color: rgba(255,255,255,0.9);">Net Pay</div>
+                            <div class="payroll-value" style="color: white; font-size: 1.5rem;">
+                                ฿${netPay.toLocaleString()}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        },
+        
+        loadSalaryHistory() {
+            if (!state.selectedEmployee) return;
+            
+            const history = state.selectedEmployee.salaryHistory || [];
+            const container = document.getElementById('salaryHistoryList');
+            
+            if (history.length === 0) {
+                container.innerHTML = '<div class="payroll-section"><p>No salary history records.</p></div>';
+                return;
+            }
+            
+            container.innerHTML = history.map(item => {
+                const increase = item.newSalary - item.oldSalary;
+                const percent = ((increase / item.oldSalary) * 100).toFixed(1);
+                const statusClass = item.paymentStatus === 'paid' ? 'status-paid' : 'status-pending';
+                
+                return `
+                    <div class="salary-history-item">
+                        <div class="salary-history-header">
+                            <div class="salary-change">
+                                <span class="salary-old">฿${item.oldSalary.toLocaleString()}</span>
+                                →
+                                <span class="salary-new">฿${item.newSalary.toLocaleString()}</span>
+                            </div>
+                            <span class="salary-status ${statusClass}">
+                                ${item.paymentStatus === 'paid' ? 'Paid' : 'Pending'}
+                            </span>
+                        </div>
+                        <div style="margin: 0.5rem 0; color: #666;">
+                            <div>Effective: ${item.effectiveDate}</div>
+                            <div>Payment: ${item.paymentDate || 'Not specified'}</div>
+                        </div>
+                        <div style="color: #333; font-style: italic;">
+                            ${item.reason || 'No reason specified'}
+                        </div>
+                        <div style="margin-top: 0.5rem; padding: 0.5rem; background: #d4edda; 
+                                    border-radius: 5px; color: #155724;">
+                            Increase: +฿${increase.toLocaleString()} (+${percent}%)
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        },
+        
+        loadNotes() {
+            if (!state.selectedEmployee) return;
+            
+            const notes = state.selectedEmployee.notes || [];
+            const container = document.getElementById('notesList');
+            
+            if (notes.length === 0) {
+                container.innerHTML = '<div class="payroll-section"><p>No notes available.</p></div>';
+                return;
+            }
+            
+            container.innerHTML = notes.map(note => `
+                <div style="background: white; border: 1px solid var(--border); 
+                            border-radius: 10px; padding: 1rem; margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span style="color: #666; font-size: 0.8rem;">${note.date}</span>
+                        <span style="background: var(--primary); color: white; 
+                                     padding: 0.25rem 0.5rem; border-radius: 10px; font-size: 0.7rem;">
+                            ${note.createdBy || 'Admin'}
+                        </span>
+                    </div>
+                    <div style="color: #333;">${note.content}</div>
+                </div>
+            `).join('');
+        }
+    };
+    
+    // Payroll Module
+    const Payroll = {
+        calculateNetPay(employee) {
+            if (!employee.payroll) {
+                return employee.salary - 750; // Default social security
+            }
+            
+            const p = employee.payroll;
+            const otAmount = (p.otHours || 0) * (p.otRate || 0);
+            const earnings = employee.salary + otAmount + (p.allowances || 0) + (p.accommodation || 0);
+            const deductions = (p.socialSecurity || 0) + (p.otherDeductions || 0);
+            
+            return earnings - deductions;
+        },
+        
+        showPayrollModal() {
+            if (!state.selectedEmployee) return;
+            
+            const p = state.selectedEmployee.payroll || {};
+            document.getElementById('otHours').value = p.otHours || 0;
+            document.getElementById('otRate').value = p.otRate || Math.round(state.selectedEmployee.salary / 240 * 1.5);
+            document.getElementById('allowances').value = p.allowances || 0;
+            document.getElementById('accommodation').value = p.accommodation || 0;
+            document.getElementById('socialSecurity').value = p.socialSecurity || 750;
+            document.getElementById('otherDeductions').value = p.otherDeductions || 0;
+            
+            document.getElementById('payrollModal').classList.add('active');
+        },
+        
+        closePayrollModal() {
+            document.getElementById('payrollModal').classList.remove('active');
+        },
+        
+        savePayrollDetails() {
+            if (!state.selectedEmployee) return;
+            
+            state.selectedEmployee.payroll = {
+                otHours: parseFloat(document.getElementById('otHours').value) || 0,
+                otRate: parseFloat(document.getElementById('otRate').value) || 0,
+                allowances: parseFloat(document.getElementById('allowances').value) || 0,
+                accommodation: parseFloat(document.getElementById('accommodation').value) || 0,
+                socialSecurity: parseFloat(document.getElementById('socialSecurity').value) || 0,
+                otherDeductions: parseFloat(document.getElementById('otherDeductions').value) || 0
+            };
+            
+            const idx = state.employees.findIndex(e => e.id === state.selectedEmployee.id);
+            if (idx !== -1) {
+                state.employees[idx] = state.selectedEmployee;
+            }
+            
+            Core.saveData();
+            UI.loadPayrollInfo();
+            UI.updateStatistics();
+            this.closePayrollModal();
+        },
+        
+        showSalaryHistoryModal() {
+            if (!state.selectedEmployee) return;
+            
+            document.getElementById('oldSalary').value = state.selectedEmployee.salary;
+            document.getElementById('effectiveDate').valueAsDate = new Date();
+            document.getElementById('salaryHistoryModal').classList.add('active');
+        },
+        
+        closeSalaryHistoryModal() {
+            document.getElementById('salaryHistoryModal').classList.remove('active');
+            document.getElementById('salaryHistoryForm').reset();
+        },
+        
+        saveSalaryHistory() {
+            if (!state.selectedEmployee) return;
+            
+            const historyItem = {
+                effectiveDate: document.getElementById('effectiveDate').value,
+                paymentDate: document.getElementById('paymentDate').value,
+                oldSalary: parseFloat(document.getElementById('oldSalary').value),
+                newSalary: parseFloat(document.getElementById('newSalary').value),
+                paymentStatus: document.getElementById('paymentStatus').value,
+                reason: document.getElementById('reason').value,
+                createdAt: new Date().toISOString()
+            };
+            
+            if (!state.selectedEmployee.salaryHistory) {
+                state.selectedEmployee.salaryHistory = [];
+            }
+            
+            state.selectedEmployee.salaryHistory.unshift(historyItem);
+            state.selectedEmployee.salary = historyItem.newSalary;
+            
+            const idx = state.employees.findIndex(e => e.id === state.selectedEmployee.id);
+            if (idx !== -1) {
+                state.employees[idx] = state.selectedEmployee;
+            }
+            
+            Core.saveData();
+            UI.loadSalaryHistory();
+            UI.updateStatistics();
+            this.closeSalaryHistoryModal();
+        }
+    };
+    
+    // Data I/O Module
+    const DataIO = {
+        exportJSON() {
+            const exportData = {
+                projectName: CONFIG.projectName,
+                projectCode: CONFIG.chatName,
+                version: CONFIG.version,
+                exportDate: new Date().toISOString(),
+                employees: state.employees,
+                totalRecords: state.employees.length
+            };
+            
+            const blob = new Blob([JSON.stringify(exportData, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `HR_Data_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            Utils.notify('JSON exported successfully', 'success');
+        },
+        
+        importJSON(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    const imported = data.employees || data;
+                    
+                    state.employees = imported.map((emp, idx) => ({
+                        id: emp.id || idx + 1,
+                        idCard: emp.idCard || `110000000000${idx}`,
+                        name: emp.name || '',
+                        department: emp.department || '',
+                        jobPosition: emp.jobPosition || emp.position || '',
+                        email: emp.email || '',
+                        phone: emp.phone || '',
+                        address: emp.address || '',
+                        dateOfBirth: emp.dateOfBirth || emp.birthdate || '',
+                        employmentDate: emp.employmentDate || '',
+                        salary: parseInt(emp.salary || 0),
+                        type: emp.type || 'Internal',
+                        payroll: emp.payroll || {
+                            otHours: 0,
+                            otRate: Math.round((emp.salary || 0) / 240 * 1.5),
+                            allowances: 0,
+                            accommodation: 0,
+                            socialSecurity: 750,
+                            otherDeductions: 0
+                        },
+                        salaryHistory: emp.salaryHistory || [],
+                        notes: emp.notes || []
+                    }));
+                    
+                    state.filteredEmployees = [...state.employees];
+                    Core.saveData();
+                    UI.updateStatistics();
+                    UI.renderEmployees();
+                    
+                    Utils.notify(`Imported ${state.employees.length} records successfully`, 'success');
+                } catch (err) {
+                    console.error('Import error:', err);
+                    Utils.notify('Failed to import JSON', 'error');
+                }
+            };
+            reader.readAsText(file);
+        },
+        
+        exportExcel() {
+            try {
+                const mainData = state.employees.map((emp, idx) => {
+                    const netPay = Payroll.calculateNetPay(emp);
+                    const p = emp.payroll || {};
+                    
+                    return {
+                        'No': idx + 1,
+                        'ID Card': emp.idCard,
+                        'Name': emp.name,
+                        'Department': CONFIG.departments[emp.department] || emp.department,
+                        'Position': emp.jobPosition,
+                        'Email': emp.email,
+                        'Phone': emp.phone,
+                        'Birth Date': emp.dateOfBirth,
+                        'Employment Date': emp.employmentDate,
+                        'Base Salary': emp.salary,
+                        'OT Hours': p.otHours || 0,
+                        'OT Amount': (p.otHours || 0) * (p.otRate || 0),
+                        'Allowances': p.allowances || 0,
+                        'Accommodation': p.accommodation || 0,
+                        'Social Security': p.socialSecurity || 0,
+                        'Other Deductions': p.otherDeductions || 0,
+                        'Net Pay': netPay,
+                        'Type': emp.type
+                    };
+                });
+                
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.json_to_sheet(mainData);
+                XLSX.utils.book_append_sheet(wb, ws, 'Employees');
+                
+                XLSX.writeFile(wb, `HR_Data_${new Date().toISOString().split('T')[0]}.xlsx`);
+                Utils.notify('Excel exported successfully', 'success');
+            } catch (err) {
+                Utils.notify('Failed to export Excel', 'error');
+            }
+        },
+        
+        importExcel() {
+            document.getElementById('importFile').accept = '.xlsx,.xls';
+            document.getElementById('importFile').click();
+        }
+    };
+    
+    // Utils Module
+    const Utils = {
+        notify(message, type = 'info') {
+            // Simple notification implementation
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        },
+        
+        sortEmployees(employees) {
+            return employees.sort((a, b) => a.name.localeCompare(b.name));
+        },
+        
+        calculateAge(birthDate) {
+            if (!birthDate) return 'N/A';
+            const today = new Date();
+            const birth = new Date(birthDate);
+            let age = today.getFullYear() - birth.getFullYear();
+            const m = today.getMonth() - birth.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) age--;
+            return age;
+        },
+        
+        calculateExperience(startDate) {
+            if (!startDate) return 'N/A';
+            const today = new Date();
+            const start = new Date(startDate);
+            const months = (today.getFullYear() - start.getFullYear()) * 12 + 
+                          (today.getMonth() - start.getMonth());
+            const years = Math.floor(months / 12);
+            const remainingMonths = months % 12;
+            return `${years} years, ${remainingMonths} months`;
+        }
+    };
+    
+    // Public API
+    return {
+        init: () => Core.init(),
+        saveData: () => Core.saveData(),
+        clearData: () => Core.clearData(),
+        exportJSON: () => DataIO.exportJSON(),
+        importJSON: () => document.getElementById('importFile').click(),
+        exportExcel: () => DataIO.exportExcel(),
+        importExcel: () => DataIO.importExcel(),
+        
+        // Employee Management
+        openAddModal() {
+            state.editingEmployeeId = null;
+            document.getElementById('modalTitle').textContent = 'Add New Employee';
+            document.getElementById('employeeForm').reset();
+            document.getElementById('employeeModal').classList.add('active');
+        },
+        
+        editSelectedEmployee() {
+            if (!state.selectedEmployee) return;
+            
+            state.editingEmployeeId = state.selectedEmployee.id;
+            document.getElementById('modalTitle').textContent = 'Edit Employee';
+            
+            const emp = state.selectedEmployee;
+            document.getElementById('idCard').value = emp.idCard;
+            document.getElementById('name').value = emp.name;
+            document.getElementById('department').value = emp.department;
+            document.getElementById('jobPosition').value = emp.jobPosition;
+            document.getElementById('email').value = emp.email;
+            document.getElementById('phone').value = emp.phone;
+            document.getElementById('dateOfBirth').value = emp.dateOfBirth;
+            document.getElementById('employmentDate').value = emp.employmentDate;
+            document.getElementById('address').value = emp.address;
+            document.getElementById('salary').value = emp.salary;
+            document.getElementById('type').value = emp.type;
+            
+            document.getElementById('employeeModal').classList.add('active');
+        },
+        
+        closeModal() {
+            document.getElementById('employeeModal').classList.remove('active');
+            state.editingEmployeeId = null;
+        },
+        
+        saveEmployee() {
+            const form = document.getElementById('employeeForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+            
+            const employeeData = {
+                idCard: document.getElementById('idCard').value,
+                name: document.getElementById('name').value,
+                department: document.getElementById('department').value,
+                jobPosition: document.getElementById('jobPosition').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                dateOfBirth: document.getElementById('dateOfBirth').value,
+                employmentDate: document.getElementById('employmentDate').value,
+                address: document.getElementById('address').value,
+                salary: parseInt(document.getElementById('salary').value),
+                type: document.getElementById('type').value
+            };
+            
+            if (state.editingEmployeeId) {
+                const idx = state.employees.findIndex(e => e.id === state.editingEmployeeId);
+                state.employees[idx] = {
+                    ...state.employees[idx],
+                    ...employeeData
+                };
+                
+                if (state.selectedEmployee && state.selectedEmployee.id === state.editingEmployeeId) {
+                    state.selectedEmployee = state.employees[idx];
+                    UI.loadPersonalInfo();
+                }
+            } else {
+                const newId = Math.max(...state.employees.map(e => e.id), 0) + 1;
+                state.employees.push({
+                    id: newId,
+                    ...employeeData,
+                    payroll: {
+                        otHours: 0,
+                        otRate: Math.round(employeeData.salary / 240 * 1.5),
+                        allowances: 0,
+                        accommodation: 0,
+                        socialSecurity: 750,
+                        otherDeductions: 0
+                    },
+                    salaryHistory: [],
+                    notes: []
+                });
+            }
+            
+            state.filteredEmployees = [...state.employees];
+            Core.saveData();
+            UI.updateStatistics();
+            UI.renderEmployees();
+            this.closeModal();
+        },
+        
+        searchEmployees(query) {
+            if (!query) {
+                state.filteredEmployees = [...state.employees];
+            } else {
+                const q = query.toLowerCase();
+                state.filteredEmployees = state.employees.filter(emp =>
+                    emp.name.toLowerCase().includes(q) ||
+                    emp.idCard.includes(q) ||
+                    (emp.jobPosition && emp.jobPosition.toLowerCase().includes(q)) ||
+                    emp.department.toLowerCase().includes(q)
+                );
+            }
+            UI.renderEmployees();
+        },
+        
+        filterByDepartment(dept) {
+            if (!dept) {
+                state.filteredEmployees = [...state.employees];
+            } else {
+                state.filteredEmployees = state.employees.filter(e => e.department === dept);
+            }
+            UI.renderEmployees();
+        },
+        
+        addNote() {
+            const noteText = document.getElementById('newNote').value.trim();
+            if (!noteText || !state.selectedEmployee) return;
+            
+            if (!state.selectedEmployee.notes) {
+                state.selectedEmployee.notes = [];
+            }
+            
+            state.selectedEmployee.notes.unshift({
+                date: new Date().toLocaleString('en-US'),
+                content: noteText,
+                createdBy: 'User'
+            });
+            
+            const idx = state.employees.findIndex(e => e.id === state.selectedEmployee.id);
+            if (idx !== -1) {
+                state.employees[idx] = state.selectedEmployee;
+            }
+            
+            Core.saveData();
+            UI.loadNotes();
+            document.getElementById('newNote').value = '';
+        },
+        
+        // Export modules for extensibility
+        UI: UI,
+        Payroll: Payroll,
+        DataIO: DataIO,
+        Utils: Utils
+    };
+})();
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => HR.init());
+    </script>
+</body>
+</html>

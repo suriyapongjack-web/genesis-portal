@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PTTEP Portfolio - Modular SQL System</title>
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+    <div id="app">
+        <div id="app-loading" class="loading-screen">
+            <div class="spinner"></div>
+            <p>Loading Modules...</p>
+        </div>
+    </div>
+
+    <!-- Core Configuration -->
+    <script src="config/app.config.js"></script>
+    
+    <!-- Database Modules -->
+    <script src="modules/database/db.config.js"></script>
+    <script src="modules/database/db.connector.js"></script>
+    <script src="modules/database/db.queries.js"></script>
+    
+    <!-- Service Modules -->
+    <script src="modules/services/data.service.js"></script>
+    <script src="modules/services/export.service.js"></script>
+    <script src="modules/services/import.service.js"></script>
+    
+    <!-- Component Modules -->
+    <script src="modules/components/header.component.js"></script>
+    <script src="modules/components/navigation.component.js"></script>
+    <script src="modules/components/dashboard.component.js"></script>
+    <script src="modules/components/table.component.js"></script>
+    
+    <!-- Main Application -->
+    <script src="app.main.js"></script>
+    
+    <script>
+        // Initialize when all modules are loaded
+        window.addEventListener('DOMContentLoaded', () => {
+            if (typeof AppMain !== 'undefined') {
+                AppMain.init();
+            } else {
+                console.error('Main application module not loaded');
+            }
+        });
+    </script>
+</body>
+</html>

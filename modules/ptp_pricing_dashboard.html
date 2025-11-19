@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PTP Link Pricing Dashboard - Oil & Gas ATEX SEA Region</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .dashboard {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            animation: slideDown 0.5s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        h1 {
+            color: #1e3c72;
+            font-size: 2.8em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+        
+        .subtitle {
+            color: #666;
+            text-align: center;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: #333;
+        }
+        
+        .tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .tab.active {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+        
+        .content-area {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        .content-area.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .metric-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .metric-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .metric-change {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(700px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .chart-title {
+            font-size: 1.4em;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        canvas {
+            max-height: 400px;
+        }
+        
+        .recommendation-box {
+            background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-top: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .recommendation-title {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+        
+        .recommendation-value {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .recommendation-details {
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            overflow-x: auto;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            font-weight: bold;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #1e3c72;
+            border: 2px solid #1e3c72;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        .timeline {
+            position: relative;
+            padding: 30px 0;
+        }
+        
+        .timeline-item {
+            display: flex;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .timeline-date {
+            background: #1e3c72;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 30px;
+            min-width: 150px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .timeline-content {
+            margin-left: 30px;
+            padding: 15px 25px;
+            background: white;
+            border-radius: 15px;
+            flex: 1;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .timeline-title {
+            font-weight: 600;
+            color: #1e3c72;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+        
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .recommendation-value {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>📊 PTP Link Pricing Analysis Dashboard</h1>
+            <div class="subtitle">Oil & Gas + ATEX Equipment | Southeast Asia Region</div>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('overview')">Overview</button>
+                <button class="tab" onclick="showTab('pricing')">Pricing Analysis</button>
+                <button class="tab" onclick="showTab('comparison')">Regional Comparison</button>
+                <button class="tab" onclick="showTab('recommendation')">Recommendations</button>
+                <button class="tab" onclick="showTab('timeline')">Project Timeline</button>
+            </div>
+        </div>
+        
+        <!-- Overview Tab -->
+        <div id="overview" class="content-area active">
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Lowest Regional Rate</div>
+                    <div class="metric-value" style="color: #00b09b;">Myanmar</div>
+                    <div class="metric-change">$3,500 - 5,000 /month</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Highest Regional Rate</div>
+                    <div class="metric-value" style="color: #e74c3c;">Malaysia</div>
+                    <div class="metric-change">$6,000 - 10,000 /month</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">ATEX Premium</div>
+                    <div class="metric-value" style="color: #f39c12;">+30-50%</div>
+                    <div class="metric-change">Additional cost vs standard</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Break-even Point</div>
+                    <div class="metric-value" style="color: #3498db;">10-12 mo</div>
+                    <div class="metric-change">Rental vs CAPEX</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">PTTEP Recommended</div>
+                    <div class="metric-value" style="color: #1e3c72;">$4,500</div>
+                    <div class="metric-change">Optimal monthly rate</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">5-Year Total</div>
+                    <div class="metric-value" style="color: #9b59b6;">$270K</div>
+                    <div class="metric-change">Complete service cost</div>
+                </div>
+            </div>
+            
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <div class="chart-title">CAPEX Investment by Country (USD)</div>
+                    <canvas id="capexChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Monthly Rental Rates Comparison</div>
+                    <canvas id="rentalChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pricing Analysis Tab -->
+        <div id="pricing" class="content-area">
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <div class="chart-title">5-Year Total Cost Comparison</div>
+                    <canvas id="totalCostChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">ATEX Equipment Cost Breakdown</div>
+                    <canvas id="breakdownChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cost Component</th>
+                            <th>Amount (USD)</th>
+                            <th>Percentage</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Base Equipment (Ceragon IP-50CX)</td>
+                            <td>$14,250</td>
+                            <td>31%</td>
+                            <td>Main radio equipment</td>
+                        </tr>
+                        <tr class="highlight">
+                            <td>ATEX Zone 2 Certification</td>
+                            <td>$8,500</td>
+                            <td>18.5%</td>
+                            <td>Required for offshore</td>
+                        </tr>
+                        <tr>
+                            <td>Antenna & RF Components</td>
+                            <td>$3,530</td>
+                            <td>7.7%</td>
+                            <td>1.2m antenna, diplexers</td>
+                        </tr>
+                        <tr>
+                            <td>Installation & Commissioning</td>
+                            <td>$6,500</td>
+                            <td>14.2%</td>
+                            <td>Offshore installation</td>
+                        </tr>
+                        <tr>
+                            <td>Professional Services</td>
+                            <td>$9,690</td>
+                            <td>21.1%</td>
+                            <td>PMO, FAT, SAT, Training</td>
+                        </tr>
+                        <tr>
+                            <td>Spare Parts (10%)</td>
+                            <td>$3,364</td>
+                            <td>7.3%</td>
+                            <td>Critical spares inventory</td>
+                        </tr>
+                        <tr style="font-weight: bold; background: #f8f9fa;">
+                            <td>TOTAL</td>
+                            <td>$45,834</td>
+                            <td>100%</td>
+                            <td>One-time CAPEX</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Regional Comparison Tab -->
+        <div id="comparison" class="content-area">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Country</th>
+                            <th>CAPEX Range</th>
+                            <th>Monthly Rental</th>
+                            <th>Key Advantages</th>
+                            <th>Challenges</th>
+                            <th>Recommendation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="highlight">
+                            <td><strong>Myanmar</strong></td>
+                            <td>$35-50K</td>
+                            <td>$3,500-5,000</td>
+                            <td>✓ Lowest cost<br>✓ Good coverage</td>
+                            <td>⚠ Country risk<br>⚠ Regulatory complex</td>
+                            <td>✅ Best for PTTEP</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Thailand</strong></td>
+                            <td>$43-62K</td>
+                            <td>$5,000-8,000</td>
+                            <td>✓ Best infrastructure<br>✓ Strong support</td>
+                            <td>⚠ Higher cost<br>⚠ Competition</td>
+                            <td>Good alternative</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Malaysia</strong></td>
+                            <td>$45-65K</td>
+                            <td>$6,000-10,000</td>
+                            <td>✓ International standards<br>✓ Premium quality</td>
+                            <td>⚠ Highest cost<br>⚠ Complex process</td>
+                            <td>Premium option</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Vietnam</strong></td>
+                            <td>$30-42K</td>
+                            <td>$3,000-4,500</td>
+                            <td>✓ Growing market<br>✓ Competitive</td>
+                            <td>⚠ Limited expertise<br>⚠ New market</td>
+                            <td>Emerging option</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Laos/Cambodia</strong></td>
+                            <td>$25-35K</td>
+                            <td>Limited</td>
+                            <td>✓ Low equipment cost</td>
+                            <td>⚠ Limited ATEX<br>⚠ Poor support</td>
+                            <td>Not recommended</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="charts-grid" style="margin-top: 30px;">
+                <div class="chart-container">
+                    <div class="chart-title">Regional Price Positioning</div>
+                    <canvas id="radarChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <div class="chart-title">Service Model Comparison</div>
+                    <canvas id="modelChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recommendations Tab -->
+        <div id="recommendation" class="content-area">
+            <div class="recommendation-box">
+                <div class="recommendation-title">✅ Recommended Strategy for PTTEP Zawtika</div>
+                <div class="recommendation-value">$4,500 - $5,000 /month</div>
+                <div class="recommendation-details">
+                    <strong>5-Year Rental Agreement with Mytel</strong><br><br>
+                    ✓ Zero CAPEX Investment Required<br>
+                    ✓ 99.95% SLA with Automatic Penalties<br>
+                    ✓ Complete 24/7 NOC Support<br>
+                    ✓ ATEX Zone 2 Certified Equipment<br>
+                    ✓ Myanmar Regulatory Compliance Included<br>
+                    ✓ Technology Refresh During Contract
+                </div>
+            </div>
+            
+            <div class="metrics-grid" style="margin-top: 30px;">
+                <div class="metric-card">
+                    <div class="metric-label">Initial Investment</div>
+                    <div class="metric-value" style="color: #00b09b;">$0</div>
+                    <div class="metric-change">No upfront payment</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Annual Cost</div>
+                    <div class="metric-value" style="color: #3498db;">$54K</div>
+                    <div class="metric-change">Fixed monthly rate</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">5-Year Total</div>
+                    <div class="metric-value" style="color: #9b59b6;">$270K</div>
+                    <div class="metric-change">All-inclusive service</div>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <h3 style="margin-bottom: 20px; color: #1e3c72;">Value Proposition Analysis</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Aspect</th>
+                            <th>CAPEX Model</th>
+                            <th>Rental Model (Recommended)</th>
+                            <th>Advantage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Initial Investment</td>
+                            <td>$45,000 - 50,000</td>
+                            <td>$0</td>
+                            <td style="color: #00b09b;">✓ Rental</td>
+                        </tr>
+                        <tr>
+                            <td>Maintenance Risk</td>
+                            <td>PTTEP responsibility</td>
+                            <td>Service provider</td>
+                            <td style="color: #00b09b;">✓ Rental</td>
+                        </tr>
+                        <tr>
+                            <td>Equipment Failure</td>
+                            <td>PTTEP cost</td>
+                            <td>Covered in contract</td>
+                            <td style="color: #00b09b;">✓ Rental</td>
+                        </tr>
+                        <tr>
+                            <td>Technology Update</td>
+                            <td>Additional CAPEX</td>
+                            <td>Included in service</td>
+                            <td style="color: #00b09b;">✓ Rental</td>
+                        </tr>
+                        <tr>
+                            <td>Regulatory Compliance</td>
+                            <td>PTTEP manages</td>
+                            <td>Mytel handles</td>
+                            <td style="color: #00b09b;">✓ Rental</td>
+                        </tr>
+                        <tr>
+                            <td>Performance Guarantee</td>
+                            <td>None</td>
+                            <td>99.95% SLA</td>
+                            <td style="color: #00b09b;">✓ Rental</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Timeline Tab -->
+        <div id="timeline" class="content-area">
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">Week 1-2</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Contract Finalization</div>
+                        <div>• Finalize commercial terms with PTTEP<br>
+                        • Sign service agreement with Mytel<br>
+                        • Confirm technical specifications</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Week 3-4</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Procurement Initiation</div>
+                        <div>• Place equipment order (24-week lead time)<br>
+                        • Arrange payment terms<br>
+                        • Setup project management office</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Week 5-24</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Manufacturing & Logistics</div>
+                        <div>• Equipment manufacturing in Norway<br>
+                        • ATEX certification process<br>
+                        • Customs clearance preparation</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Week 25-26</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Factory Acceptance Test</div>
+                        <div>• FAT at Bergen, Norway<br>
+                        • Equipment inspection<br>
+                        • Performance validation</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Week 27-28</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Shipment & Delivery</div>
+                        <div>• Equipment shipping to Myanmar<br>
+                        • Customs clearance<br>
+                        • Transport to offshore location</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Week 29-30</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Installation & Commissioning</div>
+                        <div>• Offshore installation<br>
+                        • Site Acceptance Test (SAT)<br>
+                        • Go-live and handover</div>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date" style="background: #00b09b;">Month 8</div>
+                    <div class="timeline-content" style="border: 2px solid #00b09b;">
+                        <div class="timeline-title" style="color: #00b09b;">System Go-Live</div>
+                        <div>• Full operational status<br>
+                        • 24/7 NOC monitoring active<br>
+                        • 5-year service period begins</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="downloadReport()">📥 Download Full Report</button>
+                <button class="btn btn-secondary" onclick="printDashboard()">🖨️ Print Dashboard</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Tab switching
+        function showTab(tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.content-area');
+            
+            tabs.forEach(tab => {
+                if (tab.textContent.toLowerCase().includes(tabName.substring(0, 4))) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            contents.forEach(content => {
+                if (content.id === tabName) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+            
+            // Trigger chart resize for proper rendering
+            window.dispatchEvent(new Event('resize'));
+        }
+        
+        // Chart configurations
+        Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif';
+        
+        // CAPEX Comparison Chart
+        const capexCtx = document.getElementById('capexChart').getContext('2d');
+        const capexChart = new Chart(capexCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Myanmar', 'Thailand', 'Malaysia', 'Laos/Cambodia', 'Vietnam'],
+                datasets: [
+                    {
+                        label: 'Equipment Cost',
+                        data: [25000, 30000, 37500, 21500, 23000],
+                        backgroundColor: 'rgba(52, 152, 219, 0.8)',
+                        borderColor: '#3498db',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'ATEX Premium (35%)',
+                        data: [8750, 10500, 13125, 7525, 8050],
+                        backgroundColor: 'rgba(231, 76, 60, 0.8)',
+                        borderColor: '#e74c3c',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Installation & Services',
+                        data: [6500, 10000, 17500, 3000, 5000],
+                        backgroundColor: 'rgba(243, 156, 18, 0.8)',
+                        borderColor: '#f39c12',
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        stacked: true
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + (value/1000) + 'k';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Monthly Rental Comparison
+        const rentalCtx = document.getElementById('rentalChart').getContext('2d');
+        const rentalChart = new Chart(rentalCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Myanmar', 'Thailand', 'Malaysia', 'Vietnam', 'PTTEP Project'],
+                datasets: [{
+                    label: 'Minimum Rate',
+                    data: [3500, 5000, 6000, 3000, 4500],
+                    backgroundColor: 'rgba(52, 152, 219, 0.6)',
+                    borderColor: '#3498db',
+                    borderWidth: 2
+                },
+                {
+                    label: 'Maximum Rate',
+                    data: [5000, 8000, 10000, 4500, 5000],
+                    backgroundColor: 'rgba(231, 76, 60, 0.6)',
+                    borderColor: '#e74c3c',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': $' + context.parsed.y.toLocaleString() + '/month';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 5-Year Total Cost Comparison
+        const totalCostCtx = document.getElementById('totalCostChart').getContext('2d');
+        const totalCostChart = new Chart(totalCostCtx, {
+            type: 'line',
+            data: {
+                labels: ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5'],
+                datasets: [
+                    {
+                        label: 'CAPEX Model (Myanmar)',
+                        data: [40250, 45250, 50250, 55250, 60250],
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Rental Model - Low ($4,000/mo)',
+                        data: [48000, 96000, 144000, 192000, 240000],
+                        borderColor: '#27ae60',
+                        backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.3
+                    },
+                    {
+                        label: 'Rental Model - High ($5,000/mo)',
+                        data: [60000, 120000, 180000, 240000, 300000],
+                        borderColor: '#f39c12',
+                        backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.3
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + (value/1000) + 'k';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Cost Breakdown Pie Chart
+        const breakdownCtx = document.getElementById('breakdownChart').getContext('2d');
+        const breakdownChart = new Chart(breakdownCtx, {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    'Base Equipment (Ceragon IP-50CX)',
+                    'ATEX Zone 2 Certification',
+                    'Antenna & RF Components',
+                    'Installation & Commissioning',
+                    'Professional Services',
+                    'Spare Parts (10%)'
+                ],
+                datasets: [{
+                    data: [14250, 8500, 3530, 6500, 9690, 3364],
+                    backgroundColor: [
+                        '#3498db',
+                        '#e74c3c',
+                        '#f39c12',
+                        '#27ae60',
+                        '#9b59b6',
+                        '#34495e'
+                    ],
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                return context.label + ': $' + context.parsed.toLocaleString() + ' (' + percentage + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Radar Chart for Regional Comparison
+        const radarCtx = document.getElementById('radarChart').getContext('2d');
+        const radarChart = new Chart(radarCtx, {
+            type: 'radar',
+            data: {
+                labels: ['Cost', 'Infrastructure', 'Support', 'ATEX Expertise', 'Regulatory Ease', 'Market Maturity'],
+                datasets: [
+                    {
+                        label: 'Myanmar',
+                        data: [90, 60, 65, 70, 55, 65],
+                        borderColor: '#3498db',
+                        backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Thailand',
+                        data: [60, 95, 90, 85, 80, 95],
+                        borderColor: '#e74c3c',
+                        backgroundColor: 'rgba(231, 76, 60, 0.2)',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Malaysia',
+                        data: [40, 100, 95, 90, 85, 100],
+                        borderColor: '#27ae60',
+                        backgroundColor: 'rgba(39, 174, 96, 0.2)',
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    r: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            stepSize: 20
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Service Model Comparison
+        const modelCtx = document.getElementById('modelChart').getContext('2d');
+        const modelChart = new Chart(modelCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Initial Cost', 'Year 1 Total', 'Year 3 Total', 'Year 5 Total'],
+                datasets: [
+                    {
+                        label: 'CAPEX Model',
+                        data: [45000, 50000, 60000, 70000],
+                        backgroundColor: 'rgba(231, 76, 60, 0.8)',
+                        borderColor: '#e74c3c',
+                        borderWidth: 2
+                    },
+                    {
+                        label: 'Rental Model ($4,500/mo)',
+                        data: [0, 54000, 162000, 270000],
+                        backgroundColor: 'rgba(39, 174, 96, 0.8)',
+                        borderColor: '#27ae60',
+                        borderWidth: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + (value/1000) + 'k';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Download and Print functions
+        function downloadReport() {
+            alert('Report download functionality would be implemented here.\nThis would generate a PDF report with all charts and analysis.');
+        }
+        
+        function printDashboard() {
+            window.print();
+        }
+    </script>
+</body>
+</html>

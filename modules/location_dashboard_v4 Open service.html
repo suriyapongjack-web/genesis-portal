@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Location Dashboard v4 - AVS Service Catalog</title>
+
+<!-- AVS Service Catalog Integration -->
+<meta name="avs-module" content="location-dashboard">
+<meta name="avs-version" content="4.0">
+<meta name="avs-catalog" content="service-locations">
+
+<style>
+body{font-family:Arial,sans-serif;margin:0;padding:20px;background:#f5f5f5}
+.container{max-width:1200px;margin:0 auto}
+.header{background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:30px;border-radius:10px;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.card{background:white;padding:20px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+.card h3{margin:0 0 15px 0;color:#333}
+.location-item{padding:8px;margin:5px 0;background:#f9f9f9;border-left:3px solid #667eea;border-radius:4px;cursor:pointer;transition:all 0.3s}
+.location-item:hover{background:#e3f2fd;transform:translateX(5px)}
+.location-item.selected{background:#dbeafe;border-left-color:#3b82f6;font-weight:600}
+.stats{display:flex;justify-content:space-around;margin:20px 0}
+.stat{text-align:center}
+.stat-num{font-size:2em;font-weight:bold;color:#667eea}
+.stat-label{color:#666;font-size:0.9em}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{padding:8px;text-align:left;border-bottom:1px solid #ddd}
+th{background:#f0f0f0;font-weight:600}
+.offshore{border-left-color:#3498db}
+.onshore{border-left-color:#2ecc71}
+.document{border-left-color:#e74c3c}
+
+/* AVS Integration Status */
+.avs-status {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    background: #2ecc71;
+    color: white;
+    border-radius: 5px;
+    font-size: 12px;
+    display: none;
+}
+.avs-status.active { display: block; }
+
+/* Action Buttons */
+.action-bar {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+.btn {
+    padding: 8px 16px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.3s;
+}
+.btn:hover { background: #5a67d8; }
+.btn-secondary { background: #6b7280; }
+.btn-secondary:hover { background: #4b5563; }
+
+.filter-select {
+    padding: 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 12px;
+}
+</style>
+</head>
+<body>
+<div class="container" id="avs-dashboard">
+<div class="header">
+<h1>📍 Client Location Dashboard v4</h1>
+<p style="margin:0">AVS Service Catalog System - Location Management</p>
+</div>
+
+<div class="action-bar">
+    <select class="filter-select" id="filterType" onchange="filterLocations()">
+        <option value="all">All Locations</option>
+        <option value="offshore">Offshore Only</option>
+        <option value="onshore">Onshore Only</option>
+        <option value="document">Document Centers</option>
+    </select>
+    <select class="filter-select" id="filterCountry" onchange="filterByCountry()">
+        <option value="all">All Countries</option>
+        <option value="thailand">🇹🇭 Thailand</option>
+        <option value="myanmar">🇲🇲 Myanmar</option>
+        <option value="malaysia">🇲🇾 Malaysia</option>
+    </select>
+    <button class="btn" onclick="openServiceCatalog()">Open Service Catalog</button>
+    <button class="btn btn-secondary" onclick="exportLocationData()">Export Data</button>
+</div>
+
+<div class="stats">
+<div class="stat">
+<div class="stat-num" id="countryCount">3</div>
+<div class="stat-label">Countries</div>
+</div>
+<div class="stat">
+<div class="stat-num" id="locationCount">20</div>
+<div class="stat-label">Locations</div>
+</div>
+<div class="stat">
+<div class="stat-num" id="offshoreCount">12</div>
+<div class="stat-label">Offshore</div>
+</div>
+<div class="stat">
+<div class="stat-num" id="onshoreCount">3</div>
+<div class="stat-label">Onshore</div>
+</div>
+</div>
+
+<div class="grid" id="location-grid">
+<div class="card" data-avs-country="thailand">
+<h3>🇹🇭 Thailand (12 locations)</h3>
+<div class="location-item offshore" data-avs-id="th-g1" onclick="selectLocation(this)">
+    <b>G1 Platform:</b> Platong, Erawan, Satun, Funan
+    <span style="float:right;font-size:10px;color:#666">PTTEP</span>
+</div>
+<div class="location-item offshore" data-avs-id="th-g2" onclick="selectLocation(this)">
+    <b>G2 Platform:</b> G2N, G2S, Arthit
+    <span style="float:right;font-size:10px;color:#666">PTTEP</span>
+</div>
+<div class="location-item offshore" data-avs-id="th-bualuang" onclick="selectLocation(this)">
+    <b>Bualuang Field:</b> Alpha, Bravo
+    <span style="float:right;font-size:10px;color:#666">Chevron</span>
+</div>
+<div class="location-item offshore" data-avs-id="th-gcme" onclick="selectLocation(this)">
+    <b>GCME Platform:</b> Arthit South
+    <span style="float:right;font-size:10px;color:#666">MUBADALA</span>
+</div>
+<div class="location-item document" data-avs-id="th-bkk" onclick="selectLocation(this)">
+    <b>Bangkok DCC:</b> Main, VDRL, ESO, PMO
+    <span style="float:right;font-size:10px;color:#666">All Clients</span>
+</div>
+</div>
+
+<div class="card" data-avs-country="myanmar">
+<h3>🇲🇲 Myanmar (5 locations)</h3>
+<div class="location-item offshore" data-avs-id="mm-zawtika-off" onclick="selectLocation(this)">
+    <b>ZAWTIKA Offshore:</b> ZPQ, Z1D, Z1E
+    <span style="float:right;font-size:10px;color:#666">PTTEP</span>
+</div>
+<div class="location-item onshore" data-avs-id="mm-zawtika-on" onclick="selectLocation(this)">
+    <b>ZAWTIKA Onshore:</b> ATL Processing Plant
+    <span style="float:right;font-size:10px;color:#666">PTTEP</span>
+</div>
+<div class="location-item onshore" data-avs-id="mm-yadana" onclick="selectLocation(this)">
+    <b>YADANA:</b> PLC-MS Control System
+    <span style="float:right;font-size:10px;color:#666">TOTAL</span>
+</div>
+</div>
+
+<div class="card" data-avs-country="malaysia">
+<h3>🇲🇾 Malaysia (1 location)</h3>
+<div class="location-item offshore" data-avs-id="my-jda" onclick="selectLocation(this)">
+    <b>JDA Platform:</b> CPOC Central Processing
+    <span style="float:right;font-size:10px;color:#666">Other O&G</span>
+</div>
+</div>
+
+<div class="card" style="background:#f0f9ff;border:2px solid #3b82f6">
+<h3>📊 Service Coverage Summary</h3>
+<table style="font-size:12px">
+<thead>
+<tr>
+<th>Location Type</th>
+<th>Common Services</th>
+<th>Avg. Duration</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><b>Offshore</b></td>
+<td>Installation, Maintenance, SAT</td>
+<td>5-10 days</td>
+</tr>
+<tr>
+<td><b>Onshore</b></td>
+<td>Upgrade, Training, FAT</td>
+<td>3-7 days</td>
+</tr>
+<tr>
+<td><b>Document Center</b></td>
+<td>FEED, Detail Design, VDRL</td>
+<td>20-60 days</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div style="text-align:center;margin-top:30px;color:#666">
+<small>AVS Location Dashboard v4.0 | Last Updated: <span id="date"></span></small>
+</div>
+</div>
+
+<!-- AVS Status Indicator -->
+<div class="avs-status" id="avs-status">
+✅ Connected to AVS Service Catalog
+</div>
+
+<script>
+// ============================================
+// AVS LOCATION DASHBOARD v4.0 - ENHANCED
+// ============================================
+
+// Configuration
+const AVS_CONFIG = {
+    enabled: true,
+    catalogURL: 'avs_service_catalog_system.html',
+    autoSync: true,
+    debug: true
+};
+
+// Location Dashboard Controller
+const LocationDashboard = {
+    selectedLocation: null,
+    
+    init: function() {
+        console.log('🚀 AVS Location Dashboard v4.0 Initialized');
+        this.updateDate();
+        this.updateStatistics();
+        this.setupEventListeners();
+        this.connectToAVS();
+    },
+    
+    updateDate: function() {
+        document.getElementById('date').textContent = new Date().toLocaleString();
+    },
+    
+    updateStatistics: function() {
+        const locations = document.querySelectorAll('.location-item');
+        const offshore = document.querySelectorAll('.location-item.offshore');
+        const onshore = document.querySelectorAll('.location-item.onshore');
+        
+        document.getElementById('locationCount').textContent = locations.length;
+        document.getElementById('offshoreCount').textContent = offshore.length;
+        document.getElementById('onshoreCount').textContent = onshore.length;
+    },
+    
+    connectToAVS: function() {
+        if (AVS_CONFIG.enabled) {
+            // Show connection status
+            const status = document.getElementById('avs-status');
+            status.classList.add('active');
+            
+            // Send ready signal
+            this.sendMessage('DASHBOARD_READY', {
+                module: 'location-dashboard',
+                version: '4.0',
+                locations: this.getAllLocations()
+            });
+            
+            // Hide status after 3 seconds
+            setTimeout(() => {
+                status.classList.remove('active');
+            }, 3000);
+        }
+    },
+    
+    getAllLocations: function() {
+        const locations = [];
+        document.querySelectorAll('.location-item').forEach(item => {
+            locations.push({
+                id: item.getAttribute('data-avs-id'),
+                type: item.className.replace('location-item ', '').replace(' selected', ''),
+                name: item.querySelector('b').textContent.replace(':', ''),
+                details: item.textContent.split(':')[1].trim(),
+                country: item.closest('.card').getAttribute('data-avs-country')
+            });
+        });
+        return locations;
+    },
+    
+    sendMessage: function(type, data) {
+        const message = {
+            type: type,
+            data: data,
+            timestamp: new Date().toISOString(),
+            source: 'location-dashboard'
+        };
+        
+        // Send to parent window if in iframe
+        if (window.parent !== window) {
+            window.parent.postMessage(message, '*');
+        }
+        
+        // Log for debugging
+        if (AVS_CONFIG.debug) {
+            console.log('📤 Sent:', message);
+        }
+    },
+    
+    setupEventListeners: function() {
+        // Listen for messages from AVS Catalog
+        window.addEventListener('message', (event) => {
+            if (event.data.source === 'service-catalog') {
+                this.handleCatalogMessage(event.data);
+            }
+        });
+    },
+    
+    handleCatalogMessage: function(data) {
+        if (AVS_CONFIG.debug) {
+            console.log('📥 Received from Catalog:', data);
+        }
+        
+        switch(data.type) {
+            case 'REQUEST_LOCATION':
+                this.sendSelectedLocation();
+                break;
+            case 'UPDATE_LOCATION':
+                this.highlightLocation(data.locationId);
+                break;
+        }
+    },
+    
+    sendSelectedLocation: function() {
+        if (this.selectedLocation) {
+            this.sendMessage('LOCATION_SELECTED', {
+                id: this.selectedLocation.getAttribute('data-avs-id'),
+                content: this.selectedLocation.textContent,
+                type: this.selectedLocation.className.replace('location-item ', '').replace(' selected', '')
+            });
+        }
+    },
+    
+    highlightLocation: function(locationId) {
+        // Remove all selections
+        document.querySelectorAll('.location-item').forEach(item => {
+            item.classList.remove('selected');
+        });
+        
+        // Highlight new selection
+        const location = document.querySelector(`[data-avs-id="${locationId}"]`);
+        if (location) {
+            location.classList.add('selected');
+            location.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+};
+
+// Global Functions
+function selectLocation(element) {
+    // Clear previous selection
+    document.querySelectorAll('.location-item').forEach(item => {
+        item.classList.remove('selected');
+    });
+    
+    // Select new location
+    element.classList.add('selected');
+    LocationDashboard.selectedLocation = element;
+    
+    // Send to AVS Catalog
+    LocationDashboard.sendMessage('LOCATION_SELECTED', {
+        id: element.getAttribute('data-avs-id'),
+        content: element.textContent,
+        type: element.className.replace('location-item ', '').replace(' selected', ''),
+        country: element.closest('.card').getAttribute('data-avs-country')
+    });
+    
+    // Visual feedback
+    const status = document.getElementById('avs-status');
+    status.textContent = '📍 Location sent to Service Catalog';
+    status.classList.add('active');
+    setTimeout(() => {
+        status.textContent = '✅ Connected to AVS Service Catalog';
+        status.classList.remove('active');
+    }, 2000);
+}
+
+function filterLocations() {
+    const filterType = document.getElementById('filterType').value;
+    const items = document.querySelectorAll('.location-item');
+    
+    items.forEach(item => {
+        if (filterType === 'all') {
+            item.style.display = 'block';
+        } else {
+            item.style.display = item.classList.contains(filterType) ? 'block' : 'none';
+        }
+    });
+    
+    LocationDashboard.updateStatistics();
+}
+
+function filterByCountry() {
+    const country = document.getElementById('filterCountry').value;
+    const cards = document.querySelectorAll('.card[data-avs-country]');
+    
+    cards.forEach(card => {
+        if (country === 'all') {
+            card.style.display = 'block';
+        } else {
+            card.style.display = card.getAttribute('data-avs-country') === country ? 'block' : 'none';
+        }
+    });
+}
+
+function openServiceCatalog() {
+    if (AVS_CONFIG.catalogURL) {
+        window.open(AVS_CONFIG.catalogURL, '_blank');
+    }
+}
+
+function exportLocationData() {
+    const data = LocationDashboard.getAllLocations();
+    const json = JSON.stringify(data, null, 2);
+    
+    // Create download link
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'avs_locations_' + new Date().toISOString().split('T')[0] + '.json';
+    a.click();
+    
+    // Show status
+    const status = document.getElementById('avs-status');
+    status.textContent = '💾 Location data exported';
+    status.classList.add('active');
+    setTimeout(() => {
+        status.textContent = '✅ Connected to AVS Service Catalog';
+        status.classList.remove('active');
+    }, 2000);
+}
+
+// Initialize on load
+document.addEventListener('DOMContentLoaded', function() {
+    LocationDashboard.init();
+});
+
+// Make available globally
+window.LocationDashboard = LocationDashboard;
+</script>
+
+</body>
+</html>

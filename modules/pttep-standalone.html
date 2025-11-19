@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PTTEP Portfolio Management System - Standalone</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            min-height: 100vh; 
+            padding: 20px; 
+        }
+        .container { max-width: 1600px; margin: 0 auto; }
+        .header { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+        }
+        .header h1 { 
+            color: #667eea; 
+            margin-bottom: 5px; 
+            font-size: 2rem; 
+        }
+        .header p { color: #6b7280; }
+        .navigation { 
+            background: white; 
+            display: flex; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            margin-bottom: 20px; 
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08); 
+        }
+        .nav-btn { 
+            padding: 15px 25px; 
+            border: none; 
+            background: transparent; 
+            cursor: pointer; 
+            font-weight: 600; 
+            color: #6b7280; 
+            transition: all 0.3s; 
+        }
+        .nav-btn:hover { 
+            color: #667eea; 
+            background: rgba(102, 126, 234, 0.05); 
+        }
+        .nav-btn.active { 
+            color: #667eea; 
+            background: rgba(102, 126, 234, 0.1); 
+            border-bottom: 3px solid #667eea; 
+        }
+        .content { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 15px; 
+            min-height: 500px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+        }
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 20px; 
+            margin-bottom: 30px; 
+        }
+        .stat-card { 
+            background: linear-gradient(135deg, #667eea, #764ba2); 
+            color: white; 
+            padding: 20px; 
+            border-radius: 10px; 
+        }
+        .stat-card h3 { 
+            font-size: 0.9rem; 
+            opacity: 0.9; 
+            margin-bottom: 10px; 
+        }
+        .stat-value { 
+            font-size: 2rem; 
+            font-weight: bold; 
+        }
+        .filters { 
+            display: flex; 
+            gap: 10px; 
+            margin-bottom: 20px; 
+            flex-wrap: wrap; 
+        }
+        .filters input, .filters select { 
+            padding: 8px 12px; 
+            border: 1px solid #d1d5db; 
+            border-radius: 6px; 
+        }
+        .filters button { 
+            padding: 8px 16px; 
+            background: #667eea; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+        }
+        .filters button:hover { background: #5a67d8; }
+        .data-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+        }
+        .data-table th { 
+            background: #f3f4f6; 
+            padding: 12px; 
+            text-align: left; 
+            font-weight: 600; 
+            color: #374151; 
+        }
+        .data-table td { 
+            padding: 12px; 
+            border-bottom: 1px solid #e5e7eb; 
+        }
+        .data-table tr:hover { background: #f9fafb; }
+        .status-delivered { 
+            background: #10b981; 
+            color: white; 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            font-size: 0.8rem; 
+        }
+        .status-amendment { 
+            background: #f59e0b; 
+            color: white; 
+            padding: 2px 8px; 
+            border-radius: 4px; 
+            font-size: 0.8rem; 
+        }
+        .pagination { 
+            display: flex; 
+            gap: 5px; 
+            justify-content: center; 
+            margin-top: 20px; 
+        }
+        .page-btn { 
+            padding: 5px 10px; 
+            border: 1px solid #d1d5db; 
+            background: white; 
+            cursor: pointer; 
+            border-radius: 4px; 
+        }
+        .page-btn:hover { background: #f3f4f6; }
+        .page-btn.active { 
+            background: #667eea; 
+            color: white; 
+        }
+        .export-buttons { 
+            display: flex; 
+            gap: 10px; 
+            margin: 20px 0; 
+        }
+        .export-btn { 
+            padding: 10px 20px; 
+            background: #10b981; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-weight: 600; 
+        }
+        .export-btn:hover { background: #059669; }
+        .loading { 
+            text-align: center; 
+            padding: 50px; 
+            color: #6b7280; 
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>PTTEP Portfolio Management System</h1>
+            <p>Addvalue Innovation Co., Ltd. - Complete Database (31 Records)</p>
+        </div>
+        
+        <nav class="navigation">
+            <button class="nav-btn active" data-tab="dashboard">📊 Dashboard</button>
+            <button class="nav-btn" data-tab="data">📋 Data Management</button>
+            <button class="nav-btn" data-tab="export">📥 Export</button>
+        </nav>
+        
+        <main class="content" id="content">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Loading System...</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+    // Complete PTTEP Portfolio Data - All 31 Records
+    const PORTFOLIO_DATA = [
+        {item:31,date:'2023-05-25',po:'4700028986',client:'Carigali-PTTEPI Operating Company Sdn Bhd (CPOC)',project:'MOD-19/010',title:'PROVISION OF MANPOWER, MATERIAL AND EQUIPMENT SUPPLY FOR THE CONFIGURATION OF RING NETWORK FOR POINT-TO-POINT RADIO COMMUNICATION SYSTEMS',value_thb:475000,value_usd:13571.43,incoterms:'N/A',delivery:'Tambol Huasao, Amphur Singhanakorn, Songkhla 90280, Thailand',status:'delivered'},
+        {item:30,date:'2023-05-03',po:'3450044753',client:'PTTEP Energy Development Company Limited',project:'1602 PTTEP ED BG2 – G2/61',title:'Provision of Site Survey ATEX CCTV at G2N',value_thb:384000,value_usd:11294.12,incoterms:'N/A',delivery:'-',status:'delivered'},
+        {item:29,date:'2019-12-11',po:'3500058102',client:'PTT Exploration and Production Public Co., Ltd. (PTTEP)',project:'1201 PTTEP Arthit B14A,B15A,B1',title:'SGHz LTE-U Connectorized ANT :ART',value_thb:198316.2,value_usd:6610.54,incoterms:'DDP',delivery:'PTTEP HQ, TH',status:'delivered'},
+        {item:28,date:'2019-12-11',po:'3500058101',client:'PTT Exploration and Production Public Co., Ltd. (PTTEP)',project:'1201 PTTEP Arthit B14A,B15A,B1',title:'SGHz LTE-U Connectorized CMP :ART',value_thb:393666,value_usd:13122.2,incoterms:'DDP',delivery:'PTTEP HQ, TH',status:'delivered'},
+        {item:27,date:'2023-03-16',po:'3450043707',client:'Andaman Transportation Limited',project:'8401 ATL',title:'Provision of CCTV System Improvement at ZMS',value_thb:184600.5,value_usd:5429.43,incoterms:'N/A',delivery:'-',status:'delivered'},
+        {item:26,date:'2022-08-23',po:'3450038789',client:'PTTEP Energy Development Company Limited',project:'1602 PTTEP ED BG2 – G2/61',title:'Supply Cable / Tester',value_thb:228600,value_usd:6531.43,incoterms:'DDP',delivery:'PTTEP PSB Warehouse 6, SKL, TH',status:'delivered'},
+        {item:25,date:'2021-11-23',po:'3450032952',client:'Andaman Transportation Limited',project:'8401 ATL',title:'Provision of Wi-Max communication system between ZOC and ZMS',value_thb:68560,value_usd:2060,incoterms:'DAP',delivery:'DAP PTTEP Ranong Supply Base Freezone',status:'delivered'},
+        {item:24,date:'2021-11-11',po:'3450026161',client:'PTT Exploration and Production Public Co., Ltd. (PTTEP)',project:'Arthit Asset',title:'Amendment no.3 : Additional fee for New Redline 2.3 GHz Offshore ART',value_thb:9281898.53,value_usd:278456.96,incoterms:'N/A',delivery:'ART',status:'amendment'},
+        {item:23,date:'2021-04-12',po:'3450028573',client:'PTT Exploration and Production Public Co., Ltd. (PTTEP)',project:'Arthit Asset',title:'AVS_PM_Aviation and Telrad_4G_LTE',value_thb:100000,value_usd:3333.33,incoterms:'N/A',delivery:'PTTEP ART (OMS/F), TH',status:'delivered'},
+        {item:22,date:'2019-11-27',po:'3450023662',client:'Andaman Transportation Limited',project:'8401 ATL',title:'Supply of Spare Part of 60W POE Injector for Zawtika Onshore Operation',value_thb:3300,value_usd:110,incoterms:'DAP',delivery:'PTTEP Ranong Free Zone, TH',status:'delivered'},
+        {item:21,date:'2018-05-01',po:'3450018329',client:'Andaman Transportation Limited',project:'8401 ATL',title:'Provision of Engineering/Procurement/Installation services to replace the existing Explosion Proof CCTV with new CCTV system at ZOC-ZMS-ZBV2',value_thb:174358.97,value_usd:5573.89,incoterms:'N/A',delivery:'ZOC,ZMS,ZBV2',status:'delivered'},
+        {item:20,date:'2018-03-16',po:'3450018836',client:'Andaman Transportation Limited',project:'8401 ATL',title:'Provision of Aviation Obstruction Red Bulb (Beacon) for Telecom Towers in Onshore',value_thb:192160,value_usd:6148.99,incoterms:'DDP',delivery:'PTTEP ZMS',status:'delivered'},
+        {item:19,date:'2016-08-23',po:'3450014616',client:'Andaman Transportation Limited',project:'8401 ATL',title:'WiMax Tri Band Radio Link inclusive of Installation and Preventive Maintenance for ZOC-ZMS',value_thb:959420.5,value_usd:27150,incoterms:'DDP',delivery:'ZOC, Kanbauk Office',status:'delivered'},
+        {item:18,date:'2016-08-02',po:'3450014525',client:'Andaman Transportation Limited',project:'8401 ATL',title:'Purchasing BOSCH CCTV IP Speed Dome',value_thb:665250,value_usd:18828,incoterms:'DDP',delivery:'ZOC, Kanbauk',status:'delivered'},
+        {item:17,date:'2016-05-13',po:'3450013953',client:'Andaman Transportation Limited',project:'8401 ATL',title:'Testing and Simulating Service for Wi-Max System',value_thb:214000,value_usd:6057.93,incoterms:'DDP',delivery:'ZOC, Kanbauk',status:'delivered'},
+        {item:16,date:'2013-12-19',po:'3450003642',client:'PTT Exploration and Production Public Co., Ltd. (PTTEP)',project:'1201 PTTEP Arthit B15A,B15A,B1',title:'Base Radio for ART',value_thb:1054750,value_usd:32961,incoterms:'DDP',delivery:'PTTEP Songkhla Warehouse',status:'delivered'},
+        {item:15,date:'2013-11-11',po:'3450004323',client:'PTT Exploration and Production Public Co., Ltd. (PTTEP)',project:'1000 PTTEP Corporate REGULAR',title:'Exact Complete Link',value_thb:1541682.95,value_usd:48178.84,incoterms:'DDP',delivery:'PTTEP Songkhla Warehouse',status:'delivered'},
+        {item:14,date:'2013-05-03',po:'OB156885',client:'PTT Exploration and Production Public Co., Ltd. (PTTEP)',project:'Bongkot Project',title:'Upgrade Firmware AUSJ to Wireless Broadband Access (GEN)',value_thb:99000,value_usd:3300,incoterms:'N/A',delivery:'Bongkot Platform',status:'delivered'},
+        {item:13,date:'2012-05-06',po:'OB149401',client:'PTT Exploration and Production Public Co., Ltd. (PTTEP)',project:'Bongkot Project',title:'Stand alone Access unit base station/Limited to 8 SU/S, SU-3 and/or SU-6 only',value_thb:933000,value_usd:30096.77,incoterms:'DDP',delivery:'PTTEP SONGKHLA WAREHOUSE',status:'delivered'},
+        {item:12,date:'2012-06-04',po:'OA127238',client:'PTT Exploration and Production Public Co., Ltd. (PTTEP)',project:'Arthit Project',title:'Omni Antenna Directional 15 dBi high performance 5.725-5.850 GHz',value_thb:12600,value_usd:406.45,incoterms:'DDP',delivery:'PTTEP SONGKHLA WAREHOUSE',status:'amendment'},
+        {item:11,date:'2012-04-03',po:'OB149087',client:'PTT Exploration and Production Public Co., Ltd. (PTTEP)',project:'Bongkot Project',title:'Omni antenna directional 15 dBi high performance 5.725–5.850 GHz, Vertical Polarization',value_thb:12600,value_usd:406.45,incoterms:'DDP',delivery:'PTTEP BANGKOK OFFICE',status:'delivered'},
+        {item:10,date:'2012-04-14',po:'OA126755',client:'PTT Exploration and Production Public Co., Ltd. (PTTEP)',project:'Arthit Project',title:'Extended temperature universal DC power supply unit',value_thb:27310,value_usd:881.61,incoterms:'DDP',delivery:'PTTEP SONGKHLA WAREHOUSE',status:'delivered'},
+        {item:9,date:'2012-01-11',po:'OC127547',client:'PTT Exploration and Production Public Co., Ltd. (PTTEP)',project:'PTTEP Head Office',title:'S1 WiMAX testing and Field Network Area Coverage Design - Vendor evaluation',value_thb:180000,value_usd:5806.45,incoterms:'N/A',delivery:'PTTEP Head Office',status:'delivered'},
+        {item:8,date:'2011-12-27',po:'OA126569',client:'PTT Exploration and Production Public Co., Ltd. (PTTEP)',project:'Arthit Project',title:'Stand alone Access unit base station/Limited to 8 SU/S, SU-3 and/or SU-6 only',value_thb:998750,value_usd:31645.57,incoterms:'DDP',delivery:'PTTEP SONGKHLA WAREHOUSE',status:'delivered'},
+        {item:7,date:'2011-02-02',po:'OB142443',client:'PTT Exploration and Production Public Co., Ltd. (PTTEP)',project:'Bongkot Project',title:'Wireless Broadband Access Bongkot IT Support Platform Phase 3 for Bongkot IT Support',value_thb:1000000,value_usd:33003.3,incoterms:'DDP',delivery:'PTTEP ENCO BUILDING',status:'delivered'},
+        {item:6,date:'2010-06-04',po:'OA119706',client:'PTT Exploration and Production Public Co., Ltd. (PTTEP)',project:'Arthit Project',title:'Stand alone Access unit base station, Limited to 8 SU/S, SU-3 and/or SU-6 only',value_thb:510000,value_usd:15810.24,incoterms:'DDP',delivery:'PTTEP SONGKHLA WAREHOUSE',status:'delivered'},
+        {item:5,date:'2009-03-19',po:'OB133728',client:'PTT Exploration and Production Public Co., Ltd. (PTTEP)',project:'Bangkok Project',title:'Wireless Broadband Access',value_thb:458000,value_usd:12943.5,incoterms:'DDP',delivery:'PTTEP BANGKOK OFFICE',status:'delivered'},
+        {item:4,date:'2008-10-08',po:'OB130278',client:'PTT Exploration and Production Public Co., Ltd. (PTTEP)',project:'Bangkok Project',title:'Alloy DC1121B10: Atex Certified Flameproof Control Box *(Line 8-9, Part of same PO)*',value_thb:80304,value_usd:2399.52,incoterms:'DDP',delivery:'PTTEP HEAD OFFICE',status:'delivered'},
+        {item:3,date:'2008-09-05',po:'OB130278',client:'PTT Exploration and Production Public Co., Ltd. (PTTEP)',project:'Bangkok Project',title:'Avarian 858547: Standalone access unit base station',value_thb:1070000,value_usd:32121.21,incoterms:'DDP',delivery:'PTTEP HEAD OFFICE',status:'delivered'}
+    ];
+
+    // Application State
+    let state = {
+        currentTab: 'dashboard',
+        currentPage: 1,
+        perPage: 10,
+        filteredData: [...PORTFOLIO_DATA],
+        filters: {}
+    };
+
+    // Initialize Application
+    document.addEventListener('DOMContentLoaded', function() {
+        setupEventListeners();
+        renderDashboard();
+    });
+
+    // Setup Event Listeners
+    function setupEventListeners() {
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const tab = e.target.dataset.tab;
+                switchTab(tab);
+            });
+        });
+    }
+
+    // Switch Tabs
+    function switchTab(tab) {
+        state.currentTab = tab;
+        state.currentPage = 1;
+        
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.tab === tab);
+        });
+        
+        switch(tab) {
+            case 'dashboard':
+                renderDashboard();
+                break;
+            case 'data':
+                renderDataManagement();
+                break;
+            case 'export':
+                renderExport();
+                break;
+        }
+    }
+
+    // Render Dashboard
+    function renderDashboard() {
+        const stats = calculateStats();
+        const content = document.getElementById('content');
+        
+        content.innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Orders</h3>
+                    <p class="stat-value">${stats.totalOrders}</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Value (THB)</h3>
+                    <p class="stat-value">฿${(stats.totalTHB / 1e6).toFixed(2)}M</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Value (USD)</h3>
+                    <p class="stat-value">$${(stats.totalUSD / 1e3).toFixed(2)}K</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Unique Clients</h3>
+                    <p class="stat-value">${stats.uniqueClients}</p>
+                </div>
+            </div>
+            
+            <h2 style="margin: 30px 0 20px; color: #374151;">Portfolio Overview</h2>
+            <div style="line-height: 1.8; color: #6b7280;">
+                <p><strong>Date Range:</strong> 2008-2023 (15 years of operations)</p>
+                <p><strong>Major Clients:</strong> PTTEP, Andaman Transportation Limited, Carigali-PTTEPI, PTTEP Energy Development</p>
+                <p><strong>Key Projects:</strong> Arthit Field, Bongkot Field, Zawtika Field (8401 ATL), Bangkok Operations</p>
+                <p><strong>Services:</strong> Communication Systems, CCTV Systems, WiMax Networks, Radio Equipment, Technical Support</p>
+            </div>
+        `;
+    }
+
+    // Render Data Management
+    function renderDataManagement() {
+        const content = document.getElementById('content');
+        const clients = [...new Set(PORTFOLIO_DATA.map(r => r.client))];
+        const projects = [...new Set(PORTFOLIO_DATA.map(r => r.project))];
+        
+        content.innerHTML = `
+            <div class="filters">
+                <input type="text" id="searchPO" placeholder="Search PO Number..." onkeyup="applyFilters()">
+                <select id="filterClient" onchange="applyFilters()">
+                    <option value="">All Clients</option>
+                    ${clients.map(c => `<option value="${c}">${c.split('(')[0].trim()}</option>`).join('')}
+                </select>
+                <select id="filterProject" onchange="applyFilters()">
+                    <option value="">All Projects</option>
+                    ${projects.map(p => `<option value="${p}">${p}</option>`).join('')}
+                </select>
+                <button onclick="clearFilters()">Clear Filters</button>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Date</th>
+                            <th>PO Number</th>
+                            <th>Client</th>
+                            <th>Project</th>
+                            <th>Title</th>
+                            <th>THB Value</th>
+                            <th>USD Value</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTable">
+                        ${renderTableRows()}
+                    </tbody>
+                </table>
+                <div class="pagination" id="pagination">
+                    ${renderPagination()}
+                </div>
+            </div>
+        `;
+    }
+
+    // Render Export Options
+    function renderExport() {
+        const content = document.getElementById('content');
+        
+        content.innerHTML = `
+            <h2 style="margin-bottom: 20px; color: #374151;">Export Portfolio Data</h2>
+            <p style="color: #6b7280; margin-bottom: 30px;">Export your PTTEP portfolio data in various formats for reporting and analysis.</p>
+            
+            <div class="export-buttons">
+                <button class="export-btn" onclick="exportToCSV()">📊 Export to CSV</button>
+                <button class="export-btn" onclick="exportToJSON()">📄 Export to JSON</button>
+                <button class="export-btn" onclick="exportToSQL()">🗃️ Export to SQL</button>
+            </div>
+            
+            <div id="exportResult"></div>
+        `;
+    }
+
+    // Render Table Rows
+    function renderTableRows() {
+        const start = (state.currentPage - 1) * state.perPage;
+        const end = start + state.perPage;
+        const pageData = state.filteredData.slice(start, end);
+        
+        return pageData.map(record => `
+            <tr>
+                <td>${record.item}</td>
+                <td>${record.date}</td>
+                <td><strong>${record.po}</strong></td>
+                <td>${record.client.split('(')[0].trim()}</td>
+                <td>${record.project}</td>
+                <td title="${record.title}">${record.title.substring(0, 40)}...</td>
+                <td>฿${record.value_thb.toLocaleString()}</td>
+                <td>$${record.value_usd.toLocaleString()}</td>
+                <td><span class="status-${record.status}">${record.status}</span></td>
+            </tr>
+        `).join('');
+    }
+
+    // Render Pagination
+    function renderPagination() {
+        const totalPages = Math.ceil(state.filteredData.length / state.perPage);
+        if (totalPages <= 1) return '';
+        
+        let html = '';
+        for (let i = 1; i <= totalPages; i++) {
+            html += `<button class="page-btn ${i === state.currentPage ? 'active' : ''}" 
+                     onclick="changePage(${i})">${i}</button>`;
+        }
+        return html;
+    }
+
+    // Apply Filters
+    function applyFilters() {
+        const searchPO = document.getElementById('searchPO')?.value?.toLowerCase() || '';
+        const filterClient = document.getElementById('filterClient')?.value || '';
+        const filterProject = document.getElementById('filterProject')?.value || '';
+        
+        state.filteredData = PORTFOLIO_DATA.filter(record => {
+            const matchPO = !searchPO || record.po.toLowerCase().includes(searchPO);
+            const matchClient = !filterClient || record.client === filterClient;
+            const matchProject = !filterProject || record.project === filterProject;
+            return matchPO && matchClient && matchProject;
+        });
+        
+        state.currentPage = 1;
+        updateTable();
+    }
+
+    // Clear Filters
+    function clearFilters() {
+        document.getElementById('searchPO').value = '';
+        document.getElementById('filterClient').value = '';
+        document.getElementById('filterProject').value = '';
+        state.filteredData = [...PORTFOLIO_DATA];
+        state.currentPage = 1;
+        updateTable();
+    }
+
+    // Update Table
+    function updateTable() {
+        const tbody = document.getElementById('dataTable');
+        const pagination = document.getElementById('pagination');
+        if (tbody) tbody.innerHTML = renderTableRows();
+        if (pagination) pagination.innerHTML = renderPagination();
+    }
+
+    // Change Page
+    function changePage(page) {
+        state.currentPage = page;
+        updateTable();
+    }
+
+    // Calculate Statistics
+    function calculateStats() {
+        return {
+            totalOrders: PORTFOLIO_DATA.length,
+            totalTHB: PORTFOLIO_DATA.reduce((sum, r) => sum + r.value_thb, 0),
+            totalUSD: PORTFOLIO_DATA.reduce((sum, r) => sum + r.value_usd, 0),
+            uniqueClients: [...new Set(PORTFOLIO_DATA.map(r => r.client))].length
+        };
+    }
+
+    // Export to CSV
+    function exportToCSV() {
+        const headers = ['Item', 'Date', 'PO Number', 'Client', 'Project', 'Title', 'THB Value', 'USD Value', 'Incoterms', 'Delivery', 'Status'];
+        const rows = PORTFOLIO_DATA.map(r => [
+            r.item, r.date, r.po, r.client, r.project, r.title,
+            r.value_thb, r.value_usd, r.incoterms, r.delivery, r.status
+        ]);
+        
+        let csv = headers.join(',') + '\n';
+        rows.forEach(row => {
+            csv += row.map(cell => {
+                const strCell = String(cell).replace(/"/g, '""');
+                return strCell.includes(',') ? `"${strCell}"` : strCell;
+            }).join(',') + '\n';
+        });
+        
+        downloadFile(csv, 'pttep_portfolio.csv', 'text/csv');
+        showExportResult('CSV file exported successfully!');
+    }
+
+    // Export to JSON
+    function exportToJSON() {
+        const json = JSON.stringify({
+            metadata: {
+                total_records: PORTFOLIO_DATA.length,
+                exported_at: new Date().toISOString(),
+                company: 'Addvalue Innovation Co., Ltd.'
+            },
+            data: PORTFOLIO_DATA
+        }, null, 2);
+        
+        downloadFile(json, 'pttep_portfolio.json', 'application/json');
+        showExportResult('JSON file exported successfully!');
+    }
+
+    // Export to SQL
+    function exportToSQL() {
+        let sql = '-- PTTEP Portfolio Data Export\\n';
+        sql += '-- Generated: ' + new Date().toISOString() + '\\n\\n';
+        sql += 'CREATE TABLE IF NOT EXISTS purchase_orders (\\n';
+        sql += '  item INT PRIMARY KEY,\\n';
+        sql += '  po_date DATE,\\n';
+        sql += '  po_number VARCHAR(20),\\n';
+        sql += '  client VARCHAR(255),\\n';
+        sql += '  project VARCHAR(100),\\n';
+        sql += '  title TEXT,\\n';
+        sql += '  value_thb DECIMAL(12,2),\\n';
+        sql += '  value_usd DECIMAL(12,2),\\n';
+        sql += '  incoterms VARCHAR(10),\\n';
+        sql += '  delivery VARCHAR(255),\\n';
+        sql += '  status VARCHAR(20)\\n';
+        sql += ');\\n\\n';
+        
+        sql += 'INSERT INTO purchase_orders VALUES\\n';
+        PORTFOLIO_DATA.forEach((r, i) => {
+            sql += `(${r.item}, '${r.date}', '${r.po}', '${r.client.replace(/'/g, "''")}', `;
+            sql += `'${r.project}', '${r.title.replace(/'/g, "''")}', ${r.value_thb}, ${r.value_usd}, `;
+            sql += `'${r.incoterms}', '${r.delivery}', '${r.status}')`;
+            sql += i < PORTFOLIO_DATA.length - 1 ? ',\\n' : ';';
+        });
+        
+        downloadFile(sql, 'pttep_portfolio.sql', 'text/plain');
+        showExportResult('SQL file exported successfully!');
+    }
+
+    // Download File
+    function downloadFile(content, filename, mimeType) {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    // Show Export Result
+    function showExportResult(message) {
+        const result = document.getElementById('exportResult');
+        if (result) {
+            result.innerHTML = `<p style="color: #10b981; margin-top: 20px; padding: 15px; background: #f0fdf4; border-radius: 6px;">${message}</p>`;
+            setTimeout(() => result.innerHTML = '', 3000);
+        }
+    }
+    </script>
+</body>
+</html>
